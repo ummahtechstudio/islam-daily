@@ -204,13 +204,18 @@ export default function HadithScreen() {
   };
 
   const filteredHadiths = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return allHadiths;
+    const trimmed = searchQuery.trim();
+    if (!trimmed) return allHadiths;
+    const isNumericQuery = /^\d+$/.test(trimmed);
+    if (isNumericQuery) {
+      return allHadiths.filter((h) => h.hadith_number === trimmed);
+    }
+    const q = trimmed.toLowerCase();
     return allHadiths.filter(
       (h) =>
-        h.hadith_number.includes(q) ||
         (h.english ?? '').toLowerCase().includes(q) ||
-        (h.narrator ?? '').toLowerCase().includes(q),
+        (h.narrator ?? '').toLowerCase().includes(q) ||
+        (h.arabic ?? '').includes(trimmed),
     );
   }, [allHadiths, searchQuery]);
 
@@ -285,6 +290,8 @@ export default function HadithScreen() {
             <Text style={styles.headerSub}>
               {viewMode === 'collections'
                 ? 'Authentic narrations of the Prophet ﷺ'
+                : searchQuery
+                ? `${totalCount.toLocaleString()} results`
                 : `${totalCount.toLocaleString()} hadiths`}
             </Text>
           </View>
@@ -348,6 +355,9 @@ export default function HadithScreen() {
               </TouchableOpacity>
             ) : null}
           </View>
+          <Text style={[styles.searchHint, { color: theme.textMuted }]}>
+            Type a hadith number (e.g. 35) for exact match, or text to search content
+          </Text>
 
           <FlatList
             data={visibleHadiths}
@@ -404,6 +414,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   searchInput: { flex: 1, fontSize: 14 },
+  searchHint: {
+    fontSize: 11,
+    marginHorizontal: 16,
+    marginBottom: 6,
+    fontStyle: 'italic',
+  },
   empty: { padding: 40, alignItems: 'center' },
   emptyText: { fontSize: 14 },
   loading: {

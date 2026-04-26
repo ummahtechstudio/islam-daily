@@ -115,10 +115,17 @@ export default function DuaScreen() {
   useEffect(() => { setExpanded(null); }, [selectedCategory]);
 
   const currentCategory = HISNUL_MUSLIM.find((c) => c.id === selectedCategory);
+  const filteredDuas = currentCategory?.duas ?? [];
   const currentDhikr = DHIKR_ITEMS[selectedDhikr];
   const targetCount = currentDhikr.count;
   const progress = Math.min(dhikrCount / targetCount, 1);
   const duaOfMoment = getDuaOfMoment();
+
+  useEffect(() => {
+    console.log('[Dua] Category selected:', selectedCategory);
+    console.log('[Dua] Filtered duas count:', filteredDuas.length);
+    console.log('[Dua] All categories in data:', [...new Set(HISNUL_MUSLIM.map((c) => c.id))]);
+  }, [selectedCategory, filteredDuas.length]);
 
   const handleDhikrTap = async () => {
     incrementDhikr();
@@ -134,10 +141,6 @@ export default function DuaScreen() {
       <View style={[styles.tabBar, { backgroundColor: Colors.primary }]}>
         <View style={styles.titleRow}>
           <Text style={styles.screenTitle}>Dua & Dhikr</Text>
-          <View style={styles.offlineChip}>
-            <Ionicons name="checkmark-circle" size={12} color="rgba(255,255,255,0.8)" />
-            <Text style={styles.offlineChipText}>Always offline</Text>
-          </View>
         </View>
         <View style={styles.tabs}>
           <TouchableOpacity
@@ -223,56 +226,74 @@ export default function DuaScreen() {
           </ScrollView>
 
           {/* Duas list */}
-          <ScrollView contentContainerStyle={styles.duaList} showsVerticalScrollIndicator={false}>
-            {currentCategory?.duas.map((dua, idx) => (
-              <TouchableOpacity
-                key={idx}
-                style={[
-                  styles.duaCard,
-                  { backgroundColor: theme.card, borderColor: theme.border },
-                ]}
-                onPress={() => setExpanded(expanded === idx ? null : idx)}
-                activeOpacity={0.8}
-              >
-                {/* Gold left accent bar */}
-                <View style={styles.duaGoldAccent} />
-
-                <View style={styles.duaHeader}>
-                  <View style={[styles.duaNumBadge, { backgroundColor: Colors.primary + '22' }]}>
-                    <Text style={[styles.duaNum, { color: Colors.primary }]}>{idx + 1}</Text>
-                  </View>
-                  <Ionicons
-                    name={expanded === idx ? 'chevron-up' : 'chevron-down'}
-                    size={16}
-                    color={theme.textMuted}
-                  />
-                </View>
-
-                <Text
-                  style={[styles.duaArabic, { color: theme.text }]}
-                  textBreakStrategy="simple"
-                  numberOfLines={expanded === idx ? undefined : 3}
+          {filteredDuas.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyEmoji}>🤲</Text>
+              <Text style={[styles.emptyTitle, { color: theme.text }]}>
+                No duas in this category yet
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: theme.textMuted }]}>
+                We're adding more soon InshaAllah
+              </Text>
+            </View>
+          ) : (
+            <ScrollView contentContainerStyle={styles.duaList} showsVerticalScrollIndicator={false}>
+              {filteredDuas.map((dua, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.duaCard,
+                    { backgroundColor: theme.card, borderColor: theme.border },
+                  ]}
+                  onPress={() => setExpanded(expanded === idx ? null : idx)}
+                  activeOpacity={0.8}
                 >
-                  {dua.arabic}
-                </Text>
+                  {/* Gold left accent bar */}
+                  <View style={styles.duaGoldAccent} />
 
-                {expanded === idx && (
-                  <>
-                    <View style={[styles.divider, { backgroundColor: theme.border }]} />
-                    <Text style={[styles.duaTranslit, { color: Colors.primary }]}>
-                      {dua.transliteration}
-                    </Text>
-                    <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
-                      {dua.english}
-                    </Text>
-                    <Text style={[styles.duaRef, { color: theme.textMuted }]}>
-                      — {dua.reference}
-                    </Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                  <View style={styles.duaHeader}>
+                    <View style={[styles.duaNumBadge, { backgroundColor: Colors.primary + '22' }]}>
+                      <Text style={[styles.duaNum, { color: Colors.primary }]}>{idx + 1}</Text>
+                    </View>
+                    <Ionicons
+                      name={expanded === idx ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      color={theme.textMuted}
+                    />
+                  </View>
+
+                  <Text
+                    style={[styles.duaArabic, { color: theme.text }]}
+                    textBreakStrategy="simple"
+                    numberOfLines={expanded === idx ? undefined : 3}
+                  >
+                    {dua.arabic || '—'}
+                  </Text>
+
+                  {expanded === idx && (
+                    <>
+                      <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                      {dua.transliteration ? (
+                        <Text style={[styles.duaTranslit, { color: Colors.primary }]}>
+                          {dua.transliteration}
+                        </Text>
+                      ) : (
+                        <Text style={[styles.duaTranslit, { color: theme.textMuted }]}>
+                          Transliteration not available
+                        </Text>
+                      )}
+                      <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
+                        {dua.english || 'Translation not available'}
+                      </Text>
+                      <Text style={[styles.duaRef, { color: theme.textMuted }]}>
+                        — {dua.reference || 'Source unknown'}
+                      </Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
         </View>
       ) : (
         /* ── Dhikr Counter ── */
@@ -366,16 +387,6 @@ const styles = StyleSheet.create({
   tabBar: { padding: 16, paddingTop: 14, alignItems: 'center', gap: 12 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   screenTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
-  offlineChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  offlineChipText: { color: 'rgba(255,255,255,0.75)', fontSize: 10, fontWeight: '600' },
   tabs: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, padding: 3 },
   tabBtn: { paddingHorizontal: 24, paddingVertical: 7, borderRadius: 18 },
   tabBtnActive: { backgroundColor: '#fff' },
@@ -480,6 +491,18 @@ const styles = StyleSheet.create({
   duaTranslit: { fontSize: 14, fontStyle: 'italic', marginBottom: 6 },
   duaEnglish: { fontSize: 14, lineHeight: 22, marginBottom: 6 },
   duaRef: { fontSize: 12 },
+
+  // Empty state
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    gap: 8,
+  },
+  emptyEmoji: { fontSize: 48, marginBottom: 8 },
+  emptyTitle: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
+  emptySubtitle: { fontSize: 13, textAlign: 'center' },
 
   // Dhikr
   dhikrContainer: { padding: 16, alignItems: 'center', gap: 16, paddingBottom: 32 },
