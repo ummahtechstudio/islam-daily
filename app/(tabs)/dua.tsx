@@ -1,0 +1,544 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  useColorScheme,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+
+import { Colors } from '../../src/constants/colors';
+import { useStore } from '../../src/store';
+import { trackScreen } from '../../src/services/analytics';
+
+// ─── Hisnul Muslim dataset (local asset) ─────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const HISNUL_MUSLIM: DuaCategory[] = require('../../assets/hisnul_muslim.json');
+
+const GOLD = '#EF9F27';
+
+interface Dua {
+  arabic: string;
+  transliteration: string;
+  english: string;
+  reference: string;
+}
+
+interface DuaCategory {
+  id: string;
+  title: string;
+  icon: string;
+  duas: Dua[];
+}
+
+// ─── Category icon overrides (time-aware, more descriptive) ──────────────────
+
+const CATEGORY_ICONS: Record<string, string> = {
+  waking:      '🌅',
+  morning:     '☀️',
+  evening:     '🌙',
+  sleep:       '🌛',
+  prayer:      '🕌',
+  eating:      '🍽️',
+  travel:      '✈️',
+  distress:    '🤲',
+  forgiveness: '💚',
+  mosque:      '🕍',
+  protection:  '🛡️',
+  dua_parents: '👨‍👩‍👧',
+  rain:        '🌧️',
+  knowledge:   '📖',
+};
+
+// ─── "Dua of the Moment" ─────────────────────────────────────────────────────
+
+function getDuaOfMoment(): { category: DuaCategory; dua: Dua; reason: string } | null {
+  const hour = new Date().getHours();
+  let catId: string;
+  let reason: string;
+
+  if (hour >= 4 && hour < 7) {
+    catId = 'waking'; reason = 'Morning awakening';
+  } else if (hour >= 7 && hour < 12) {
+    catId = 'morning'; reason = 'Morning adhkar time';
+  } else if (hour >= 12 && hour < 13) {
+    catId = 'prayer'; reason = 'Dhuhr prayer time';
+  } else if (hour >= 13 && hour < 16) {
+    catId = 'knowledge'; reason = 'Midday — seek knowledge';
+  } else if (hour >= 15 && hour < 18) {
+    catId = 'evening'; reason = 'Evening adhkar time';
+  } else if (hour >= 18 && hour < 20) {
+    catId = 'evening'; reason = 'Sunset adhkar';
+  } else if (hour >= 20 && hour < 23) {
+    catId = 'sleep'; reason = 'Preparing for sleep';
+  } else {
+    catId = 'sleep'; reason = 'Late night';
+  }
+
+  const category = HISNUL_MUSLIM.find((c) => c.id === catId) ?? HISNUL_MUSLIM[0];
+  const dua = category.duas[new Date().getDate() % category.duas.length];
+  return dua ? { category, dua, reason } : null;
+};
+
+// ─── Dhikr items ─────────────────────────────────────────────────────────────
+
+const DHIKR_ITEMS = [
+  { arabic: 'سُبْحَانَ اللَّهِ', transliteration: 'SubhanAllah', english: 'Glory be to Allah', count: 33 },
+  { arabic: 'الْحَمْدُ لِلَّهِ', transliteration: 'Alhamdulillah', english: 'All praise is due to Allah', count: 33 },
+  { arabic: 'اللَّهُ أَكْبَرُ', transliteration: 'Allahu Akbar', english: 'Allah is the Greatest', count: 34 },
+  { arabic: 'لَا إِلَهَ إِلَّا اللَّهُ', transliteration: 'La ilaha illallah', english: 'There is no deity but Allah', count: 100 },
+  { arabic: 'أَسْتَغْفِرُ اللَّهَ', transliteration: 'Astaghfirullah', english: 'I seek forgiveness from Allah', count: 100 },
+];
+
+type Tab = 'dua' | 'dhikr';
+
+export default function DuaScreen() {
+  useEffect(() => { trackScreen('Dua'); }, []);
+  const colorScheme = useColorScheme();
+  const settings = useStore((s) => s.settings);
+  const { dhikrCount, incrementDhikr, resetDhikr } = useStore();
+  const isDark =
+    settings.colorScheme === 'dark' ||
+    (settings.colorScheme === 'system' && colorScheme === 'dark');
+  const theme = isDark ? Colors.dark : Colors.light;
+
+  const [tab, setTab] = useState<Tab>('dua');
+  const [selectedCategory, setSelectedCategory] = useState(HISNUL_MUSLIM[0].id);
+  const [selectedDhikr, setSelectedDhikr] = useState(0);
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  useEffect(() => { setExpanded(null); }, [selectedCategory]);
+
+  const currentCategory = HISNUL_MUSLIM.find((c) => c.id === selectedCategory);
+  const currentDhikr = DHIKR_ITEMS[selectedDhikr];
+  const targetCount = currentDhikr.count;
+  const progress = Math.min(dhikrCount / targetCount, 1);
+  const duaOfMoment = getDuaOfMoment();
+
+  const handleDhikrTap = async () => {
+    incrementDhikr();
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if ((dhikrCount + 1) % targetCount === 0) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+  };
+
+  return (
+    <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
+      {/* Tab bar */}
+      <View style={[styles.tabBar, { backgroundColor: Colors.primary }]}>
+        <View style={styles.titleRow}>
+          <Text style={styles.screenTitle}>Dua & Dhikr</Text>
+          <View style={styles.offlineChip}>
+            <Ionicons name="checkmark-circle" size={12} color="rgba(255,255,255,0.8)" />
+            <Text style={styles.offlineChipText}>Always offline</Text>
+          </View>
+        </View>
+        <View style={styles.tabs}>
+          <TouchableOpacity
+            style={[styles.tabBtn, tab === 'dua' && styles.tabBtnActive]}
+            onPress={() => setTab('dua')}
+          >
+            <Text style={[styles.tabBtnText, tab === 'dua' && styles.tabBtnTextActive]}>
+              Duas
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tabBtn, tab === 'dhikr' && styles.tabBtnActive]}
+            onPress={() => setTab('dhikr')}
+          >
+            <Text style={[styles.tabBtnText, tab === 'dhikr' && styles.tabBtnTextActive]}>
+              Dhikr
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {tab === 'dua' ? (
+        <View style={{ flex: 1 }}>
+          {/* Dua of the Moment */}
+          {duaOfMoment && (
+            <View style={[styles.duaMomentCard, { backgroundColor: Colors.primary }]}>
+              <View style={styles.duaMomentHeader}>
+                <View style={styles.duaMomentBadge}>
+                  <Text style={styles.duaMomentIcon}>
+                    {CATEGORY_ICONS[duaOfMoment.category.id] ?? duaOfMoment.category.icon}
+                  </Text>
+                  <Text style={styles.duaMomentBadgeText}>Dua of the Moment</Text>
+                </View>
+                <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
+              </View>
+              <Text style={styles.duaMomentArabic} textBreakStrategy="simple" numberOfLines={3}>
+                {duaOfMoment.dua.arabic}
+              </Text>
+              <Text style={styles.duaMomentEnglish} numberOfLines={2}>
+                {duaOfMoment.dua.english}
+              </Text>
+            </View>
+          )}
+
+          {/* Category selector */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categories}
+          >
+            {HISNUL_MUSLIM.map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                style={[
+                  styles.catChip,
+                  { borderColor: theme.border, backgroundColor: theme.card },
+                  selectedCategory === cat.id && {
+                    backgroundColor: Colors.primary,
+                    borderColor: Colors.primary,
+                  },
+                ]}
+                onPress={() => setSelectedCategory(cat.id)}
+              >
+                <Text style={styles.catIcon}>
+                  {CATEGORY_ICONS[cat.id] ?? cat.icon}
+                </Text>
+                <Text
+                  style={[
+                    styles.catLabel,
+                    { color: selectedCategory === cat.id ? '#fff' : theme.text },
+                  ]}
+                >
+                  {cat.title}
+                </Text>
+                <Text style={[
+                  styles.catCount,
+                  { color: selectedCategory === cat.id ? 'rgba(255,255,255,0.7)' : theme.textMuted },
+                ]}>
+                  {cat.duas.length}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Duas list */}
+          <ScrollView contentContainerStyle={styles.duaList} showsVerticalScrollIndicator={false}>
+            {currentCategory?.duas.map((dua, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={[
+                  styles.duaCard,
+                  { backgroundColor: theme.card, borderColor: theme.border },
+                ]}
+                onPress={() => setExpanded(expanded === idx ? null : idx)}
+                activeOpacity={0.8}
+              >
+                {/* Gold left accent bar */}
+                <View style={styles.duaGoldAccent} />
+
+                <View style={styles.duaHeader}>
+                  <View style={[styles.duaNumBadge, { backgroundColor: Colors.primary + '22' }]}>
+                    <Text style={[styles.duaNum, { color: Colors.primary }]}>{idx + 1}</Text>
+                  </View>
+                  <Ionicons
+                    name={expanded === idx ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={theme.textMuted}
+                  />
+                </View>
+
+                <Text
+                  style={[styles.duaArabic, { color: theme.text }]}
+                  textBreakStrategy="simple"
+                  numberOfLines={expanded === idx ? undefined : 3}
+                >
+                  {dua.arabic}
+                </Text>
+
+                {expanded === idx && (
+                  <>
+                    <View style={[styles.divider, { backgroundColor: theme.border }]} />
+                    <Text style={[styles.duaTranslit, { color: Colors.primary }]}>
+                      {dua.transliteration}
+                    </Text>
+                    <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
+                      {dua.english}
+                    </Text>
+                    <Text style={[styles.duaRef, { color: theme.textMuted }]}>
+                      — {dua.reference}
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      ) : (
+        /* ── Dhikr Counter ── */
+        <ScrollView contentContainerStyle={styles.dhikrContainer}>
+          {/* Dhikr selector */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dhikrTabs}
+          >
+            {DHIKR_ITEMS.map((item, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={[
+                  styles.dhikrChip,
+                  { borderColor: theme.border, backgroundColor: theme.card },
+                  selectedDhikr === idx && {
+                    backgroundColor: Colors.primary,
+                    borderColor: Colors.primary,
+                  },
+                ]}
+                onPress={() => { setSelectedDhikr(idx); resetDhikr(); }}
+              >
+                <Text
+                  style={[
+                    styles.dhikrChipText,
+                    { color: selectedDhikr === idx ? '#fff' : theme.text },
+                  ]}
+                >
+                  {item.transliteration}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Counter display */}
+          <View style={[styles.counterCard, { backgroundColor: theme.card, borderColor: GOLD + '40' }]}>
+            <View style={styles.counterGoldBar} />
+            <Text style={[styles.dhikrArabic, { color: theme.text }]}>
+              {currentDhikr.arabic}
+            </Text>
+            <Text style={[styles.dhikrTranslit, { color: Colors.primary }]}>
+              {currentDhikr.transliteration}
+            </Text>
+            <Text style={[styles.dhikrEnglish, { color: theme.textSecondary }]}>
+              {currentDhikr.english}
+            </Text>
+
+            {/* Progress bar */}
+            <View style={[styles.progressBg, { backgroundColor: theme.border }]}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${progress * 100}%`, backgroundColor: Colors.primary },
+                ]}
+              />
+            </View>
+            <Text style={[styles.countDisplay, { color: theme.text }]}>
+              {dhikrCount % (targetCount + 1)}{' '}
+              <Text style={{ color: theme.textMuted, fontSize: 18 }}>/ {targetCount}</Text>
+            </Text>
+          </View>
+
+          {/* Tap button */}
+          <TouchableOpacity
+            style={styles.tapButton}
+            onPress={handleDhikrTap}
+            activeOpacity={0.75}
+          >
+            <Text style={styles.tapButtonText}>Tap to Count</Text>
+            <Text style={styles.tapSubtext}>Total: {dhikrCount}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.resetBtn, { borderColor: theme.border }]}
+            onPress={resetDhikr}
+          >
+            <Ionicons name="refresh" size={16} color={theme.textSecondary} />
+            <Text style={[styles.resetText, { color: theme.textSecondary }]}>Reset</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+
+  // Header tabs
+  tabBar: { padding: 16, paddingTop: 14, alignItems: 'center', gap: 12 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  screenTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  offlineChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  offlineChipText: { color: 'rgba(255,255,255,0.75)', fontSize: 10, fontWeight: '600' },
+  tabs: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, padding: 3 },
+  tabBtn: { paddingHorizontal: 24, paddingVertical: 7, borderRadius: 18 },
+  tabBtnActive: { backgroundColor: '#fff' },
+  tabBtnText: { color: 'rgba(255,255,255,0.7)', fontWeight: '600', fontSize: 14 },
+  tabBtnTextActive: { color: Colors.primary },
+
+  // Dua of the moment
+  duaMomentCard: {
+    margin: 12,
+    marginBottom: 4,
+    borderRadius: 16,
+    padding: 16,
+  },
+  duaMomentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  duaMomentBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: GOLD,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  duaMomentIcon: { fontSize: 14 },
+  duaMomentBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+  duaMomentReason: { color: 'rgba(255,255,255,0.6)', fontSize: 11 },
+  duaMomentArabic: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 18,
+    textAlign: 'right',
+    lineHeight: 38,
+    color: '#fff',
+    writingDirection: 'rtl',
+    marginBottom: 8,
+  },
+  duaMomentEnglish: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.75)',
+    fontStyle: 'italic',
+    lineHeight: 18,
+  },
+
+  // Dua
+  categories: { paddingHorizontal: 12, gap: 8, paddingVertical: 12 },
+  catChip: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    minWidth: 72,
+  },
+  catIcon: { fontSize: 18 },
+  catLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
+  catCount: { fontSize: 9, fontWeight: '600' },
+  duaList: { padding: 12, gap: 12, paddingBottom: 32 },
+  duaCard: {
+    borderRadius: 16,
+    padding: 16,
+    paddingLeft: 20,
+    borderWidth: 1,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  duaGoldAccent: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    backgroundColor: GOLD,
+  },
+  duaHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  duaNumBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  duaNum: { fontSize: 12, fontWeight: '700' },
+  duaArabic: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 22,
+    textAlign: 'right',
+    lineHeight: 42,
+    writingDirection: 'rtl',
+  },
+  divider: { height: 1, marginVertical: 10 },
+  duaTranslit: { fontSize: 14, fontStyle: 'italic', marginBottom: 6 },
+  duaEnglish: { fontSize: 14, lineHeight: 22, marginBottom: 6 },
+  duaRef: { fontSize: 12 },
+
+  // Dhikr
+  dhikrContainer: { padding: 16, alignItems: 'center', gap: 16, paddingBottom: 32 },
+  dhikrTabs: { gap: 8, paddingVertical: 4 },
+  dhikrChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  dhikrChipText: { fontSize: 13, fontWeight: '600' },
+  counterCard: {
+    width: '100%',
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 20,
+    alignItems: 'center',
+    gap: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  counterGoldBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: GOLD,
+  },
+  dhikrArabic: { fontFamily: 'Amiri_400Regular', fontSize: 30, textAlign: 'center' },
+  dhikrTranslit: { fontSize: 18, fontWeight: '700', textAlign: 'center' },
+  dhikrEnglish: { fontSize: 14, textAlign: 'center', fontStyle: 'italic' },
+  progressBg: { width: '100%', height: 6, borderRadius: 3, marginTop: 8 },
+  progressFill: { height: 6, borderRadius: 3 },
+  countDisplay: { fontSize: 42, fontWeight: '800' },
+  tapButton: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+    gap: 4,
+  },
+  tapButtonText: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  tapSubtext: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
+  resetBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  resetText: { fontSize: 14 },
+});

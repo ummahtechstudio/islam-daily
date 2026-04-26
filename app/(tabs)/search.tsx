@@ -1,0 +1,203 @@
+import React, { useState, useCallback, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  useColorScheme,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+
+import { Colors } from '../../src/constants/colors';
+import { trackScreen } from '../../src/services/analytics';
+import { searchQuran, QuranSearchResult } from '../../src/services/api';
+import { useStore } from '../../src/store';
+
+export default function SearchScreen() {
+  useEffect(() => { trackScreen('Search'); }, []);
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const settings = useStore((s) => s.settings);
+  const isDark =
+    settings.colorScheme === 'dark' ||
+    (settings.colorScheme === 'system' && colorScheme === 'dark');
+  const theme = isDark ? Colors.dark : Colors.light;
+
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<QuranSearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const handleSearch = useCallback(async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    setSearched(true);
+    try {
+      const data = await searchQuran(query.trim());
+      setResults(data);
+    } catch {
+      setResults([]);
+    }
+    setLoading(false);
+  }, [query]);
+
+  const renderResult = ({ item }: { item: QuranSearchResult }) => (
+    <TouchableOpacity
+      style={[styles.resultCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+      onPress={() => router.push(`/quran/${item.surah.number}` as any)}
+      activeOpacity={0.75}
+    >
+      <View style={styles.resultHeader}>
+        <View style={[styles.refBadge, { backgroundColor: Colors.primary + '18' }]}>
+          <Text style={[styles.refText, { color: Colors.primary }]}>
+            {item.surah.englishName} {item.surah.number}:{item.numberInSurah}
+          </Text>
+        </View>
+      </View>
+      <Text style={[styles.resultEnglish, { color: theme.text }]}>{item.text}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: Colors.primary }]}>
+        <Text style={styles.headerTitle}>Islamic Search</Text>
+        <Text style={styles.headerSub}>Search the Quran by keyword</Text>
+      </View>
+
+      {/* Search input */}
+      <View style={[styles.searchRow, { backgroundColor: theme.surface }]}>
+        <View style={[styles.inputWrapper, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <Ionicons name="search" size={18} color={theme.textMuted} />
+          <TextInput
+            style={[styles.input, { color: theme.text }]}
+            placeholder="e.g. mercy, patience, prayer..."
+            placeholderTextColor={theme.textMuted}
+            value={query}
+            onChangeText={setQuery}
+            returnKeyType="search"
+            onSubmitEditing={handleSearch}
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={() => { setQuery(''); setResults([]); setSearched(false); }}>
+              <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+            </TouchableOpacity>
+          )}
+        </View>
+        <TouchableOpacity
+          style={styles.searchBtn}
+          onPress={handleSearch}
+          disabled={!query.trim()}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.searchBtnText}>Search</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Suggestions */}
+      {!searched && (
+        <View style={styles.suggestions}>
+          <Text style={[styles.suggestLabel, { color: theme.textSecondary }]}>Popular searches</Text>
+          <View style={styles.chips}>
+            {['mercy', 'patience', 'paradise', 'prayer', 'forgiveness', 'knowledge'].map((s) => (
+              <TouchableOpacity
+                key={s}
+                style={[styles.chip, { backgroundColor: theme.card, borderColor: theme.border }]}
+                onPress={() => { setQuery(s); setTimeout(handleSearch, 100); }}
+              >
+                <Text style={[styles.chipText, { color: theme.text }]}>{s}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* Results */}
+      {loading ? (
+        <ActivityIndicator color={Colors.primary} style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={results}
+          keyExtractor={(item) => String(item.number)}
+          renderItem={renderResult}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            searched ? (
+              <View style={styles.empty}>
+                <Text style={styles.emptyIcon}>🔍</Text>
+                <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+                  No results found for "{query}"
+                </Text>
+              </View>
+            ) : null
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  header: { padding: 16, paddingTop: 14, alignItems: 'center' },
+  headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
+  headerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 2 },
+
+  searchRow: {
+    flexDirection: 'row',
+    padding: 12,
+    gap: 10,
+    alignItems: 'center',
+  },
+  inputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  input: { flex: 1, fontSize: 15 },
+  searchBtn: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 11,
+    borderRadius: 12,
+  },
+  searchBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+
+  suggestions: { padding: 16 },
+  suggestLabel: { fontSize: 13, marginBottom: 10 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  chipText: { fontSize: 13 },
+
+  list: { padding: 12, gap: 10 },
+  resultCard: {
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+  },
+  resultHeader: { marginBottom: 8 },
+  refBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start' },
+  refText: { fontSize: 12, fontWeight: '700' },
+  resultEnglish: { fontSize: 14, lineHeight: 22 },
+
+  empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
+  emptyIcon: { fontSize: 40 },
+  emptyText: { fontSize: 15, textAlign: 'center' },
+});
