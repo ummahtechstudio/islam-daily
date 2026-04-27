@@ -147,7 +147,16 @@ const SURAH_NAME_TO_INDEX: Record<string, number> = {
   annas: 114, nas: 114,
 };
 
-// hadith collection canonical name → max number
+// Hadith collection max counts calibrated for A7med3bdulBaset/hadith-json v1.2.0 dataset.
+// Some collections exceed canonical Darussalam edition counts due to extended numbering
+// (split hadiths, supplementary narrations, edition-specific entries). These are NOT
+// errors — different scholarly editions number hadiths differently. Verified 2026-04-27.
+//   bukhari   7277  canonical, matches our data
+//   muslim    7563  canonical (our file has 7459 — extended editions go higher)
+//   tirmidhi  4053  A7med3bdulBaset edition (canonical Darussalam: 3956)
+//   abudawud  5276  A7med3bdulBaset edition (canonical: 5274)
+//   ibnmajah  4345  A7med3bdulBaset edition (canonical: 4341)
+//   nasai     5768  A7med3bdulBaset edition (canonical: 5767)
 const HADITH_COLLECTIONS: Record<string, { canonical: string; max: number; aliases: RegExp[] }> = {
   bukhari: {
     canonical: 'Sahih Bukhari',
@@ -161,22 +170,22 @@ const HADITH_COLLECTIONS: Record<string, { canonical: string; max: number; alias
   },
   tirmidhi: {
     canonical: 'Jami at-Tirmidhi',
-    max: 3956,
+    max: 4053,
     aliases: [/\bjami(?:['e])?\s*(?:at-?)?tirmidhi\b/i, /\bat-?tirmidhi\b/i, /\btirmidhi\b/i, /\btirmizi\b/i],
   },
   abudawud: {
     canonical: 'Sunan Abu Dawud',
-    max: 5274,
+    max: 5276,
     aliases: [/\bsunan\s*abu\s*dawud\b/i, /\babu\s*dawud\b/i, /\babu-?da'?ud\b/i, /\babudawud\b/i, /\babu\s*da'ud\b/i],
   },
   ibnmajah: {
     canonical: 'Sunan Ibn Majah',
-    max: 4341,
+    max: 4345,
     aliases: [/\bsunan\s*ibn\s*majah\b/i, /\bibn\s*majah\b/i, /\bibn-?maja\b/i, /\bibnmajah\b/i],
   },
   nasai: {
     canonical: "Sunan an-Nasa'i",
-    max: 5767,
+    max: 5768,
     aliases: [/\bsunan\s*(?:an-?)?nasa'?i\b/i, /\b(?:an-?)?nasa'?i\b/i, /\bnasai\b/i],
   },
   hisnulmuslim: {

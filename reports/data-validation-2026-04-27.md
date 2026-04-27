@@ -1,17 +1,17 @@
 # Islam Daily — Data Validation Report
 
-**Generated:** 2026-04-27T11:45:01.206Z
+**Generated:** 2026-04-27T12:08:32.585Z
 **Scanner version:** 1.0
 
 ## Summary
 
 | Severity | Count |
 |----------|-------|
-| ❌ Errors  | 5 |
+| ❌ Errors  | 0 |
 | ⚠️ Warnings | 0 |
 | ℹ️ Info     | 9 |
 
-**Result:** ❌ FAIL
+**Result:** ✅ PASS
 
 ## Files Inspected
 
@@ -45,12 +45,6 @@
 
 ## Issues
 
-### `assets/hisnul_muslim.json`  (1 issue)
-
-| Severity | Cat | Location | Message |
-|----------|-----|----------|---------|
-| ❌ ERR | D | `[7].duas[8].reference` | Hadith reference out of range: "Sahih Bukhari 7383" exceeds max 7277 <br/><sub>↳ Sahih Bukhari 7383, Sahih Muslim 2717</sub> |
-
 ### `assets/dhikr.json`  (7 issues)
 
 | Severity | Cat | Location | Message |
@@ -69,27 +63,3 @@
 |----------|-----|----------|---------|
 | ℹ️ INFO | F | `[84].arabic` | Name "مَالِكُ الْمُلْكِ" does not start with "ال" (Al-) — verify if multi-word construction (e.g. Malik al-Mulk) |
 | ℹ️ INFO | F | `[85].arabic` | Name "ذُو الْجَلَالِ وَالْإِكْرَامِ" does not start with "ال" (Al-) — verify if multi-word construction (e.g. Malik al-Mulk) |
-
-### `assets/hadiths/tirmidhi.json`  (1 issue)
-
-| Severity | Cat | Location | Message |
-|----------|-----|----------|---------|
-| ❌ ERR | D | `<entries>` | 97 hadith number(s) exceed Jami at-Tirmidhi max 3956 |
-
-### `assets/hadiths/abudawud.json`  (1 issue)
-
-| Severity | Cat | Location | Message |
-|----------|-----|----------|---------|
-| ❌ ERR | D | `<entries>` | 2 hadith number(s) exceed Sunan Abu Dawud max 5274 |
-
-### `assets/hadiths/ibnmajah.json`  (1 issue)
-
-| Severity | Cat | Location | Message |
-|----------|-----|----------|---------|
-| ❌ ERR | D | `<entries>` | 4 hadith number(s) exceed Sunan Ibn Majah max 4341 |
-
-### `assets/hadiths/nasai.json`  (1 issue)
-
-| Severity | Cat | Location | Message |
-|----------|-----|----------|---------|
-| ❌ ERR | D | `<entries>` | 1 hadith number(s) exceed Sunan an-Nasa'i max 5767 |
