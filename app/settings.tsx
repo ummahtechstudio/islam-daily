@@ -81,9 +81,9 @@ const HADITH_TIME_OPTIONS: string[] = [
 ];
 
 const APP_VERSION = '1.0.0';
-const CONTACT_EMAIL = 'luqmanraaz4@gmail.com';
-const PRIVACY_URL = 'https://luqmanraaz.com/islam-daily/privacy';
-const TERMS_URL = 'https://luqmanraaz.com/islam-daily/terms';
+const CONTACT_EMAIL = 'ummahtech.studio@gmail.com';
+const PRIVACY_URL = 'https://ummahtechstudio.github.io/islam-daily/privacy.html';
+const TERMS_URL = 'https://ummahtechstudio.github.io/islam-daily/terms.html';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
