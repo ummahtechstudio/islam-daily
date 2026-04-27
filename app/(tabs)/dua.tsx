@@ -191,38 +191,42 @@ export default function DuaScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categories}
           >
-            {HISNUL_MUSLIM.map((cat) => (
-              <TouchableOpacity
-                key={cat.id}
-                style={[
-                  styles.catChip,
-                  { borderColor: theme.border, backgroundColor: theme.card },
-                  selectedCategory === cat.id && {
-                    backgroundColor: Colors.primary,
-                    borderColor: Colors.primary,
-                  },
-                ]}
-                onPress={() => setSelectedCategory(cat.id)}
-              >
-                <Text style={styles.catIcon}>
-                  {CATEGORY_ICONS[cat.id] ?? cat.icon}
-                </Text>
-                <Text
+            {HISNUL_MUSLIM.map((cat) => {
+              const isActive = selectedCategory === cat.id;
+              return (
+                <TouchableOpacity
+                  key={cat.id}
                   style={[
-                    styles.catLabel,
-                    { color: selectedCategory === cat.id ? '#fff' : theme.text },
+                    styles.catChip,
+                    { borderColor: theme.border, backgroundColor: theme.card },
+                    isActive && styles.catChipActive,
                   ]}
+                  onPress={() => setSelectedCategory(cat.id)}
+                  activeOpacity={0.85}
                 >
-                  {cat.title}
-                </Text>
-                <Text style={[
-                  styles.catCount,
-                  { color: selectedCategory === cat.id ? 'rgba(255,255,255,0.7)' : theme.textMuted },
-                ]}>
-                  {cat.duas.length}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text style={styles.catIcon}>
+                    {CATEGORY_ICONS[cat.id] ?? cat.icon}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.catLabel,
+                      { color: isActive ? '#fff' : theme.text },
+                    ]}
+                    numberOfLines={2}
+                  >
+                    {cat.title}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.catCount,
+                      { color: isActive ? 'rgba(255,255,255,0.85)' : theme.textMuted },
+                    ]}
+                  >
+                    {cat.duas.length}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
 
           {/* Duas list */}
@@ -286,7 +290,7 @@ export default function DuaScreen() {
                         {dua.english || 'Translation not available'}
                       </Text>
                       <Text style={[styles.duaRef, { color: theme.textMuted }]}>
-                        — {dua.reference || 'Source unknown'}
+                        Reference: {dua.reference || 'Hisn al-Muslim'}
                       </Text>
                     </>
                   )}
@@ -395,10 +399,11 @@ const styles = StyleSheet.create({
 
   // Dua of the moment
   duaMomentCard: {
-    margin: 12,
+    marginHorizontal: 16,
+    marginTop: 12,
     marginBottom: 4,
     borderRadius: 16,
-    padding: 16,
+    padding: 18,
   },
   duaMomentHeader: {
     flexDirection: 'row',
@@ -435,20 +440,31 @@ const styles = StyleSheet.create({
   },
 
   // Dua
-  categories: { paddingHorizontal: 12, gap: 8, paddingVertical: 12 },
+  categories: { paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
   catChip: {
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 3,
+    justifyContent: 'center',
+    gap: 4,
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
     borderWidth: 1,
-    minWidth: 72,
+    minWidth: 88,
+    minHeight: 76,
   },
-  catIcon: { fontSize: 18 },
+  catChipActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
+  catIcon: { fontSize: 24 },
   catLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
-  catCount: { fontSize: 9, fontWeight: '600' },
+  catCount: { fontSize: 10, fontWeight: '600' },
   duaList: { padding: 12, gap: 12, paddingBottom: 32 },
   duaCard: {
     borderRadius: 16,
