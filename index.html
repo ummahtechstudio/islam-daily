@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Islam Daily — Your Daily Islamic Companion</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.7;
+      color: #333;
+      background: linear-gradient(180deg, #0F6E56 0%, #0a4d3c 100%);
+      min-height: 100vh;
+    }
+    .hero {
+      text-align: center;
+      padding: 80px 20px 60px;
+      color: white;
+    }
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+    .hero .arabic {
+      font-size: 32px;
+      color: #EF9F27;
+      margin-bottom: 16px;
+      font-family: 'Amiri', 'Traditional Arabic', serif;
+    }
+    .hero p { font-size: 20px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .features {
+      background: white;
+      padding: 60px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #0F6E56;
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 40px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .feature {
+      padding: 20px;
+      text-align: center;
+    }
+    .feature .emoji { font-size: 40px; margin-bottom: 12px; }
+    .feature h3 { color: #0F6E56; margin-bottom: 8px; }
+    .feature p { color: #666; font-size: 14px; }
+    .cta {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+    }
+    .button {
+      display: inline-block;
+      background: #EF9F27;
+      color: white;
+      padding: 16px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 18px;
+      margin: 8px;
+      transition: transform 0.2s;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button.secondary { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); }
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+    }
+    .footer a { color: #EF9F27; }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin: 32px 0;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; color: white; }
+    .stat .number { font-size: 36px; font-weight: 700; color: #EF9F27; }
+    .stat .label { font-size: 14px; opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="arabic">بِسْمِ اللهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <h1>Islam Daily</h1>
+    <p>Your free, ad-free daily Islamic companion. Built with care for the Ummah.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="number">6,236</div>
+      <div class="label">Quran Ayahs</div>
+    </div>
+    <div class="stat">
+      <div class="number">34,178</div>
+      <div class="label">Authentic Hadiths</div>
+    </div>
+    <div class="stat">
+      <div class="number">102</div>
+      <div class="label">Duas & Dhikr</div>
+    </div>
+    <div class="stat">
+      <div class="number">99</div>
+      <div class="label">Names of Allah</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="features">
+      <h2>What's Inside</h2>
+      <div class="grid">
+        <div class="feature">
+          <div class="emoji">📖</div>
+          <h3>The Holy Quran</h3>
+          <p>Complete Quran with Arabic, English translation, and audio recitation</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">📜</div>
+          <h3>Hadith Collections</h3>
+          <p>Bukhari, Muslim, Tirmidhi, Abu Dawud, Ibn Majah, Nasa'i — all 6 major collections</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">🤲</div>
+          <h3>Duas & Dhikr</h3>
+          <p>Authentic supplications from Hisn al-Muslim with hadith references</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">🕌</div>
+          <h3>Prayer Times</h3>
+          <p>Accurate prayer times based on your location with multiple calculation methods</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">🧭</div>
+          <h3>Qibla Direction</h3>
+          <p>Find the direction of the Kaaba from anywhere in the world</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">🕋</div>
+          <h3>Mosque Finder</h3>
+          <p>Discover nearby mosques with directions and distance</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">✨</div>
+          <h3>99 Names of Allah</h3>
+          <p>Beautiful names with meanings and explanations</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">📅</div>
+          <h3>Hijri Calendar</h3>
+          <p>Islamic calendar with important dates and events</p>
+        </div>
+        <div class="feature">
+          <div class="emoji">⭐</div>
+          <h3>Bookmarks & Sharing</h3>
+          <p>Save your favorites and share authentic content with family</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <h2 style="color: white;">Available Soon on Google Play</h2>
+    <p style="opacity: 0.9; margin-bottom: 24px;">Free forever. No ads. No tracking. Just authentic Islam.</p>
+    <a href="#" class="button">📱 Coming Soon</a>
+    <a href="mailto:ummahtech.studio@gmail.com" class="button secondary">✉️ Contact Us</a>
+  </div>
+
+  <div class="footer">
+    <p>Built with ❤️ by <strong>Ummah Tech Studio</strong> in Ajman, UAE</p>
+    <p style="margin-top: 12px;">
+      <a href="privacy.html">Privacy Policy</a> · 
+      <a href="terms.html">Terms of Service</a> · 
+      <a href="mailto:ummahtech.studio@gmail.com">Contact</a>
+    </p>
+    <p style="margin-top: 16px; opacity: 0.6;">May Allah accept this work as Sadaqah Jariyah 🤲</p>
+  </div>
+</body>
+</html>
