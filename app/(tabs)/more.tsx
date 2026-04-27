@@ -88,7 +88,6 @@ const SECTIONS = [
       { icon: '🔖', label: 'My Bookmarks',   sub: 'Saved hadith, duas & dhikr', route: '/bookmarks',    bg: '#EF9F2722' },
       { icon: '📚', label: 'Hadith Browser', sub: '6 major collections',    route: '/hadith',         bg: '#3B82F622' },
       { icon: '☪️',  label: '99 Names',      sub: 'Asma ul-Husna',          route: '/names',          bg: '#8B5CF622' },
-      { icon: '❓', label: 'Fatwa Q&A',      sub: 'Browse & ask questions', route: '/fatwa',          bg: '#F59E0B22' },
       { icon: '📖', label: 'Islamic Books',  sub: 'Free classic texts',     route: '/islamic-books',  bg: '#22C55E22' },
       { icon: '🎧', label: 'Audio Books',   sub: 'Lectures, Quran & Naats', route: '/audio-library',  bg: '#0F6E5622' },
     ],

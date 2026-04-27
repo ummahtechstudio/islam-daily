@@ -133,7 +133,6 @@ export default function RootLayout() {
         <Stack.Screen name="hadith" options={{ title: 'Hadith Browser' }} />
         <Stack.Screen name="names" options={{ title: '99 Names of Allah' }} />
         <Stack.Screen name="calendar" options={{ title: 'Islamic Calendar' }} />
-        <Stack.Screen name="fatwa" options={{ title: 'Fatwa Q&A' }} />
         <Stack.Screen name="quran/[id]" options={{ title: 'Quran Reader' }} />
         <Stack.Screen name="downloads" options={{ title: 'Offline Downloads' }} />
         <Stack.Screen name="language" options={{ title: 'Translation Language' }} />

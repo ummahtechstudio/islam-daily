@@ -18,7 +18,6 @@ export const HOME_TILES: HomeTile[] = [
   { id: 'hadith',         label: 'Hadith',            emoji: '📜', route: '/hadith',         required: true,  defaultEnabled: true },
   { id: 'names',          label: '99 Names of Allah', emoji: '☪️', route: '/names',          required: false, defaultEnabled: true },
   { id: 'islamic-books',  label: 'Islamic Books',     emoji: '📕', route: '/islamic-books',  required: false, defaultEnabled: true },
-  { id: 'fatwa',          label: 'Fatwa Q&A',         emoji: '⚡', route: '/fatwa',          required: false, defaultEnabled: false },
 
   // Calculators
   { id: 'zakat-calculator', label: 'Zakat Calculator', emoji: '💰', route: '/zakat-calculator', required: false, defaultEnabled: true },

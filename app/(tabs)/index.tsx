@@ -310,7 +310,6 @@ const MORE_SECTIONS: MoreSection[] = [
       { id: 'hadith',        icon: '📜', label: 'Hadith',           sub: '6 collections',    route: '/hadith' },
       { id: 'names',         icon: '☪️',  label: '99 Names of Allah', sub: 'Asmaul Husna',     route: '/names' },
       { id: 'islamic-books', icon: '📕', label: 'Islamic Books',     sub: 'Free PDFs',        route: '/islamic-books' },
-      { id: 'fatwa',         icon: '⚡', label: 'Fatwa Q&A',         sub: 'Ask scholars',     route: '/fatwa' },
     ],
   },
   {

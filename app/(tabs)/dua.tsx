@@ -257,7 +257,7 @@ export default function DuaScreen() {
                       styles.catLabel,
                       { color: isActive ? '#fff' : theme.text },
                     ]}
-                    numberOfLines={2}
+                    numberOfLines={1}
                   >
                     {cat.title}
                   </Text>
@@ -599,16 +599,13 @@ const styles = StyleSheet.create({
   // Dua
   categories: { paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
   catChip: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 18,
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 20,
     borderWidth: 1,
-    minWidth: 88,
-    minHeight: 76,
   },
   catChipActive: {
     backgroundColor: Colors.primary,
@@ -619,9 +616,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 4,
   },
-  catIcon: { fontSize: 24 },
-  catLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
-  catCount: { fontSize: 10, fontWeight: '600' },
+  catIcon: { fontSize: 16 },
+  catLabel: { fontSize: 13, fontWeight: '600' },
+  catCount: { fontSize: 11, fontWeight: '700', marginLeft: 2 },
   duaList: { padding: 12, gap: 12, paddingBottom: 32 },
   duaCard: {
     borderRadius: 16,

@@ -11,8 +11,9 @@ import {
   Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Colors } from '../../src/constants/colors';
 import { trackScreen } from '../../src/services/analytics';
@@ -39,6 +40,18 @@ try {
 
 const BISMILLAH = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
 const QURAN_CDN = 'https://cdn.islamic.network/quran/audio/128';
+const GOLD = '#EF9F27';
+
+// ─── Recitation mode ─────────────────────────────────────────────────────────
+
+type QuranMode = 'recite' | 'study';
+const QURAN_MODE_KEY = 'settings_quran_mode';
+const QURAN_ARABIC_FONT_SIZE_KEY = 'settings_quran_arabic_font_size';
+const RECITE_FONT_SIZES = [24, 30, 36] as const;
+const DEFAULT_RECITE_FONT_SIZE = 30;
+
+const toArabicNumerals = (n: number): string =>
+  String(n).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[+d]);
 
 // ─── Tajweed parsing ─────────────────────────────────────────────────────────
 
@@ -179,11 +192,61 @@ export default function SurahReaderScreen() {
   const [showTranslation, setShowTranslation] = useState(true);
   const [fontSize, setFontSize] = useState(settings.arabicFontSize);
   const [tajweedOn, setTajweedOn] = useState(false);
+  const [quranMode, setQuranMode] = useState<QuranMode>('recite');
+  const [reciteFontSize, setReciteFontSize] = useState<number>(DEFAULT_RECITE_FONT_SIZE);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [m, f] = await Promise.all([
+          AsyncStorage.getItem(QURAN_MODE_KEY),
+          AsyncStorage.getItem(QURAN_ARABIC_FONT_SIZE_KEY),
+        ]);
+        if (m === 'recite' || m === 'study') setQuranMode(m);
+        const fNum = f ? parseInt(f, 10) : NaN;
+        if ((RECITE_FONT_SIZES as readonly number[]).includes(fNum)) {
+          setReciteFontSize(fNum);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const updateQuranMode = (m: QuranMode) => {
+    setQuranMode(m);
+    AsyncStorage.setItem(QURAN_MODE_KEY, m).catch(() => {});
+  };
+
+  const updateReciteFontSize = (n: number) => {
+    setReciteFontSize(n);
+    AsyncStorage.setItem(QURAN_ARABIC_FONT_SIZE_KEY, String(n)).catch(() => {});
+  };
   const [showReciterPicker, setShowReciterPicker] = useState(false);
+  const [showReciteSettings, setShowReciteSettings] = useState(false);
   const [selectedReciter, setSelectedReciter] = useState(settings.selectedReciter ?? 'ar.alafasy');
   const [playingAyah, setPlayingAyah] = useState<number | null>(null);
   const [loadingAyah, setLoadingAyah] = useState<number | null>(null);
   const soundRef = useRef<any>(null);
+
+  const surahBookmarkId = `quran_surah_${surahNum}`;
+  const surahBookmarked = bookmarkedAyahs.has(surahBookmarkId);
+
+  const toggleSurahBookmark = async () => {
+    if (!arabic) return;
+    if (surahBookmarked) {
+      await removeBookmark('quran', surahBookmarkId);
+    } else {
+      await addBookmark({
+        type: 'quran',
+        id: surahBookmarkId,
+        title: `${arabic.englishName} (Full Surah)`,
+        arabic: BISMILLAH,
+        translation: `Surah ${arabic.englishName} — ${arabic.numberOfAyahs} verses`,
+        reference: `Surah ${arabic.englishName} (#${surahNum})`,
+        category: 'surah',
+      });
+    }
+    refreshBookmarks();
+  };
 
   // Word meaning popup
   const [wordPopup, setWordPopup] = useState<WordMeaning | null>(null);
@@ -288,6 +351,53 @@ export default function SurahReaderScreen() {
         type: 'quran',
       });
     };
+
+    // ─── Recite mode: Arabic-only, large font, decorative ayah marker ──────
+    if (quranMode === 'recite') {
+      return (
+        <View style={[styles.reciteVerse, { borderBottomColor: GOLD + '30' }]}>
+          <Text
+            style={[
+              styles.reciteArabic,
+              {
+                color: theme.text,
+                fontSize: reciteFontSize,
+                lineHeight: reciteFontSize + 22,
+              },
+            ]}
+            textBreakStrategy="simple"
+          >
+            {item.text}
+          </Text>
+          <Text style={[styles.ayahMarker, { color: GOLD }]}>
+            {`\u{FD3F} ${toArabicNumerals(item.numberInSurah)} \u{FD3E}`}
+          </Text>
+          <View style={styles.reciteActions}>
+            <TouchableOpacity onPress={() => playAyah(item)} hitSlop={8}>
+              {isLoadingAudio ? (
+                <ActivityIndicator size={16} color={Colors.primary} />
+              ) : (
+                <Ionicons
+                  name={isPlaying ? 'pause-circle' : 'play-circle-outline'}
+                  size={20}
+                  color={isPlaying ? Colors.primary : theme.textMuted}
+                />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleBookmark} hitSlop={8}>
+              <Ionicons
+                name={bookmarked ? 'bookmark' : 'bookmark-outline'}
+                size={18}
+                color={bookmarked ? Colors.accent : theme.textMuted}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleShare} hitSlop={8}>
+              <Ionicons name="share-outline" size={18} color={theme.textMuted} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
 
     // Render Arabic text: either plain or as tappable words with optional tajweed
     const renderArabicText = () => {
@@ -401,22 +511,70 @@ export default function SurahReaderScreen() {
   // ─── Reciter name display ─────────────────────────────────────────────────
   const reciterName = RECITERS.find((r) => r.id === selectedReciter)?.name ?? selectedReciter;
 
+  const isRecite = quranMode === 'recite';
+
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
+      <Stack.Screen
+        options={{
+          title: arabic.englishName,
+          headerRight: () =>
+            isRecite ? (
+              <TouchableOpacity
+                onPress={() => setShowReciteSettings(true)}
+                hitSlop={8}
+                style={{ marginRight: 4 }}
+              >
+                <Ionicons name="settings-outline" size={22} color="#fff" />
+              </TouchableOpacity>
+            ) : null,
+        }}
+      />
 
-      {/* Surah header */}
-      <View style={[styles.surahHeader, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.surahName}>{arabic.englishName}</Text>
-        <Text style={styles.surahArabicName}>{arabic.name}</Text>
-        <Text style={styles.surahMeta}>
-          {arabic.revelationType} · {arabic.numberOfAyahs} Verses
-        </Text>
-        {surahNum !== 9 && (
-          <Text style={styles.bismillah}>{BISMILLAH}</Text>
-        )}
-      </View>
+      {/* Surah header (study mode only) */}
+      {!isRecite && (
+        <View style={[styles.surahHeader, { backgroundColor: Colors.primary }]}>
+          <Text style={styles.surahName}>{arabic.englishName}</Text>
+          <Text style={styles.surahArabicName}>{arabic.name}</Text>
+          <Text style={styles.surahMeta}>
+            {arabic.revelationType} · {arabic.numberOfAyahs} Verses
+          </Text>
+          {surahNum !== 9 && (
+            <Text style={styles.bismillah}>{BISMILLAH}</Text>
+          )}
+        </View>
+      )}
 
-      {/* Toolbar */}
+      {/* Mode toggle pills (study mode only — recite mode toggles via gear) */}
+      {!isRecite && (
+        <View style={[styles.modeBar, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+          <TouchableOpacity
+            style={[styles.modePill, { borderColor: theme.border }]}
+            onPress={() => updateQuranMode('recite')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.modePillText, { color: theme.textMuted }]}>
+              🔊 Recite
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.modePill,
+              { borderColor: theme.border },
+              { backgroundColor: GOLD, borderColor: GOLD },
+            ]}
+            onPress={() => updateQuranMode('study')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.modePillText, { color: '#fff' }]}>
+              📖 Study
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Toolbar (Study mode only) */}
+      {quranMode === 'study' && (
       <View style={[styles.toolbar, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
         {/* Offline cache indicator */}
         {fromCache && (
@@ -484,9 +642,10 @@ export default function SurahReaderScreen() {
           </TouchableOpacity>
         </View>
       </View>
+      )}
 
       {/* Tajweed legend */}
-      {tajweedOn && (
+      {quranMode === 'study' && tajweedOn && (
         <View style={[styles.legend, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
           <Text style={[styles.legendItem, { color: '#4B9BFF' }]}>■ Qalqala</Text>
           <Text style={[styles.legendItem, { color: '#4CAF50' }]}>■ Ghunna</Text>
@@ -504,6 +663,13 @@ export default function SurahReaderScreen() {
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
+        ListHeaderComponent={
+          isRecite && surahNum !== 9 ? (
+            <View style={styles.reciteBismillahWrap}>
+              <Text style={[styles.reciteBismillah, { color: GOLD }]}>{BISMILLAH}</Text>
+            </View>
+          ) : null
+        }
       />
 
       {/* ── Reciter Picker Modal ── */}
@@ -531,6 +697,84 @@ export default function SurahReaderScreen() {
                 )}
               </TouchableOpacity>
             ))}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* ── Recite Settings Modal ── */}
+      <Modal
+        visible={showReciteSettings}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowReciteSettings(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowReciteSettings(false)}>
+          <Pressable style={[styles.modalSheet, { backgroundColor: theme.card }]}>
+            <View style={[styles.modalHandle, { backgroundColor: theme.border }]} />
+            <Text style={[styles.modalTitle, { color: theme.text }]}>Recite Settings</Text>
+
+            {/* Switch to Study mode */}
+            <TouchableOpacity
+              style={[styles.reciteSettingRow, { borderBottomColor: theme.border }]}
+              onPress={() => {
+                updateQuranMode('study');
+                setShowReciteSettings(false);
+              }}
+            >
+              <Ionicons name="book-outline" size={20} color={Colors.primary} />
+              <Text style={[styles.reciteSettingLabel, { color: theme.text }]}>Switch to Study Mode</Text>
+              <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+            </TouchableOpacity>
+
+            {/* Bookmark surah */}
+            <TouchableOpacity
+              style={[styles.reciteSettingRow, { borderBottomColor: theme.border }]}
+              onPress={toggleSurahBookmark}
+            >
+              <Ionicons
+                name={surahBookmarked ? 'bookmark' : 'bookmark-outline'}
+                size={20}
+                color={surahBookmarked ? Colors.accent : Colors.primary}
+              />
+              <Text style={[styles.reciteSettingLabel, { color: theme.text }]}>
+                {surahBookmarked ? 'Bookmarked' : 'Bookmark this Surah'}
+              </Text>
+              {surahBookmarked && (
+                <Ionicons name="checkmark-circle" size={18} color={Colors.accent} />
+              )}
+            </TouchableOpacity>
+
+            {/* Font size */}
+            <View style={styles.reciteSettingFontRow}>
+              <Text style={[styles.reciteSettingLabel, { color: theme.text, flex: 0 }]}>Font Size</Text>
+              <View style={styles.reciteSettingFontPills}>
+                {RECITE_FONT_SIZES.map((size, idx) => {
+                  const labels = ['A-', 'A', 'A+'];
+                  const active = reciteFontSize === size;
+                  return (
+                    <TouchableOpacity
+                      key={size}
+                      style={[
+                        styles.reciteFontPill,
+                        { borderColor: theme.border },
+                        active && { backgroundColor: GOLD + '22', borderColor: GOLD },
+                      ]}
+                      onPress={() => updateReciteFontSize(size)}
+                      hitSlop={6}
+                    >
+                      <Text
+                        style={[
+                          styles.reciteFontPillText,
+                          { color: active ? GOLD : theme.textMuted, fontSize: 11 + idx * 2 },
+                        ]}
+                      >
+                        {labels[idx]}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
           </Pressable>
         </Pressable>
       </Modal>
@@ -578,6 +822,99 @@ const styles = StyleSheet.create({
     fontFamily: 'Amiri_400Regular',
     fontSize: 22,
     marginTop: 8,
+  },
+
+  modeBar: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+  },
+  modePill: {
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    minWidth: 110,
+    alignItems: 'center',
+  },
+  modePillText: { fontSize: 13, fontWeight: '700' },
+
+  reciteControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+  },
+  reciteControlsLabel: { fontSize: 12, fontWeight: '600', marginRight: 4 },
+  reciteFontPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    minWidth: 36,
+    alignItems: 'center',
+  },
+  reciteFontPillText: { fontWeight: '700' },
+
+  reciteVerse: {
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 24,
+    borderBottomWidth: 1,
+  },
+  reciteArabic: {
+    fontFamily: 'Amiri_400Regular',
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  reciteBismillahWrap: {
+    paddingTop: 28,
+    paddingBottom: 16,
+    alignItems: 'center',
+  },
+  reciteBismillah: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 30,
+    textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  reciteSettingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  reciteSettingLabel: { fontSize: 15, fontWeight: '600', flex: 1 },
+  reciteSettingFontRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+  },
+  reciteSettingFontPills: { flexDirection: 'row', gap: 8 },
+  ayahMarker: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 22,
+    textAlign: 'center',
+    marginTop: 14,
+    letterSpacing: 1,
+  },
+  reciteActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 16,
+    marginTop: 10,
   },
 
   toolbar: {
