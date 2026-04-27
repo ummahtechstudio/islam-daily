@@ -38,7 +38,6 @@ export const CACHE_KEYS = {
   hadithOfDay: 'cache_hadith_of_day',
   quranSurahList: 'cache_quran_surah_list',
   names99: 'cache_99_names',
-  bookmarks: 'bookmarks',
   settings: 'settings',
   location: 'last_location',
   hifzProgress: 'hifz_progress',

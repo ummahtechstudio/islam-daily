@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,13 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
+import { getBookmarks } from '../../src/utils/bookmarks';
 
 const { width: W } = Dimensions.get('window');
 const CARD_W = (W - 48) / 2;
@@ -84,6 +85,7 @@ const SECTIONS = [
     icon: 'book' as const,
     color: '#3B82F6',
     items: [
+      { icon: '🔖', label: 'My Bookmarks',   sub: 'Saved hadith, duas & dhikr', route: '/bookmarks',    bg: '#EF9F2722' },
       { icon: '📚', label: 'Hadith Browser', sub: '6 major collections',    route: '/hadith',         bg: '#3B82F622' },
       { icon: '☪️',  label: '99 Names',      sub: 'Asma ul-Husna',          route: '/names',          bg: '#8B5CF622' },
       { icon: '❓', label: 'Fatwa Q&A',      sub: 'Browse & ask questions', route: '/fatwa',          bg: '#F59E0B22' },
@@ -123,7 +125,13 @@ export default function MoreScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
-  const bookmarkCount = useStore((s) => s.bookmarks.length);
+  const [bookmarkCount, setBookmarkCount] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      getBookmarks().then((all) => setBookmarkCount(all.length));
+    }, []),
+  );
 
   const isDark =
     settings.colorScheme === 'dark' ||
@@ -144,7 +152,7 @@ export default function MoreScreen() {
           </View>
           <TouchableOpacity
             style={styles.bookmarkBadge}
-            onPress={() => router.push('/settings' as any)}
+            onPress={() => router.push('/bookmarks' as any)}
           >
             <Ionicons name="bookmark" size={14} color={GOLD} />
             <Text style={styles.bookmarkCount}>{bookmarkCount} saved</Text>

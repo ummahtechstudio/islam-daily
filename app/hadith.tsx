@@ -12,7 +12,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../src/constants/colors';
@@ -20,6 +19,7 @@ import { HADITH_COLLECTIONS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
 import { SupabaseHadith } from '../src/lib/supabase';
 import { useStore } from '../src/store';
+import CardActionsRow from '../components/CardActionsRow';
 import {
   getCollection,
   getCollectionCounts,
@@ -138,7 +138,6 @@ export default function HadithScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [progress, setProgress] = useState<CollectionLoadProgress | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [collectionCounts, setCollectionCounts] = useState<Record<string, number>>({});
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -148,13 +147,6 @@ export default function HadithScreen() {
   // Load cached counts on mount
   useEffect(() => {
     getCollectionCounts().then(setCollectionCounts);
-  }, []);
-
-  // Load bookmarks
-  useEffect(() => {
-    AsyncStorage.getItem('hadith_bookmarks').then((raw) => {
-      if (raw) setBookmarkedIds(new Set(JSON.parse(raw)));
-    });
   }, []);
 
   const loadCollection = useCallback(async (key: HadithCollectionKey) => {
@@ -195,14 +187,6 @@ export default function HadithScreen() {
     await loadCollection(selectedCollection);
   };
 
-  const toggleBookmark = async (hadith: SupabaseHadith) => {
-    const bmKey = `${hadith.collection_key}-${hadith.hadith_number}`;
-    const updated = new Set(bookmarkedIds);
-    updated.has(bmKey) ? updated.delete(bmKey) : updated.add(bmKey);
-    setBookmarkedIds(updated);
-    await AsyncStorage.setItem('hadith_bookmarks', JSON.stringify([...updated]));
-  };
-
   const filteredHadiths = useMemo(() => {
     const trimmed = searchQuery.trim();
     if (!trimmed) return allHadiths;
@@ -227,8 +211,6 @@ export default function HadithScreen() {
   };
 
   const renderHadith = ({ item }: { item: SupabaseHadith }) => {
-    const bmKey = `${item.collection_key}-${item.hadith_number}`;
-    const isBookmarked = bookmarkedIds.has(bmKey);
     return (
       <View style={[cardStyles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
         <View style={[cardStyles.accent, { backgroundColor: collMeta.color }]} />
@@ -242,13 +224,6 @@ export default function HadithScreen() {
             </Text>
           ) : null}
           <GradeBadge grade={item.grade ?? 'Sahih'} theme={theme} />
-          <TouchableOpacity onPress={() => toggleBookmark(item)} hitSlop={8}>
-            <Ionicons
-              name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
-              size={18}
-              color={isBookmarked ? GOLD : theme.textMuted}
-            />
-          </TouchableOpacity>
         </View>
 
         <Text style={[cardStyles.bookName, { color: collMeta.color }]}>{collName}</Text>
@@ -268,6 +243,24 @@ export default function HadithScreen() {
         {item.narrator ? (
           <Text style={[cardStyles.narrator, { color: collMeta.color }]}>— {item.narrator}</Text>
         ) : null}
+
+        <CardActionsRow
+          bookmark={{
+            type: 'hadith',
+            id: `${item.collection_key}-${item.hadith_number}`,
+            title: `${collName} #${item.hadith_number}`,
+            arabic: item.arabic ?? '',
+            translation: item.english ?? '',
+            reference: `${collName} ${item.hadith_number}`,
+          }}
+          shareable={{
+            arabic: item.arabic ?? '',
+            translation: item.english ?? '',
+            reference: `${collName} ${item.hadith_number}`,
+            type: 'hadith',
+          }}
+          iconColor={theme.textMuted}
+        />
       </View>
     );
   };

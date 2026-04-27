@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
+import CardActionsRow from '../../components/CardActionsRow';
 
 // ─── Hisnul Muslim dataset (local asset) ─────────────────────────────────────
 
@@ -339,6 +340,24 @@ export default function DuaScreen() {
                           {dua.reference || 'Hisn al-Muslim'}
                         </Text>
                       </View>
+                      <CardActionsRow
+                        bookmark={{
+                          type: 'dua',
+                          id: `dua-${selectedCategory}-${idx}`,
+                          title: `${currentCategory?.title ?? 'Dua'} #${idx + 1}`,
+                          arabic: dua.arabic,
+                          translation: dua.english,
+                          reference: dua.reference || 'Hisn al-Muslim',
+                          category: currentCategory?.title,
+                        }}
+                        shareable={{
+                          arabic: dua.arabic,
+                          translation: dua.english,
+                          reference: dua.reference || 'Hisn al-Muslim',
+                          type: 'dua',
+                        }}
+                        iconColor={theme.textMuted}
+                      />
                     </>
                   )}
                 </TouchableOpacity>
@@ -458,6 +477,26 @@ export default function DuaScreen() {
               <Text style={[styles.referenceText, { color: theme.textMuted }]}>
                 {currentDhikr.reference}
               </Text>
+            </View>
+            <View style={{ alignSelf: 'stretch' }}>
+              <CardActionsRow
+                bookmark={{
+                  type: 'dhikr',
+                  id: `dhikr-${selectedDhikrCategory}-${safeDhikrIdx}`,
+                  title: `${currentDhikrCategory.title} — ${currentDhikr.transliteration}`,
+                  arabic: currentDhikr.arabic,
+                  translation: currentDhikr.english,
+                  reference: currentDhikr.reference,
+                  category: currentDhikrCategory.title,
+                }}
+                shareable={{
+                  arabic: currentDhikr.arabic,
+                  translation: currentDhikr.english,
+                  reference: currentDhikr.reference,
+                  type: 'dhikr',
+                }}
+                iconColor={theme.textMuted}
+              />
             </View>
           </View>
 

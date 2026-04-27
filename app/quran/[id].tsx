@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
-  Share,
   Modal,
   ActivityIndicator,
   Pressable,
@@ -25,6 +24,12 @@ import { Ayah } from '../../src/services/api';
 import { findTranslation } from '../../src/constants/translations';
 import { FONTS, urduStyle } from '../../src/constants/fonts';
 import { RECITERS } from '../../src/constants';
+import {
+  addBookmark,
+  getBookmarks,
+  removeBookmark,
+} from '../../src/utils/bookmarks';
+import { shareContent } from '../../src/utils/share';
 
 // ─── expo-av optional import ─────────────────────────────────────────────────
 let Audio: any = null;
@@ -149,7 +154,17 @@ export default function SurahReaderScreen() {
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const updateSettings = useStore((s) => s.updateSettings);
-  const { addBookmark, removeBookmark, isBookmarked } = useStore();
+
+  const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<string>>(new Set());
+
+  const refreshBookmarks = useCallback(async () => {
+    const all = await getBookmarks();
+    setBookmarkedAyahs(
+      new Set(all.filter((b) => b.type === 'quran').map((b) => b.id)),
+    );
+  }, []);
+
+  useEffect(() => { refreshBookmarks(); }, [refreshBookmarks]);
 
   const isDark =
     settings.colorScheme === 'dark' ||
@@ -244,30 +259,33 @@ export default function SurahReaderScreen() {
   const renderVerse = ({ item, index }: { item: Ayah; index: number }) => {
     const trAyah = translation.ayahs[index];
     const bookmarkId = `quran_${surahNum}_${item.numberInSurah}`;
-    const bookmarked = isBookmarked(bookmarkId);
+    const bookmarked = bookmarkedAyahs.has(bookmarkId);
     const isPlaying = playingAyah === item.number;
     const isLoadingAudio = loadingAyah === item.number;
+    const reference = `${arabic.englishName} ${surahNum}:${item.numberInSurah}`;
 
-    const handleBookmark = () => {
+    const handleBookmark = async () => {
       if (bookmarked) {
-        removeBookmark(bookmarkId);
+        await removeBookmark('quran', bookmarkId);
       } else {
-        addBookmark({
-          id: bookmarkId,
+        await addBookmark({
           type: 'quran',
-          surahNumber: surahNum,
-          verseNumber: item.numberInSurah,
+          id: bookmarkId,
+          title: `${arabic.englishName} ${surahNum}:${item.numberInSurah}`,
           arabic: item.text,
-          english: trAyah?.text ?? '',
-          reference: `${arabic.englishName} ${surahNum}:${item.numberInSurah}`,
-          savedAt: Date.now(),
+          translation: trAyah?.text ?? '',
+          reference,
         });
       }
+      refreshBookmarks();
     };
 
     const handleShare = async () => {
-      await Share.share({
-        message: `${item.text}\n\n${trAyah?.text ?? ''}\n\n— ${arabic.englishName} ${surahNum}:${item.numberInSurah}`,
+      await shareContent({
+        arabic: item.text,
+        translation: trAyah?.text ?? '',
+        reference,
+        type: 'quran',
       });
     };
 
