@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path } from 'react-native-svg';
@@ -26,6 +26,8 @@ import { useStore } from '../../src/store';
 import { CACHE_KEYS, PRAYER_LIST } from '../../src/constants';
 import { getContentLanguage, ContentLanguage, isRtlLanguage } from '../../src/services/localization';
 import { trackScreen } from '../../src/services/analytics';
+import { getSetting } from '../../src/utils/settings';
+import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 
 import KNOWLEDGE_DATA from '../../assets/daily_knowledge.json';
 
@@ -151,25 +153,26 @@ const heroStyles = StyleSheet.create({
 });
 
 // ─── Quick Access 2×2 Grid ────────────────────────────────────────────────────
-const QUICK_CARDS: { icon: string; label: string; defaultSub: string; route: string; color: string; bg: string }[] = [
-  { icon: '📖', label: 'Quran',        defaultSub: 'Read & Listen',    route: '/quran',        color: '#0F6E56', bg: '#0F6E5618' },
-  { icon: '🕌', label: 'Prayer Times', defaultSub: 'All 5 prayers',    route: '/prayer-times', color: '#2563EB', bg: '#2563EB18' },
-  { icon: '🤲', label: 'Duas',         defaultSub: 'Hisnul Muslim',    route: '/dua',          color: '#7C3AED', bg: '#7C3AED18' },
-  { icon: '🧭', label: 'Qibla',        defaultSub: 'Find direction',   route: '/qibla',        color: '#F59E0B', bg: '#F59E0B18' },
+const QUICK_CARDS: { id: string; icon: string; label: string; defaultSub: string; route: string; color: string; bg: string }[] = [
+  { id: 'quran',         icon: '📖', label: 'Quran',        defaultSub: 'Read & Listen',    route: '/quran',        color: '#0F6E56', bg: '#0F6E5618' },
+  { id: 'prayer-times',  icon: '🕌', label: 'Prayer Times', defaultSub: 'All 5 prayers',    route: '/prayer-times', color: '#2563EB', bg: '#2563EB18' },
+  { id: 'dua',           icon: '🤲', label: 'Duas',         defaultSub: 'Hisnul Muslim',    route: '/dua',          color: '#7C3AED', bg: '#7C3AED18' },
+  { id: 'qibla',         icon: '🧭', label: 'Qibla',        defaultSub: 'Find direction',   route: '/qibla',        color: '#F59E0B', bg: '#F59E0B18' },
 ];
 
-function QuickGrid({ isDark, prayerData, nextPrayer, onPress }: {
+function QuickGrid({ isDark, prayerData, nextPrayer, onPress, cards }: {
   isDark: boolean;
   prayerData: any;
   nextPrayer: any;
   onPress: (route: string) => void;
+  cards: typeof QUICK_CARDS;
 }) {
   const theme = isDark ? Colors.dark : Colors.light;
   const half = Math.floor((W - 32 - 10) / 2);
 
   return (
     <View style={quickStyles.grid}>
-      {QUICK_CARDS.map((card) => {
+      {cards.map((card) => {
         let sub = card.defaultSub;
         if (card.label === 'Prayer Times' && nextPrayer) {
           sub = `Next: ${nextPrayer.name} ${nextPrayer.time}`;
@@ -295,16 +298,19 @@ const knowledgeStyles = StyleSheet.create({
 });
 
 // ─── More Features Section ────────────────────────────────────────────────────
-const MORE_SECTIONS = [
+type MoreItem = { id: string; icon: string; label: string; sub: string; route: string };
+type MoreSection = { title: string; icon: string; color: string; items: MoreItem[] };
+
+const MORE_SECTIONS: MoreSection[] = [
   {
     title: 'Islamic Knowledge',
     icon: '📚',
     color: '#2563EB',
     items: [
-      { icon: '📜', label: 'Hadith',           sub: '6 collections',    route: '/hadith' },
-      { icon: '☪️',  label: '99 Names of Allah', sub: 'Asmaul Husna',     route: '/names' },
-      { icon: '📕', label: 'Islamic Books',     sub: 'Free PDFs',        route: '/islamic-books' },
-      { icon: '⚡', label: 'Fatwa Q&A',         sub: 'Ask scholars',     route: '/fatwa' },
+      { id: 'hadith',        icon: '📜', label: 'Hadith',           sub: '6 collections',    route: '/hadith' },
+      { id: 'names',         icon: '☪️',  label: '99 Names of Allah', sub: 'Asmaul Husna',     route: '/names' },
+      { id: 'islamic-books', icon: '📕', label: 'Islamic Books',     sub: 'Free PDFs',        route: '/islamic-books' },
+      { id: 'fatwa',         icon: '⚡', label: 'Fatwa Q&A',         sub: 'Ask scholars',     route: '/fatwa' },
     ],
   },
   {
@@ -312,8 +318,8 @@ const MORE_SECTIONS = [
     icon: '🧮',
     color: '#0D9488',
     items: [
-      { icon: '💰', label: 'Zakat Calculator',  sub: 'Calculate zakat',  route: '/zakat-calculator' },
-      { icon: '🌙', label: 'Ramadan Mode',       sub: 'Sehri & Iftar',    route: '/ramadan' },
+      { id: 'zakat-calculator', icon: '💰', label: 'Zakat Calculator',  sub: 'Calculate zakat',  route: '/zakat-calculator' },
+      { id: 'ramadan',          icon: '🌙', label: 'Ramadan Mode',       sub: 'Sehri & Iftar',    route: '/ramadan' },
     ],
   },
   {
@@ -321,9 +327,9 @@ const MORE_SECTIONS = [
     icon: '🛠️',
     color: '#7C3AED',
     items: [
-      { icon: '📅', label: 'Islamic Calendar',   sub: 'Hijri dates',       route: '/calendar' },
-      { icon: '🕌', label: 'Mosque Finder',       sub: 'Near you',          route: '/mosque-finder' },
-      { icon: '🥩', label: 'Halal Finder',        sub: 'Halal restaurants', route: '/halal-finder' },
+      { id: 'calendar',       icon: '📅', label: 'Islamic Calendar',   sub: 'Hijri dates',       route: '/calendar' },
+      { id: 'mosque-finder',  icon: '🕌', label: 'Mosque Finder',       sub: 'Near you',          route: '/mosque-finder' },
+      { id: 'halal-finder',   icon: '🥩', label: 'Halal Finder',        sub: 'Halal restaurants', route: '/halal-finder' },
     ],
   },
   {
@@ -331,9 +337,9 @@ const MORE_SECTIONS = [
     icon: '👤',
     color: '#F59E0B',
     items: [
-      { icon: '📿', label: 'Hifz Tracker',       sub: 'Track memorization', route: '/hifz-tracker' },
-      { icon: '🔥', label: 'Prayer Streak',       sub: 'Daily prayers',     route: '/prayer-streak' },
-      { icon: '💬', label: 'Feedback',            sub: 'Share thoughts',    route: '/feedback' },
+      { id: 'hifz-tracker',  icon: '📿', label: 'Hifz Tracker',       sub: 'Track memorization', route: '/hifz-tracker' },
+      { id: 'prayer-streak', icon: '🔥', label: 'Prayer Streak',       sub: 'Daily prayers',     route: '/prayer-streak' },
+      { id: 'feedback',      icon: '💬', label: 'Feedback',            sub: 'Share thoughts',    route: '/feedback' },
     ],
   },
 ];
@@ -436,6 +442,41 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [verseLoading, setVerseLoading] = useState(true);
   const [contentLang, setContentLang] = useState<ContentLanguage>('en');
+
+  // Home tile customization preferences
+  const [enabledIds, setEnabledIds] = useState<string[]>(DEFAULT_ENABLED_TILE_IDS);
+  const [tilesLoaded, setTilesLoaded] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        const stored = await getSetting<string[]>(
+          HOME_TILES_STORAGE_KEY,
+          DEFAULT_ENABLED_TILE_IDS,
+        );
+        if (!cancelled) {
+          setEnabledIds(stored);
+          setTilesLoaded(true);
+        }
+      })();
+      return () => { cancelled = true; };
+    }, []),
+  );
+
+  const isTileVisible = useCallback(
+    (id: string) => {
+      const tile = HOME_TILES.find((t) => t.id === id);
+      if (tile?.required) return true;
+      return enabledIds.includes(id);
+    },
+    [enabledIds],
+  );
+
+  const visibleQuickCards = QUICK_CARDS.filter((c) => isTileVisible(c.id));
+  const visibleMoreSections = MORE_SECTIONS
+    .map((s) => ({ ...s, items: s.items.filter((i) => isTileVisible(i.id)) }))
+    .filter((s) => s.items.length > 0);
 
   const hijriMonth = prayerData?.date?.hijri?.month?.number ?? 0;
   const isRamadan = hijriMonth === 9;
@@ -542,8 +583,18 @@ export default function HomeScreen() {
         )}
 
         {/* ── Quick Access 2×2 ── */}
-        <SectionTitle title="Quick Access" isDark={isDark} />
-        <QuickGrid isDark={isDark} prayerData={prayerData} nextPrayer={nextPrayer} onPress={navigate} />
+        {tilesLoaded && visibleQuickCards.length > 0 && (
+          <>
+            <SectionTitle title="Quick Access" isDark={isDark} />
+            <QuickGrid
+              isDark={isDark}
+              prayerData={prayerData}
+              nextPrayer={nextPrayer}
+              onPress={navigate}
+              cards={visibleQuickCards}
+            />
+          </>
+        )}
 
         <GoldDivider />
 
@@ -580,10 +631,14 @@ export default function HomeScreen() {
         <GoldDivider />
 
         {/* ── More Features ── */}
-        <SectionTitle title="More Features" isDark={isDark} />
-        {MORE_SECTIONS.map((section) => (
-          <MoreSection key={section.title} section={section} isDark={isDark} onPress={navigate} />
-        ))}
+        {tilesLoaded && visibleMoreSections.length > 0 && (
+          <>
+            <SectionTitle title="More Features" isDark={isDark} />
+            {visibleMoreSections.map((section) => (
+              <MoreSection key={section.title} section={section} isDark={isDark} onPress={navigate} />
+            ))}
+          </>
+        )}
 
         {/* ── Footer ── */}
         <View style={[styles.footer, { borderTopColor: theme.border }]}>

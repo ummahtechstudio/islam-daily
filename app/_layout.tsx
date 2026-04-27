@@ -138,6 +138,7 @@ export default function RootLayout() {
         <Stack.Screen name="downloads" options={{ title: 'Offline Downloads' }} />
         <Stack.Screen name="language" options={{ title: 'Translation Language' }} />
         <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+        <Stack.Screen name="customize-home" options={{ title: 'Customize Home Screen' }} />
         <Stack.Screen name="hifz-tracker" options={{ title: 'Hifz Tracker' }} />
         <Stack.Screen name="prayer-streak" options={{ title: 'Prayer Streak' }} />
         <Stack.Screen name="mosque-finder" options={{ title: 'Mosque Finder' }} />

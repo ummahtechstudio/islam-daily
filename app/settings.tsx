@@ -13,6 +13,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -89,6 +90,7 @@ const TERMS_URL = 'https://luqmanraaz.com/islam-daily/terms';
 export default function SettingsScreen() {
   useEffect(() => { trackScreen('Settings'); }, []);
   const colorScheme = useColorScheme();
+  const router = useRouter();
   const settings = useStore((s) => s.settings);
   const updateSettings = useStore((s) => s.updateSettings);
 
@@ -348,6 +350,27 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: themeColors.background }]} edges={['bottom']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+
+        {/* ── HOME SCREEN ────────────────────────────────────────────────── */}
+        <SectionLabel>Home Screen</SectionLabel>
+        <SectionCard>
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => router.push('/customize-home' as any)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
+              <Ionicons name="grid" size={18} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Customize Home Screen</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>
+                Choose which tiles appear on your home
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={themeColors.textMuted} />
+          </TouchableOpacity>
+        </SectionCard>
 
         {/* ── APPEARANCE ─────────────────────────────────────────────────── */}
         <SectionLabel>Appearance</SectionLabel>
