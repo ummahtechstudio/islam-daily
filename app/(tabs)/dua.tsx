@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -19,6 +20,8 @@ import { trackScreen } from '../../src/services/analytics';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const HISNUL_MUSLIM: DuaCategory[] = require('../../assets/hisnul_muslim.json');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const DHIKR_DATA: DhikrCategory[] = require('../../assets/dhikr.json');
 
 const GOLD = '#EF9F27';
 
@@ -34,6 +37,22 @@ interface DuaCategory {
   title: string;
   icon: string;
   duas: Dua[];
+}
+
+interface DhikrItem {
+  arabic: string;
+  transliteration: string;
+  english: string;
+  count: number;
+  benefit: string;
+  reference: string;
+}
+
+interface DhikrCategory {
+  id: string;
+  title: string;
+  icon: string;
+  items: DhikrItem[];
 }
 
 // ─── Category icon overrides (time-aware, more descriptive) ──────────────────
@@ -53,6 +72,10 @@ const CATEGORY_ICONS: Record<string, string> = {
   dua_parents: '👨‍👩‍👧',
   rain:        '🌧️',
   knowledge:   '📖',
+  sickness:    '🤒',
+  marriage:    '💍',
+  rizq:        '💰',
+  friday:      '🕌',
 };
 
 // ─── "Dua of the Moment" ─────────────────────────────────────────────────────
@@ -85,16 +108,6 @@ function getDuaOfMoment(): { category: DuaCategory; dua: Dua; reason: string } |
   return dua ? { category, dua, reason } : null;
 };
 
-// ─── Dhikr items ─────────────────────────────────────────────────────────────
-
-const DHIKR_ITEMS = [
-  { arabic: 'سُبْحَانَ اللَّهِ', transliteration: 'SubhanAllah', english: 'Glory be to Allah', count: 33 },
-  { arabic: 'الْحَمْدُ لِلَّهِ', transliteration: 'Alhamdulillah', english: 'All praise is due to Allah', count: 33 },
-  { arabic: 'اللَّهُ أَكْبَرُ', transliteration: 'Allahu Akbar', english: 'Allah is the Greatest', count: 34 },
-  { arabic: 'لَا إِلَهَ إِلَّا اللَّهُ', transliteration: 'La ilaha illallah', english: 'There is no deity but Allah', count: 100 },
-  { arabic: 'أَسْتَغْفِرُ اللَّهَ', transliteration: 'Astaghfirullah', english: 'I seek forgiveness from Allah', count: 100 },
-];
-
 type Tab = 'dua' | 'dhikr';
 
 export default function DuaScreen() {
@@ -109,23 +122,34 @@ export default function DuaScreen() {
 
   const [tab, setTab] = useState<Tab>('dua');
   const [selectedCategory, setSelectedCategory] = useState(HISNUL_MUSLIM[0].id);
+  const [selectedDhikrCategory, setSelectedDhikrCategory] = useState(DHIKR_DATA[0].id);
   const [selectedDhikr, setSelectedDhikr] = useState(0);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => { setExpanded(null); }, [selectedCategory]);
+  useEffect(() => { setExpanded(null); }, [searchQuery]);
 
   const currentCategory = HISNUL_MUSLIM.find((c) => c.id === selectedCategory);
-  const filteredDuas = currentCategory?.duas ?? [];
-  const currentDhikr = DHIKR_ITEMS[selectedDhikr];
+  const baseDuas = currentCategory?.duas ?? [];
+  const filteredDuas = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return baseDuas;
+    return baseDuas.filter((d) =>
+      (d.english || '').toLowerCase().includes(q) ||
+      (d.transliteration || '').toLowerCase().includes(q) ||
+      (d.reference || '').toLowerCase().includes(q),
+    );
+  }, [baseDuas, searchQuery]);
+
+  const currentDhikrCategory =
+    DHIKR_DATA.find((c) => c.id === selectedDhikrCategory) ?? DHIKR_DATA[0];
+  const dhikrItems = currentDhikrCategory.items;
+  const safeDhikrIdx = Math.min(selectedDhikr, dhikrItems.length - 1);
+  const currentDhikr = dhikrItems[safeDhikrIdx];
   const targetCount = currentDhikr.count;
   const progress = Math.min(dhikrCount / targetCount, 1);
   const duaOfMoment = getDuaOfMoment();
-
-  useEffect(() => {
-    console.log('[Dua] Category selected:', selectedCategory);
-    console.log('[Dua] Filtered duas count:', filteredDuas.length);
-    console.log('[Dua] All categories in data:', [...new Set(HISNUL_MUSLIM.map((c) => c.id))]);
-  }, [selectedCategory, filteredDuas.length]);
 
   const handleDhikrTap = async () => {
     incrementDhikr();
@@ -165,7 +189,7 @@ export default function DuaScreen() {
       {tab === 'dua' ? (
         <View style={{ flex: 1 }}>
           {/* Dua of the Moment */}
-          {duaOfMoment && (
+          {duaOfMoment && !searchQuery && (
             <View style={[styles.duaMomentCard, { backgroundColor: Colors.primary }]}>
               <View style={styles.duaMomentHeader}>
                 <View style={styles.duaMomentBadge}>
@@ -184,6 +208,26 @@ export default function DuaScreen() {
               </Text>
             </View>
           )}
+
+          {/* Search bar */}
+          <View style={[styles.searchBar, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Ionicons name="search" size={16} color={theme.textMuted} />
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search English, transliteration, or reference (e.g. Bukhari)…"
+              placeholderTextColor={theme.textMuted}
+              style={[styles.searchInput, { color: theme.text }]}
+              autoCorrect={false}
+              autoCapitalize="none"
+              returnKeyType="search"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Category selector */}
           <ScrollView
@@ -232,12 +276,12 @@ export default function DuaScreen() {
           {/* Duas list */}
           {filteredDuas.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyEmoji}>🤲</Text>
+              <Text style={styles.emptyEmoji}>{searchQuery ? '🔍' : '🤲'}</Text>
               <Text style={[styles.emptyTitle, { color: theme.text }]}>
-                No duas in this category yet
+                {searchQuery ? 'No duas match your search' : 'No duas in this category yet'}
               </Text>
               <Text style={[styles.emptySubtitle, { color: theme.textMuted }]}>
-                We're adding more soon InshaAllah
+                {searchQuery ? 'Try different keywords or clear the search' : 'We\'re adding more soon InshaAllah'}
               </Text>
             </View>
           ) : (
@@ -289,9 +333,12 @@ export default function DuaScreen() {
                       <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
                         {dua.english || 'Translation not available'}
                       </Text>
-                      <Text style={[styles.duaRef, { color: theme.textMuted }]}>
-                        Reference: {dua.reference || 'Hisn al-Muslim'}
-                      </Text>
+                      <View style={[styles.referenceContainer, { borderTopColor: theme.border }]}>
+                        <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 Reference:</Text>
+                        <Text style={[styles.referenceText, { color: theme.textMuted }]}>
+                          {dua.reference || 'Hisn al-Muslim'}
+                        </Text>
+                      </View>
                     </>
                   )}
                 </TouchableOpacity>
@@ -302,19 +349,58 @@ export default function DuaScreen() {
       ) : (
         /* ── Dhikr Counter ── */
         <ScrollView contentContainerStyle={styles.dhikrContainer}>
-          {/* Dhikr selector */}
+          {/* Dhikr category selector */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.dhikrTabs}
           >
-            {DHIKR_ITEMS.map((item, idx) => (
+            {DHIKR_DATA.map((cat) => {
+              const isActive = selectedDhikrCategory === cat.id;
+              return (
+                <TouchableOpacity
+                  key={cat.id}
+                  style={[
+                    styles.dhikrCatChip,
+                    { borderColor: theme.border, backgroundColor: theme.card },
+                    isActive && {
+                      backgroundColor: Colors.primary,
+                      borderColor: Colors.primary,
+                    },
+                  ]}
+                  onPress={() => {
+                    setSelectedDhikrCategory(cat.id);
+                    setSelectedDhikr(0);
+                    resetDhikr();
+                  }}
+                >
+                  <Text style={styles.dhikrCatIcon}>{cat.icon}</Text>
+                  <Text
+                    style={[
+                      styles.dhikrCatLabel,
+                      { color: isActive ? '#fff' : theme.text },
+                    ]}
+                  >
+                    {cat.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* Dhikr item selector */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dhikrTabs}
+          >
+            {dhikrItems.map((item, idx) => (
               <TouchableOpacity
                 key={idx}
                 style={[
                   styles.dhikrChip,
                   { borderColor: theme.border, backgroundColor: theme.card },
-                  selectedDhikr === idx && {
+                  safeDhikrIdx === idx && {
                     backgroundColor: Colors.primary,
                     borderColor: Colors.primary,
                   },
@@ -324,8 +410,9 @@ export default function DuaScreen() {
                 <Text
                   style={[
                     styles.dhikrChipText,
-                    { color: selectedDhikr === idx ? '#fff' : theme.text },
+                    { color: safeDhikrIdx === idx ? '#fff' : theme.text },
                   ]}
+                  numberOfLines={1}
                 >
                   {item.transliteration}
                 </Text>
@@ -359,6 +446,19 @@ export default function DuaScreen() {
               {dhikrCount % (targetCount + 1)}{' '}
               <Text style={{ color: theme.textMuted, fontSize: 18 }}>/ {targetCount}</Text>
             </Text>
+
+            {/* Benefit + Reference */}
+            {currentDhikr.benefit ? (
+              <Text style={[styles.dhikrBenefit, { color: theme.textSecondary }]}>
+                ✨ {currentDhikr.benefit}
+              </Text>
+            ) : null}
+            <View style={[styles.referenceContainer, { borderTopColor: theme.border, alignSelf: 'stretch' }]}>
+              <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 Reference:</Text>
+              <Text style={[styles.referenceText, { color: theme.textMuted }]}>
+                {currentDhikr.reference}
+              </Text>
+            </View>
           </View>
 
           {/* Tap button */}
@@ -439,6 +539,24 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 
+  // Search bar
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    paddingVertical: 0,
+  },
+
   // Dua
   categories: { paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
   catChip: {
@@ -506,7 +624,19 @@ const styles = StyleSheet.create({
   divider: { height: 1, marginVertical: 10 },
   duaTranslit: { fontSize: 14, fontStyle: 'italic', marginBottom: 6 },
   duaEnglish: { fontSize: 14, lineHeight: 22, marginBottom: 6 },
-  duaRef: { fontSize: 12 },
+
+  // Reference row (subtle, muted)
+  referenceContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    gap: 6,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  referenceLabel: { fontSize: 11, fontWeight: '600' },
+  referenceText: { fontSize: 11, flexShrink: 1, lineHeight: 16 },
 
   // Empty state
   emptyContainer: {
@@ -523,11 +653,23 @@ const styles = StyleSheet.create({
   // Dhikr
   dhikrContainer: { padding: 16, alignItems: 'center', gap: 16, paddingBottom: 32 },
   dhikrTabs: { gap: 8, paddingVertical: 4 },
+  dhikrCatChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  dhikrCatIcon: { fontSize: 14 },
+  dhikrCatLabel: { fontSize: 13, fontWeight: '700' },
   dhikrChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
+    maxWidth: 220,
   },
   dhikrChipText: { fontSize: 13, fontWeight: '600' },
   counterCard: {
@@ -548,9 +690,10 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: GOLD,
   },
-  dhikrArabic: { fontFamily: 'Amiri_400Regular', fontSize: 30, textAlign: 'center' },
-  dhikrTranslit: { fontSize: 18, fontWeight: '700', textAlign: 'center' },
-  dhikrEnglish: { fontSize: 14, textAlign: 'center', fontStyle: 'italic' },
+  dhikrArabic: { fontFamily: 'Amiri_400Regular', fontSize: 26, textAlign: 'center', lineHeight: 44 },
+  dhikrTranslit: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
+  dhikrEnglish: { fontSize: 13, textAlign: 'center', fontStyle: 'italic', lineHeight: 20 },
+  dhikrBenefit: { fontSize: 12, textAlign: 'center', lineHeight: 18, marginTop: 4 },
   progressBg: { width: '100%', height: 6, borderRadius: 3, marginTop: 8 },
   progressFill: { height: 6, borderRadius: 3 },
   countDisplay: { fontSize: 42, fontWeight: '800' },

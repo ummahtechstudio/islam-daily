@@ -1,0 +1,350 @@
+[
+  {
+    "id": "after_salah",
+    "title": "After Salah",
+    "icon": "🕌",
+    "items": [
+      {
+        "arabic": "أَسْتَغْفِرُ اللهَ",
+        "transliteration": "Astaghfirullah",
+        "english": "I seek the forgiveness of Allah.",
+        "count": 3,
+        "benefit": "The Prophet ﷺ would say this 3 times immediately after every fard prayer.",
+        "reference": "Sahih Muslim 591"
+      },
+      {
+        "arabic": "اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+        "transliteration": "Allahumma antas-Salaam, wa minkas-Salaam, tabarakta yaa Dhal-Jalaali wal-Ikraam",
+        "english": "O Allah, You are Peace, and from You comes peace. Blessed are You, O Possessor of majesty and honour.",
+        "count": 1,
+        "benefit": "Said immediately after the salam at the end of each prayer.",
+        "reference": "Sahih Muslim 591"
+      },
+      {
+        "arabic": "سُبْحَانَ اللهِ",
+        "transliteration": "SubhanAllah",
+        "english": "Glory be to Allah.",
+        "count": 33,
+        "benefit": "Part of the tasbeeh after every fard prayer (33 + 33 + 33 + 1 = 100). Whoever completes them — his sins are forgiven even if like the foam of the sea.",
+        "reference": "Sahih Muslim 597, Sahih Bukhari 843"
+      },
+      {
+        "arabic": "الْحَمْدُ لِلَّهِ",
+        "transliteration": "Alhamdulillah",
+        "english": "All praise is due to Allah.",
+        "count": 33,
+        "benefit": "Part of the tasbeeh after every fard prayer.",
+        "reference": "Sahih Bukhari 843, Sahih Muslim 595"
+      },
+      {
+        "arabic": "اللهُ أَكْبَرُ",
+        "transliteration": "Allahu Akbar",
+        "english": "Allah is the Greatest.",
+        "count": 33,
+        "benefit": "Part of the tasbeeh after every fard prayer.",
+        "reference": "Sahih Bukhari 843, Sahih Muslim 595"
+      },
+      {
+        "arabic": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        "transliteration": "La ilaha illallahu wahdahu la shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer",
+        "english": "There is no deity worthy of worship but Allah alone, without partner. To Him belongs all sovereignty and praise, and He is over all things competent.",
+        "count": 1,
+        "benefit": "Said once after the 33+33+33 to complete 100 — sins forgiven even if like the foam of the sea.",
+        "reference": "Sahih Muslim 597"
+      },
+      {
+        "arabic": "اللهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ، لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...",
+        "transliteration": "Allahu la ilaha illa Huwal-Hayyul-Qayyoom, la ta'khuthuhu sinatun wa la nawm... (Ayat al-Kursi)",
+        "english": "Allah — there is no deity except Him, the Ever-Living, the Sustainer of all existence... (Recite Ayat al-Kursi after each fard prayer.)",
+        "count": 1,
+        "benefit": "The Prophet ﷺ said Ayat al-Kursi is the greatest verse of the Qur'an. Reciting it after every fard prayer is established Sunnah.",
+        "reference": "Sahih Muslim 810 (greatness of Ayat al-Kursi); Hisn al-Muslim — recitation after each fard prayer."
+      },
+      {
+        "arabic": "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ، وَشُكْرِكَ، وَحُسْنِ عِبَادَتِكَ",
+        "transliteration": "Allahumma a'innee 'ala dhikrika, wa shukrika, wa husni 'ibadatik",
+        "english": "O Allah, help me to remember You, to give You thanks, and to worship You in the best manner.",
+        "count": 1,
+        "benefit": "The Prophet ﷺ told Mu'adh ibn Jabal (RA) never to abandon this dua after every prayer.",
+        "reference": "Abu Dawud 1522, An-Nasa'i 1303 (Sahih)"
+      }
+    ]
+  },
+  {
+    "id": "morning",
+    "title": "Morning Adhkar",
+    "icon": "🌅",
+    "items": [
+      {
+        "arabic": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ",
+        "transliteration": "Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namootu, wa ilaykan-nushoor",
+        "english": "O Allah, by Your leave we have reached the morning and by Your leave we have reached the evening, by Your leave we live and die, and unto You is our resurrection.",
+        "count": 1,
+        "benefit": "Acknowledging Allah as the Bringer of every state — said upon entering the morning.",
+        "reference": "At-Tirmidhi 3391 (Sahih)"
+      },
+      {
+        "arabic": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+        "transliteration": "Allahumma anta rabbee la ilaha illa ant, khalaqtanee wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't, a'oothu bika min sharri ma sana't, aboo'u laka bini'matika 'alayy, wa aboo'u bidhanbee faghfir lee fa-innahu la yaghfiru-dh-dhunooba illa ant",
+        "english": "O Allah, You are my Lord, there is no deity except You. You created me and I am Your slave. I keep Your covenant and pledge to You so far as I am able. I seek refuge in You from the evil of what I have done. I acknowledge Your favour upon me and my sin — so forgive me, for none can forgive sins except You.",
+        "count": 1,
+        "benefit": "Sayyid al-Istighfar (Master of Seeking Forgiveness). Whoever says it during the day with conviction and dies that day before evening — he is from the people of Paradise.",
+        "reference": "Sahih Bukhari 6306"
+      },
+      {
+        "arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+        "transliteration": "SubhanAllahi wa bihamdih",
+        "english": "Glory be to Allah and praise be to Him.",
+        "count": 100,
+        "benefit": "Whoever says it 100 times morning and evening, none on the Day of Resurrection will come with anything better — except one who said the same or more.",
+        "reference": "Sahih Muslim 2692"
+      },
+      {
+        "arabic": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        "transliteration": "La ilaha illallahu wahdahu la shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer",
+        "english": "There is no deity worthy of worship but Allah alone, without partner. To Him belongs all sovereignty and praise, and He is over all things competent.",
+        "count": 10,
+        "benefit": "Whoever says it 100 times in a day — equivalent to freeing 10 slaves, 100 good deeds written, 100 sins erased, and protection from Satan that day until evening.",
+        "reference": "Sahih Bukhari 3293, Sahih Muslim 2691"
+      },
+      {
+        "arabic": "أَسْتَغْفِرُ اللهَ وَأَتُوبُ إِلَيْهِ",
+        "transliteration": "Astaghfirullaha wa atoobu ilayh",
+        "english": "I seek the forgiveness of Allah and I repent to Him.",
+        "count": 100,
+        "benefit": "The Prophet ﷺ said: 'I seek Allah's forgiveness and turn to Him in repentance more than seventy times a day.'",
+        "reference": "Sahih Bukhari 6307"
+      },
+      {
+        "arabic": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ، وَهُوَ السَّمِيعُ الْعَلِيمُ",
+        "transliteration": "Bismillahil-lathee la yadurru ma'asmihi shay'un fil-ardi wa la fis-samaa', wa huwa-s-Samee'u-l-'Aleem",
+        "english": "In the name of Allah, with whose name nothing in the earth or heavens can cause harm, and He is the All-Hearing, the All-Knowing.",
+        "count": 3,
+        "benefit": "Whoever says it 3x in the morning and 3x in the evening, nothing will harm him.",
+        "reference": "Abu Dawud 5088, At-Tirmidhi 3388 (Sahih)"
+      },
+      {
+        "arabic": "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ",
+        "transliteration": "Allahumma 'aafinee fee badanee, allahumma 'aafinee fee sam'ee, allahumma 'aafinee fee basaree, la ilaha illa ant. Allahumma innee a'oothu bika minal-kufri wal-faqr, wa a'oothu bika min 'athabil-qabri, la ilaha illa ant",
+        "english": "O Allah, grant me well-being in my body, my hearing, and my sight. There is no deity worthy of worship but You. O Allah, I seek refuge in You from disbelief and poverty, and I seek refuge in You from the punishment of the grave. There is no deity worthy of worship but You.",
+        "count": 3,
+        "benefit": "For protection of body, faith, and from the trial of the grave.",
+        "reference": "Abu Dawud 5090 (Sahih)"
+      },
+      {
+        "arabic": "حَسْبِيَ اللهُ لَا إِلَهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+        "transliteration": "Hasbiyallahu la ilaha illa Huwa, 'alayhi tawakkalt, wa huwa rabbul-'arshil-'adheem",
+        "english": "Allah is sufficient for me. There is no deity worthy of worship but Him. Upon Him I place my trust, and He is the Lord of the Mighty Throne.",
+        "count": 7,
+        "benefit": "Whoever says it 7x morning and evening, Allah will suffice him in whatever concerns him of this world and the Hereafter.",
+        "reference": "Abu Dawud 5081"
+      },
+      {
+        "arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ",
+        "transliteration": "SubhanAllahi wa bihamdih, 'adada khalqih, wa rida nafsih, wa zinata 'arshih, wa midada kalimatih",
+        "english": "Glory and praise be to Allah, by the number of His creation, the pleasure of His self, the weight of His Throne, and the ink of His words.",
+        "count": 3,
+        "benefit": "The Prophet ﷺ taught Juwairiyyah (RA) that this said 3 times after Fajr outweighs everything she had said since dawn.",
+        "reference": "Sahih Muslim 2726"
+      },
+      {
+        "arabic": "قُلْ هُوَ اللهُ أَحَدٌ ۞ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۞ قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
+        "transliteration": "Qul huwallahu ahad / Qul a'oothu birabbil-falaq / Qul a'oothu birabbin-naas (Mu'awwidhat)",
+        "english": "Recite Surah Al-Ikhlas, Surah Al-Falaq, and Surah An-Nas — three times each.",
+        "count": 3,
+        "benefit": "'They will suffice you against everything.'",
+        "reference": "Abu Dawud 5082, At-Tirmidhi 3575 (Sahih)"
+      }
+    ]
+  },
+  {
+    "id": "evening",
+    "title": "Evening Adhkar",
+    "icon": "🌇",
+    "items": [
+      {
+        "arabic": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ",
+        "transliteration": "Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namootu, wa ilaykal-maseer",
+        "english": "O Allah, by Your leave we have reached the evening and by Your leave we have reached the morning, by Your leave we live and die, and unto You is our return.",
+        "count": 1,
+        "benefit": "Said upon entering the evening.",
+        "reference": "At-Tirmidhi 3391 (Sahih)"
+      },
+      {
+        "arabic": "اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ",
+        "transliteration": "Allahumma faatira-s-samawati wal-ard, 'aalimal-ghaybi wash-shahadah, rabba kulli shay'in wa maleekah, ashhadu an la ilaha illa ant, a'oothu bika min sharri nafsee, wa min sharri-sh-shaytani wa shirkih, wa an aqtarifa 'ala nafsee soo'an aw ajurrahu ila muslim",
+        "english": "O Allah, Originator of the heavens and the earth, Knower of the unseen and seen, Lord and Sovereign of all things — I bear witness that there is no deity except You. I seek refuge in You from the evil of myself, the evil of Satan and his association of partners with Allah, and from committing wrong against myself or bringing such upon another Muslim.",
+        "count": 1,
+        "benefit": "Said morning, evening, and when going to sleep — for protection from oneself and Satan.",
+        "reference": "Abu Dawud 5067, At-Tirmidhi 3392 (Sahih)"
+      },
+      {
+        "arabic": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+        "transliteration": "A'oothu bikalimatillahit-tammati min sharri ma khalaq",
+        "english": "I seek refuge in the perfect words of Allah from the evil of what He has created.",
+        "count": 3,
+        "benefit": "Whoever says it 3x in the evening, no harm shall touch him that night.",
+        "reference": "Sahih Muslim 2709"
+      },
+      {
+        "arabic": "اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ، فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ",
+        "transliteration": "Allahumma ma amsa bee min ni'matin aw bi-ahadin min khalqik, faminka wahdaka la shareeka lak, falakal-hamdu wa lakash-shukr",
+        "english": "O Allah, whatever blessing has reached me this evening, or any of Your creation — it is from You alone, without partner. To You belongs all praise and all gratitude.",
+        "count": 1,
+        "benefit": "Whoever says it in the evening has fulfilled the gratitude of that evening.",
+        "reference": "Abu Dawud 5073, An-Nasa'i in 'Amalul-Yawm wal-Laylah 7 (Hasan)"
+      },
+      {
+        "arabic": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ، وَهُوَ السَّمِيعُ الْعَلِيمُ",
+        "transliteration": "Bismillahil-lathee la yadurru ma'asmihi shay'un fil-ardi wa la fis-samaa', wa huwa-s-Samee'u-l-'Aleem",
+        "english": "In the name of Allah, with whose name nothing in the earth or heavens can cause harm, and He is the All-Hearing, the All-Knowing.",
+        "count": 3,
+        "benefit": "Whoever says it 3x morning and evening, nothing will harm him.",
+        "reference": "Abu Dawud 5088, At-Tirmidhi 3388 (Sahih)"
+      },
+      {
+        "arabic": "حَسْبِيَ اللهُ لَا إِلَهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+        "transliteration": "Hasbiyallahu la ilaha illa Huwa, 'alayhi tawakkalt, wa huwa rabbul-'arshil-'adheem",
+        "english": "Allah is sufficient for me. There is no deity worthy of worship but Him. Upon Him I place my trust, and He is the Lord of the Mighty Throne.",
+        "count": 7,
+        "benefit": "Whoever says it 7x morning and evening, Allah will suffice him in whatever concerns him.",
+        "reference": "Abu Dawud 5081"
+      },
+      {
+        "arabic": "رَضِيتُ بِاللهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا",
+        "transliteration": "Radeetu billahi rabba, wa bil-islaami deena, wa bi-Muhammadin ﷺ nabiyya",
+        "english": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad ﷺ as my Prophet.",
+        "count": 3,
+        "benefit": "Whoever says it 3x morning and evening — it will be a duty upon Allah to please him on the Day of Judgment.",
+        "reference": "At-Tirmidhi 3389, Abu Dawud 5072 (Sahih)"
+      },
+      {
+        "arabic": "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+        "transliteration": "Yaa Hayyu yaa Qayyoom, birahmatika astagheeth, aslih lee sha'nee kullah, wa la takilnee ila nafsee tarfata 'ayn",
+        "english": "O Ever-Living, O Sustainer, by Your mercy I seek help. Rectify all of my affairs and do not leave me to myself even for the blink of an eye.",
+        "count": 3,
+        "benefit": "A powerful dua of reliance on Allah, said by the Prophet ﷺ when distressed.",
+        "reference": "At-Tirmidhi 3524 (Hasan per Al-Albani)"
+      },
+      {
+        "arabic": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+        "transliteration": "Allahumma salli wa sallim 'ala nabiyyina Muhammad",
+        "english": "O Allah, send prayers and peace upon our Prophet Muhammad.",
+        "count": 10,
+        "benefit": "Whoever sends one salah upon me, Allah sends ten upon him. Sending salawat is recommended throughout the day, especially in the evening.",
+        "reference": "Sahih Muslim 408"
+      },
+      {
+        "arabic": "أَسْتَغْفِرُ اللهَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ",
+        "transliteration": "Astaghfirullaha-l-lathee la ilaha illa Huwa-l-Hayyu-l-Qayyoom, wa atoobu ilayh",
+        "english": "I seek forgiveness of Allah, beside whom there is no deity worthy of worship — the Ever-Living, the Sustainer of all existence — and I turn to Him in repentance.",
+        "count": 3,
+        "benefit": "Whoever says it, his sins are forgiven even if he had fled from battle.",
+        "reference": "Abu Dawud 1517, At-Tirmidhi 3577 (Sahih per Al-Hakim and Al-Albani)"
+      }
+    ]
+  },
+  {
+    "id": "general",
+    "title": "General Dhikr",
+    "icon": "📿",
+    "items": [
+      {
+        "arabic": "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ",
+        "transliteration": "La hawla wa la quwwata illa billah",
+        "english": "There is no might nor power except with Allah.",
+        "count": 100,
+        "benefit": "A treasure from the treasures of Paradise.",
+        "reference": "Sahih Bukhari 4202, Sahih Muslim 2704"
+      },
+      {
+        "arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ، سُبْحَانَ اللهِ الْعَظِيمِ",
+        "transliteration": "SubhanAllahi wa bihamdih, SubhanAllahil-'adheem",
+        "english": "Glory and praise be to Allah, glory be to Allah the Mighty.",
+        "count": 100,
+        "benefit": "Two phrases light on the tongue, heavy on the scales, beloved to the Most Merciful.",
+        "reference": "Sahih Bukhari 6406, Sahih Muslim 2694"
+      },
+      {
+        "arabic": "سُبْحَانَ اللهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللهُ، وَاللهُ أَكْبَرُ",
+        "transliteration": "SubhanAllah, walhamdulillah, wa la ilaha illallah, wallahu akbar",
+        "english": "Glory be to Allah, praise be to Allah, there is no deity but Allah, and Allah is the Greatest.",
+        "count": 100,
+        "benefit": "The most beloved speech to Allah — He chose them for His servants. Saying any of them is better than the world and what is in it.",
+        "reference": "Sahih Muslim 2137, At-Tirmidhi 3585"
+      },
+      {
+        "arabic": "لَا إِلَهَ إِلَّا اللهُ",
+        "transliteration": "La ilaha illallah",
+        "english": "There is no deity worthy of worship except Allah.",
+        "count": 100,
+        "benefit": "The best of what I and the prophets before me have said is 'La ilaha illallah'.",
+        "reference": "At-Tirmidhi 3585 (Hasan)"
+      },
+      {
+        "arabic": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+        "transliteration": "Allahumma salli wa sallim 'ala nabiyyina Muhammad",
+        "english": "O Allah, send prayers and peace upon our Prophet Muhammad.",
+        "count": 10,
+        "benefit": "Whoever sends one salah upon me, Allah sends ten upon him.",
+        "reference": "Sahih Muslim 408"
+      },
+      {
+        "arabic": "أَسْتَغْفِرُ اللهَ",
+        "transliteration": "Astaghfirullah",
+        "english": "I seek the forgiveness of Allah.",
+        "count": 100,
+        "benefit": "The Prophet ﷺ used to seek Allah's forgiveness more than 70 times daily. Frequent istighfar opens sustenance and relieves distress.",
+        "reference": "Sahih Bukhari 6307; cf. Quran 71:10-12"
+      },
+      {
+        "arabic": "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+        "transliteration": "La ilaha illa anta subhanaaka innee kuntu minadh-dhalimeen",
+        "english": "There is no deity except You. Glory be to You. Indeed, I have been of the wrongdoers.",
+        "count": 40,
+        "benefit": "The dua of Yunus (AS) — no Muslim makes it concerning anything except Allah answers him.",
+        "reference": "At-Tirmidhi 3505 (Sahih per Al-Hakim and Al-Albani)"
+      },
+      {
+        "arabic": "حَسْبُنَا اللهُ وَنِعْمَ الْوَكِيلُ",
+        "transliteration": "Hasbunallahu wa ni'mal-wakeel",
+        "english": "Allah is sufficient for us, and He is the Best Disposer of affairs.",
+        "count": 7,
+        "benefit": "Said by Ibrahim (AS) when thrown into the fire and by the Prophet ﷺ when warned of an army gathering against him.",
+        "reference": "Quran 3:173, Sahih Bukhari 4563"
+      },
+      {
+        "arabic": "بِسْمِ اللهِ",
+        "transliteration": "Bismillah",
+        "english": "In the name of Allah.",
+        "count": 1,
+        "benefit": "Said before any task — barakah is added to the activity. The Prophet ﷺ said any matter of importance not begun with Bismillah is incomplete.",
+        "reference": "Hisn al-Muslim. Said before eating, leaving home, entering home, and any task."
+      },
+      {
+        "arabic": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        "transliteration": "La ilaha illallahu wahdahu la shareeka lah, lahul-mulku wa lahul-hamd, wa huwa 'ala kulli shay'in qadeer",
+        "english": "There is no deity but Allah alone, without partner. To Him belongs all sovereignty and praise, and He is over all things competent.",
+        "count": 10,
+        "benefit": "Equivalent in reward to freeing four slaves from the descendants of Isma'eel; recommended after Fajr and Maghrib in particular.",
+        "reference": "Sahih Bukhari 6403, Sahih Muslim 2693"
+      },
+      {
+        "arabic": "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+        "transliteration": "SubhanAllahi wa bihamdih",
+        "english": "Glory and praise be to Allah.",
+        "count": 100,
+        "benefit": "Whoever says it 100 times a day — his sins are forgiven even if they were like the foam of the sea.",
+        "reference": "Sahih Bukhari 6405, Sahih Muslim 2691"
+      },
+      {
+        "arabic": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+        "transliteration": "Allahumma salli 'ala Muhammadin wa 'ala aali Muhammad, kama sallayta 'ala Ibraheema wa 'ala aali Ibraheem, innaka hameedun majeed",
+        "english": "O Allah, send prayers upon Muhammad and the family of Muhammad, as You sent prayers upon Ibrahim and the family of Ibrahim — indeed, You are Praiseworthy, Glorious.",
+        "count": 10,
+        "benefit": "The complete Ibrahimic salawat — recited in the tashahhud and especially on Fridays.",
+        "reference": "Sahih Bukhari 3370"
+      }
+    ]
+  }
+]
