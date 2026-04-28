@@ -1,32 +1,212 @@
 [
-  { "id": 1, "title": "Say Bismillah", "tip": "Begin every action with 'Bismillah' — in the name of Allah — to gain barakah in your deeds.", "icon": "✨" },
-  { "id": 2, "title": "The Power of Istighfar", "tip": "Seeking forgiveness (Astaghfirullah) opens doors of provision, removes distress, and brings rain of mercy.", "icon": "🌧️" },
-  { "id": 3, "title": "Best Day of the Week", "tip": "Friday (Jumu'ah) is the best day. Read Surah Al-Kahf, send salawat on the Prophet ﷺ, and make abundant dua.", "icon": "🌟" },
-  { "id": 4, "title": "Night Prayer (Tahajjud)", "tip": "The closest a servant is to Allah is in the last third of the night. Rise for Tahajjud to have your duas answered.", "icon": "🌙" },
-  { "id": 5, "title": "Smile — It's Sadaqah", "tip": "A smile in the face of your brother is an act of charity (sadaqah). Small acts can carry great rewards.", "icon": "😊" },
-  { "id": 6, "title": "Guard Your Tongue", "tip": "Whoever believes in Allah and the Last Day, let him speak good or remain silent. (Bukhari)", "icon": "🤐" },
-  { "id": 7, "title": "Dhikr After Prayer", "tip": "Say SubhanAllah 33×, Alhamdulillah 33×, Allahu Akbar 34× after each prayer to magnify your rewards.", "icon": "📿" },
-  { "id": 8, "title": "Surah Al-Ikhlas", "tip": "Reciting Surah Al-Ikhlas three times is equivalent to reciting the entire Quran once. (Bukhari)", "icon": "📖" },
-  { "id": 9, "title": "Two Light Rak'ah", "tip": "Two rak'ah prayed with full concentration are better than a night spent in worship with a heedless heart.", "icon": "🕌" },
-  { "id": 10, "title": "The Prophet's ﷺ Dua", "tip": "Say: Allahumma a'inni ala dhikrika wa shukrika wa husni ibadatik — O Allah, help me remember You, thank You, and worship You well.", "icon": "🤲" },
-  { "id": 11, "title": "Charity Extinguishes Sin", "tip": "Charity (sadaqah) extinguishes sin as water extinguishes fire. (Tirmidhi) Give even a little regularly.", "icon": "💝" },
-  { "id": 12, "title": "Benefits of Wudu", "tip": "Performing wudu washes away sins. On the Day of Judgement, Muslims will be recognized by the brightness of their limbs.", "icon": "💧" },
-  { "id": 13, "title": "Visiting the Sick", "tip": "Visiting a sick Muslim earns 70,000 angels who pray for your forgiveness until evening. (Ahmad)", "icon": "🏥" },
-  { "id": 14, "title": "Ayatul Kursi Protection", "tip": "Recite Ayatul Kursi (2:255) after every obligatory prayer and before sleep for divine protection all day.", "icon": "🛡️" },
-  { "id": 15, "title": "Be Kind to Parents", "tip": "Paradise lies under the feet of your mother. (Ibn Majah) A single act of kindness to your parents is enormous worship.", "icon": "👨‍👩‍👧" },
-  { "id": 16, "title": "The Two Gardens", "tip": "Whoever prays Fajr in congregation, then sits remembering Allah until sunrise, then prays two rak'ah, gets the reward of Hajj and Umrah. (Tirmidhi)", "icon": "🌅" },
-  { "id": 17, "title": "Plant for the Akhirah", "tip": "If the Final Hour comes while you have a seedling in your hand, plant it. (Ahmad) Work for this world and the next.", "icon": "🌱" },
-  { "id": 18, "title": "Salawat on the Prophet ﷺ", "tip": "Whoever sends one salawat on me, Allah sends ten blessings upon him, erases ten sins, and raises him ten degrees. (Muslim)", "icon": "💫" },
-  { "id": 19, "title": "SubhanAllahi wa bihamdihi", "tip": "Two phrases light on the tongue but heavy on the Scale: SubhanAllahi wa bihamdihi, SubhanAllahil Azeem. (Bukhari)", "icon": "⚖️" },
-  { "id": 20, "title": "Hajj Every Year", "tip": "Perform Umrah and Hajj back to back — they remove poverty and sins as the bellows removes impurity from iron. (Nasai)", "icon": "🕋" },
-  { "id": 21, "title": "Recite Morning Adhkar", "tip": "Start your day with morning adhkar (Hisnul Muslim). It shields you throughout the day from harm and evil.", "icon": "🌄" },
-  { "id": 22, "title": "The Friday Gift", "tip": "There is a moment on Friday when no Muslim asks Allah for something except He grants it. Seek it in the last hour before Maghrib.", "icon": "🎁" },
-  { "id": 23, "title": "Make Dua for Others", "tip": "When you make dua for a fellow Muslim without their knowledge, the angel says 'And the same for you'. (Muslim)", "icon": "🤝" },
-  { "id": 24, "title": "Sunnah Fasts", "tip": "Fast Monday and Thursday — deeds are presented to Allah on these days, and the Prophet ﷺ loved his deeds to be presented while fasting.", "icon": "🌙" },
-  { "id": 25, "title": "Be Content", "tip": "Richness is not having many possessions, but richness is self-contentment (ghina an-nafs). (Bukhari)", "icon": "😌" },
-  { "id": 26, "title": "The Quran Intercedes", "tip": "Recite the Quran, for it will come as an intercessor for its companions on the Day of Resurrection. (Muslim)", "icon": "📜" },
-  { "id": 27, "title": "Removing Harm", "tip": "Removing something harmful from the road is an act of sadaqah. Small good deeds are never trivial.", "icon": "🧹" },
-  { "id": 28, "title": "Last Two Verses", "tip": "Whoever recites the last two verses of Surah Al-Baqarah at night, they will suffice him. (Bukhari)", "icon": "🌠" },
-  { "id": 29, "title": "Dua Enters Paradise", "tip": "Dua is the essence of worship. (Abu Dawud) Never stop making dua — even if the answer is delayed.", "icon": "🙏" },
-  { "id": 30, "title": "The Best Sadaqah", "tip": "The best sadaqah is that you give while you are healthy, fearing poverty, and hoping for wealth. (Bukhari)", "icon": "❤️" }
+  {
+    "id": 1,
+    "title": "Say Bismillah",
+    "tip": "Begin every action with 'Bismillah' — in the name of Allah — to gain barakah in your deeds.",
+    "icon": "✨",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 2,
+    "title": "The Power of Istighfar",
+    "tip": "Seeking forgiveness (Astaghfirullah) opens doors of provision, removes distress, and brings rain of mercy.",
+    "icon": "🌧️",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 3,
+    "title": "Best Day of the Week",
+    "tip": "Friday (Jumu'ah) is the best day. Read Surah Al-Kahf, send salawat on the Prophet ﷺ, and make abundant dua.",
+    "icon": "🌟",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 4,
+    "title": "Night Prayer (Tahajjud)",
+    "tip": "The closest a servant is to Allah is in the last third of the night. Rise for Tahajjud to have your duas answered.",
+    "icon": "🌙",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 5,
+    "title": "Smile — It's Sadaqah",
+    "tip": "A smile in the face of your brother is an act of charity (sadaqah). Small acts can carry great rewards.",
+    "icon": "😊",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 6,
+    "title": "Guard Your Tongue",
+    "tip": "Whoever believes in Allah and the Last Day, let him speak good or remain silent. (Bukhari)",
+    "icon": "🤐",
+    "reference": "Bukhari"
+  },
+  {
+    "id": 7,
+    "title": "Dhikr After Prayer",
+    "tip": "Say SubhanAllah 33×, Alhamdulillah 33×, Allahu Akbar 34× after each prayer to magnify your rewards.",
+    "icon": "📿",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 8,
+    "title": "Surah Al-Ikhlas",
+    "tip": "Reciting Surah Al-Ikhlas three times is equivalent to reciting the entire Quran once. (Bukhari)",
+    "icon": "📖",
+    "reference": "Bukhari"
+  },
+  {
+    "id": 9,
+    "title": "Two Light Rak'ah",
+    "tip": "Two rak'ah prayed with full concentration are better than a night spent in worship with a heedless heart.",
+    "icon": "🕌",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 10,
+    "title": "The Prophet's ﷺ Dua",
+    "tip": "Say: Allahumma a'inni ala dhikrika wa shukrika wa husni ibadatik — O Allah, help me remember You, thank You, and worship You well.",
+    "icon": "🤲",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 11,
+    "title": "Charity Extinguishes Sin",
+    "tip": "Charity (sadaqah) extinguishes sin as water extinguishes fire. (Tirmidhi) Give even a little regularly.",
+    "icon": "💝",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 12,
+    "title": "Benefits of Wudu",
+    "tip": "Performing wudu washes away sins. On the Day of Judgement, Muslims will be recognized by the brightness of their limbs.",
+    "icon": "💧",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 13,
+    "title": "Visiting the Sick",
+    "tip": "Visiting a sick Muslim earns 70,000 angels who pray for your forgiveness until evening. (Ahmad)",
+    "icon": "🏥",
+    "reference": "Ahmad"
+  },
+  {
+    "id": 14,
+    "title": "Ayatul Kursi Protection",
+    "tip": "Recite Ayatul Kursi (2:255) after every obligatory prayer and before sleep for divine protection all day.",
+    "icon": "🛡️",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 15,
+    "title": "Be Kind to Parents",
+    "tip": "Paradise lies under the feet of your mother. (Ibn Majah) A single act of kindness to your parents is enormous worship.",
+    "icon": "👨‍👩‍👧",
+    "reference": "Ibn Majah"
+  },
+  {
+    "id": 16,
+    "title": "The Two Gardens",
+    "tip": "Whoever prays Fajr in congregation, then sits remembering Allah until sunrise, then prays two rak'ah, gets the reward of Hajj and Umrah. (Tirmidhi)",
+    "icon": "🌅",
+    "reference": "Tirmidhi"
+  },
+  {
+    "id": 17,
+    "title": "Plant for the Akhirah",
+    "tip": "If the Final Hour comes while you have a seedling in your hand, plant it. (Ahmad) Work for this world and the next.",
+    "icon": "🌱",
+    "reference": "Ahmad"
+  },
+  {
+    "id": 18,
+    "title": "Salawat on the Prophet ﷺ",
+    "tip": "Whoever sends one salawat on me, Allah sends ten blessings upon him, erases ten sins, and raises him ten degrees. (Muslim)",
+    "icon": "💫",
+    "reference": "Muslim"
+  },
+  {
+    "id": 19,
+    "title": "SubhanAllahi wa bihamdihi",
+    "tip": "Two phrases light on the tongue but heavy on the Scale: SubhanAllahi wa bihamdihi, SubhanAllahil Azeem. (Bukhari)",
+    "icon": "⚖️",
+    "reference": "Bukhari"
+  },
+  {
+    "id": 20,
+    "title": "Hajj Every Year",
+    "tip": "Perform Umrah and Hajj back to back — they remove poverty and sins as the bellows removes impurity from iron. (Nasai)",
+    "icon": "🕋",
+    "reference": "Nasai"
+  },
+  {
+    "id": 21,
+    "title": "Recite Morning Adhkar",
+    "tip": "Start your day with morning adhkar (Hisnul Muslim). It shields you throughout the day from harm and evil.",
+    "icon": "🌄",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 22,
+    "title": "The Friday Gift",
+    "tip": "There is a moment on Friday when no Muslim asks Allah for something except He grants it. Seek it in the last hour before Maghrib.",
+    "icon": "🎁",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 23,
+    "title": "Make Dua for Others",
+    "tip": "When you make dua for a fellow Muslim without their knowledge, the angel says 'And the same for you'. (Muslim)",
+    "icon": "🤝",
+    "reference": "Muslim"
+  },
+  {
+    "id": 24,
+    "title": "Sunnah Fasts",
+    "tip": "Fast Monday and Thursday — deeds are presented to Allah on these days, and the Prophet ﷺ loved his deeds to be presented while fasting.",
+    "icon": "🌙",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 25,
+    "title": "Be Content",
+    "tip": "Richness is not having many possessions, but richness is self-contentment (ghina an-nafs). (Bukhari)",
+    "icon": "😌",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 26,
+    "title": "The Quran Intercedes",
+    "tip": "Recite the Quran, for it will come as an intercessor for its companions on the Day of Resurrection. (Muslim)",
+    "icon": "📜",
+    "reference": "Muslim"
+  },
+  {
+    "id": 27,
+    "title": "Removing Harm",
+    "tip": "Removing something harmful from the road is an act of sadaqah. Small good deeds are never trivial.",
+    "icon": "🧹",
+    "reference": "General Islamic teaching"
+  },
+  {
+    "id": 28,
+    "title": "Last Two Verses",
+    "tip": "Whoever recites the last two verses of Surah Al-Baqarah at night, they will suffice him. (Bukhari)",
+    "icon": "🌠",
+    "reference": "Bukhari"
+  },
+  {
+    "id": 29,
+    "title": "Dua Enters Paradise",
+    "tip": "Dua is the essence of worship. (Abu Dawud) Never stop making dua — even if the answer is delayed.",
+    "icon": "🙏",
+    "reference": "Abu Dawud"
+  },
+  {
+    "id": 30,
+    "title": "The Best Sadaqah",
+    "tip": "The best sadaqah is that you give while you are healthy, fearing poverty, and hoping for wealth. (Bukhari)",
+    "icon": "❤️",
+    "reference": "Bukhari"
+  }
 ]

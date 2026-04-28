@@ -87,14 +87,16 @@ export default function RootLayout() {
     if (!fontsLoaded) return;
     SplashScreen.hideAsync();
     // Check consent once after app is ready
-    hasConsentBeenShown().then((shown) => {
-      if (!shown) {
-        setShowConsent(true);
-      } else if (!analyticsRan.current) {
-        analyticsRan.current = true;
-        logSession(); // fire-and-forget
-      }
-    });
+    hasConsentBeenShown()
+      .then((shown) => {
+        if (!shown) {
+          setShowConsent(true);
+        } else if (!analyticsRan.current) {
+          analyticsRan.current = true;
+          logSession(); // fire-and-forget
+        }
+      })
+      .catch((err) => console.warn('[Layout] consent check failed', err));
   }, [fontsLoaded]);
 
   const handleConsent = async (granted: boolean) => {

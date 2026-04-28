@@ -40,9 +40,11 @@ export default function CustomAdhanScreen() {
   const soundRef = useRef<any>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem(CACHE_KEYS.customAdhan).then((raw) => {
-      if (raw) setPrefs(JSON.parse(raw));
-    });
+    AsyncStorage.getItem(CACHE_KEYS.customAdhan)
+      .then((raw) => {
+        if (raw) setPrefs(JSON.parse(raw));
+      })
+      .catch((err) => console.warn('[CustomAdhan] load prefs failed', err));
     return () => {
       soundRef.current?.unloadAsync?.();
     };

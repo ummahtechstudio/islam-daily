@@ -67,6 +67,9 @@ async function fetchNearbyMosques(
     method: 'POST',
     body: query,
   });
+  if (!response.ok) {
+    throw new Error(`Overpass API ${response.status}`);
+  }
   const data = await response.json();
   return (data.elements as OverpassElement[]) || [];
 }

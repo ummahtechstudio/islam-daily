@@ -58,7 +58,7 @@ export default function NamesScreen() {
       onPress={() => setSelected(item)}
       activeOpacity={0.75}
     >
-      <Text style={[styles.nameNum, { color: Colors.primary }]}>{item.id}</Text>
+      <Text style={[styles.nameNum, { color: Colors.primary }]}>{item.id === 0 ? '✦' : item.id}</Text>
       <Text style={[styles.nameArabic, { color: theme.text }]}>{item.name}</Text>
       <Text style={[styles.nameTranslit, { color: theme.textSecondary }]} numberOfLines={1}>
         {item.transliteration}
@@ -100,7 +100,7 @@ export default function NamesScreen() {
               <TouchableOpacity onPress={() => setSelected(null)} style={styles.closeBtn}>
                 <Text style={{ color: '#fff', fontSize: 24 }}>✕</Text>
               </TouchableOpacity>
-              <Text style={styles.detailNum}>{selected.id} / 99</Text>
+              <Text style={styles.detailNum}>{selected.id === 0 ? '✦ The Greatest Name' : `${selected.id} / 99`}</Text>
             </View>
             <ScrollView contentContainerStyle={styles.detailContent}>
               <Text style={[styles.detailArabic, { color: theme.text }]}>{selected.name}</Text>

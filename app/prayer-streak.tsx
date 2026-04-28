@@ -56,9 +56,11 @@ export default function PrayerStreakScreen() {
   const last7 = getLast7Days();
 
   useEffect(() => {
-    AsyncStorage.getItem(CACHE_KEYS.prayerStreak).then((raw) => {
-      if (raw) setRecords(JSON.parse(raw));
-    });
+    AsyncStorage.getItem(CACHE_KEYS.prayerStreak)
+      .then((raw) => {
+        if (raw) setRecords(JSON.parse(raw));
+      })
+      .catch((err) => console.warn('[PrayerStreak] load records failed', err));
   }, []);
 
   const togglePrayer = useCallback(async (date: string, prayer: string) => {

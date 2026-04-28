@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   useColorScheme,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -20,6 +21,14 @@ import { getBookmarks } from '../../src/utils/bookmarks';
 const { width: W } = Dimensions.get('window');
 const CARD_W = (W - 48) / 2;
 const GOLD = '#EF9F27';
+
+const COMING_SOON_ROUTES: Record<string, { title: string; message: string }> = {
+  '/audio-library': {
+    title: 'Audio Library — Coming Soon',
+    message:
+      "We're curating a beautiful collection of Quran recitations and Islamic lectures.\n\nAvailable in v1.1, InshaAllah!",
+  },
+};
 
 // ─── Islamic Quotes (rotating by day) ────────────────────────────────────────
 
@@ -128,7 +137,9 @@ export default function MoreScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      getBookmarks().then((all) => setBookmarkCount(all.length));
+      getBookmarks()
+        .then((all) => setBookmarkCount(all.length))
+        .catch((err) => console.warn('[More] getBookmarks failed', err));
     }, []),
   );
 
@@ -173,30 +184,45 @@ export default function MoreScreen() {
 
             {/* 2-column grid */}
             <View style={styles.grid}>
-              {section.items.map((item) => (
-                <TouchableOpacity
-                  key={item.route}
-                  style={[
-                    styles.card,
-                    { backgroundColor: theme.card, borderColor: theme.border, width: CARD_W },
-                  ]}
-                  onPress={() => router.push(item.route as any)}
-                  activeOpacity={0.72}
-                >
-                  <View style={[styles.cardIconBg, { backgroundColor: item.bg }]}>
-                    <Text style={styles.cardIcon}>{item.icon}</Text>
-                  </View>
-                  <Text style={[styles.cardLabel, { color: theme.text }]} numberOfLines={1}>
-                    {item.label}
-                  </Text>
-                  <Text style={[styles.cardSub, { color: theme.textMuted }]} numberOfLines={2}>
-                    {item.sub}
-                  </Text>
-                  <View style={styles.cardArrow}>
-                    <Ionicons name="chevron-forward" size={12} color={theme.textMuted} />
-                  </View>
-                </TouchableOpacity>
-              ))}
+              {section.items.map((item) => {
+                const comingSoon = COMING_SOON_ROUTES[item.route];
+                return (
+                  <TouchableOpacity
+                    key={item.route}
+                    style={[
+                      styles.card,
+                      { backgroundColor: theme.card, borderColor: theme.border, width: CARD_W },
+                    ]}
+                    onPress={() => {
+                      if (comingSoon) {
+                        Alert.alert(comingSoon.title, comingSoon.message, [{ text: 'OK' }]);
+                        return;
+                      }
+                      router.push(item.route as any);
+                    }}
+                    activeOpacity={0.72}
+                  >
+                    <View style={[styles.cardIconBg, { backgroundColor: item.bg }]}>
+                      <Text style={styles.cardIcon}>{item.icon}</Text>
+                    </View>
+                    <Text style={[styles.cardLabel, { color: theme.text }]} numberOfLines={1}>
+                      {item.label}
+                    </Text>
+                    <Text style={[styles.cardSub, { color: theme.textMuted }]} numberOfLines={2}>
+                      {item.sub}
+                    </Text>
+                    {comingSoon ? (
+                      <View style={styles.soonBadge}>
+                        <Text style={styles.soonBadgeText}>SOON</Text>
+                      </View>
+                    ) : (
+                      <View style={styles.cardArrow}>
+                        <Ionicons name="chevron-forward" size={12} color={theme.textMuted} />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         ))}
@@ -343,6 +369,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 14,
     right: 12,
+  },
+  soonBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: GOLD,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  soonBadgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
 
   featuredCard: {

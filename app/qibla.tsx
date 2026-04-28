@@ -99,14 +99,19 @@ export default function QiblaScreen() {
   useEffect(() => {
     if (!orientationReady) return;
     let sub: ReturnType<typeof Magnetometer.addListener> | undefined;
-    Magnetometer.isAvailableAsync().then((available) => {
-      setMagnetAvailable(available);
-      if (!available) return;
-      Magnetometer.setUpdateInterval(100);
-      sub = Magnetometer.addListener(({ x, y }) => {
-        setCompassHeading(compassDegFromMag(x, y));
+    Magnetometer.isAvailableAsync()
+      .then((available) => {
+        setMagnetAvailable(available);
+        if (!available) return;
+        Magnetometer.setUpdateInterval(100);
+        sub = Magnetometer.addListener(({ x, y }) => {
+          setCompassHeading(compassDegFromMag(x, y));
+        });
+      })
+      .catch((err) => {
+        console.warn('[Qibla] magnetometer unavailable', err);
+        setMagnetAvailable(false);
       });
-    });
     return () => sub?.remove();
   }, [orientationReady]);
 

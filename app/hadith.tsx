@@ -146,7 +146,9 @@ export default function HadithScreen() {
 
   // Load cached counts on mount
   useEffect(() => {
-    getCollectionCounts().then(setCollectionCounts);
+    getCollectionCounts()
+      .then(setCollectionCounts)
+      .catch((err) => console.warn('[Hadith] getCollectionCounts failed', err));
   }, []);
 
   const loadCollection = useCallback(async (key: HadithCollectionKey) => {

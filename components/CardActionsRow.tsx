@@ -30,9 +30,11 @@ export default function CardActionsRow({ bookmark, shareable, iconColor }: Props
 
   useEffect(() => {
     let mounted = true;
-    checkBookmarked(bookmark.type, bookmark.id).then((b) => {
-      if (mounted) setSaved(b);
-    });
+    checkBookmarked(bookmark.type, bookmark.id)
+      .then((b) => {
+        if (mounted) setSaved(b);
+      })
+      .catch((err) => console.warn('[CardActionsRow] checkBookmarked failed', err));
     return () => {
       mounted = false;
     };

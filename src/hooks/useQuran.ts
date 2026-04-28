@@ -30,9 +30,11 @@ export function useSurah(number: number, translation = 'ur.jalandhry') {
     setFromCache(false);
 
     // Check offline pack first to set fromCache flag before fetching
-    AsyncStorage.getItem(`offline_surah_${number}`).then((raw) => {
-      if (raw) setFromCache(true);
-    });
+    AsyncStorage.getItem(`offline_surah_${number}`)
+      .then((raw) => {
+        if (raw) setFromCache(true);
+      })
+      .catch((err) => console.warn('[useQuran] offline-pack lookup failed', err));
 
     fetchSurah(number, translation)
       .then(([ar, tr]) => {

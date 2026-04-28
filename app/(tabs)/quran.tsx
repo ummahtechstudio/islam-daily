@@ -213,9 +213,11 @@ function PageView({
   const isBookmarked = bookmarkedPages.includes(currentPage);
 
   useEffect(() => {
-    AsyncStorage.getItem(BOOKMARKED_PAGES_KEY).then((raw) => {
-      if (raw) setBookmarkedPages(JSON.parse(raw));
-    });
+    AsyncStorage.getItem(BOOKMARKED_PAGES_KEY)
+      .then((raw) => {
+        if (raw) setBookmarkedPages(JSON.parse(raw));
+      })
+      .catch((err) => console.warn('[Quran] load bookmarked pages failed', err));
   }, []);
 
   // Restore last-read position after list is laid out
@@ -258,7 +260,9 @@ function PageView({
       const p = viewableItems[0].item as number;
       setCurrentPage(p);
       onPageChange(p);
-      AsyncStorage.setItem(LAST_PAGE_KEY, String(p));
+      AsyncStorage.setItem(LAST_PAGE_KEY, String(p)).catch((err) =>
+        console.warn('[Quran] persist last page failed', err),
+      );
     }
   });
 
@@ -539,8 +543,12 @@ export default function QuranScreen() {
   const [lastPage, setLastPage] = useState(1);
 
   useEffect(() => {
-    AsyncStorage.getItem(LAST_READ_KEY).then((v) => { if (v) setLastReadSurah(parseInt(v, 10)); });
-    AsyncStorage.getItem(LAST_PAGE_KEY).then((v) => { if (v) setLastPage(parseInt(v, 10)); });
+    AsyncStorage.getItem(LAST_READ_KEY)
+      .then((v) => { if (v) setLastReadSurah(parseInt(v, 10)); })
+      .catch((err) => console.warn('[Quran] read LAST_READ_KEY failed', err));
+    AsyncStorage.getItem(LAST_PAGE_KEY)
+      .then((v) => { if (v) setLastPage(parseInt(v, 10)); })
+      .catch((err) => console.warn('[Quran] read LAST_PAGE_KEY failed', err));
   }, []);
 
   if (loading) return <LoadingSpinner message="Loading Quran..." dark={isDark} />;
