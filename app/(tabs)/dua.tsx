@@ -60,24 +60,24 @@ interface DhikrCategory {
 // Single source of truth for category pills. The id matches hisnul_muslim.json.
 
 const DUA_CATEGORIES: { id: string; emoji: string; label: string }[] = [
-  { id: 'waking',      emoji: '🌄', label: 'Wake Up' },
-  { id: 'morning',     emoji: '☀️', label: 'Morning' },
-  { id: 'evening',     emoji: '🌇', label: 'Evening' },
+  { id: 'waking',      emoji: '🌞', label: 'Waking' },
+  { id: 'morning',     emoji: '🌅', label: 'Morning' },
+  { id: 'evening',     emoji: '🌆', label: 'Evening' },
   { id: 'sleep',       emoji: '🌙', label: 'Sleep' },
   { id: 'prayer',      emoji: '🕌', label: 'Prayer' },
-  { id: 'eating',      emoji: '🍽️', label: 'Eating' },
-  { id: 'travel',      emoji: '✈️', label: 'Travel' },
+  { id: 'eating',      emoji: '🍴', label: 'Eating' },
+  { id: 'travel',      emoji: '🛫', label: 'Travel' },
   { id: 'distress',    emoji: '🤲', label: 'Distress' },
   { id: 'forgiveness', emoji: '💚', label: 'Forgiveness' },
-  { id: 'protection',  emoji: '🛡️', label: 'Protection' },
+  { id: 'protection',  emoji: '🔰', label: 'Protection' },
   { id: 'sickness',    emoji: '🤒', label: 'Sickness' },
   { id: 'marriage',    emoji: '💍', label: 'Marriage' },
   { id: 'rizq',        emoji: '💰', label: 'Rizq' },
-  { id: 'friday',      emoji: '🕋', label: 'Friday' },
-  { id: 'dua_parents', emoji: '👨‍👩‍👧', label: 'Family' },
-  { id: 'mosque',      emoji: '🕍', label: 'Gratitude' },
-  { id: 'knowledge',   emoji: '📖', label: 'Guidance' },
-  { id: 'rain',        emoji: '🌧️', label: 'Patience' },
+  { id: 'friday',      emoji: '📿', label: 'Friday' },
+  { id: 'dua_parents', emoji: '👪', label: 'Parents' },
+  { id: 'mosque',      emoji: '🕌', label: 'Mosque' },
+  { id: 'knowledge',   emoji: '📚', label: 'Knowledge' },
+  { id: 'rain',        emoji: '💧', label: 'Patience' },
 ];
 
 const CATEGORY_ICONS: Record<string, string> = DUA_CATEGORIES.reduce(
@@ -236,10 +236,11 @@ export default function DuaScreen() {
             )}
           </View>
 
-          {/* Category selector — explicit pills with emoji + label */}
+          {/* Category selector — vertical emoji-on-top, label-below pills */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
+            style={styles.categoriesScroll}
             contentContainerStyle={styles.categories}
           >
             {DUA_CATEGORIES.map((cat) => {
@@ -256,14 +257,14 @@ export default function DuaScreen() {
                   onPress={() => setSelectedCategory(cat.id)}
                   activeOpacity={0.8}
                 >
+                  <Text style={styles.catPillEmoji}>{cat.emoji}</Text>
                   <Text
                     style={[
-                      styles.catPillText,
+                      styles.catPillLabel,
                       { color: isActive ? '#FFFFFF' : Colors.primary },
                     ]}
-                    numberOfLines={1}
                   >
-                    {cat.emoji} {cat.label}
+                    {cat.label}
                   </Text>
                 </TouchableOpacity>
               );
@@ -593,14 +594,17 @@ const styles = StyleSheet.create({
   },
 
   // Dua categories
-  categories: { paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
+  categoriesScroll: { minHeight: 90, maxHeight: 90 },
+  categories: { paddingHorizontal: 16, gap: 8, alignItems: 'center' },
   catPill: {
-    minWidth: 110,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    minWidth: 80,
+    minHeight: 76,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 18,
   },
   catPillInactive: {
     backgroundColor: 'rgba(15,110,86,0.12)',
@@ -617,11 +621,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  catPillText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
+  catPillEmoji: { fontSize: 24, marginBottom: 4, textAlign: 'center' },
+  catPillLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
   duaList: { padding: 12, gap: 12, paddingBottom: 32 },
   duaCard: {
     borderRadius: 16,
