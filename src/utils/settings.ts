@@ -31,3 +31,29 @@ export const resetAllSettings = async (): Promise<void> => {
     console.error('Failed to reset settings:', e);
   }
 };
+
+// ─── Translation language ────────────────────────────────────────────────────
+// Controls which translation is shown for duas, dhikr (Arabic always shown).
+// Default 'urdu' — primary audience is Pakistani.
+
+export type TranslationLanguage = 'urdu' | 'english';
+
+const TRANSLATION_LANGUAGE_KEY = `${PREFIX}translation_language`;
+
+export const getTranslationLanguage = async (): Promise<TranslationLanguage> => {
+  try {
+    const v = await AsyncStorage.getItem(TRANSLATION_LANGUAGE_KEY);
+    if (v === 'english' || v === 'urdu') return v;
+    return 'urdu';
+  } catch {
+    return 'urdu';
+  }
+};
+
+export const setTranslationLanguage = async (lang: TranslationLanguage): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(TRANSLATION_LANGUAGE_KEY, lang);
+  } catch (e) {
+    console.error('Failed to save translation language:', e);
+  }
+};

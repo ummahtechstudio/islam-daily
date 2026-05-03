@@ -25,7 +25,14 @@ import {
   ContentLanguage,
   saveContentLanguage,
 } from '../src/services/localization';
-import { getSetting, setSetting, resetAllSettings } from '../src/utils/settings';
+import {
+  getSetting,
+  setSetting,
+  resetAllSettings,
+  getTranslationLanguage,
+  setTranslationLanguage,
+  TranslationLanguage,
+} from '../src/utils/settings';
 
 // ─── Option lists ─────────────────────────────────────────────────────────────
 
@@ -113,6 +120,7 @@ export default function SettingsScreen() {
   const [dailyHadith, setDailyHadith] = useState<boolean>(true);
   const [dailyHadithTime, setDailyHadithTime] = useState<string>('08:00');
   const [fridayReminder, setFridayReminder] = useState<boolean>(true);
+  const [translationLang, setTranslationLang] = useState<TranslationLanguage>('urdu');
 
   // Storage info
   const [cacheSizeKB, setCacheSizeKB] = useState<number | null>(null);
@@ -141,6 +149,7 @@ export default function SettingsScreen() {
       setDailyHadith(await getSetting<boolean>('daily_hadith', true));
       setDailyHadithTime(await getSetting<string>('daily_hadith_time', '08:00'));
       setFridayReminder(await getSetting<boolean>('friday_reminder', true));
+      setTranslationLang(await getTranslationLanguage());
     })();
 
     computeCacheSize();
@@ -257,6 +266,11 @@ export default function SettingsScreen() {
     await setSetting('friday_reminder', v);
   };
 
+  const onSelectTranslationLang = async (v: TranslationLanguage) => {
+    setTranslationLang(v);
+    await setTranslationLanguage(v);
+  };
+
   // ─── Storage actions ───────────────────────────────────────────────────────
 
   const onClearCache = () => {
@@ -309,6 +323,7 @@ export default function SettingsScreen() {
             setDailyHadith(true);
             setDailyHadithTime('08:00');
             setFridayReminder(true);
+            setTranslationLang('urdu');
             Alert.alert('Settings Reset', 'All preferences have been restored to defaults.');
           },
         },
@@ -350,6 +365,38 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: themeColors.background }]} edges={['bottom']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+
+        {/* ── TRANSLATION LANGUAGE ──────────────────────────────────────── */}
+        <SectionLabel>ترجمہ کی زبان / Translation Language</SectionLabel>
+        <SectionCard>
+          <View style={[styles.row, styles.rowColumn]}>
+            <View style={styles.radioColumn}>
+              <TouchableOpacity
+                style={styles.radioRow}
+                onPress={() => onSelectTranslationLang('urdu')}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.radioOuter, { borderColor: translationLang === 'urdu' ? Colors.primary : themeColors.border }]}>
+                  {translationLang === 'urdu' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
+                </View>
+                <Text style={[styles.radioLabel, { color: themeColors.text }]}>🇵🇰 اردو (Urdu)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.radioRow}
+                onPress={() => onSelectTranslationLang('english')}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.radioOuter, { borderColor: translationLang === 'english' ? Colors.primary : themeColors.border }]}>
+                  {translationLang === 'english' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
+                </View>
+                <Text style={[styles.radioLabel, { color: themeColors.text }]}>🇬🇧 English</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
+              Note: Arabic is always shown. This setting affects English/Urdu translations of duas, dhikr, and hadith.
+            </Text>
+          </View>
+        </SectionCard>
 
         {/* ── HOME SCREEN ────────────────────────────────────────────────── */}
         <SectionLabel>Home Screen</SectionLabel>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 
 import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import CardActionsRow from '../../components/CardActionsRow';
+import { getTranslationLanguage, TranslationLanguage } from '../../src/utils/settings';
+
+const URDU_DISCLAIMER_KEY = 'urdu_disclaimer_dismissed';
 
 // ─── Hisnul Muslim dataset (local asset) ─────────────────────────────────────
 
@@ -30,6 +36,7 @@ interface Dua {
   arabic: string;
   transliteration: string;
   english: string;
+  urdu?: string;
   reference: string;
 }
 
@@ -44,6 +51,7 @@ interface DhikrItem {
   arabic: string;
   transliteration: string;
   english: string;
+  urdu?: string;
   count: number;
   benefit: string;
   reference: string;
@@ -133,9 +141,32 @@ export default function DuaScreen() {
   const [selectedDhikr, setSelectedDhikr] = useState(0);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [language, setLanguage] = useState<TranslationLanguage>('urdu');
+  const [disclaimerDismissed, setDisclaimerDismissed] = useState<boolean>(true);
 
   useEffect(() => { setExpanded(null); }, [selectedCategory]);
   useEffect(() => { setExpanded(null); }, [searchQuery]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      (async () => {
+        const lang = await getTranslationLanguage();
+        if (active) setLanguage(lang);
+        const dismissed = await AsyncStorage.getItem(URDU_DISCLAIMER_KEY);
+        if (active) setDisclaimerDismissed(dismissed === '1');
+      })();
+      return () => { active = false; };
+    }, []),
+  );
+
+  const dismissDisclaimer = async () => {
+    setDisclaimerDismissed(true);
+    await AsyncStorage.setItem(URDU_DISCLAIMER_KEY, '1');
+  };
+
+  const translationFor = (item: { english: string; urdu?: string }) =>
+    language === 'urdu' && item.urdu ? item.urdu : item.english;
 
   const currentCategory = HISNUL_MUSLIM.find((c) => c.id === selectedCategory);
   const baseDuas = currentCategory?.duas ?? [];
@@ -144,6 +175,7 @@ export default function DuaScreen() {
     if (!q) return baseDuas;
     return baseDuas.filter((d) =>
       (d.english || '').toLowerCase().includes(q) ||
+      (d.urdu || '').toLowerCase().includes(q) ||
       (d.transliteration || '').toLowerCase().includes(q) ||
       (d.reference || '').toLowerCase().includes(q),
     );
@@ -195,6 +227,23 @@ export default function DuaScreen() {
 
       {tab === 'dua' ? (
         <View style={{ flex: 1 }}>
+          {/* Urdu disclaimer (dismissible) */}
+          {language === 'urdu' && !disclaimerDismissed && (
+            <View style={[styles.disclaimerCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.disclaimerText, { color: theme.textSecondary }]}>
+                  ℹ️ Urdu translations are based on authentic Islamic sources. For verification, please refer to printed Hisn al-Muslim Urdu edition.
+                </Text>
+                <Text style={[styles.disclaimerTextUrdu, { color: theme.textMuted }]}>
+                  ℹ️ اردو تراجم مستند اسلامی ذرائع پر مبنی ہیں۔ تصدیق کے لیے براہ کرم حصن المسلم کی اردو طبع شدہ کتاب سے رجوع کریں۔
+                </Text>
+              </View>
+              <TouchableOpacity onPress={dismissDisclaimer} hitSlop={8}>
+                <Ionicons name="close" size={18} color={theme.textMuted} />
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Dua of the Moment */}
           {duaOfMoment && !searchQuery && (
             <View style={[styles.duaMomentCard, { backgroundColor: Colors.primary }]}>
@@ -210,8 +259,14 @@ export default function DuaScreen() {
               <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
                 {duaOfMoment.dua.arabic}
               </Text>
-              <Text style={styles.duaMomentEnglish}>
-                {duaOfMoment.dua.english}
+              <Text
+                style={
+                  language === 'urdu' && duaOfMoment.dua.urdu
+                    ? [styles.duaMomentEnglish, styles.duaMomentUrdu]
+                    : styles.duaMomentEnglish
+                }
+              >
+                {translationFor(duaOfMoment.dua)}
               </Text>
             </View>
           )}
@@ -328,9 +383,15 @@ export default function DuaScreen() {
                           Transliteration not available
                         </Text>
                       )}
-                      <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
-                        {dua.english || 'Translation not available'}
-                      </Text>
+                      {language === 'urdu' && dua.urdu ? (
+                        <Text style={[styles.duaEnglish, styles.urduText, { color: theme.textSecondary }]}>
+                          {dua.urdu}
+                        </Text>
+                      ) : (
+                        <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
+                          {dua.english || 'Translation not available'}
+                        </Text>
+                      )}
                       <View style={[styles.referenceContainer, { borderTopColor: theme.border }]}>
                         <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 Reference:</Text>
                         <Text style={[styles.referenceText, { color: theme.textMuted }]}>
@@ -343,13 +404,13 @@ export default function DuaScreen() {
                           id: `dua-${selectedCategory}-${idx}`,
                           title: `${currentCategory?.title ?? 'Dua'} #${idx + 1}`,
                           arabic: dua.arabic,
-                          translation: dua.english,
+                          translation: translationFor(dua),
                           reference: dua.reference || 'Hisn al-Muslim',
                           category: currentCategory?.title,
                         }}
                         shareable={{
                           arabic: dua.arabic,
-                          translation: dua.english,
+                          translation: translationFor(dua),
                           reference: dua.reference || 'Hisn al-Muslim',
                           type: 'dua',
                         }}
@@ -445,9 +506,15 @@ export default function DuaScreen() {
             <Text style={[styles.dhikrTranslit, { color: Colors.primary }]}>
               {currentDhikr.transliteration}
             </Text>
-            <Text style={[styles.dhikrEnglish, { color: theme.textSecondary }]}>
-              {currentDhikr.english}
-            </Text>
+            {language === 'urdu' && currentDhikr.urdu ? (
+              <Text style={[styles.dhikrEnglish, styles.urduText, { color: theme.textSecondary }]}>
+                {currentDhikr.urdu}
+              </Text>
+            ) : (
+              <Text style={[styles.dhikrEnglish, { color: theme.textSecondary }]}>
+                {currentDhikr.english}
+              </Text>
+            )}
 
             {/* Progress bar */}
             <View style={[styles.progressBg, { backgroundColor: theme.border }]}>
@@ -482,13 +549,13 @@ export default function DuaScreen() {
                   id: `dhikr-${selectedDhikrCategory}-${safeDhikrIdx}`,
                   title: `${currentDhikrCategory.title} — ${currentDhikr.transliteration}`,
                   arabic: currentDhikr.arabic,
-                  translation: currentDhikr.english,
+                  translation: translationFor(currentDhikr),
                   reference: currentDhikr.reference,
                   category: currentDhikrCategory.title,
                 }}
                 shareable={{
                   arabic: currentDhikr.arabic,
-                  translation: currentDhikr.english,
+                  translation: translationFor(currentDhikr),
                   reference: currentDhikr.reference,
                   type: 'dhikr',
                 }}
@@ -664,6 +731,41 @@ const styles = StyleSheet.create({
   divider: { height: 1, marginVertical: 10 },
   duaTranslit: { fontSize: 14, fontStyle: 'italic', marginBottom: 6 },
   duaEnglish: { fontSize: 14, lineHeight: 22, marginBottom: 6 },
+  urduText: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    fontSize: 16,
+    lineHeight: 28,
+    fontStyle: 'normal',
+    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+  },
+  duaMomentUrdu: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    fontSize: 14,
+    lineHeight: 26,
+    fontStyle: 'normal',
+    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+  },
+  disclaimerCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  disclaimerText: { fontSize: 12, lineHeight: 18 },
+  disclaimerTextUrdu: {
+    fontSize: 12,
+    lineHeight: 22,
+    marginTop: 6,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+  },
 
   // Reference row (subtle, muted)
   referenceContainer: {

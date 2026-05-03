@@ -1,6 +1,6 @@
 # Islam Daily — Data Validation Report
 
-**Generated:** 2026-05-03T07:23:26.953Z
+**Generated:** 2026-05-03T08:37:13.118Z
 **Scanner version:** 1.0
 
 ## Summary
@@ -17,8 +17,8 @@
 
 | File | Entries | Size |
 |------|--------:|-----:|
-| `assets/hisnul_muslim.json` | 102 | 72.0 KB |
-| `assets/dhikr.json` | 40 | 26.6 KB |
+| `assets/hisnul_muslim.json` | 102 | 97.6 KB |
+| `assets/dhikr.json` | 40 | 34.8 KB |
 | `assets/names_of_allah.json` | 100 | 39.1 KB |
 | `assets/daily_knowledge.json` | 52 | 83.1 KB |
 | `assets/islamic_tips.json` | 30 | 7.0 KB |
