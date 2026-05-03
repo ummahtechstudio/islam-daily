@@ -8,6 +8,7 @@ import {
   useColorScheme,
   Linking,
   Platform,
+  ScrollView,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,9 +18,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
+import { fetchWithTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
 
-const RADIUS_OPTIONS = [1, 5, 10, 25] as const;
+const RADIUS_OPTIONS = [1, 5, 10, 25, 50] as const;
 type Radius = (typeof RADIUS_OPTIONS)[number];
+const DEFAULT_RADIUS_KM: Radius = 10;
+const ACCENT = '#E94B3C';
 
 interface Restaurant {
   id: number;
@@ -28,7 +32,16 @@ interface Restaurant {
   name: string;
   cuisine?: string;
   halalCert?: string;
-  distance?: number;
+  distance: number;
+}
+
+interface OverpassElement {
+  type: string;
+  id: number;
+  lat?: number;
+  lon?: number;
+  center?: { lat: number; lon: number };
+  tags?: Record<string, string>;
 }
 
 function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -39,6 +52,75 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number): numb
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function fetchHalalRestaurants(
+  lat: number,
+  lon: number,
+  radiusMeters: number,
+): Promise<OverpassElement[]> {
+  // Match restaurants tagged halal explicitly OR by cuisine that strongly
+  // implies halal (arabic, turkish, pakistani, indian, middle_eastern, lebanese,
+  // afghan, persian, moroccan, egyptian, iranian, kebab) OR with "halal" in name.
+  const cuisineRegex = 'halal|arabic|turkish|pakistani|indian|middle_eastern|lebanese|afghan|persian|moroccan|egyptian|iranian|kebab';
+  const nameRegex = '[Hh][Aa][Ll][Aa][Ll]';
+  const query = `
+    [out:json][timeout:25];
+    (
+      node["amenity"~"restaurant|fast_food|cafe"]["halal"="yes"](around:${radiusMeters},${lat},${lon});
+      node["amenity"~"restaurant|fast_food|cafe"]["diet:halal"="yes"](around:${radiusMeters},${lat},${lon});
+      node["amenity"~"restaurant|fast_food|cafe"]["cuisine"~"${cuisineRegex}",i](around:${radiusMeters},${lat},${lon});
+      node["amenity"~"restaurant|fast_food|cafe"]["name"~"${nameRegex}"](around:${radiusMeters},${lat},${lon});
+    );
+    out body;
+  `;
+  const res = await fetchWithTimeout(
+    'https://overpass-api.de/api/interpreter',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `data=${encodeURIComponent(query)}`,
+    },
+    20000,
+  );
+  if (!res.ok) throw new Error(`Overpass API ${res.status}`);
+  const json = await res.json();
+  return (json.elements as OverpassElement[]) || [];
+}
+
+function elementsToRestaurants(
+  elements: OverpassElement[],
+  userLat: number,
+  userLon: number,
+): Restaurant[] {
+  const seen = new Set<number>();
+  const out: Restaurant[] = [];
+  for (const el of elements) {
+    if (seen.has(el.id)) continue;
+    seen.add(el.id);
+    const lat = el.lat ?? el.center?.lat;
+    const lon = el.lon ?? el.center?.lon;
+    if (lat == null || lon == null) continue;
+    const tags = el.tags ?? {};
+    const name: string = tags.name || tags['name:en'] || 'Unnamed Restaurant';
+    const cuisine: string | undefined = tags.cuisine;
+    const halalTag: string | undefined = tags.halal || tags['diet:halal'];
+    let halalCert: string | undefined;
+    if (halalTag === 'yes') halalCert = 'Halal certified';
+    else if (cuisine?.toLowerCase().includes('halal')) halalCert = 'Halal cuisine';
+    else if (/halal/i.test(name)) halalCert = 'Halal (by name)';
+    out.push({
+      id: el.id,
+      lat,
+      lon,
+      name,
+      cuisine: cuisine?.split(';').map((c) => c.trim()).join(', '),
+      halalCert,
+      distance: haversine(userLat, userLon, lat, lon),
+    });
+  }
+  out.sort((a, b) => a.distance - b.distance);
+  return out;
 }
 
 export default function HalalFinderScreen() {
@@ -55,82 +137,77 @@ export default function HalalFinderScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userLat, setUserLat] = useState<number | null>(null);
-  const [radius, setRadius] = useState<Radius>(5);
+  const [userLon, setUserLon] = useState<number | null>(null);
+  const [radius, setRadius] = useState<Radius>(DEFAULT_RADIUS_KM);
+  const [effectiveRadiusKm, setEffectiveRadiusKm] = useState<number>(DEFAULT_RADIUS_KM);
+  const [autoExpanded, setAutoExpanded] = useState(false);
 
-  const fetchPlaces = useCallback(async (searchRadius: Radius = radius) => {
+  const search = useCallback(async (lat: number, lon: number, requestedKm: Radius) => {
     setLoading(true);
     setError(null);
+    setAutoExpanded(false);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Location permission denied. Please enable location access in Settings.');
-        setLoading(false);
-        return;
+      const elements = await fetchHalalRestaurants(lat, lon, requestedKm * 1000);
+      let result = elementsToRestaurants(elements, lat, lon);
+      let usedKm: number = requestedKm;
+      if (result.length === 0 && requestedKm < 25) {
+        const expanded = await fetchHalalRestaurants(lat, lon, 25 * 1000);
+        const expandedResult = elementsToRestaurants(expanded, lat, lon);
+        if (expandedResult.length > 0) {
+          result = expandedResult;
+          usedKm = 25;
+          setAutoExpanded(true);
+        }
       }
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const { latitude, longitude } = loc.coords;
-      setUserLat(latitude);
-
-      const r = searchRadius * 1000;
-      // Overpass API: finds restaurants tagged as halal by cuisine or explicit halal=yes tag
-      const query = [
-        '[out:json][timeout:25];',
-        '(',
-        `  node["amenity"="restaurant"]["cuisine"~"halal",i](around:${r},${latitude},${longitude});`,
-        `  node["amenity"="fast_food"]["cuisine"~"halal",i](around:${r},${latitude},${longitude});`,
-        `  node["amenity"="restaurant"]["halal"="yes"](around:${r},${latitude},${longitude});`,
-        `  node["amenity"="fast_food"]["halal"="yes"](around:${r},${latitude},${longitude});`,
-        `  node["amenity"="restaurant"]["diet:halal"="yes"](around:${r},${latitude},${longitude});`,
-        ');',
-        'out body;',
-      ].join('\n');
-
-      const res = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `data=${encodeURIComponent(query)}`,
-      });
-
-      if (!res.ok) throw new Error(`status ${res.status}`);
-
-      const json = await res.json();
-      const elements: any[] = json.elements ?? [];
-
-      const seen = new Set<number>();
-      const restaurants: Restaurant[] = [];
-      for (const el of elements) {
-        if (seen.has(el.id)) continue;
-        seen.add(el.id);
-        const name: string = el.tags?.name || el.tags?.['name:en'] || 'Unnamed Restaurant';
-        const cuisine: string | undefined = el.tags?.cuisine;
-        const halalTag: string | undefined = el.tags?.halal || el.tags?.['diet:halal'];
-        let halalCert: string | undefined;
-        if (halalTag === 'yes') halalCert = 'Halal certified';
-        else if (cuisine?.toLowerCase().includes('halal')) halalCert = 'Halal cuisine';
-        restaurants.push({
-          id: el.id,
-          lat: el.lat,
-          lon: el.lon,
-          name,
-          cuisine: cuisine?.split(';').map((c: string) => c.trim()).join(', '),
-          halalCert,
-          distance: haversine(latitude, longitude, el.lat, el.lon),
-        });
+      setPlaces(result);
+      setEffectiveRadiusKm(usedKm);
+    } catch (e) {
+      if (e instanceof OfflineError) {
+        setError(OFFLINE_MESSAGE);
+      } else {
+        setError('Failed to find restaurants. Please try again in a moment.');
       }
-      restaurants.sort((a, b) => (a.distance ?? 999) - (b.distance ?? 999));
-      setPlaces(restaurants);
-    } catch {
-      setError('Failed to find restaurants. Please check your internet connection and try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [radius]);
+  }, []);
 
-  useEffect(() => { fetchPlaces(); }, []);
+  const fetchAtCurrentLocation = useCallback(
+    async (km: Radius) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setError('Location permission denied. Please enable location access in Settings.');
+          setLoading(false);
+          return;
+        }
+        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        const { latitude, longitude } = loc.coords;
+        setUserLat(latitude);
+        setUserLon(longitude);
+        await search(latitude, longitude, km);
+      } catch (e) {
+        setError('Failed to get your location.');
+        setLoading(false);
+      }
+    },
+    [search],
+  );
+
+  useEffect(() => { fetchAtCurrentLocation(DEFAULT_RADIUS_KM); }, [fetchAtCurrentLocation]);
 
   const handleRadiusChange = (r: Radius) => {
     setRadius(r);
-    fetchPlaces(r);
+    if (userLat != null && userLon != null) {
+      search(userLat, userLon, r);
+    } else {
+      fetchAtCurrentLocation(r);
+    }
   };
+
+  const handleRefresh = () => fetchAtCurrentLocation(radius);
 
   const openDirections = (lat: number, lon: number, name: string) => {
     const url = Platform.select({
@@ -144,39 +221,65 @@ export default function HalalFinderScreen() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: '#E94B3C' }]}>
+      <View style={[styles.header, { backgroundColor: ACCENT }]}>
         <Text style={styles.headerEmoji}>🥩</Text>
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>Halal Restaurants</Text>
-          <Text style={styles.headerSub}>Nearby halal food options</Text>
+          <Text style={styles.headerSub} numberOfLines={1}>
+            {loading
+              ? 'Finding halal restaurants near you...'
+              : userLat != null && places.length > 0
+              ? `Found ${places.length} ${places.length === 1 ? 'restaurant' : 'restaurants'} within ${effectiveRadiusKm}km`
+              : userLat != null
+              ? `No restaurants within ${effectiveRadiusKm}km`
+              : 'Finding your location...'}
+          </Text>
         </View>
-        <TouchableOpacity onPress={() => fetchPlaces()} style={styles.refreshBtn} disabled={loading}>
+        <TouchableOpacity onPress={handleRefresh} style={styles.refreshBtn} hitSlop={8} disabled={loading}>
           {loading
             ? <ActivityIndicator size="small" color="#fff" />
             : <Ionicons name="refresh" size={20} color="#fff" />}
         </TouchableOpacity>
       </View>
 
-      {/* Radius selector */}
-      <View style={[styles.radiusRow, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
-        {RADIUS_OPTIONS.map((r) => (
-          <TouchableOpacity
-            key={r}
-            style={[styles.radiusBtn, radius === r && styles.radiusBtnActive]}
-            onPress={() => handleRadiusChange(r)}
-            disabled={loading}
-          >
-            <Text style={[styles.radiusBtnText, { color: radius === r ? '#fff' : theme.textSecondary }]}>
-              {r} km
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {/* Radius selector chips */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.radiusRow}
+      >
+        {RADIUS_OPTIONS.map((km) => {
+          const active = radius === km;
+          return (
+            <TouchableOpacity
+              key={km}
+              style={[
+                styles.radiusChip,
+                { borderColor: theme.border, backgroundColor: theme.card },
+                active && { backgroundColor: ACCENT, borderColor: ACCENT },
+              ]}
+              onPress={() => handleRadiusChange(km)}
+              activeOpacity={0.75}
+              disabled={loading}
+            >
+              <Text style={[styles.radiusChipText, { color: active ? '#fff' : theme.text }]}>
+                {km} km
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      {autoExpanded ? (
+        <Text style={[styles.autoExpandText, { color: theme.textMuted }]}>
+          No restaurants within {radius}km — showing within {effectiveRadiusKm}km
+        </Text>
+      ) : null}
 
       {loading ? (
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color="#E94B3C" />
-          <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+          <ActivityIndicator size="large" color={ACCENT} />
+          <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
             Finding halal restaurants nearby...
           </Text>
         </View>
@@ -185,8 +288,8 @@ export default function HalalFinderScreen() {
           <Ionicons name="warning-outline" size={40} color={Colors.warning} />
           <Text style={[styles.errorText, { color: theme.text }]}>{error}</Text>
           <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: '#E94B3C' }]}
-            onPress={() => fetchPlaces()}
+            style={[styles.actionBtn, { backgroundColor: ACCENT }]}
+            onPress={handleRefresh}
           >
             <Text style={styles.actionBtnText}>Try Again</Text>
           </TouchableOpacity>
@@ -195,65 +298,50 @@ export default function HalalFinderScreen() {
         <View style={styles.centerBox}>
           <Text style={{ fontSize: 40 }}>🔍</Text>
           <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-            No halal restaurants found nearby. Try expanding the search radius.
+            No halal restaurants found within {effectiveRadiusKm}km. Try expanding your radius.
           </Text>
-          <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: '#E94B3C' }]}
-            onPress={() => fetchPlaces()}
-          >
-            <Text style={styles.actionBtnText}>Search Again</Text>
-          </TouchableOpacity>
         </View>
       ) : (
-        <>
-          {userLat !== null && (
-            <Text style={[styles.resultCount, { color: theme.textSecondary }]}>
-              📍 You are here · {places.length} restaurant{places.length !== 1 ? 's' : ''} within {radius} km
-            </Text>
-          )}
-          <FlatList
-            data={places}
-            keyExtractor={(item) => String(item.id)}
-            contentContainerStyle={{ paddingVertical: 4 }}
-            renderItem={({ item }) => (
-              <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                <View style={styles.iconBg}>
-                  <Text style={{ fontSize: 22 }}>🥙</Text>
-                </View>
-                <View style={styles.info}>
-                  <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  {item.halalCert && (
-                    <View style={styles.certRow}>
-                      <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
-                      <Text style={styles.certText}>{item.halalCert}</Text>
-                    </View>
-                  )}
-                  {item.cuisine && (
-                    <Text style={[styles.cuisineText, { color: theme.textMuted }]} numberOfLines={1}>
-                      {item.cuisine}
-                    </Text>
-                  )}
-                  {item.distance !== undefined && (
-                    <Text style={styles.distance}>
-                      {item.distance < 1
-                        ? `${Math.round(item.distance * 1000)} m away`
-                        : `${item.distance.toFixed(1)} km away`}
-                    </Text>
-                  )}
-                </View>
-                <TouchableOpacity
-                  style={styles.dirBtn}
-                  onPress={() => openDirections(item.lat, item.lon, item.name)}
-                >
-                  <Ionicons name="navigate" size={14} color="#fff" />
-                  <Text style={styles.dirBtnText}>Go</Text>
-                </TouchableOpacity>
+        <FlatList
+          data={places}
+          keyExtractor={(item) => String(item.id)}
+          contentContainerStyle={{ paddingVertical: 4 }}
+          renderItem={({ item }) => (
+            <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <View style={styles.iconBg}>
+                <Text style={{ fontSize: 22 }}>🥙</Text>
               </View>
-            )}
-          />
-        </>
+              <View style={styles.info}>
+                <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={1}>
+                  {item.name}
+                </Text>
+                {item.halalCert && (
+                  <View style={styles.certRow}>
+                    <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
+                    <Text style={styles.certText}>{item.halalCert}</Text>
+                  </View>
+                )}
+                {item.cuisine && (
+                  <Text style={[styles.cuisineText, { color: theme.textMuted }]} numberOfLines={1}>
+                    {item.cuisine}
+                  </Text>
+                )}
+                <Text style={styles.distance}>
+                  📍 {item.distance < 1
+                    ? `${Math.round(item.distance * 1000)} m away`
+                    : `${item.distance.toFixed(1)} km away`}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.dirBtn}
+                onPress={() => openDirections(item.lat, item.lon, item.name)}
+              >
+                <Ionicons name="navigate" size={14} color="#fff" />
+                <Text style={styles.dirBtnText}>Go</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
       )}
     </SafeAreaView>
   );
@@ -269,35 +357,26 @@ const styles = StyleSheet.create({
   },
   headerEmoji: { fontSize: 26 },
   headerTitle: { color: '#fff', fontSize: 17, fontWeight: '700' },
-  headerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12 },
-  refreshBtn: { padding: 8, minWidth: 36, alignItems: 'center' },
+  headerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  refreshBtn: { padding: 4, minWidth: 36, alignItems: 'center' },
 
   radiusRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  radiusBtn: {
-    flex: 1,
+  radiusChip: {
+    paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 20,
-    alignItems: 'center',
-    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#E94B3C',
   },
-  radiusBtnActive: { backgroundColor: '#E94B3C', borderColor: '#E94B3C' },
-  radiusBtnText: { fontSize: 12, fontWeight: '600' },
-
-  resultCount: {
+  radiusChipText: { fontSize: 13, fontWeight: '600' },
+  autoExpandText: {
     fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    paddingVertical: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontStyle: 'italic',
+    marginHorizontal: 16,
+    marginBottom: 4,
   },
 
   centerBox: {
@@ -307,10 +386,10 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 12,
   },
-  loadingText: { fontSize: 14, marginTop: 8 },
+  loadingText: { fontSize: 14 },
   errorText: { fontSize: 15, textAlign: 'center', lineHeight: 22 },
-  emptyText: { fontSize: 15, textAlign: 'center', lineHeight: 22 },
-  actionBtn: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, marginTop: 4 },
+  emptyText: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
+  actionBtn: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
   actionBtnText: { color: '#fff', fontWeight: '700' },
 
   card: {
@@ -327,21 +406,21 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 14,
-    backgroundColor: '#E94B3C20',
+    backgroundColor: ACCENT + '20',
     justifyContent: 'center',
     alignItems: 'center',
   },
   info: { flex: 1 },
   placeName: { fontSize: 15, fontWeight: '700', marginBottom: 2 },
   certRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 },
-  certText: { fontSize: 11, color: '#27AE60', fontWeight: '600' },
+  certText: { fontSize: 11, color: Colors.success, fontWeight: '600' },
   cuisineText: { fontSize: 11, lineHeight: 16, marginBottom: 2 },
-  distance: { fontSize: 12, fontWeight: '600', color: '#E94B3C', marginTop: 2 },
+  distance: { fontSize: 12, fontWeight: '600', color: ACCENT, marginTop: 2 },
   dirBtn: {
     width: 44,
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: '#E94B3C',
+    backgroundColor: ACCENT,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 2,

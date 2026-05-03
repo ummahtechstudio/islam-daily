@@ -56,28 +56,34 @@ interface DhikrCategory {
   items: DhikrItem[];
 }
 
-// ─── Category icon overrides (time-aware, more descriptive) ──────────────────
+// ─── Explicit Dua categories (id → emoji + label) ────────────────────────────
+// Single source of truth for category pills. The id matches hisnul_muslim.json.
 
-const CATEGORY_ICONS: Record<string, string> = {
-  waking:      '🌅',
-  morning:     '☀️',
-  evening:     '🌙',
-  sleep:       '🌛',
-  prayer:      '🕌',
-  eating:      '🍽️',
-  travel:      '✈️',
-  distress:    '🤲',
-  forgiveness: '💚',
-  mosque:      '🕍',
-  protection:  '🛡️',
-  dua_parents: '👨‍👩‍👧',
-  rain:        '🌧️',
-  knowledge:   '📖',
-  sickness:    '🤒',
-  marriage:    '💍',
-  rizq:        '💰',
-  friday:      '🕌',
-};
+const DUA_CATEGORIES: { id: string; emoji: string; label: string }[] = [
+  { id: 'waking',      emoji: '🌄', label: 'Wake Up' },
+  { id: 'morning',     emoji: '☀️', label: 'Morning' },
+  { id: 'evening',     emoji: '🌇', label: 'Evening' },
+  { id: 'sleep',       emoji: '🌙', label: 'Sleep' },
+  { id: 'prayer',      emoji: '🕌', label: 'Prayer' },
+  { id: 'eating',      emoji: '🍽️', label: 'Eating' },
+  { id: 'travel',      emoji: '✈️', label: 'Travel' },
+  { id: 'distress',    emoji: '🤲', label: 'Distress' },
+  { id: 'forgiveness', emoji: '💚', label: 'Forgiveness' },
+  { id: 'protection',  emoji: '🛡️', label: 'Protection' },
+  { id: 'sickness',    emoji: '🤒', label: 'Sickness' },
+  { id: 'marriage',    emoji: '💍', label: 'Marriage' },
+  { id: 'rizq',        emoji: '💰', label: 'Rizq' },
+  { id: 'friday',      emoji: '🕋', label: 'Friday' },
+  { id: 'dua_parents', emoji: '👨‍👩‍👧', label: 'Family' },
+  { id: 'mosque',      emoji: '🕍', label: 'Gratitude' },
+  { id: 'knowledge',   emoji: '📖', label: 'Guidance' },
+  { id: 'rain',        emoji: '🌧️', label: 'Patience' },
+];
+
+const CATEGORY_ICONS: Record<string, string> = DUA_CATEGORIES.reduce(
+  (acc, c) => ({ ...acc, [c.id]: c.emoji }),
+  {} as Record<string, string>,
+);
 
 // ─── "Dua of the Moment" ─────────────────────────────────────────────────────
 
@@ -201,10 +207,10 @@ export default function DuaScreen() {
                 </View>
                 <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
               </View>
-              <Text style={styles.duaMomentArabic} textBreakStrategy="simple" numberOfLines={3}>
+              <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
                 {duaOfMoment.dua.arabic}
               </Text>
-              <Text style={styles.duaMomentEnglish} numberOfLines={2}>
+              <Text style={styles.duaMomentEnglish}>
                 {duaOfMoment.dua.english}
               </Text>
             </View>
@@ -230,44 +236,34 @@ export default function DuaScreen() {
             )}
           </View>
 
-          {/* Category selector */}
+          {/* Category selector — explicit pills with emoji + label */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categories}
           >
-            {HISNUL_MUSLIM.map((cat) => {
+            {DUA_CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat.id;
+              const exists = HISNUL_MUSLIM.some((c) => c.id === cat.id);
+              if (!exists) return null;
               return (
                 <TouchableOpacity
                   key={cat.id}
                   style={[
-                    styles.catChip,
-                    { borderColor: theme.border, backgroundColor: theme.card },
-                    isActive && styles.catChipActive,
+                    styles.catPill,
+                    isActive ? styles.catPillActive : styles.catPillInactive,
                   ]}
                   onPress={() => setSelectedCategory(cat.id)}
-                  activeOpacity={0.85}
+                  activeOpacity={0.8}
                 >
-                  <Text style={styles.catIcon}>
-                    {CATEGORY_ICONS[cat.id] ?? cat.icon}
-                  </Text>
                   <Text
                     style={[
-                      styles.catLabel,
-                      { color: isActive ? '#fff' : theme.text },
+                      styles.catPillText,
+                      { color: isActive ? '#FFFFFF' : Colors.primary },
                     ]}
                     numberOfLines={1}
                   >
-                    {cat.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.catCount,
-                      { color: isActive ? 'rgba(255,255,255,0.85)' : theme.textMuted },
-                    ]}
-                  >
-                    {cat.duas.length}
+                    {cat.emoji} {cat.label}
                   </Text>
                 </TouchableOpacity>
               );
@@ -596,29 +592,36 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 
-  // Dua
+  // Dua categories
   categories: { paddingHorizontal: 16, gap: 8, paddingVertical: 12 },
-  catChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+  catPill: {
+    minWidth: 110,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 20,
-    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  catChipActive: {
+  catPillInactive: {
+    backgroundColor: 'rgba(15,110,86,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(15,110,86,0.3)',
+  },
+  catPillActive: {
     backgroundColor: Colors.primary,
+    borderWidth: 1,
     borderColor: Colors.primary,
     shadowColor: Colors.primary,
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 4,
+    elevation: 3,
   },
-  catIcon: { fontSize: 16 },
-  catLabel: { fontSize: 13, fontWeight: '600' },
-  catCount: { fontSize: 11, fontWeight: '700', marginLeft: 2 },
+  catPillText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   duaList: { padding: 12, gap: 12, paddingBottom: 32 },
   duaCard: {
     borderRadius: 16,

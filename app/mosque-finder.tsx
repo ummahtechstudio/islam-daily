@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
+import { fetchWithTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
 
 interface Mosque {
   id: string;
@@ -63,10 +64,11 @@ async function fetchNearbyMosques(
     );
     out center;
   `;
-  const response = await fetch('https://overpass-api.de/api/interpreter', {
-    method: 'POST',
-    body: query,
-  });
+  const response = await fetchWithTimeout(
+    'https://overpass-api.de/api/interpreter',
+    { method: 'POST', body: query },
+    20000,
+  );
   if (!response.ok) {
     throw new Error(`Overpass API ${response.status}`);
   }
@@ -150,7 +152,11 @@ export default function MosqueFinder() {
       setMosques(result);
       setEffectiveRadiusKm(usedKm);
     } catch (e) {
-      setError('Failed to find mosques. Please check your internet connection.');
+      if (e instanceof OfflineError) {
+        setError(OFFLINE_MESSAGE);
+      } else {
+        setError('Failed to find mosques. Please try again in a moment.');
+      }
     } finally {
       setLoading(false);
     }
