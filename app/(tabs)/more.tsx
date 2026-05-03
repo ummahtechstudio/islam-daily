@@ -169,6 +169,29 @@ export default function MoreScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* ── Featured: Tasbeeh Counter ── */}
+        <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+          <TouchableOpacity
+            style={[styles.tasbeehCard, { backgroundColor: theme.card, borderColor: GOLD + '40' }]}
+            onPress={() => router.push('/tasbeeh' as any)}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.tasbeehIconBox, { backgroundColor: Colors.primary }]}>
+              <Text style={styles.tasbeehIcon}>📿</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.tasbeehLabel, { color: theme.text }]}>Tasbeeh Counter</Text>
+              <Text style={[styles.tasbeehUrdu, { color: theme.textSecondary }]}>تسبیح کاؤنٹر</Text>
+              <Text style={[styles.tasbeehSub, { color: theme.textMuted }]}>
+                Count your dhikr with timer
+              </Text>
+            </View>
+            <View style={[styles.tasbeehChevron, { backgroundColor: Colors.primary + '14' }]}>
+              <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {/* ── Sections ── */}
         {SECTIONS.map((section) => (
           <View key={section.title} style={styles.section}>
@@ -384,6 +407,38 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.5,
+  },
+
+  tasbeehCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+  },
+  tasbeehIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tasbeehIcon: { fontSize: 26 },
+  tasbeehLabel: { fontSize: 16, fontWeight: '800' },
+  tasbeehUrdu: {
+    fontFamily: 'NotoNastaliqUrdu_400Regular',
+    fontSize: 13,
+    marginTop: 2,
+    writingDirection: 'rtl',
+  },
+  tasbeehSub: { fontSize: 12, marginTop: 2 },
+  tasbeehChevron: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   featuredCard: {

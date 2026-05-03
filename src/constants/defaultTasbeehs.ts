@@ -1,0 +1,43 @@
+import type { TasbeehCounter } from '../types/tasbeeh';
+
+export const DEFAULT_TASBEEHS: TasbeehCounter[] = [
+  {
+    id: 'default-1',
+    name: 'SubhanAllah',
+    arabic: 'سُبْحَانَ اللَّهِ',
+    target: 33,
+    currentCount: 0,
+    rounds: 0,
+    totalCount: 0,
+    totalTime: 0,
+    createdAt: 0,
+    isDefault: true,
+    source: 'After every prayer (Bukhari 843)',
+  },
+  {
+    id: 'default-2',
+    name: 'Alhamdulillah',
+    arabic: 'الْحَمْدُ لِلَّهِ',
+    target: 33,
+    currentCount: 0,
+    rounds: 0,
+    totalCount: 0,
+    totalTime: 0,
+    createdAt: 0,
+    isDefault: true,
+    source: 'After every prayer (Bukhari 843)',
+  },
+  {
+    id: 'default-3',
+    name: 'AllahuAkbar',
+    arabic: 'اللَّهُ أَكْبَرُ',
+    target: 34,
+    currentCount: 0,
+    rounds: 0,
+    totalCount: 0,
+    totalTime: 0,
+    createdAt: 0,
+    isDefault: true,
+    source: 'After every prayer (Bukhari 843)',
+  },
+];

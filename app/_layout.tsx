@@ -149,6 +149,9 @@ export default function RootLayout() {
         <Stack.Screen name="halal-finder" options={{ title: 'Halal Restaurant Finder' }} />
         <Stack.Screen name="ramadan" options={{ title: 'Ramadan' }} />
         <Stack.Screen name="audio-library" options={{ title: 'Audio Library — آڈیو لائبریری' }} />
+        <Stack.Screen name="tasbeeh" options={{ headerShown: false }} />
+        <Stack.Screen name="tasbeeh-list" options={{ headerShown: false }} />
+        <Stack.Screen name="tasbeeh-edit" options={{ headerShown: false }} />
       </Stack>
       <MiniPlayer isDark={isDark} />
       <FullPlayerModal isDark={isDark} />
