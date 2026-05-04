@@ -18,6 +18,8 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { fetchWithTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
+import { useIsOnline } from '../src/hooks/useIsOnline';
+import MosqueFinderEmptyState from '../src/components/MosqueFinderEmptyState';
 
 interface Mosque {
   id: string;
@@ -122,6 +124,7 @@ export default function MosqueFinder() {
     settings.colorScheme === 'dark' ||
     (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
+  const isOnline = useIsOnline();
 
   const [mosques, setMosques] = useState<Mosque[]>([]);
   const [loading, setLoading] = useState(true);
@@ -207,6 +210,10 @@ export default function MosqueFinder() {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
     Linking.openURL(url);
   };
+
+  if (!isOnline) {
+    return <MosqueFinderEmptyState onRetry={handleRefresh} />;
+  }
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>

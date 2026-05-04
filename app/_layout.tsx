@@ -29,10 +29,15 @@ import {
   refreshDuas,
   refreshNamesOfAllah,
 } from '../src/services/content';
+import { fetchTodaysDailyKnowledge } from '../src/services/dailyKnowledgeService';
 import {
   downloadFullQuran,
   getQuranFromCache,
 } from '../src/services/quranCache';
+import {
+  downloadHadithBook,
+  isHadithBookCached,
+} from '../src/services/hadithCache';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -87,6 +92,7 @@ export default function RootLayout() {
     refreshNamesOfAllah();
     refreshDuas();
     refreshDhikr();
+    fetchTodaysDailyKnowledge().catch(() => { /* silent */ });
 
     // Re-pull the full Quran in the background if the cache is older than
     // 30 days, in case Tanzil corrects a typo. Silent — bound only by network.
@@ -94,6 +100,12 @@ export default function RootLayout() {
     const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
     if (idx && Date.now() - idx.fetchedAt > THIRTY_DAYS) {
       downloadFullQuran().catch(() => {});
+    }
+
+    // Quietly pre-warm Bukhari so the first tap is instant. The other 5 books
+    // remain lazy on first open — see services/hadithCache.ts.
+    if (!isHadithBookCached('bukhari')) {
+      downloadHadithBook('bukhari').catch(() => {});
     }
   }, [fontsLoaded]);
 

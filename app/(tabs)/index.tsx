@@ -24,18 +24,15 @@ import { usePrayerTimes } from '../../src/hooks/usePrayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
 import { useStore } from '../../src/store';
 import { CACHE_KEYS, PRAYER_LIST } from '../../src/constants';
-import { getContentLanguage, ContentLanguage, isRtlLanguage } from '../../src/services/localization';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting } from '../../src/utils/settings';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 
-import KNOWLEDGE_DATA from '../../assets/daily_knowledge.json';
+import { DailyKnowledgeCard } from '../../src/components/DailyKnowledgeCard';
 
 const { width: W } = Dimensions.get('window');
 const GOLD = '#EF9F27';
 const GOLD_LIGHT = 'rgba(239,159,39,0.12)';
-
-type KnowledgeTip = typeof KNOWLEDGE_DATA[0];
 
 // ─── Islamic Geometric Header Pattern ────────────────────────────────────────
 function GeometricPattern({ width, height }: { width: number; height: number }) {
@@ -262,41 +259,6 @@ const verseStyles = StyleSheet.create({
   readBtn: { fontSize: 13, fontWeight: '700' },
 });
 
-// ─── Knowledge Tip Card ───────────────────────────────────────────────────────
-function KnowledgeCard({ tip, lang, isDark }: { tip: KnowledgeTip; lang: ContentLanguage; isDark: boolean }) {
-  const theme = isDark ? Colors.dark : Colors.light;
-  const content = (tip as any)[lang] as { title: string; text: string } | undefined;
-  if (!content) return null;
-  const rtl = isRtlLanguage(lang);
-
-  return (
-    <View style={[knowledgeStyles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <Text style={knowledgeStyles.icon}>{tip.icon}</Text>
-      <Text style={[knowledgeStyles.title, { color: theme.text, textAlign: rtl ? 'right' : 'left' }]} numberOfLines={2}>
-        {content.title}
-      </Text>
-      <Text style={[knowledgeStyles.text, { color: theme.textSecondary, textAlign: rtl ? 'right' : 'left' }]} numberOfLines={4}>
-        {content.text}
-      </Text>
-    </View>
-  );
-}
-
-const knowledgeStyles = StyleSheet.create({
-  card: {
-    width: 200,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    gap: 6,
-    borderLeftWidth: 3,
-    borderLeftColor: GOLD,
-  },
-  icon: { fontSize: 24 },
-  title: { fontSize: 13, fontWeight: '700' },
-  text: { fontSize: 12, lineHeight: 18 },
-});
-
 // ─── More Features Section ────────────────────────────────────────────────────
 type MoreItem = { id: string; icon: string; label: string; sub: string; route: string };
 type MoreSection = { title: string; icon: string; color: string; items: MoreItem[] };
@@ -440,7 +402,6 @@ export default function HomeScreen() {
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [verseLoading, setVerseLoading] = useState(true);
-  const [contentLang, setContentLang] = useState<ContentLanguage>('en');
 
   // Home tile customization preferences
   const [enabledIds, setEnabledIds] = useState<string[]>(DEFAULT_ENABLED_TILE_IDS);
@@ -480,20 +441,11 @@ export default function HomeScreen() {
   const hijriMonth = prayerData?.date?.hijri?.month?.number ?? 0;
   const isRamadan = hijriMonth === 9;
 
-  // Pick today's 6 tips (seeded by day)
-  const dailyTips = React.useMemo(() => {
-    const seed = new Date().getDate();
-    return [...KNOWLEDGE_DATA]
-      .sort((a, b) => ((a.id * seed) % 13) - ((b.id * seed) % 13))
-      .slice(0, 6);
-  }, []);
-
   const loadContent = useCallback(async () => {
     setVerseLoading(true);
     try {
-      const [v, lang] = await Promise.all([fetchRandomVerse(), getContentLanguage()]);
+      const v = await fetchRandomVerse();
       setVerse(v);
-      setContentLang(lang);
     } catch {}
     setVerseLoading(false);
   }, []);
@@ -617,15 +569,7 @@ export default function HomeScreen() {
 
         {/* ── Daily Knowledge ── */}
         <SectionTitle title="Daily Knowledge" isDark={isDark} />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.knowledgeRow}
-        >
-          {dailyTips.map((tip) => (
-            <KnowledgeCard key={tip.id} tip={tip} lang={contentLang} isDark={isDark} />
-          ))}
-        </ScrollView>
+        <DailyKnowledgeCard isDark={isDark} />
 
         <GoldDivider />
 
@@ -695,7 +639,6 @@ const styles = StyleSheet.create({
   },
   loadingText: { fontSize: 14 },
 
-  knowledgeRow: { gap: 10, paddingBottom: 4 },
 
   footer: {
     alignItems: 'center',

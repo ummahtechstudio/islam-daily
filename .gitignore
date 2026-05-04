@@ -46,3 +46,7 @@ app-example
 .claude/
 scripts/data/
 
+# Auto-generated CSV template — regenerate via scripts/exportDuasForDescriptions.ts.
+# The filled-in `content/dua-descriptions.csv` IS committed (source of truth).
+content/dua-descriptions-TEMPLATE.csv
+

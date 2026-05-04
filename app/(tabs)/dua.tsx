@@ -330,6 +330,15 @@ export default function DuaScreen() {
                     />
                   </View>
 
+                  {dua.description_ur ? (
+                    <Text
+                      style={[styles.duaDescription, { color: theme.textSecondary }]}
+                      numberOfLines={2}
+                    >
+                      {dua.description_ur}
+                    </Text>
+                  ) : null}
+
                   <Text
                     style={[styles.duaArabic, { color: theme.text }]}
                     textBreakStrategy="simple"
@@ -673,6 +682,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 4,
     backgroundColor: GOLD,
+  },
+  duaDescription: {
+    fontSize: 13,
+    lineHeight: 24,
+    marginBottom: 10,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
   },
   duaHeader: {
     flexDirection: 'row',

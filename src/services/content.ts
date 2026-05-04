@@ -64,20 +64,24 @@ interface SupabaseDuaRow {
   urdu: string | null;
   english: string;
   source: string | null;
+  description_ur: string | null;
+  description_source: string | null;
 }
 
 export async function refreshDuas(): Promise<void> {
   try {
     const { data, error } = await supabase
       .from('duas')
-      .select('id, category, title, arabic, transliteration, urdu, english, source')
+      .select(
+        'id, category, title, arabic, transliteration, urdu, english, source, description_ur, description_source',
+      )
       .order('id');
     if (error || !data?.length) return;
 
     // Group flat rows into DuaCategory[] using the bundled icons as a lookup.
     const iconByCat = new Map(DUAS_BUNDLED.map((c) => [c.id, c.icon] as const));
     const grouped = new Map<string, DuaCategory>();
-    for (const row of data as SupabaseDuaRow[]) {
+    for (const row of data as unknown as SupabaseDuaRow[]) {
       let cat = grouped.get(row.category);
       if (!cat) {
         cat = {
@@ -89,11 +93,14 @@ export async function refreshDuas(): Promise<void> {
         grouped.set(row.category, cat);
       }
       cat.duas.push({
+        id: row.id,
         arabic: row.arabic,
         transliteration: row.transliteration ?? '',
         english: row.english,
         urdu: row.urdu ?? undefined,
         reference: row.source ?? '',
+        description_ur: row.description_ur,
+        description_source: row.description_source,
       });
     }
     cache.setJSON<DuaCategory[]>(CACHE_KEYS.DUAS, Array.from(grouped.values()));

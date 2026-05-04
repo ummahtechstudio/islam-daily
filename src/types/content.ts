@@ -24,6 +24,31 @@ export interface Dua {
   english: string;
   urdu?: string;
   reference: string;
+
+  // Phase D.1 — populated from Supabase, absent in bundled JSON.
+  // `id` is the integer primary key from public.duas (used by import scripts
+  // to bind a CSV row back to its DB row).
+  id?: number;
+  description_ur?: string | null;
+  description_source?: string | null;
+}
+
+/**
+ * One row of public.daily_knowledge — hand-curated daily reflections.
+ */
+export interface DailyKnowledge {
+  id: string;
+  display_date: string; // ISO date "2026-05-03"
+  type: 'ayah' | 'hadith' | 'reflection' | 'name_of_allah';
+  arabic_text?: string | null;
+  source_reference?: string | null;
+  translation_ur?: string | null;
+  translation_en?: string | null;
+  context_ur?: string | null;
+  context_en?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DuaCategory {

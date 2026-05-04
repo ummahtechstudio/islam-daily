@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -20,14 +20,20 @@ import { trackScreen } from '../src/services/analytics';
 import { SupabaseHadith } from '../src/lib/supabase';
 import { useStore } from '../src/store';
 import CardActionsRow from '../components/CardActionsRow';
+import { useIsOnline } from '../src/hooks/useIsOnline';
 import {
-  getCollection,
-  getCollectionCounts,
-  clearCollectionCache,
   DEFAULT_COLLECTION_COUNTS,
   HadithCollectionKey,
-  CollectionLoadProgress,
 } from '../src/services/hadiths';
+import {
+  clearHadithCache,
+  downloadHadithBook,
+  getCachedHadithCounts,
+  getHadithsForBook,
+  isHadithBookCached,
+  type HadithDownloadProgress,
+} from '../src/services/hadithCache';
+import HadithBookDownloadStrip from '../src/components/hadith/HadithBookDownloadStrip';
 
 const GOLD = '#EF9F27';
 const PAGE_SIZE = 25;
@@ -116,12 +122,6 @@ const gridStyles = StyleSheet.create({
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export default function HadithScreen() {
   useEffect(() => { trackScreen('Hadith'); }, []);
 
@@ -129,64 +129,107 @@ export default function HadithScreen() {
   const settings = useStore((s) => s.settings);
   const isDark = settings.colorScheme === 'dark' || (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
+  const isOnline = useIsOnline();
 
   const [viewMode, setViewMode] = useState<'collections' | 'hadiths'>('collections');
   const [selectedCollection, setSelectedCollection] = useState<HadithCollectionKey | ''>('');
   const [allHadiths, setAllHadiths] = useState<SupabaseHadith[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [progress, setProgress] = useState<CollectionLoadProgress | null>(null);
+  const [progress, setProgress] = useState<HadithDownloadProgress | null>(null);
+  const [downloadError, setDownloadError] = useState<Error | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionCounts, setCollectionCounts] = useState<Record<string, number>>({});
-  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const cancelRef = useRef<{ slug: HadithCollectionKey | null; cancelled: boolean }>({
+    slug: null,
+    cancelled: false,
+  });
 
   const collMeta = COLLECTION_META[selectedCollection] ?? { color: '#0F6E56', bg: '#0F6E5615', icon: '📗' };
   const collName = HADITH_COLLECTIONS.find((c) => c.key === selectedCollection)?.name ?? '';
 
-  // Load cached counts on mount
+  // Pull cached counts once on mount.
   useEffect(() => {
-    getCollectionCounts()
-      .then(setCollectionCounts)
-      .catch((err) => console.warn('[Hadith] getCollectionCounts failed', err));
+    setCollectionCounts(getCachedHadithCounts());
   }, []);
 
-  const loadCollection = useCallback(async (key: HadithCollectionKey) => {
-    setLoading(true);
-    setLoadError(null);
-    setProgress({ receivedBytes: 0, totalBytes: null, phase: 'downloading' });
+  const startDownload = useCallback(async (key: HadithCollectionKey) => {
+    cancelRef.current = { slug: key, cancelled: false };
+    setDownloadError(null);
+    setProgress({ bookSlug: key, receivedBytes: 0, totalBytes: null, phase: 'downloading' });
     try {
-      console.log('[Hadith] loadCollection start:', key);
-      const hadiths = await getCollection(key, (p) => setProgress(p));
-      console.log('[Hadith] loadCollection done:', key, '— count:', hadiths.length);
-      setAllHadiths(hadiths);
-      setCollectionCounts((prev) => ({ ...prev, [key]: hadiths.length }));
-    } catch (err: any) {
-      console.warn('[Hadith] Failed to load collection', key, err);
-      setAllHadiths([]);
-      setLoadError(err?.message ?? 'Failed to load hadiths. Please try again.');
-    } finally {
-      setLoading(false);
+      const entry = await downloadHadithBook(key, (p) => {
+        if (cancelRef.current.cancelled || cancelRef.current.slug !== key) return;
+        setProgress(p);
+      });
+      if (cancelRef.current.cancelled || cancelRef.current.slug !== key) return;
+      setAllHadiths(entry.hadiths);
+      setCollectionCounts((prev) => ({ ...prev, [key]: entry.totalCount }));
       setProgress(null);
-      setRefreshing(false);
+    } catch (err: any) {
+      if (cancelRef.current.cancelled || cancelRef.current.slug !== key) return;
+      console.warn('[Hadith] downloadHadithBook failed', key, err);
+      setDownloadError(err instanceof Error ? err : new Error(String(err)));
     }
   }, []);
 
-  const handleSelectCollection = (key: HadithCollectionKey) => {
+  const handleSelectCollection = useCallback((key: HadithCollectionKey) => {
     setSelectedCollection(key);
-    setAllHadiths([]);
     setPage(1);
     setSearchQuery('');
     setViewMode('hadiths');
-    loadCollection(key);
-  };
+    setDownloadError(null);
+
+    const cached = getHadithsForBook(key);
+    if (cached.length > 0) {
+      setAllHadiths(cached);
+      setProgress(null);
+      return;
+    }
+    setAllHadiths([]);
+    if (isOnline) {
+      startDownload(key);
+    } else {
+      setProgress(null);
+    }
+  }, [isOnline, startDownload]);
+
+  // If we entered the screen offline-without-cache, then connectivity comes back,
+  // start the download automatically.
+  useEffect(() => {
+    if (viewMode !== 'hadiths') return;
+    if (!selectedCollection) return;
+    if (allHadiths.length > 0) return;
+    if (!isOnline) return;
+    if (progress) return;
+    if (downloadError) return;
+    if (isHadithBookCached(selectedCollection)) {
+      setAllHadiths(getHadithsForBook(selectedCollection));
+      return;
+    }
+    startDownload(selectedCollection);
+  }, [viewMode, selectedCollection, allHadiths.length, isOnline, progress, downloadError, startDownload]);
+
+  // Cancel any in-flight UI updates when leaving the screen / switching books.
+  useEffect(() => {
+    return () => {
+      cancelRef.current.cancelled = true;
+    };
+  }, []);
 
   const onRefresh = async () => {
     if (!selectedCollection) return;
+    if (!isOnline) {
+      setRefreshing(false);
+      return;
+    }
     setRefreshing(true);
     setPage(1);
-    await clearCollectionCache(selectedCollection);
-    await loadCollection(selectedCollection);
+    clearHadithCache(selectedCollection);
+    setAllHadiths([]);
+    await startDownload(selectedCollection);
+    setRefreshing(false);
   };
 
   const filteredHadiths = useMemo(() => {
@@ -209,7 +252,7 @@ export default function HadithScreen() {
   const hasMore = visibleHadiths.length < filteredHadiths.length;
 
   const loadMore = () => {
-    if (!loading && hasMore) setPage((p) => p + 1);
+    if (hasMore) setPage((p) => p + 1);
   };
 
   const renderHadith = ({ item }: { item: SupabaseHadith }) => {
@@ -268,13 +311,33 @@ export default function HadithScreen() {
   };
 
   const totalCount = filteredHadiths.length;
+  const isDownloading = !!progress && progress.phase !== 'done';
+  const showStrip = viewMode === 'hadiths' && !!selectedCollection && (isDownloading || !!downloadError) && allHadiths.length === 0;
+  const showOfflineEmpty =
+    viewMode === 'hadiths' &&
+    !!selectedCollection &&
+    allHadiths.length === 0 &&
+    !isOnline &&
+    !isDownloading &&
+    !downloadError;
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
         <View style={styles.headerRow}>
           {viewMode !== 'collections' ? (
-            <TouchableOpacity onPress={() => setViewMode('collections')} hitSlop={8} style={{ marginRight: 10 }}>
+            <TouchableOpacity
+              onPress={() => {
+                cancelRef.current.cancelled = true;
+                setViewMode('collections');
+                setSelectedCollection('');
+                setAllHadiths([]);
+                setProgress(null);
+                setDownloadError(null);
+              }}
+              hitSlop={8}
+              style={{ marginRight: 10 }}
+            >
               <Ionicons name="arrow-back" size={22} color="#fff" />
             </TouchableOpacity>
           ) : null}
@@ -293,44 +356,51 @@ export default function HadithScreen() {
         </View>
       </View>
 
+      {showStrip ? (
+        <HadithBookDownloadStrip
+          bookName={collName}
+          progress={progress}
+          isOnline={isOnline}
+          hasError={!!downloadError}
+        />
+      ) : null}
+
       {viewMode === 'collections' ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           <CollectionsGrid onSelect={handleSelectCollection} isDark={isDark} counts={collectionCounts} />
         </ScrollView>
-      ) : loading && allHadiths.length === 0 ? (
-        <View style={styles.loading}>
-          <ActivityIndicator color={Colors.primary} size="large" />
-          <Text style={[styles.loadingTitle, { color: theme.text }]}>
-            Downloading {collName}…
+      ) : showOfflineEmpty ? (
+        <View style={styles.empty}>
+          <Ionicons name="book-outline" size={56} color={GOLD} />
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>
+            {collName} not yet downloaded
           </Text>
-          {progress ? (
-            <Text style={[styles.loadingText, { color: theme.textMuted }]}>
-              {progress.phase === 'parsing'
-                ? 'Parsing…'
-                : progress.totalBytes
-                ? `${formatBytes(progress.receivedBytes)} / ${formatBytes(progress.totalBytes)}`
-                : `${formatBytes(progress.receivedBytes)} downloaded`}
-            </Text>
-          ) : null}
-          <Text style={[styles.loadingHint, { color: theme.textMuted }]}>
-            First load only — cached for 30 days.
-          </Text>
-        </View>
-      ) : loadError && allHadiths.length === 0 ? (
-        <View style={styles.loading}>
-          <Ionicons name="cloud-offline-outline" size={48} color={theme.textMuted} />
-          <Text style={[styles.loadingTitle, { color: theme.text }]}>Load Failed</Text>
-          <Text style={[styles.loadingText, { color: theme.textMuted }]} numberOfLines={3}>
-            {loadError}
+          <Text style={[styles.emptyBody, { color: theme.textMuted }]}>
+            Connect to the internet once and {collName} will be available offline forever.
           </Text>
           <TouchableOpacity
-            style={[styles.retryBtn, { backgroundColor: Colors.primary }]}
-            onPress={() => selectedCollection && loadCollection(selectedCollection)}
-            activeOpacity={0.8}
+            style={[
+              styles.retryBtn,
+              { backgroundColor: Colors.primary },
+              !isOnline && styles.retryBtnDisabled,
+            ]}
+            onPress={() => selectedCollection && startDownload(selectedCollection)}
+            disabled={!isOnline}
+            activeOpacity={0.85}
           >
             <Ionicons name="refresh" size={16} color="#fff" />
-            <Text style={styles.retryText}>Retry</Text>
+            <Text style={styles.retryText}>Try again</Text>
           </TouchableOpacity>
+        </View>
+      ) : isDownloading && allHadiths.length === 0 ? (
+        <View style={styles.empty}>
+          <ActivityIndicator color={Colors.primary} size="large" />
+          <Text style={[styles.emptyTitle, { color: theme.text }]}>
+            Preparing {collName}…
+          </Text>
+          <Text style={[styles.emptyBody, { color: theme.textMuted }]}>
+            First load only — cached forever after this.
+          </Text>
         </View>
       ) : (
         <>
@@ -375,11 +445,9 @@ export default function HadithScreen() {
               />
             }
             ListEmptyComponent={
-              loading ? null : (
-                <View style={styles.empty}>
-                  <Text style={[styles.emptyText, { color: theme.textMuted }]}>No hadiths found.</Text>
-                </View>
-              )
+              <View style={styles.empty}>
+                <Text style={[styles.emptyBody, { color: theme.textMuted }]}>No hadiths found.</Text>
+              </View>
             }
             ListFooterComponent={
               hasMore ? <ActivityIndicator color={Colors.primary} style={{ marginVertical: 20 }} /> : null
@@ -415,27 +483,25 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontStyle: 'italic',
   },
-  empty: { padding: 40, alignItems: 'center' },
-  emptyText: { fontSize: 14 },
-  loading: {
+  empty: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     paddingHorizontal: 32,
   },
-  loadingTitle: { fontSize: 16, fontWeight: '700', marginTop: 8 },
-  loadingText: { fontSize: 13, textAlign: 'center' },
-  loadingHint: { fontSize: 12, marginTop: 4, textAlign: 'center' },
+  emptyTitle: { fontSize: 17, fontWeight: '700', textAlign: 'center', marginTop: 4 },
+  emptyBody: { fontSize: 13, lineHeight: 19, textAlign: 'center' },
   retryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginTop: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 12,
+    marginTop: 10,
+    paddingHorizontal: 22,
+    paddingVertical: 11,
+    borderRadius: 22,
   },
+  retryBtnDisabled: { opacity: 0.4 },
   retryText: { color: '#fff', fontSize: 14, fontWeight: '700' },
 });
 
