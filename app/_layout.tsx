@@ -67,6 +67,7 @@ export default function RootLayout() {
     Amiri_700Bold,
     Amiri_400Regular_Italic,
     NotoNastaliqUrdu_400Regular,
+    IndoPakNastaleeq: require('../assets/fonts/IndoPakNastaleeq.ttf'),
   });
 
   const [showConsent, setShowConsent] = useState(false);

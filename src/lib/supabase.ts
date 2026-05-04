@@ -16,6 +16,8 @@ export interface QuranAyah {
   english_translation: string | null;
   juz: number | null;
   page: number | null;
+  text_indopak?: string;
+  page_indopak?: number;
 }
 
 export interface SupabaseHadith {

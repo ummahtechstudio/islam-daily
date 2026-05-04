@@ -1,12 +1,14 @@
 // ─── Font name constants ──────────────────────────────────────────────────────
 
 const URDU_FONT = 'NotoNastaliqUrdu_400Regular';
+const INDOPAK_FONT = 'IndoPakNastaleeq';
 
 export const Fonts = {
   arabic: 'Amiri_400Regular',
   arabicBold: 'Amiri_700Bold',
   arabicItalic: 'Amiri_400Regular_Italic',
   urdu: URDU_FONT,
+  indopak: INDOPAK_FONT,
 
   // System fonts
   regular: undefined,
@@ -18,6 +20,7 @@ export const Fonts = {
 export const FONTS = {
   urdu: URDU_FONT,
   arabic: 'Amiri_400Regular',
+  indopak: INDOPAK_FONT,
   sans: undefined as string | undefined,
 };
 
