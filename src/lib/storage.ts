@@ -20,6 +20,10 @@ interface SyncKV {
   clearAll(): void;
 }
 
+// On Expo Web's SSR pass `window` is undefined; native modules and even the
+// in-memory fallback should no-op so renders can complete without throwing.
+const isClient = typeof window !== 'undefined';
+
 function createInMemoryStore(): SyncKV {
   const map = new Map<string, string>();
   return {
@@ -32,6 +36,7 @@ function createInMemoryStore(): SyncKV {
 }
 
 function createMmkvStore(id: string): SyncKV {
+  if (!isClient) return createInMemoryStore();
   try {
     // Lazy require so a missing native module doesn't break the JS bundle.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -57,19 +62,37 @@ function createMmkvStore(id: string): SyncKV {
 
 function makeNamespace(store: SyncKV) {
   return {
-    get: (key: string): string | undefined => store.getString(key),
-    set: (key: string, value: string): void => store.set(key, value),
+    get: (key: string): string | undefined => {
+      if (!isClient) return undefined;
+      try { return store.getString(key); } catch { return undefined; }
+    },
+    set: (key: string, value: string): void => {
+      if (!isClient) return;
+      try { store.set(key, value); } catch { /* swallow */ }
+    },
     getJSON: <T>(key: string): T | null => {
-      const raw = store.getString(key);
+      if (!isClient) return null;
+      let raw: string | undefined;
+      try { raw = store.getString(key); } catch { return null; }
       if (!raw) return null;
       try { return JSON.parse(raw) as T; } catch { return null; }
     },
     setJSON: <T>(key: string, value: T): void => {
-      try { store.set(key, JSON.stringify(value)); } catch {}
+      if (!isClient) return;
+      try { store.set(key, JSON.stringify(value)); } catch { /* swallow */ }
     },
-    delete: (key: string): void => store.delete(key),
-    clearAll: (): void => store.clearAll(),
-    has: (key: string): boolean => store.contains(key),
+    delete: (key: string): void => {
+      if (!isClient) return;
+      try { store.delete(key); } catch { /* swallow */ }
+    },
+    clearAll: (): void => {
+      if (!isClient) return;
+      try { store.clearAll(); } catch { /* swallow */ }
+    },
+    has: (key: string): boolean => {
+      if (!isClient) return false;
+      try { return store.contains(key); } catch { return false; }
+    },
   };
 }
 

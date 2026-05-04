@@ -28,9 +28,19 @@ const DHIKR_BUNDLED = bundledDhikr as DhikrCategory[];
 
 // ─── 99 Names of Allah ───────────────────────────────────────────────────────
 
-export function getNamesOfAllah(): NameOfAllah[] {
-  const cached = cache.getJSON<NameOfAllah[]>(CACHE_KEYS.NAMES_99);
-  if (cached && cached.length) return cached;
+// Sync, SSR-safe. Returns bundled JSON only — never touches storage.
+// Use as a useState lazy initialiser so the first render works on web SSR.
+export function getBundledNamesOfAllah(): NameOfAllah[] {
+  return NAMES_BUNDLED;
+}
+
+// Reads the MMKV cache if present, else falls back to bundled.
+// MUST be called from useEffect (client-only) — storage is unavailable on SSR.
+export function getCachedOrBundledNamesOfAllah(): NameOfAllah[] {
+  try {
+    const cached = cache.getJSON<NameOfAllah[]>(CACHE_KEYS.NAMES_99);
+    if (cached && cached.length) return cached;
+  } catch { /* storage not ready -> fall through */ }
   return NAMES_BUNDLED;
 }
 
@@ -49,9 +59,15 @@ export async function refreshNamesOfAllah(): Promise<void> {
 
 // ─── Duas (Hisn al-Muslim) ───────────────────────────────────────────────────
 
-export function getDuas(): DuaCategory[] {
-  const cached = cache.getJSON<DuaCategory[]>(CACHE_KEYS.DUAS);
-  if (cached && cached.length) return cached;
+export function getBundledDuas(): DuaCategory[] {
+  return DUAS_BUNDLED;
+}
+
+export function getCachedOrBundledDuas(): DuaCategory[] {
+  try {
+    const cached = cache.getJSON<DuaCategory[]>(CACHE_KEYS.DUAS);
+    if (cached && cached.length) return cached;
+  } catch { /* storage not ready -> fall through */ }
   return DUAS_BUNDLED;
 }
 
@@ -111,9 +127,15 @@ export async function refreshDuas(): Promise<void> {
 
 // ─── Dhikr ───────────────────────────────────────────────────────────────────
 
-export function getDhikr(): DhikrCategory[] {
-  const cached = cache.getJSON<DhikrCategory[]>(CACHE_KEYS.DHIKR);
-  if (cached && cached.length) return cached;
+export function getBundledDhikr(): DhikrCategory[] {
+  return DHIKR_BUNDLED;
+}
+
+export function getCachedOrBundledDhikr(): DhikrCategory[] {
+  try {
+    const cached = cache.getJSON<DhikrCategory[]>(CACHE_KEYS.DHIKR);
+    if (cached && cached.length) return cached;
+  } catch { /* storage not ready -> fall through */ }
   return DHIKR_BUNDLED;
 }
 

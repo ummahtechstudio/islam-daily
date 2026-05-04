@@ -14,9 +14,7 @@ const DEFAULT_SETTINGS: TasbeehSettings = {
   selectedCounterId: 'default-1',
 };
 
-import { getDhikr } from '../services/content';
-
-const DHIKR_DATA = getDhikr();
+import { getCachedOrBundledDhikr } from '../services/content';
 
 export const getCounters = async (): Promise<TasbeehCounter[]> => {
   try {
@@ -95,8 +93,10 @@ export const resetCounter = async (id: string): Promise<void> => {
 };
 
 export const loadDhikrTemplates = (): TasbeehTemplate[] => {
+  // Read at call time — module-level storage reads break Expo Web SSR.
+  const dhikrData = getCachedOrBundledDhikr();
   const templates: TasbeehTemplate[] = [];
-  for (const cat of DHIKR_DATA) {
+  for (const cat of dhikrData) {
     for (let i = 0; i < cat.items.length; i++) {
       const item = cat.items[i];
       templates.push({

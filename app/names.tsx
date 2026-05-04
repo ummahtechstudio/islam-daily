@@ -15,7 +15,10 @@ import { Colors } from '../src/constants/colors';
 import { urduStyle } from '../src/constants/fonts';
 import { trackScreen } from '../src/services/analytics';
 import { useStore } from '../src/store';
-import { getNamesOfAllah } from '../src/services/content';
+import {
+  getBundledNamesOfAllah,
+  getCachedOrBundledNamesOfAllah,
+} from '../src/services/content';
 import type { NameOfAllah } from '../src/types/content';
 
 // Map content-layer NameOfAllah to the screen's display shape.
@@ -48,8 +51,14 @@ export default function NamesScreen() {
     (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
 
-  const [names] = useState<AllaName[]>(() => toDisplay(getNamesOfAllah()));
+  // Initial render — bundled JSON only, never touches storage. SSR-safe.
+  const [names, setNames] = useState<AllaName[]>(() => toDisplay(getBundledNamesOfAllah()));
   const [selected, setSelected] = useState<AllaName | null>(null);
+
+  // After mount on the client, upgrade to the cached snapshot if MMKV has fresher content.
+  useEffect(() => {
+    setNames(toDisplay(getCachedOrBundledNamesOfAllah()));
+  }, []);
 
   const renderName = ({ item }: { item: AllaName }) => (
     <TouchableOpacity

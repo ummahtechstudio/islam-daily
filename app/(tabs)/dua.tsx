@@ -20,14 +20,15 @@ import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import CardActionsRow from '../../components/CardActionsRow';
 import { getTranslationLanguage, TranslationLanguage } from '../../src/utils/settings';
-import { getDhikr, getDuas } from '../../src/services/content';
-import type { Dua, DuaCategory } from '../../src/types/content';
+import {
+  getBundledDhikr,
+  getBundledDuas,
+  getCachedOrBundledDhikr,
+  getCachedOrBundledDuas,
+} from '../../src/services/content';
+import type { Dua, DuaCategory, DhikrCategory } from '../../src/types/content';
 
 const URDU_DISCLAIMER_KEY = 'urdu_disclaimer_dismissed';
-
-// Bundled-first reads — both screens render instantly, no spinner.
-const HISNUL_MUSLIM: DuaCategory[] = getDuas();
-const DHIKR_DATA = getDhikr();
 
 const GOLD = '#EF9F27';
 
@@ -62,7 +63,10 @@ const CATEGORY_ICONS: Record<string, string> = DUA_CATEGORIES.reduce(
 
 // ─── "Dua of the Moment" ─────────────────────────────────────────────────────
 
-function getDuaOfMoment(): { category: DuaCategory; dua: Dua; reason: string } | null {
+function getDuaOfMoment(
+  duas: DuaCategory[],
+): { category: DuaCategory; dua: Dua; reason: string } | null {
+  if (!duas.length) return null;
   const hour = new Date().getHours();
   let catId: string;
   let reason: string;
@@ -85,7 +89,7 @@ function getDuaOfMoment(): { category: DuaCategory; dua: Dua; reason: string } |
     catId = 'sleep'; reason = 'Late night';
   }
 
-  const category = HISNUL_MUSLIM.find((c) => c.id === catId) ?? HISNUL_MUSLIM[0];
+  const category = duas.find((c) => c.id === catId) ?? duas[0];
   const dua = category.duas[new Date().getDate() % category.duas.length];
   return dua ? { category, dua, reason } : null;
 };
@@ -102,14 +106,24 @@ export default function DuaScreen() {
     (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
 
+  // Initial render — bundled JSON only, never touches storage. SSR-safe.
+  const [hisnulMuslim, setHisnulMuslim] = useState<DuaCategory[]>(() => getBundledDuas());
+  const [dhikrData, setDhikrData] = useState<DhikrCategory[]>(() => getBundledDhikr());
+
   const [tab, setTab] = useState<Tab>('dua');
-  const [selectedCategory, setSelectedCategory] = useState(HISNUL_MUSLIM[0].id);
-  const [selectedDhikrCategory, setSelectedDhikrCategory] = useState(DHIKR_DATA[0].id);
+  const [selectedCategory, setSelectedCategory] = useState(hisnulMuslim[0].id);
+  const [selectedDhikrCategory, setSelectedDhikrCategory] = useState(dhikrData[0].id);
   const [selectedDhikr, setSelectedDhikr] = useState(0);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [language, setLanguage] = useState<TranslationLanguage>('urdu');
   const [disclaimerDismissed, setDisclaimerDismissed] = useState<boolean>(true);
+
+  // After mount on the client, upgrade to the cached snapshot if MMKV has fresher content.
+  useEffect(() => {
+    setHisnulMuslim(getCachedOrBundledDuas());
+    setDhikrData(getCachedOrBundledDhikr());
+  }, []);
 
   useEffect(() => { setExpanded(null); }, [selectedCategory]);
   useEffect(() => { setExpanded(null); }, [searchQuery]);
@@ -135,7 +149,7 @@ export default function DuaScreen() {
   const translationFor = (item: { english: string; urdu?: string }) =>
     language === 'urdu' && item.urdu ? item.urdu : item.english;
 
-  const currentCategory = HISNUL_MUSLIM.find((c) => c.id === selectedCategory);
+  const currentCategory = hisnulMuslim.find((c) => c.id === selectedCategory);
   const baseDuas = currentCategory?.duas ?? [];
   const filteredDuas = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -149,13 +163,13 @@ export default function DuaScreen() {
   }, [baseDuas, searchQuery]);
 
   const currentDhikrCategory =
-    DHIKR_DATA.find((c) => c.id === selectedDhikrCategory) ?? DHIKR_DATA[0];
+    dhikrData.find((c) => c.id === selectedDhikrCategory) ?? dhikrData[0];
   const dhikrItems = currentDhikrCategory.items;
   const safeDhikrIdx = Math.min(selectedDhikr, dhikrItems.length - 1);
   const currentDhikr = dhikrItems[safeDhikrIdx];
   const targetCount = currentDhikr.count;
   const progress = Math.min(dhikrCount / targetCount, 1);
-  const duaOfMoment = getDuaOfMoment();
+  const duaOfMoment = getDuaOfMoment(hisnulMuslim);
 
   const handleDhikrTap = async () => {
     incrementDhikr();
@@ -267,7 +281,7 @@ export default function DuaScreen() {
           >
             {DUA_CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat.id;
-              const exists = HISNUL_MUSLIM.some((c) => c.id === cat.id);
+              const exists = hisnulMuslim.some((c) => c.id === cat.id);
               if (!exists) return null;
               return (
                 <TouchableOpacity
@@ -408,7 +422,7 @@ export default function DuaScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.dhikrTabs}
           >
-            {DHIKR_DATA.map((cat) => {
+            {dhikrData.map((cat) => {
               const isActive = selectedDhikrCategory === cat.id;
               return (
                 <TouchableOpacity
