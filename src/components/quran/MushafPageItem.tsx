@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
-  ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import { getAyahsForPage } from '../../services/quranCache';
 import { getSurahMeta } from '../../constants/surahMeta';
 import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
 import {
@@ -27,8 +26,6 @@ type MushafAyah = {
 };
 
 const BISMILLAH_TEXT = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
-
-const pageCache = new Map<number, MushafAyah[]>();
 
 const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 
@@ -200,74 +197,22 @@ export default function MushafPageItem({
   fontScale = 1,
   onAyahLongPress,
 }: MushafPageItemProps) {
-  const [ayahs, setAyahs] = useState<MushafAyah[]>(
-    () => pageCache.get(pageNumber) ?? [],
+  const ayahs = useMemo<MushafAyah[]>(
+    () =>
+      getAyahsForPage(pageNumber).map((a) => ({
+        surah: a.surah,
+        ayah: a.ayah,
+        text_indopak: a.text_indopak,
+      })),
+    [pageNumber],
   );
-  const [loading, setLoading] = useState(!pageCache.has(pageNumber));
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const cached = pageCache.get(pageNumber);
-    if (cached) {
-      setAyahs(cached);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
-    let active = true;
-    setLoading(true);
-    setError(null);
-    supabase
-      .from('quran_ayahs')
-      .select('surah_number, ayah_number, text_indopak')
-      .eq('page_indopak', pageNumber)
-      .order('surah_number', { ascending: true })
-      .order('ayah_number', { ascending: true })
-      .then(({ data, error: fetchError }) => {
-        if (!active) return;
-        if (fetchError) {
-          setError(fetchError.message);
-          setLoading(false);
-          return;
-        }
-        const rows: MushafAyah[] = (data ?? []).map((r: any) => ({
-          surah: r.surah_number,
-          ayah: r.ayah_number,
-          text_indopak: r.text_indopak ?? '',
-        }));
-        pageCache.set(pageNumber, rows);
-        setAyahs(rows);
-        setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [pageNumber]);
 
   return (
     <View style={styles.outer}>
       <View style={styles.outerBorder}>
         <View style={styles.innerBorder}>
           <View style={styles.content}>
-            {loading ? (
-              <View style={styles.statusWrap}>
-                <ActivityIndicator
-                  size="small"
-                  color={MUSHAF_COLORS.borderOuter}
-                />
-                <Text style={styles.statusText}>
-                  Loading page {pageNumber}…
-                </Text>
-              </View>
-            ) : error ? (
-              <View style={styles.statusWrap}>
-                <Text style={styles.statusText}>
-                  Could not load page {pageNumber}
-                </Text>
-                <Text style={styles.statusSub}>{error}</Text>
-              </View>
-            ) : ayahs.length === 0 ? (
+            {ayahs.length === 0 ? (
               <View style={styles.statusWrap}>
                 <Text style={styles.statusText}>
                   No ayahs on page {pageNumber}
@@ -466,12 +411,5 @@ const styles = StyleSheet.create({
     color: MUSHAF_COLORS.ink,
     fontSize: 14,
     fontWeight: '600',
-  },
-  statusSub: {
-    color: MUSHAF_COLORS.ink,
-    opacity: 0.6,
-    fontSize: 12,
-    textAlign: 'center',
-    paddingHorizontal: 16,
   },
 });

@@ -29,6 +29,10 @@ import {
   refreshDuas,
   refreshNamesOfAllah,
 } from '../src/services/content';
+import {
+  downloadFullQuran,
+  getQuranFromCache,
+} from '../src/services/quranCache';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -83,6 +87,14 @@ export default function RootLayout() {
     refreshNamesOfAllah();
     refreshDuas();
     refreshDhikr();
+
+    // Re-pull the full Quran in the background if the cache is older than
+    // 30 days, in case Tanzil corrects a typo. Silent — bound only by network.
+    const idx = getQuranFromCache();
+    const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+    if (idx && Date.now() - idx.fetchedAt > THIRTY_DAYS) {
+      downloadFullQuran().catch(() => {});
+    }
   }, [fontsLoaded]);
 
   const handleConsent = async (granted: boolean) => {

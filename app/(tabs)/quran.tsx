@@ -13,6 +13,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../../src/constants/colors';
 import { trackScreen } from '../../src/services/analytics';
 import { useStore } from '../../src/store';
+import { useIsOnline } from '../../src/hooks/useIsOnline';
+import {
+  DownloadProgress,
+  downloadFullQuran,
+  isQuranCached,
+} from '../../src/services/quranCache';
+import QuranDownloadOverlay from '../../src/components/quran/QuranDownloadOverlay';
 import TranslationTab from '../../src/components/quran/TranslationTab';
 import ReciteTab from '../../src/components/quran/ReciteTab';
 import ListenTab from '../../src/components/quran/ListenTab';
@@ -45,6 +52,12 @@ export default function QuranScreen() {
   const [activeTab, setActiveTab] = useState<QuranTab>('recite');
   const [hydrated, setHydrated] = useState(false);
 
+  const [cacheReady, setCacheReady] = useState<boolean>(() => isQuranCached());
+  const [progress, setProgress] = useState<DownloadProgress | null>(null);
+  const [downloadError, setDownloadError] = useState<Error | null>(null);
+  const [retryNonce, setRetryNonce] = useState(0);
+  const isOnline = useIsOnline();
+
   useEffect(() => {
     AsyncStorage.getItem(ACTIVE_TAB_KEY)
       .then((v) => {
@@ -60,6 +73,51 @@ export default function QuranScreen() {
     if (!hydrated) return;
     AsyncStorage.setItem(ACTIVE_TAB_KEY, activeTab).catch(() => {});
   }, [activeTab, hydrated]);
+
+  useEffect(() => {
+    if (cacheReady) return;
+    if (!isOnline) return;
+    if (downloadError) return;
+    let cancelled = false;
+    setProgress(null);
+    downloadFullQuran((p) => {
+      if (!cancelled) setProgress(p);
+    })
+      .then(() => {
+        if (!cancelled) setCacheReady(true);
+      })
+      .catch((e: unknown) => {
+        if (cancelled) return;
+        const err = e instanceof Error ? e : new Error('Download failed');
+        setDownloadError(err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [cacheReady, isOnline, downloadError, retryNonce]);
+
+  if (!cacheReady) {
+    return (
+      <SafeAreaView
+        style={[styles.flex, { backgroundColor: theme.background }]}
+        edges={['top']}
+      >
+        <View style={[styles.header, { backgroundColor: Colors.primary }]}>
+          <Text style={styles.headerTitle}>The Holy Quran</Text>
+          <Text style={styles.headerSub}>القرآن الكريم</Text>
+        </View>
+        <QuranDownloadOverlay
+          progress={progress}
+          error={downloadError}
+          isOnline={isOnline}
+          onRetry={() => {
+            setDownloadError(null);
+            setRetryNonce((n) => n + 1);
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
