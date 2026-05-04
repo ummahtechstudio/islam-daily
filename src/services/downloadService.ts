@@ -371,7 +371,7 @@ export async function downloadNames(
   // Fallback: bundled local asset (no network needed)
   onProgress(40);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const local = require('../../assets/names_of_allah.json') as any[];
+  const local = require('../../assets/data/names99.json') as any[];
   const str = JSON.stringify(local);
   await AsyncStorage.setItem('offline_99names', str);
   onProgress(100);

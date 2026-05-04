@@ -20,49 +20,16 @@ import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import CardActionsRow from '../../components/CardActionsRow';
 import { getTranslationLanguage, TranslationLanguage } from '../../src/utils/settings';
+import { getDhikr, getDuas } from '../../src/services/content';
+import type { Dua, DuaCategory } from '../../src/types/content';
 
 const URDU_DISCLAIMER_KEY = 'urdu_disclaimer_dismissed';
 
-// ─── Hisnul Muslim dataset (local asset) ─────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const HISNUL_MUSLIM: DuaCategory[] = require('../../assets/hisnul_muslim.json');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const DHIKR_DATA: DhikrCategory[] = require('../../assets/dhikr.json');
+// Bundled-first reads — both screens render instantly, no spinner.
+const HISNUL_MUSLIM: DuaCategory[] = getDuas();
+const DHIKR_DATA = getDhikr();
 
 const GOLD = '#EF9F27';
-
-interface Dua {
-  arabic: string;
-  transliteration: string;
-  english: string;
-  urdu?: string;
-  reference: string;
-}
-
-interface DuaCategory {
-  id: string;
-  title: string;
-  icon: string;
-  duas: Dua[];
-}
-
-interface DhikrItem {
-  arabic: string;
-  transliteration: string;
-  english: string;
-  urdu?: string;
-  count: number;
-  benefit: string;
-  reference: string;
-}
-
-interface DhikrCategory {
-  id: string;
-  title: string;
-  icon: string;
-  items: DhikrItem[];
-}
 
 // ─── Explicit Dua categories (id → emoji + label) ────────────────────────────
 // Single source of truth for category pills. The id matches hisnul_muslim.json.

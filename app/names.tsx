@@ -12,23 +12,32 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '../src/constants/colors';
-import { FONTS, urduStyle } from '../src/constants/fonts';
+import { urduStyle } from '../src/constants/fonts';
 import { trackScreen } from '../src/services/analytics';
-import { fetchNamesOfAllah, AllaName } from '../src/services/api';
 import { useStore } from '../src/store';
-import { LoadingSpinner } from '../src/components/LoadingSpinner';
-import { ErrorView } from '../src/components/ErrorView';
-import namesJson from '../assets/names_of_allah.json';
+import { getNamesOfAllah } from '../src/services/content';
+import type { NameOfAllah } from '../src/types/content';
 
-// Map local JSON to AllaName shape — ensures all 99 show offline
-const NAMES_FALLBACK: AllaName[] = (namesJson as any[]).map((n) => ({
-  id: n.id,
-  name: n.arabic,
-  transliteration: n.transliteration,
-  pronunciation: '',
-  meaning: n.english_meaning,
-  description: n.urdu_meaning,
-}));
+// Map content-layer NameOfAllah to the screen's display shape.
+interface AllaName {
+  id: number;
+  name: string;
+  transliteration: string;
+  pronunciation: string;
+  meaning: string;
+  description?: string | null;
+}
+
+function toDisplay(rows: NameOfAllah[]): AllaName[] {
+  return rows.map((n) => ({
+    id: n.id,
+    name: n.arabic,
+    transliteration: n.transliteration,
+    pronunciation: '',
+    meaning: n.english_meaning,
+    description: n.urdu_meaning ?? n.meaning_detail ?? null,
+  }));
+}
 
 export default function NamesScreen() {
   useEffect(() => { trackScreen('NamesOfAllah'); }, []);
@@ -39,18 +48,8 @@ export default function NamesScreen() {
     (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
 
-  const [names, setNames] = useState<AllaName[]>(NAMES_FALLBACK);
-  const [loading, setLoading] = useState(true);
+  const [names] = useState<AllaName[]>(() => toDisplay(getNamesOfAllah()));
   const [selected, setSelected] = useState<AllaName | null>(null);
-
-  useEffect(() => {
-    fetchNamesOfAllah()
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setNames(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   const renderName = ({ item }: { item: AllaName }) => (
     <TouchableOpacity
@@ -73,19 +72,15 @@ export default function NamesScreen() {
         <Text style={styles.headerAr}>أسماء الله الحسنى</Text>
       </View>
 
-      {loading && names.length === 0 ? (
-        <LoadingSpinner message="Loading names..." dark={isDark} />
-      ) : (
-        <FlatList
-          data={names}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderName}
-          numColumns={3}
-          contentContainerStyle={styles.grid}
-          columnWrapperStyle={styles.row}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+      <FlatList
+        data={names}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={renderName}
+        numColumns={3}
+        contentContainerStyle={styles.grid}
+        columnWrapperStyle={styles.row}
+        showsVerticalScrollIndicator={false}
+      />
 
       {/* Detail Modal */}
       <Modal

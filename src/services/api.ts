@@ -186,22 +186,6 @@ export async function fetchRandomHadith() {
   return hadiths[idx];
 }
 
-// ─── 99 Names of Allah ────────────────────────────────────────────────────────
-
-export async function fetchNamesOfAllah() {
-  // Offline pack takes precedence
-  try {
-    const offlineRaw = await AsyncStorage.getItem('offline_99names');
-    if (offlineRaw) return JSON.parse(offlineRaw) as AllaName[];
-  } catch {}
-
-  return cachedFetch('api_99_names', async () => {
-    const res = await fetch('https://ummahapi.com/api/asmaul-husna');
-    const json = await res.json();
-    return json as AllaName[];
-  }, 30 * 24 * 60 * 60 * 1000);
-}
-
 // ─── Islamic Search (client-side across Quran) ────────────────────────────────
 
 export async function searchQuran(query: string) {
@@ -307,15 +291,6 @@ export interface HadithItem {
   headingEnglish: string;
   headingUrdu: string;
   status: string;
-}
-
-export interface AllaName {
-  id: number;
-  name: string;
-  transliteration: string;
-  pronunciation: string;
-  meaning: string;
-  description?: string;
 }
 
 export interface QuranSearchResult {

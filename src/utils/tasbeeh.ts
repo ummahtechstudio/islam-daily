@@ -14,20 +14,9 @@ const DEFAULT_SETTINGS: TasbeehSettings = {
   selectedCounterId: 'default-1',
 };
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const DHIKR_DATA: Array<{
-  id: string;
-  title: string;
-  icon: string;
-  items: Array<{
-    arabic: string;
-    transliteration: string;
-    english: string;
-    count: number;
-    benefit: string;
-    reference: string;
-  }>;
-}> = require('../../assets/dhikr.json');
+import { getDhikr } from '../services/content';
+
+const DHIKR_DATA = getDhikr();
 
 export const getCounters = async (): Promise<TasbeehCounter[]> => {
   try {

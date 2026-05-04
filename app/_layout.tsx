@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme, View, Text, StyleSheet, Platform } from 'react-native';
+import { useColorScheme, Platform } from 'react-native';
 import { AudioPlayerProvider } from '../src/context/AudioPlayerContext';
 import { MiniPlayer } from '../src/components/MiniPlayer';
 import { FullPlayerModal } from '../src/components/FullPlayerModal';
@@ -15,47 +15,26 @@ import { NotoNastaliqUrdu_400Regular } from '@expo-google-fonts/noto-nastaliq-ur
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useStore } from '../src/store';
 import { Colors } from '../src/constants/colors';
-import { useNetworkStatus } from '../src/hooks/useNetworkStatus';
 import { PrivacyConsentModal } from '../src/components/PrivacyConsentModal';
 import {
   hasConsentBeenShown,
   saveConsent,
   logSession,
 } from '../src/services/locationAnalytics';
+import {
+  refreshDhikr,
+  refreshDuas,
+  refreshNamesOfAllah,
+} from '../src/services/content';
 
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
   anchor: '(tabs)',
 };
-
-function OfflineBanner() {
-  const isOnline = useNetworkStatus();
-  if (isOnline) return null;
-  return (
-    <View style={banner.bar}>
-      <Ionicons name="wifi" size={13} color="#fff" style={{ opacity: 0.85 }} />
-      <Text style={banner.text}>No internet connection — showing offline content</Text>
-    </View>
-  );
-}
-
-const banner = StyleSheet.create({
-  bar: {
-    backgroundColor: '#374151',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-  },
-  text: { color: '#fff', fontSize: 12, fontWeight: '500' },
-});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -98,6 +77,12 @@ export default function RootLayout() {
         }
       })
       .catch((err) => console.warn('[Layout] consent check failed', err));
+
+    // Silent background refresh of bundled content. Failures are swallowed;
+    // the screens always render from bundled JSON regardless.
+    refreshNamesOfAllah();
+    refreshDuas();
+    refreshDhikr();
   }, [fontsLoaded]);
 
   const handleConsent = async (granted: boolean) => {
@@ -121,7 +106,6 @@ export default function RootLayout() {
     <SafeAreaProvider>
     <AudioPlayerProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <OfflineBanner />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: Colors.primary },

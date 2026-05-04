@@ -71,7 +71,7 @@ async function seedHadiths() {
 async function seedDuas() {
   log('Seeding duas...');
   const raw = fs.readFileSync(
-    path.join(__dirname, '../assets/hisnul_muslim.json'),
+    path.join(__dirname, '../assets/data/duas-core.json'),
     'utf-8'
   );
   const categories: any[] = JSON.parse(raw);
@@ -105,7 +105,7 @@ async function seedDuas() {
 async function seedNames() {
   log('Seeding 99 Names of Allah from local asset...');
   const raw = fs.readFileSync(
-    path.join(__dirname, '../assets/names_of_allah.json'),
+    path.join(__dirname, '../assets/data/names99.json'),
     'utf-8'
   );
   const names: any[] = JSON.parse(raw);
