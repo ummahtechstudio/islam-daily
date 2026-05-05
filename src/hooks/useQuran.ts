@@ -40,6 +40,27 @@ function ayahFromCache(a: AyahLite, text: string, offset: number): Ayah {
   };
 }
 
+// Tanzil Uthmani's `arabic_text` column has Bismillah baked into ayah 1 for
+// every surah except At-Tawbah (9). For Surah 1 that's correct (Bismillah IS
+// ayah 1). For all other surahs the surah header already shows Bismillah, so
+// keeping it on ayah 1 too produces a duplicate. Strip it on the Translation
+// path; the Mushaf view uses `text_indopak` (already clean) and is untouched.
+const BISMILLAH_PREFIX = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+
+function stripBismillahFromFirstAyah(s: SurahEdition): SurahEdition {
+  if (s.number === 1) return s; // Al-Fatiha: Bismillah IS ayah 1
+  const ayahs = s.ayahs.map((a) => {
+    if (a.numberInSurah !== 1) return a;
+    // Skip optional BOM / zero-width / NBSP at the start, then check prefix.
+    const head = a.text.replace(/^[﻿‌‎‏ ]+/, '');
+    if (!head.startsWith(BISMILLAH_PREFIX)) return a;
+    const rest = head.slice(BISMILLAH_PREFIX.length).replace(/^\s+/, '');
+    if (rest.length === 0) return a; // Defensive: never strip if it would empty the ayah
+    return { ...a, text: rest };
+  });
+  return { ...s, ayahs };
+}
+
 type CachedSurah = {
   arabic: SurahEdition;
   translation: SurahEdition | null;
@@ -139,7 +160,7 @@ export function useSurah(number: number, translation = 'ur.jalandhry') {
 
     // Cache covers BOTH arabic + translation: fully offline render, done.
     if (cached?.arabic && cached.translation) {
-      setArabic(cached.arabic);
+      setArabic(stripBismillahFromFirstAyah(cached.arabic));
       setTranslationEdition(cached.translation);
       setFromCache(true);
       setLoading(false);
@@ -158,7 +179,7 @@ export function useSurah(number: number, translation = 'ur.jalandhry') {
       .then(([ar, tr]) => {
         // Prefer cached Arabic when we have it (Tanzil Uthmani is universal);
         // network supplies the requested translation edition.
-        setArabic(cached?.arabic ?? ar);
+        setArabic(stripBismillahFromFirstAyah(cached?.arabic ?? ar));
         setTranslationEdition(tr);
         if (cached?.arabic) setFromCache(true);
       })

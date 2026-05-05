@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
+  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -16,12 +17,34 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { useRouter } from 'expo-router';
 
 import { Colors } from '../constants/colors';
 import { useStore } from '../store';
 import { trackScreen } from '../services/analytics';
 import { supabase } from '../lib/supabase';
+
+const SCREENSHOT_BUCKET = 'feedback-screenshots';
+const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
+const MAX_SCREENSHOT_WIDTH = 1920;
+
+interface PickedScreenshot {
+  uri: string;
+  width: number;
+  height: number;
+}
+
+async function compressForUpload(asset: PickedScreenshot): Promise<{ uri: string; mime: string }> {
+  const needsResize = asset.width > MAX_SCREENSHOT_WIDTH;
+  const result = await ImageManipulator.manipulateAsync(
+    asset.uri,
+    needsResize ? [{ resize: { width: MAX_SCREENSHOT_WIDTH } }] : [],
+    { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG },
+  );
+  return { uri: result.uri, mime: 'image/jpeg' };
+}
 
 type FeedbackCategory = 'Bug' | 'Suggestion' | 'Content Issue' | 'Other';
 const CATEGORIES: FeedbackCategory[] = ['Bug', 'Suggestion', 'Content Issue', 'Other'];
@@ -57,11 +80,79 @@ export default function FeedbackScreen() {
   const [email, setEmail] = useState('');
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [rating, setRating] = useState(0);
+  const [screenshot, setScreenshot] = useState<PickedScreenshot | null>(null);
+
+  const pickScreenshot = async () => {
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) {
+        Alert.alert('Permission needed', 'Please allow photo library access to attach a screenshot.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 1,
+      });
+      if (result.canceled || !result.assets?.[0]) return;
+      const a = result.assets[0];
+      setScreenshot({ uri: a.uri, width: a.width ?? 0, height: a.height ?? 0 });
+    } catch (err: any) {
+      console.error('[Feedback] image pick failed', err);
+      Alert.alert('Could not open picker', err?.message ?? 'Try again.');
+    }
+  };
+
+  const uploadScreenshot = async (): Promise<string | null> => {
+    if (!screenshot) return null;
+    const { uri, mime } = await compressForUpload(screenshot);
+    const res = await fetch(uri);
+    const blob = await res.blob();
+    if (blob.size > MAX_SCREENSHOT_BYTES) {
+      throw new Error('Screenshot is too large (limit 5 MB after compression).');
+    }
+    const filename = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const { error } = await supabase.storage
+      .from(SCREENSHOT_BUCKET)
+      .upload(filename, blob, { contentType: mime, upsert: false });
+    if (error) throw error;
+    const { data } = supabase.storage.from(SCREENSHOT_BUCKET).getPublicUrl(filename);
+    return data.publicUrl ?? null;
+  };
+
+  const insertFeedbackRow = async (
+    finalCategory: FeedbackCategory,
+    trimmedMessage: string,
+    appVersion: string,
+    deviceModel: string,
+    screenshotUrl: string | null,
+  ) => {
+    const { error } = await supabase.from('feedback').insert({
+      rating: rating || null,
+      category: finalCategory,
+      message: trimmedMessage,
+      name: name.trim() || 'Anonymous',
+      email: email.trim() || null,
+      app_version: appVersion,
+      device_platform: Platform.OS,
+      device_model: deviceModel,
+      screenshot_url: screenshotUrl,
+    });
+    if (error) throw error;
+    setSubmitState('success');
+    setCategory('Other');
+    setMessage('');
+    setName('');
+    setEmail('');
+    setRating(0);
+    setScreenshot(null);
+    Alert.alert('JazakAllah Khair!', 'Your feedback has been received.', [
+      { text: 'OK', onPress: () => router.back() },
+    ]);
+  };
 
   const handleSend = async () => {
     const finalCategory: FeedbackCategory = category || 'Other';
     const trimmedMessage = message.trim();
-    console.log('[Feedback] Submitting:', { category: finalCategory, messageLength: trimmedMessage.length });
 
     if (trimmedMessage.length < 10) {
       Alert.alert('Message Too Short', 'Please write at least 10 characters.');
@@ -69,40 +160,42 @@ export default function FeedbackScreen() {
     }
 
     setSubmitState('loading');
-    try {
-      const appVersion = Constants.expoConfig?.version ?? '1.0.0';
-      const deviceModel = Device.modelName ?? 'Unknown';
+    const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+    const deviceModel = Device.modelName ?? 'Unknown';
 
-      console.log('[Feedback] Inserting to Supabase', { category: finalCategory, appVersion, deviceModel, platform: Platform.OS });
-
-      const { error } = await supabase.from('feedback').insert({
-        rating: rating || null,
-        category: finalCategory,
-        message: trimmedMessage,
-        name: name.trim() || 'Anonymous',
-        email: email.trim() || null,
-        app_version: appVersion,
-        device_platform: Platform.OS,
-        device_model: deviceModel,
-      });
-
-      console.log('[Feedback] Supabase response:', { error });
-
-      if (error) {
-        console.error('[Feedback] Supabase error:', JSON.stringify(error));
-        throw error;
+    let screenshotUrl: string | null = null;
+    if (screenshot) {
+      try {
+        screenshotUrl = await uploadScreenshot();
+      } catch (uploadErr: any) {
+        console.warn('[Feedback] screenshot upload failed', uploadErr);
+        Alert.alert(
+          'Screenshot upload failed',
+          'Submit feedback without the screenshot?',
+          [
+            { text: 'Cancel', style: 'cancel', onPress: () => setSubmitState('idle') },
+            {
+              text: 'Submit anyway',
+              onPress: () => {
+                void (async () => {
+                  try {
+                    await insertFeedbackRow(finalCategory, trimmedMessage, appVersion, deviceModel, null);
+                  } catch (err: any) {
+                    console.error('[Feedback] Submit failed:', JSON.stringify(err));
+                    setSubmitState('error');
+                    Alert.alert('Submit Failed', err?.message ?? 'Please check your connection and try again.');
+                  }
+                })();
+              },
+            },
+          ],
+        );
+        return;
       }
+    }
 
-      console.log('[Feedback] Submitted successfully');
-      setSubmitState('success');
-      setCategory('Other');
-      setMessage('');
-      setName('');
-      setEmail('');
-      setRating(0);
-      Alert.alert('JazakAllah Khair!', 'Your feedback has been received.', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+    try {
+      await insertFeedbackRow(finalCategory, trimmedMessage, appVersion, deviceModel, screenshotUrl);
     } catch (err: any) {
       console.error('[Feedback] Submit failed:', JSON.stringify(err));
       setSubmitState('error');
@@ -214,6 +307,38 @@ export default function FeedbackScreen() {
             <Text style={[styles.charCount, { color: message.length >= 10 ? Colors.success : theme.textMuted }]}>
               {message.length}/1000{message.length > 0 && message.length < 10 ? ` (${10 - message.length} more needed)` : ''}
             </Text>
+          </View>
+
+          {/* Screenshot (optional) */}
+          <Text style={[styles.label, { color: theme.textSecondary }]}>SCREENSHOT (OPTIONAL)</Text>
+          <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            {screenshot ? (
+              <View style={styles.screenshotPreviewRow}>
+                <Image source={{ uri: screenshot.uri }} style={styles.screenshotThumb} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.screenshotMeta, { color: theme.text }]} numberOfLines={1}>
+                    Image attached
+                  </Text>
+                  <Text style={[styles.screenshotMetaSub, { color: theme.textMuted }]} numberOfLines={1}>
+                    {screenshot.width}×{screenshot.height}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => setScreenshot(null)} hitSlop={8} style={styles.screenshotRemove}>
+                  <Ionicons name="close-circle" size={24} color={theme.textMuted} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={pickScreenshot}
+                activeOpacity={0.7}
+                style={[styles.screenshotPicker, { borderColor: theme.border }]}
+              >
+                <Ionicons name="image-outline" size={20} color={Colors.primary} />
+                <Text style={[styles.screenshotPickerText, { color: Colors.primary }]}>
+                  Attach screenshot
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Optional: Name & Email */}
@@ -338,6 +463,32 @@ const styles = StyleSheet.create({
   charCount: { fontSize: 12, textAlign: 'right', marginTop: 8, fontWeight: '500' },
 
   inlineInput: { fontSize: 15, paddingHorizontal: 16, paddingVertical: 14 },
+
+  screenshotPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  screenshotPickerText: { fontSize: 14, fontWeight: '600' },
+  screenshotPreviewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  screenshotThumb: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    backgroundColor: '#0001',
+  },
+  screenshotMeta: { fontSize: 14, fontWeight: '600' },
+  screenshotMetaSub: { fontSize: 12, marginTop: 2 },
+  screenshotRemove: { padding: 4 },
 
   infoBox: {
     flexDirection: 'row',

@@ -73,7 +73,6 @@ function GreetingCard({ hijriDate }: { hijriDate: string | null }) {
         <View style={greetingStyles.patternWrap} pointerEvents="none">
           <IslamicPattern size={70} color={palette.green} opacity={0.05} />
         </View>
-        <Text style={greetingStyles.salamAr}>السلام عليكم</Text>
         <Text style={greetingStyles.salamEn}>Assalamu Alaikum</Text>
         {hijriDate ? (
           <Text style={greetingStyles.hijri}>{hijriDate}</Text>
@@ -87,14 +86,6 @@ const greetingStyles = StyleSheet.create({
     position: 'absolute',
     right: -6,
     top: -6,
-  },
-  salamAr: {
-    fontFamily: 'Amiri_400Regular',
-    color: palette.gold,
-    fontSize: 22,
-    letterSpacing: 0.5,
-    lineHeight: 30,
-    marginBottom: 2,
   },
   salamEn: {
     ...typography.heading1,

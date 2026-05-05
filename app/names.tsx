@@ -45,6 +45,17 @@ function toDisplay(rows: NameOfAllah[]): AllaName[] {
   }));
 }
 
+// Reverses each row chunk so the grid reads right-to-left without altering
+// each card's internal layout. With 99 names and 3 columns, Name 1 lands at
+// top-right and Name 99 at bottom-left.
+function chunkRTL<T>(arr: T[], chunkSize: number): T[] {
+  const out: T[] = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    out.push(...arr.slice(i, i + chunkSize).reverse());
+  }
+  return out;
+}
+
 export default function NamesScreen() {
   useEffect(() => { trackScreen('NamesOfAllah'); }, []);
   const colorScheme = useColorScheme();
@@ -62,6 +73,11 @@ export default function NamesScreen() {
   useEffect(() => {
     setNames(toDisplay(getCachedOrBundledNamesOfAllah()));
   }, []);
+
+  // Bundled data is 100 entries: id=0 is "The Greatest Name" (✦), ids 1–99 are
+  // the 99 Names. Render ✦ as a hero card so the 99-name grid is a clean 33×3.
+  const greatestName = names.find((n) => n.id === 0) ?? null;
+  const ninetyNineRTL = chunkRTL(names.filter((n) => n.id !== 0), 3);
 
   const renderName = ({ item }: { item: AllaName }) => (
     <TouchableOpacity
@@ -85,13 +101,28 @@ export default function NamesScreen() {
       </View>
 
       <FlatList
-        data={names}
+        data={ninetyNineRTL}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderName}
         numColumns={3}
         contentContainerStyle={styles.grid}
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          greatestName ? (
+            <TouchableOpacity
+              style={[styles.heroCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+              onPress={() => setSelected(greatestName)}
+              activeOpacity={0.75}
+            >
+              <Text style={[styles.heroSymbol, { color: Colors.primary }]}>✦</Text>
+              <Text style={[styles.nameArabic, { color: theme.text }]}>{greatestName.name}</Text>
+              <Text style={[styles.nameTranslit, { color: theme.textSecondary }]} numberOfLines={1}>
+                {greatestName.transliteration}
+              </Text>
+            </TouchableOpacity>
+          ) : null
+        }
       />
 
       {/* Detail Modal — manuscript treatment */}
@@ -159,6 +190,17 @@ const styles = StyleSheet.create({
   nameNum: { fontSize: 11, fontWeight: '700' },
   nameArabic: { fontFamily: 'Amiri_400Regular', fontSize: 20, textAlign: 'center' },
   nameTranslit: { fontSize: 11, textAlign: 'center' },
+
+  heroCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 12,
+  },
+  heroSymbol: { fontSize: 22, fontWeight: '700', marginBottom: 2 },
 
   detailHeader: { padding: 16, alignItems: 'center', position: 'relative' },
   closeBtn: { position: 'absolute', right: 16, top: 16 },
