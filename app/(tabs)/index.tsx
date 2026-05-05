@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,15 @@ import {
   RefreshControl,
   useColorScheme,
   Dimensions,
-  Animated,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path } from 'react-native-svg';
 
-import { Colors } from '../../src/constants/colors';
-import { FONTS, urduStyle } from '../../src/constants/fonts';
+import { Colors, palette } from '../../src/constants/colors';
+import { typography } from '../../src/constants/typography';
+import { spacing, radius } from '../../src/constants/spacing';
 import { useLocation } from '../../src/hooks/useLocation';
 import { usePrayerTimes } from '../../src/hooks/usePrayerTimes';
 import { useResolvedLocation } from '../../src/hooks/useResolvedLocation';
@@ -27,18 +25,18 @@ import { formatPrayerTime, formatCountdown } from '../../src/utils/formatPrayerT
 import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
 import { useStore } from '../../src/store';
-import { CACHE_KEYS, PRAYER_LIST } from '../../src/constants';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting } from '../../src/utils/settings';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 
 import { DailyKnowledgeCard } from '../../src/components/DailyKnowledgeCard';
+import { ManuscriptCard } from '../../src/components/ManuscriptCard';
+import { IslamicPattern } from '../../src/components/IslamicPattern';
+import { MinaretIcon, PrayerBeadsIcon } from '../../src/components/icons';
 
 const { width: W } = Dimensions.get('window');
-const GOLD = '#EF9F27';
-const GOLD_LIGHT = 'rgba(239,159,39,0.12)';
 
-// ─── Islamic Geometric Header Pattern ────────────────────────────────────────
+// ─── Subtle diamond watermark for header ─────────────────────────────────────
 function GeometricPattern({ width, height }: { width: number; height: number }) {
   const size = 32;
   const cols = Math.ceil(width / size) + 1;
@@ -54,7 +52,7 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
           key={`${r}-${c}`}
           d={`M${x},${y - s} L${x + s},${y} L${x},${y + s} L${x - s},${y} Z`}
           fill="none"
-          stroke="rgba(239,159,39,0.12)"
+          stroke="rgba(239,159,39,0.05)"
           strokeWidth="0.8"
         />
       );
@@ -67,7 +65,7 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
   );
 }
 
-// ─── Compact Prayer Next Card (P.1a) ──────────────────────────────────────────
+// ─── Compact Prayer Next Card (P.1a) — manuscript treatment ──────────────────
 const PRAYER_LABEL_MAP: Record<PrayerName, string> = {
   fajr: 'Fajr',
   sunrise: 'Sunrise',
@@ -89,22 +87,20 @@ const METHOD_LABEL_MAP: Record<string, string> = {
   Tehran: 'Tehran',
 };
 
-function PrayerNextSkeleton({ isDark }: { isDark: boolean }) {
-  const theme = isDark ? Colors.dark : Colors.light;
+function PrayerNextSkeleton() {
   return (
-    <View style={[skelStyles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-      <View style={[skelStyles.bar, { backgroundColor: theme.surface, width: '40%' }]} />
-      <View style={[skelStyles.bar, { backgroundColor: theme.surface, width: '60%', height: 22 }]} />
-      <View style={[skelStyles.bar, { backgroundColor: theme.surface, width: '50%' }]} />
-    </View>
+    <ManuscriptCard variant="bordered" style={{ marginBottom: spacing.md }}>
+      <View style={[skelStyles.bar, { width: '40%' }]} />
+      <View style={[skelStyles.bar, { width: '60%', height: 22, marginTop: spacing.sm }]} />
+      <View style={[skelStyles.bar, { width: '50%', marginTop: spacing.sm }]} />
+    </ManuscriptCard>
   );
 }
 const skelStyles = StyleSheet.create({
-  card: { borderRadius: 16, borderWidth: 1, padding: 16, gap: 8, marginBottom: 14 },
-  bar: { height: 12, borderRadius: 6 },
+  bar: { height: 12, borderRadius: 6, backgroundColor: palette.creamSoft },
 });
 
-function PrayerNextCard({ isDark, onPress }: { isDark: boolean; onPress: () => void }) {
+function PrayerNextCard({ onPress }: { onPress: () => void }) {
   const { settings, loading } = useResolvedLocation();
   const [tick, setTick] = useState(Date.now());
   useEffect(() => {
@@ -118,7 +114,7 @@ function PrayerNextCard({ isDark, onPress }: { isDark: boolean; onPress: () => v
   );
 
   if (loading || !computed) {
-    return <PrayerNextSkeleton isDark={isDark} />;
+    return <PrayerNextSkeleton />;
   }
 
   const nextEntry = computed.prayers.find((p) => p.name === computed.nextPrayer);
@@ -137,56 +133,100 @@ function PrayerNextCard({ isDark, onPress }: { isDark: boolean; onPress: () => v
   const methodLabel = METHOD_LABEL_MAP[settings.method] ?? settings.method;
 
   return (
-    <TouchableOpacity
-      style={pncStyles.card}
-      onPress={onPress}
-      activeOpacity={0.85}
-    >
-      <View style={pncStyles.row}>
-        <Text style={pncStyles.label}>Next</Text>
-        <Text style={pncStyles.name}>{nextName}</Text>
-      </View>
-      <Text style={pncStyles.time}>{time}</Text>
-      <Text style={pncStyles.countdown}>{countdown}</Text>
-      <Text style={pncStyles.subtitle}>
-        📍 {settings.location.city} · {methodLabel} method
-      </Text>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={{ marginBottom: spacing.md }}>
+      <ManuscriptCard variant="bordered">
+        <View style={pncStyles.patternWrap} pointerEvents="none">
+          <IslamicPattern size={90} color={palette.green} opacity={0.06} />
+        </View>
+        <Text style={pncStyles.label}>NEXT PRAYER</Text>
+        <View style={pncStyles.row}>
+          <Text style={pncStyles.name}>{nextName}</Text>
+          <Text style={pncStyles.time}>{time}</Text>
+        </View>
+        <Text style={pncStyles.countdown}>{countdown}</Text>
+        <View style={pncStyles.locRow}>
+          <Ionicons name="location-outline" size={14} color={palette.green} />
+          <Text style={pncStyles.location}>
+            {settings.location.city} · {methodLabel}
+          </Text>
+        </View>
+      </ManuscriptCard>
     </TouchableOpacity>
   );
 }
 const pncStyles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.primary,
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 14,
-    gap: 4,
+  patternWrap: {
+    position: 'absolute',
+    right: -6,
+    top: -6,
+    opacity: 1,
   },
-  row: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
-  label: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
-  name: { color: '#fff', fontSize: 22, fontWeight: '800' },
-  time: { color: GOLD, fontSize: 30, fontWeight: '900', letterSpacing: -0.5, marginTop: 2 },
-  countdown: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: '600' },
-  subtitle: { color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 4 },
+  label: {
+    ...typography.caption,
+    color: palette.textOnCreamSecondary,
+    fontWeight: '700',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginTop: spacing.xs,
+  },
+  name: {
+    ...typography.display,
+    color: palette.textOnCream,
+  },
+  time: {
+    ...typography.display,
+    color: palette.gold,
+  },
+  countdown: {
+    ...typography.bodySmall,
+    color: palette.textOnCreamSecondary,
+    marginTop: 2,
+  },
+  locRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  location: {
+    ...typography.caption,
+    color: palette.textOnCreamSecondary,
+  },
 });
 
-// ─── Quick Access 2×2 Grid ────────────────────────────────────────────────────
-const QUICK_CARDS: { id: string; icon: string; label: string; defaultSub: string; route: string; color: string; bg: string }[] = [
-  { id: 'quran',         icon: '📖', label: 'Quran',        defaultSub: 'Read & Listen',    route: '/quran',        color: '#0F6E56', bg: '#0F6E5618' },
-  { id: 'prayer-times',  icon: '🕌', label: 'Prayer Times', defaultSub: 'All 5 prayers',    route: '/prayer',       color: '#2563EB', bg: '#2563EB18' },
-  { id: 'dua',           icon: '🤲', label: 'Duas',         defaultSub: 'Hisnul Muslim',    route: '/dua',          color: '#7C3AED', bg: '#7C3AED18' },
-  { id: 'qibla',         icon: '🧭', label: 'Qibla',        defaultSub: 'Find direction',   route: '/qibla',        color: '#F59E0B', bg: '#F59E0B18' },
+// ─── Quick Access 2×2 Grid — refined icons, no emojis ────────────────────────
+type QuickIcon = 'quran' | 'prayer-times' | 'dua' | 'qibla';
+type QuickCard = { id: QuickIcon; label: string; defaultSub: string; route: string };
+
+const QUICK_CARDS: QuickCard[] = [
+  { id: 'quran',         label: 'Quran',        defaultSub: 'Read & Listen',    route: '/quran' },
+  { id: 'prayer-times',  label: 'Prayer Times', defaultSub: 'All 5 prayers',    route: '/prayer' },
+  { id: 'dua',           label: 'Duas',         defaultSub: 'Hisnul Muslim',    route: '/dua' },
+  { id: 'qibla',         label: 'Qibla',        defaultSub: 'Find direction',   route: '/qibla' },
 ];
 
-function QuickGrid({ isDark, prayerData, nextPrayer, onPress, cards }: {
-  isDark: boolean;
-  prayerData: any;
+function QuickIconRender({ id }: { id: QuickIcon }) {
+  switch (id) {
+    case 'quran':
+      return <Ionicons name="book-outline" size={28} color={palette.gold} />;
+    case 'prayer-times':
+      return <MinaretIcon size={30} color={palette.gold} strokeWidth={1.6} />;
+    case 'dua':
+      return <PrayerBeadsIcon size={28} color={palette.gold} />;
+    case 'qibla':
+      return <Ionicons name="compass-outline" size={30} color={palette.gold} />;
+  }
+}
+
+function QuickGrid({ nextPrayer, onPress, cards }: {
   nextPrayer: any;
   onPress: (route: string) => void;
-  cards: typeof QUICK_CARDS;
+  cards: QuickCard[];
 }) {
-  const theme = isDark ? Colors.dark : Colors.light;
-  const half = Math.floor((W - 32 - 10) / 2);
+  const half = Math.floor((W - 32 - 12) / 2);
 
   return (
     <View style={quickStyles.grid}>
@@ -198,16 +238,15 @@ function QuickGrid({ isDark, prayerData, nextPrayer, onPress, cards }: {
         return (
           <TouchableOpacity
             key={card.route}
-            style={[quickStyles.card, { width: half, backgroundColor: theme.card, borderColor: theme.border }]}
+            style={[quickStyles.card, { width: half }]}
             onPress={() => onPress(card.route)}
-            activeOpacity={0.75}
+            activeOpacity={0.8}
           >
-            <View style={[quickStyles.iconBg, { backgroundColor: card.bg }]}>
-              <Text style={quickStyles.icon}>{card.icon}</Text>
+            <View style={quickStyles.iconBg}>
+              <QuickIconRender id={card.id} />
             </View>
-            <Text style={[quickStyles.label, { color: theme.text }]}>{card.label}</Text>
-            <Text style={[quickStyles.sub, { color: theme.textMuted }]} numberOfLines={1}>{sub}</Text>
-            <View style={[quickStyles.accent, { backgroundColor: card.color }]} />
+            <Text style={quickStyles.label}>{card.label}</Text>
+            <Text style={quickStyles.sub} numberOfLines={1}>{sub}</Text>
           </TouchableOpacity>
         );
       })}
@@ -216,125 +255,183 @@ function QuickGrid({ isDark, prayerData, nextPrayer, onPress, cards }: {
 }
 
 const quickStyles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 4 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginBottom: spacing.xs },
   card: {
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 16,
-    gap: 6,
-    position: 'relative',
-    overflow: 'hidden',
+    backgroundColor: palette.greenLight,
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    gap: spacing.xs + 2,
   },
-  iconBg: { width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 2 },
-  icon: { fontSize: 24 },
-  label: { fontSize: 15, fontWeight: '800' },
-  sub: { fontSize: 11 },
-  accent: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 3 },
+  iconBg: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.md,
+    backgroundColor: 'rgba(239,159,39,0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  label: {
+    ...typography.heading3,
+    color: palette.textPrimary,
+  },
+  sub: {
+    ...typography.bodySmall,
+    color: palette.textSecondary,
+  },
 });
 
-// ─── Verse of the Day card ────────────────────────────────────────────────────
+// ─── Verse of the Day card — manuscript treatment ────────────────────────────
 function VerseCard({
-  arabic, english, reference, isDark, onPress,
+  arabic, english, reference, onPress,
 }: {
-  arabic: string; english: string; reference: string; isDark: boolean; onPress: () => void;
+  arabic: string; english: string; reference: string; onPress: () => void;
 }) {
-  const theme = isDark ? Colors.dark : Colors.light;
   return (
     <TouchableOpacity
-      style={[verseStyles.card, { backgroundColor: theme.card, borderColor: GOLD + '55' }]}
       onPress={onPress}
       activeOpacity={0.9}
+      style={{ marginBottom: spacing.md }}
     >
-      <View style={verseStyles.goldBar} />
-      <Text style={verseStyles.bismillah}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
-      <View style={verseStyles.refRow}>
-        <View style={[verseStyles.refBadge, { backgroundColor: GOLD_LIGHT }]}>
-          <Text style={[verseStyles.refBadgeText, { color: GOLD }]}>Verse of the Day</Text>
+      <ManuscriptCard variant="bordered">
+        <Text style={verseStyles.bismillah}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
+        <View style={verseStyles.refRow}>
+          <View style={verseStyles.refBadge}>
+            <Text style={verseStyles.refBadgeText}>Verse of the Day</Text>
+          </View>
+          <Text style={verseStyles.reference}>{reference}</Text>
         </View>
-        <Text style={[verseStyles.reference, { color: Colors.primary }]}>{reference}</Text>
-      </View>
-      <Text style={[verseStyles.arabic, { color: theme.text }]} textBreakStrategy="simple">
-        {arabic}
-      </Text>
-      <View style={[verseStyles.divider, { backgroundColor: GOLD + '30' }]} />
-      <Text style={[verseStyles.english, { color: theme.textSecondary }]}>{english}</Text>
-      <View style={verseStyles.readRow}>
-        <Text style={[verseStyles.readBtn, { color: Colors.primary }]}>Continue Reading →</Text>
-      </View>
+        <Text style={verseStyles.arabic} textBreakStrategy="simple">
+          {arabic}
+        </Text>
+        <View style={verseStyles.divider} />
+        <Text style={verseStyles.english}>{english}</Text>
+        <View style={verseStyles.readRow}>
+          <Text style={verseStyles.readBtn}>Continue Reading →</Text>
+        </View>
+      </ManuscriptCard>
     </TouchableOpacity>
   );
 }
 
 const verseStyles = StyleSheet.create({
-  card: { borderRadius: 20, padding: 18, borderWidth: 1, marginBottom: 12, overflow: 'hidden' },
-  goldBar: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: GOLD },
-  bismillah: { fontFamily: 'Amiri_400Regular', fontSize: 18, textAlign: 'center', color: GOLD, marginBottom: 10, marginTop: 6 },
-  refRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  refBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
-  refBadgeText: { fontSize: 11, fontWeight: '700' },
-  reference: { fontSize: 13, fontWeight: '700', letterSpacing: 0.5 },
-  arabic: { fontFamily: 'Amiri_400Regular', fontSize: 24, textAlign: 'right', lineHeight: 50, writingDirection: 'rtl' },
-  divider: { height: 1, marginVertical: 12 },
-  english: { fontSize: 14, lineHeight: 22, fontStyle: 'italic' },
-  readRow: { marginTop: 10, alignItems: 'flex-end' },
-  readBtn: { fontSize: 13, fontWeight: '700' },
+  bismillah: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 18,
+    textAlign: 'center',
+    color: palette.gold,
+    marginBottom: spacing.sm,
+  },
+  refRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  refBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: radius.sm,
+    backgroundColor: 'rgba(239,159,39,0.18)',
+  },
+  refBadgeText: {
+    ...typography.caption,
+    color: palette.goldSoft,
+    fontWeight: '700',
+  },
+  reference: {
+    ...typography.bodySmall,
+    color: palette.green,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  arabic: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 24,
+    textAlign: 'right',
+    lineHeight: 50,
+    writingDirection: 'rtl',
+    color: palette.textOnCream,
+  },
+  divider: {
+    height: 1,
+    marginVertical: spacing.md,
+    backgroundColor: palette.goldBorderSubtle,
+  },
+  english: {
+    ...typography.bodySmall,
+    color: palette.textOnCreamSecondary,
+    fontStyle: 'italic',
+  },
+  readRow: { marginTop: spacing.sm, alignItems: 'flex-end' },
+  readBtn: {
+    ...typography.bodySmall,
+    color: palette.green,
+    fontWeight: '700',
+  },
 });
 
 // ─── More Features Section ────────────────────────────────────────────────────
-type MoreItem = { id: string; icon: string; label: string; sub: string; route: string };
-type MoreSection = { title: string; icon: string; color: string; items: MoreItem[] };
+type MoreItem = { id: string; icon: keyof typeof Ionicons.glyphMap | string; label: string; sub: string; route: string; useCustomIcon?: 'minaret' };
+type MoreSection = { title: string; ionicon: keyof typeof Ionicons.glyphMap; color: string; items: MoreItem[] };
 
 const MORE_SECTIONS: MoreSection[] = [
   {
     title: 'Islamic Knowledge',
-    icon: '📚',
+    ionicon: 'library-outline',
     color: '#2563EB',
     items: [
-      { id: 'hadith',        icon: '📜', label: 'Hadith',           sub: '6 collections',    route: '/hadith' },
-      { id: 'names',         icon: '☪️',  label: '99 Names of Allah', sub: 'Asmaul Husna',     route: '/names' },
-      { id: 'islamic-books', icon: '📕', label: 'Islamic Books',     sub: 'Free PDFs',        route: '/islamic-books' },
+      { id: 'hadith',        icon: 'document-text-outline', label: 'Hadith',           sub: '6 collections',    route: '/hadith' },
+      { id: 'names',         icon: 'star-outline',  label: '99 Names of Allah', sub: 'Asmaul Husna',     route: '/names' },
+      { id: 'islamic-books', icon: 'book-outline', label: 'Islamic Books',     sub: 'Free PDFs',        route: '/islamic-books' },
     ],
   },
   {
     title: 'Calculators',
-    icon: '🧮',
+    ionicon: 'calculator-outline',
     color: '#0D9488',
     items: [
-      { id: 'zakat-calculator', icon: '💰', label: 'Zakat Calculator',  sub: 'Calculate zakat',  route: '/zakat-calculator' },
-      { id: 'ramadan',          icon: '🌙', label: 'Ramadan Mode',       sub: 'Sehri & Iftar',    route: '/ramadan' },
+      { id: 'zakat-calculator', icon: 'wallet-outline', label: 'Zakat Calculator',  sub: 'Calculate zakat',  route: '/zakat-calculator' },
+      { id: 'ramadan',          icon: 'moon-outline', label: 'Ramadan Mode',       sub: 'Sehri & Iftar',    route: '/ramadan' },
     ],
   },
   {
     title: 'Tools',
-    icon: '🛠️',
+    ionicon: 'construct-outline',
     color: '#7C3AED',
     items: [
-      { id: 'calendar',       icon: '📅', label: 'Islamic Calendar',   sub: 'Hijri dates',       route: '/calendar' },
-      { id: 'mosque-finder',  icon: '🕌', label: 'Mosque Finder',       sub: 'Near you',          route: '/mosque-finder' },
-      { id: 'halal-finder',   icon: '🥩', label: 'Halal Finder',        sub: 'Halal restaurants', route: '/halal-finder' },
+      { id: 'calendar',       icon: 'calendar-outline', label: 'Islamic Calendar',   sub: 'Hijri dates',       route: '/calendar' },
+      { id: 'mosque-finder',  icon: 'minaret', useCustomIcon: 'minaret', label: 'Mosque Finder',       sub: 'Near you',          route: '/mosque-finder' },
+      { id: 'halal-finder',   icon: 'restaurant-outline', label: 'Halal Finder',        sub: 'Halal restaurants', route: '/halal-finder' },
     ],
   },
   {
     title: 'Personal',
-    icon: '👤',
+    ionicon: 'person-outline',
     color: '#F59E0B',
     items: [
-      { id: 'hifz-tracker',  icon: '📿', label: 'Hifz Tracker',       sub: 'Track memorization', route: '/hifz-tracker' },
-      { id: 'prayer-streak', icon: '🔥', label: 'Prayer Streak',       sub: 'Daily prayers',     route: '/prayer-streak' },
-      { id: 'feedback',      icon: '💬', label: 'Feedback',            sub: 'Share thoughts',    route: '/feedback' },
+      { id: 'hifz-tracker',  icon: 'bookmark-outline', label: 'Hifz Tracker',       sub: 'Track memorization', route: '/hifz-tracker' },
+      { id: 'feedback',      icon: 'chatbubble-outline', label: 'Feedback',            sub: 'Share thoughts',    route: '/feedback' },
     ],
   },
 ];
 
-function MoreSection({ section, isDark, onPress }: {
-  section: typeof MORE_SECTIONS[0]; isDark: boolean; onPress: (route: string) => void;
+function MoreItemIcon({ item }: { item: MoreItem }) {
+  if (item.useCustomIcon === 'minaret') {
+    return <MinaretIcon size={20} color={palette.gold} strokeWidth={1.6} />;
+  }
+  return <Ionicons name={item.icon as keyof typeof Ionicons.glyphMap} size={18} color={palette.gold} />;
+}
+
+function MoreSectionView({ section, isDark, onPress }: {
+  section: MoreSection; isDark: boolean; onPress: (route: string) => void;
 }) {
   const theme = isDark ? Colors.dark : Colors.light;
   return (
-    <View style={{ marginBottom: 16 }}>
+    <View style={{ marginBottom: spacing.lg }}>
       <View style={moreStyles.sectionHeader}>
         <View style={[moreStyles.sectionIconBox, { backgroundColor: section.color + '20' }]}>
-          <Text style={{ fontSize: 14 }}>{section.icon}</Text>
+          <Ionicons name={section.ionicon} size={14} color={section.color} />
         </View>
         <Text style={[moreStyles.sectionTitle, { color: theme.text }]}>{section.title}</Text>
       </View>
@@ -350,7 +447,7 @@ function MoreSection({ section, isDark, onPress }: {
             activeOpacity={0.7}
           >
             <View style={[moreStyles.itemIconBox, { backgroundColor: theme.surface }]}>
-              <Text style={{ fontSize: 16 }}>{item.icon}</Text>
+              <MoreItemIcon item={item} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[moreStyles.itemLabel, { color: theme.text }]}>{item.label}</Text>
@@ -365,14 +462,14 @@ function MoreSection({ section, isDark, onPress }: {
 }
 
 const moreStyles = StyleSheet.create({
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
   sectionIconBox: { width: 28, height: 28, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  sectionTitle: { fontSize: 13, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5 },
-  sectionCard: { borderRadius: 16, borderWidth: 1, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 12, gap: 12 },
-  itemIconBox: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
-  itemLabel: { fontSize: 14, fontWeight: '600' },
-  itemSub: { fontSize: 11, marginTop: 1 },
+  sectionTitle: { ...typography.caption, fontWeight: '800', textTransform: 'uppercase', fontSize: 12 },
+  sectionCard: { borderRadius: radius.lg, borderWidth: 1, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md + 2, paddingVertical: spacing.md, gap: spacing.md },
+  itemIconBox: { width: 36, height: 36, borderRadius: radius.sm + 2, justifyContent: 'center', alignItems: 'center' },
+  itemLabel: { ...typography.body, fontWeight: '600' },
+  itemSub: { ...typography.bodySmall, fontSize: 11, marginTop: 1 },
 });
 
 // ─── Gold Divider ─────────────────────────────────────────────────────────────
@@ -386,9 +483,9 @@ function GoldDivider() {
   );
 }
 const dividerStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', marginVertical: 16, gap: 10 },
-  line: { flex: 1, height: 1, backgroundColor: GOLD + '30' },
-  star: { color: GOLD, fontSize: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.lg, gap: spacing.sm + 2 },
+  line: { flex: 1, height: 1, backgroundColor: palette.goldBorderSubtle },
+  star: { color: palette.gold, fontSize: 12 },
 });
 
 // ─── Section Header ───────────────────────────────────────────────────────────
@@ -396,15 +493,15 @@ function SectionTitle({ title, isDark }: { title: string; isDark: boolean }) {
   const theme = isDark ? Colors.dark : Colors.light;
   return (
     <View style={stStyles.row}>
-      <View style={[stStyles.dot, { backgroundColor: Colors.primary }]} />
+      <View style={stStyles.dot} />
       <Text style={[stStyles.text, { color: theme.text }]}>{title}</Text>
     </View>
   );
 }
 const stStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10, marginTop: 4 },
-  dot: { width: 4, height: 16, borderRadius: 2 },
-  text: { fontSize: 16, fontWeight: '800' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm + 2, marginTop: spacing.xs },
+  dot: { width: 4, height: 16, borderRadius: 2, backgroundColor: palette.gold },
+  text: { ...typography.heading3, fontWeight: '700' },
 });
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
@@ -424,7 +521,6 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [verseLoading, setVerseLoading] = useState(true);
 
-  // Home tile customization preferences
   const [enabledIds, setEnabledIds] = useState<string[]>(DEFAULT_ENABLED_TILE_IDS);
   const [tilesLoaded, setTilesLoaded] = useState(false);
 
@@ -472,7 +568,7 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => { trackScreen('Home'); }, []);
-  useEffect(() => { loadContent(); }, []);
+  useEffect(() => { loadContent(); }, [loadContent]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -483,13 +579,16 @@ export default function HomeScreen() {
   const navigate = (route: string) => router.push(route as any);
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: Colors.primary }]} edges={['top']}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.green }]} edges={['top']}>
 
       {/* ── Header ── */}
       <View style={styles.header}>
-        <GeometricPattern width={W} height={110} />
+        <GeometricPattern width={W} height={120} />
+        <View style={styles.headerPatternWrap} pointerEvents="none">
+          <IslamicPattern size={90} color={palette.gold} opacity={0.08} />
+        </View>
         <View style={styles.headerContent}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.salamAr}>السلام عليكم</Text>
             <Text style={styles.salamEn}>Assalamu Alaikum</Text>
             {prayerData && (
@@ -498,15 +597,13 @@ export default function HomeScreen() {
               </Text>
             )}
           </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              style={styles.headerBtn}
-              onPress={() => navigate('/settings')}
-              hitSlop={8}
-            >
-              <Ionicons name="person-circle-outline" size={28} color="rgba(255,255,255,0.9)" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.headerBtn}
+            onPress={() => navigate('/settings')}
+            hitSlop={8}
+          >
+            <Ionicons name="person-circle-outline" size={28} color={palette.textSecondary} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -518,12 +615,11 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.primary}
-            colors={[Colors.primary]}
+            tintColor={palette.green}
+            colors={[palette.green]}
           />
         }
       >
-        {/* ── Ramadan Banner ── */}
         {isRamadan && (
           <TouchableOpacity
             style={styles.ramadanBanner}
@@ -542,16 +638,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        {/* ── Next Prayer (P.1a — adhan-based) ── */}
-        <PrayerNextCard isDark={isDark} onPress={() => navigate('/prayer')} />
+        <PrayerNextCard onPress={() => navigate('/prayer')} />
 
-        {/* ── Quick Access 2×2 ── */}
         {tilesLoaded && visibleQuickCards.length > 0 && (
           <>
             <SectionTitle title="Quick Access" isDark={isDark} />
             <QuickGrid
-              isDark={isDark}
-              prayerData={prayerData}
               nextPrayer={nextPrayer}
               onPress={navigate}
               cards={visibleQuickCards}
@@ -561,7 +653,6 @@ export default function HomeScreen() {
 
         <GoldDivider />
 
-        {/* ── Verse of the Day ── */}
         <SectionTitle title="Verse of the Day" isDark={isDark} />
         {verseLoading ? (
           <View style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
@@ -572,34 +663,30 @@ export default function HomeScreen() {
             arabic={verse.arabic}
             english={verse.english}
             reference={`${verse.surahName} ${verse.surahNumber}:${verse.verseNumber}`}
-            isDark={isDark}
             onPress={() => navigate('/quran')}
           />
         ) : null}
 
         <GoldDivider />
 
-        {/* ── Daily Knowledge ── */}
         <SectionTitle title="Daily Knowledge" isDark={isDark} />
         <DailyKnowledgeCard isDark={isDark} />
 
         <GoldDivider />
 
-        {/* ── More Features ── */}
         {tilesLoaded && visibleMoreSections.length > 0 && (
           <>
             <SectionTitle title="More Features" isDark={isDark} />
             {visibleMoreSections.map((section) => (
-              <MoreSection key={section.title} section={section} isDark={isDark} onPress={navigate} />
+              <MoreSectionView key={section.title} section={section} isDark={isDark} onPress={navigate} />
             ))}
           </>
         )}
 
-        {/* ── Footer ── */}
         <View style={[styles.footer, { borderTopColor: theme.border }]}>
           <Text style={[styles.footerVersion, { color: theme.textMuted }]}>Islam Daily v1.0.0</Text>
           <Text style={[styles.footerTagline, { color: theme.textMuted }]}>Built with love for the Ummah</Text>
-          <Text style={[styles.footerBismillah, { color: Colors.primary }]}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
+          <Text style={[styles.footerBismillah, { color: palette.green }]}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -610,56 +697,87 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
 
   header: {
-    backgroundColor: Colors.primary,
-    paddingBottom: 18,
+    backgroundColor: palette.green,
+    paddingBottom: spacing.lg,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  headerPatternWrap: {
+    position: 'absolute',
+    right: -10,
+    top: 8,
+    opacity: 1,
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingTop: 14,
+    paddingHorizontal: spacing.xl - 4,
+    paddingTop: spacing.md + 2,
   },
-  salamAr: { fontFamily: 'Amiri_400Regular', color: GOLD, fontSize: 22, letterSpacing: 0.5 },
-  salamEn: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: '600', marginTop: 2 },
-  hijriDate: { color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 3 },
-  headerActions: { flexDirection: 'row', gap: 4 },
+  salamAr: {
+    fontFamily: 'Amiri_400Regular',
+    color: palette.gold,
+    fontSize: 28,
+    letterSpacing: 0.5,
+    lineHeight: 36,
+  },
+  salamEn: {
+    ...typography.heading2,
+    color: palette.textPrimary,
+    marginTop: 2,
+  },
+  hijriDate: {
+    ...typography.bodySmall,
+    color: palette.textSecondary,
+    marginTop: 4,
+  },
   headerBtn: { padding: 2 },
 
-  scroll: { padding: 16, paddingBottom: 32 },
+  scroll: { padding: spacing.lg, paddingBottom: spacing['2xl'] },
 
   ramadanBanner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
     backgroundColor: '#1A1035',
-    marginBottom: 14,
+    marginBottom: spacing.md,
   },
-  ramadanTitle: { color: GOLD, fontSize: 15, fontWeight: '800' },
+  ramadanTitle: {
+    ...typography.heading3,
+    color: palette.gold,
+    fontWeight: '800',
+  },
   ramadanTimes: { gap: 2, alignItems: 'flex-end' },
-  ramadanTime: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: '600' },
+  ramadanTime: {
+    ...typography.bodySmall,
+    color: palette.textPrimary,
+    fontWeight: '600',
+  },
 
   loadingCard: {
-    borderRadius: 16,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    padding: 24,
+    padding: spacing.xl,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
-  loadingText: { fontSize: 14 },
-
+  loadingText: { ...typography.bodySmall },
 
   footer: {
     alignItems: 'center',
-    paddingTop: 24,
-    gap: 4,
+    paddingTop: spacing.xl,
+    gap: spacing.xs,
     borderTopWidth: 1,
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
-  footerVersion: { fontSize: 12 },
-  footerTagline: { fontSize: 12 },
-  footerBismillah: { fontFamily: 'Amiri_400Regular', fontSize: 20, marginTop: 8 },
+  footerVersion: { ...typography.caption },
+  footerTagline: { ...typography.caption },
+  footerBismillah: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 20,
+    marginTop: spacing.sm,
+  },
 });

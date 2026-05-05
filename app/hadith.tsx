@@ -14,8 +14,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../src/constants/colors';
+import { Colors, palette } from '../src/constants/colors';
+import { typography } from '../src/constants/typography';
+import { spacing, radius } from '../src/constants/spacing';
 import { HADITH_COLLECTIONS } from '../src/constants';
+import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import { trackScreen } from '../src/services/analytics';
 import { SupabaseHadith } from '../src/lib/supabase';
 import { useStore } from '../src/store';
@@ -257,36 +260,35 @@ export default function HadithScreen() {
 
   const renderHadith = ({ item }: { item: SupabaseHadith }) => {
     return (
-      <View style={[cardStyles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <View style={[cardStyles.accent, { backgroundColor: collMeta.color }]} />
+      <ManuscriptCard variant="standard">
         <View style={cardStyles.header}>
-          <View style={[cardStyles.numBadge, { backgroundColor: collMeta.bg }]}>
-            <Text style={[cardStyles.numText, { color: collMeta.color }]}>#{item.hadith_number}</Text>
+          <View style={cardStyles.numBadge}>
+            <Text style={cardStyles.numText}>#{item.hadith_number}</Text>
           </View>
           {item.chapter_name ? (
-            <Text style={[cardStyles.chapter, { color: theme.textSecondary }]} numberOfLines={1}>
+            <Text style={cardStyles.chapter} numberOfLines={1}>
               {item.chapter_name}
             </Text>
           ) : null}
           <GradeBadge grade={item.grade ?? 'Sahih'} theme={theme} />
         </View>
 
-        <Text style={[cardStyles.bookName, { color: collMeta.color }]}>{collName}</Text>
+        <Text style={cardStyles.bookName}>{collName}</Text>
 
         {item.arabic ? (
-          <Text style={[cardStyles.arabic, { color: theme.text }]} textBreakStrategy="simple">
+          <Text style={cardStyles.arabic} textBreakStrategy="simple">
             {item.arabic}
           </Text>
         ) : null}
 
-        <View style={[cardStyles.divider, { backgroundColor: theme.border }]} />
+        <View style={cardStyles.divider} />
 
         {item.english ? (
-          <Text style={[cardStyles.english, { color: theme.textSecondary }]}>{item.english}</Text>
+          <Text style={cardStyles.english}>{item.english}</Text>
         ) : null}
 
         {item.narrator ? (
-          <Text style={[cardStyles.narrator, { color: collMeta.color }]}>— {item.narrator}</Text>
+          <Text style={cardStyles.narrator}>— {item.narrator}</Text>
         ) : null}
 
         <CardActionsRow
@@ -304,9 +306,9 @@ export default function HadithScreen() {
             reference: `${collName} ${item.hadith_number}`,
             type: 'hadith',
           }}
-          iconColor={theme.textMuted}
+          iconColor={palette.textOnCreamMuted}
         />
-      </View>
+      </ManuscriptCard>
     );
   };
 
@@ -506,23 +508,63 @@ const styles = StyleSheet.create({
 });
 
 const cardStyles = StyleSheet.create({
-  card: { borderRadius: 14, padding: 16, borderWidth: 1, overflow: 'hidden', position: 'relative' },
-  accent: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8, paddingLeft: 8, flexWrap: 'wrap' },
-  numBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  numText: { fontSize: 13, fontWeight: '700' },
-  chapter: { flex: 1, fontSize: 12, minWidth: 0 },
-  bookName: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, marginBottom: 8, paddingLeft: 8, textTransform: 'uppercase' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  numBadge: {
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
+    backgroundColor: 'rgba(239,159,39,0.18)',
+  },
+  numText: {
+    ...typography.caption,
+    fontSize: 13,
+    fontWeight: '700',
+    color: palette.goldSoft,
+  },
+  chapter: {
+    flex: 1,
+    ...typography.caption,
+    color: palette.textOnCreamSecondary,
+    minWidth: 0,
+  },
+  bookName: {
+    ...typography.caption,
+    color: palette.green,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: spacing.sm,
+    textTransform: 'uppercase',
+  },
   arabic: {
     fontFamily: 'Amiri_400Regular',
     fontSize: 22,
     textAlign: 'right',
     lineHeight: 42,
     writingDirection: 'rtl',
-    marginBottom: 8,
-    paddingLeft: 8,
+    marginBottom: spacing.sm,
+    color: palette.textOnCream,
   },
-  divider: { height: 1, marginBottom: 12 },
-  english: { fontSize: 14, lineHeight: 22 },
-  narrator: { fontSize: 12, fontWeight: '600', marginTop: 8 },
+  divider: {
+    height: 1,
+    marginBottom: spacing.md,
+    backgroundColor: palette.dividerOnCream,
+  },
+  english: {
+    ...typography.body,
+    fontSize: 14,
+    color: palette.textOnCreamSecondary,
+  },
+  narrator: {
+    ...typography.bodySmall,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: spacing.sm,
+    color: palette.green,
+  },
 });

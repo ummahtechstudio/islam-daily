@@ -1,5 +1,7 @@
 export * from './colors';
 export * from './fonts';
+export * from './typography';
+export * from './spacing';
 
 export const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 export const PRAYER_ICONS = ['🌙', '🌅', '☀️', '🌤️', '🌇', '⭐'];

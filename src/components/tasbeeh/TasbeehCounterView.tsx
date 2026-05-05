@@ -15,7 +15,8 @@ import { useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
 
-import { Colors } from '../../constants/colors';
+import { Colors, palette } from '../../constants/colors';
+import { spacing, radius } from '../../constants/spacing';
 import {
   getCounters,
   getSelectedCounterId,
@@ -369,8 +370,12 @@ export function TasbeehCounterView({
         ))}
       </View>
 
-      <View style={styles.dhikrBlock}>
-        <Text style={styles.dhikrArabic}>{selected.arabic}</Text>
+      <View style={styles.dhikrOuterWrap}>
+        <View style={styles.dhikrBlock}>
+          <View style={styles.dhikrGoldLineLeft} />
+          <Text style={styles.dhikrArabic}>{selected.arabic}</Text>
+          <View style={styles.dhikrGoldLineRight} />
+        </View>
         <Text style={[styles.dhikrName, { color: theme.text }]}>{selected.name}</Text>
         {selected.source ? (
           <Text style={[styles.dhikrSource, { color: theme.textMuted }]} numberOfLines={2}>
@@ -667,22 +672,43 @@ const styles = StyleSheet.create({
   },
   modeTabText: { fontSize: 13, fontWeight: '700' },
 
-  dhikrBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 6,
+  dhikrOuterWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xs + 2,
     alignItems: 'center',
-    gap: 4,
+    gap: spacing.xs,
+  },
+  dhikrBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: palette.cream,
+    borderWidth: 1,
+    borderColor: palette.creamBorder,
+    borderRadius: radius.sm + 2,
+    paddingHorizontal: spacing.md + 2,
+    paddingVertical: spacing.sm + 2,
+    gap: spacing.sm,
+  },
+  dhikrGoldLineLeft: {
+    width: 16,
+    height: 1,
+    backgroundColor: palette.goldBorderSubtle,
+  },
+  dhikrGoldLineRight: {
+    width: 16,
+    height: 1,
+    backgroundColor: palette.goldBorderSubtle,
   },
   dhikrArabic: {
     fontFamily: 'Amiri_400Regular',
-    fontSize: 30,
-    color: Colors.primary,
+    fontSize: 28,
+    color: palette.textOnCream,
     textAlign: 'center',
-    lineHeight: 50,
+    lineHeight: 46,
     writingDirection: 'rtl',
   },
-  dhikrName: { fontSize: 14, fontWeight: '700' },
+  dhikrName: { fontSize: 14, fontWeight: '700', marginTop: spacing.xs + 2 },
   dhikrSource: { fontSize: 11, textAlign: 'center', marginTop: 2 },
 
   ringWrap: {

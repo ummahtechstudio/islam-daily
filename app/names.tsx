@@ -11,8 +11,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors } from '../src/constants/colors';
+import { Colors, palette } from '../src/constants/colors';
+import { typography } from '../src/constants/typography';
+import { spacing, radius } from '../src/constants/spacing';
 import { urduStyle } from '../src/constants/fonts';
+import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import { trackScreen } from '../src/services/analytics';
 import { useStore } from '../src/store';
 import {
@@ -91,7 +94,7 @@ export default function NamesScreen() {
         showsVerticalScrollIndicator={false}
       />
 
-      {/* Detail Modal */}
+      {/* Detail Modal — manuscript treatment */}
       <Modal
         visible={!!selected}
         animationType="slide"
@@ -107,24 +110,26 @@ export default function NamesScreen() {
               <Text style={styles.detailNum}>{selected.id === 0 ? '✦ The Greatest Name' : `${selected.id} / 99`}</Text>
             </View>
             <ScrollView contentContainerStyle={styles.detailContent}>
-              <Text style={[styles.detailArabic, { color: theme.text }]}>{selected.name}</Text>
-              <Text style={[styles.detailTranslit, { color: Colors.primary }]}>
-                {selected.transliteration}
-              </Text>
-              {selected.pronunciation && (
-                <Text style={[styles.detailPronounce, { color: theme.textSecondary }]}>
-                  /{selected.pronunciation}/
-                </Text>
-              )}
-              <View style={[styles.meaningCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-                <Text style={[styles.meaningLabel, { color: Colors.primary }]}>Meaning</Text>
-                <Text style={[styles.meaningText, { color: theme.text }]}>{selected.meaning}</Text>
-              </View>
-              {selected.description && (
-                <Text style={[styles.description, { color: theme.textSecondary }, urduStyle(18)]}>
-                  {selected.description}
-                </Text>
-              )}
+              <ManuscriptCard variant="bordered" withCornerOrnaments style={{ width: '100%' }}>
+                <View style={{ alignItems: 'center', gap: spacing.sm }}>
+                  <Text style={styles.detailArabic}>{selected.name}</Text>
+                  <Text style={styles.detailTranslit}>{selected.transliteration}</Text>
+                  {selected.pronunciation && (
+                    <Text style={styles.detailPronounce}>
+                      /{selected.pronunciation}/
+                    </Text>
+                  )}
+                  <View style={styles.meaningInner}>
+                    <Text style={styles.meaningLabel}>Meaning</Text>
+                    <Text style={styles.meaningText}>{selected.meaning}</Text>
+                  </View>
+                  {selected.description && (
+                    <Text style={[styles.description, urduStyle(18)]}>
+                      {selected.description}
+                    </Text>
+                  )}
+                </View>
+              </ManuscriptCard>
             </ScrollView>
           </SafeAreaView>
         )}
@@ -159,20 +164,53 @@ const styles = StyleSheet.create({
   closeBtn: { position: 'absolute', right: 16, top: 16 },
   detailNum: { color: 'rgba(255,255,255,0.7)', fontSize: 14 },
 
-  detailContent: { padding: 24, alignItems: 'center', gap: 8 },
-  detailArabic: { fontFamily: 'Amiri_700Bold', fontSize: 52, textAlign: 'center' },
-  detailTranslit: { fontSize: 26, fontWeight: '700', textAlign: 'center' },
-  detailPronounce: { fontSize: 16, fontStyle: 'italic' },
-  meaningCard: {
-    width: '100%',
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 18,
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 8,
+  detailContent: { padding: spacing.xl, alignItems: 'center' },
+  detailArabic: {
+    fontFamily: 'Amiri_700Bold',
+    fontSize: 56,
+    textAlign: 'center',
+    color: palette.gold,
+    lineHeight: 84,
   },
-  meaningLabel: { fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 },
-  meaningText: { fontSize: 20, fontWeight: '600', textAlign: 'center' },
-  description: { fontSize: 15, lineHeight: 24, textAlign: 'center', marginTop: 8 },
+  detailTranslit: {
+    ...typography.heading1,
+    fontSize: 26,
+    fontWeight: '700',
+    textAlign: 'center',
+    color: palette.textOnCream,
+  },
+  detailPronounce: {
+    ...typography.body,
+    fontStyle: 'italic',
+    color: palette.textOnCreamSecondary,
+  },
+  meaningInner: {
+    width: '100%',
+    borderTopWidth: 1,
+    borderTopColor: palette.dividerOnCream,
+    paddingTop: spacing.md,
+    marginTop: spacing.sm,
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+  },
+  meaningLabel: {
+    ...typography.caption,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    color: palette.green,
+    fontWeight: '700',
+  },
+  meaningText: {
+    ...typography.heading2,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: palette.textOnCream,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 24,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    color: palette.textOnCreamSecondary,
+  },
 });

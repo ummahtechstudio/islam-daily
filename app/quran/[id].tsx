@@ -400,6 +400,7 @@ export default function SurahReaderScreen() {
     }
 
     // Render Arabic text: either plain or as tappable words with optional tajweed
+    const arabicInk = '#1A3D2F'; // textOnCream
     const renderArabicText = () => {
       if (tajweedOn) {
         // Render word-by-word with tajweed colors and tap-to-look-up
@@ -416,7 +417,7 @@ export default function SurahReaderScreen() {
                   {tokens.map((tok, tIdx) => (
                     <Text
                       key={tIdx}
-                      style={tok.color !== 'inherit' ? { color: tok.color } : { color: theme.text }}
+                      style={tok.color !== 'inherit' ? { color: tok.color } : { color: arabicInk }}
                     >
                       {tok.text}
                     </Text>
@@ -433,14 +434,14 @@ export default function SurahReaderScreen() {
       const words = item.text.split(' ');
       return (
         <Text
-          style={[styles.arabicText, { color: theme.text, fontSize, lineHeight: fontSize * 1.9 }]}
+          style={[styles.arabicText, { color: arabicInk, fontSize, lineHeight: fontSize * 1.9 }]}
           textBreakStrategy="simple"
         >
           {words.map((word, wIdx) => (
             <Text
               key={wIdx}
               onPress={() => handleWordTap(word, item)}
-              style={{ color: theme.text }}
+              style={{ color: arabicInk }}
             >
               {word}{wIdx < words.length - 1 ? ' ' : ''}
             </Text>
@@ -451,13 +452,9 @@ export default function SurahReaderScreen() {
 
     return (
       <View style={[styles.verseContainer, { borderBottomColor: theme.border }]}>
-        {/* Verse number + actions */}
+        {/* Verse actions row */}
         <View style={styles.verseHeader}>
-          <View style={[styles.verseNumBadge, { backgroundColor: Colors.primary + '18' }]}>
-            <Text style={[styles.verseNum, { color: Colors.primary }]}>{item.numberInSurah}</Text>
-          </View>
           <View style={styles.verseActions}>
-            {/* Audio play button */}
             <TouchableOpacity onPress={() => playAyah(item)} hitSlop={8}>
               {isLoadingAudio ? (
                 <ActivityIndicator size={18} color={Colors.primary} />
@@ -482,8 +479,13 @@ export default function SurahReaderScreen() {
           </View>
         </View>
 
-        {/* Arabic text */}
-        {renderArabicText()}
+        {/* Arabic on cream — manuscript treatment */}
+        <View style={styles.arabicCream}>
+          <View style={styles.arabicBadge}>
+            <Text style={styles.arabicBadgeText}>{item.numberInSurah}</Text>
+          </View>
+          {renderArabicText()}
+        </View>
 
         {/* Translation */}
         {showTranslation && trAyah && (
@@ -975,25 +977,49 @@ const styles = StyleSheet.create({
   verseContainer: { padding: 16, borderBottomWidth: 1 },
   verseHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     marginBottom: 12,
   },
-  verseNumBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+  verseActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+
+  arabicCream: {
+    backgroundColor: '#FBF6E4',
+    borderWidth: 1,
+    borderColor: 'rgba(200,148,31,0.4)',
+    borderRadius: 12,
+    paddingTop: 18,
+    paddingBottom: 14,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    position: 'relative',
+  },
+  arabicBadge: {
+    position: 'absolute',
+    top: -10,
+    left: 14,
+    minWidth: 28,
+    height: 24,
+    paddingHorizontal: 8,
+    backgroundColor: '#FBF6E4',
+    borderWidth: 1,
+    borderColor: '#C8941F',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  verseNum: { fontSize: 13, fontWeight: '700' },
-  verseActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  arabicBadgeText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#C8941F',
+    letterSpacing: 0.3,
+  },
 
   arabicText: {
     fontFamily: 'Amiri_400Regular',
     textAlign: 'right',
     writingDirection: 'rtl',
-    marginBottom: 8,
+    marginBottom: 4,
   },
 
   translationBlock: { borderLeftWidth: 3, paddingLeft: 12, marginTop: 4 },

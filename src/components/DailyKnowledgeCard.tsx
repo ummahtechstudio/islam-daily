@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 
-import { Colors } from '../constants/colors';
+import { palette } from '../constants/colors';
+import { typography } from '../constants/typography';
+import { spacing, radius } from '../constants/spacing';
+import { ManuscriptCard } from './ManuscriptCard';
 import {
   fetchTodaysDailyKnowledge,
   getCachedDailyKnowledge,
@@ -11,9 +14,7 @@ import { formatRelativeTime } from '../utils/time';
 
 import KNOWLEDGE_DATA from '../../assets/daily_knowledge.json';
 
-const GOLD = '#EF9F27';
-const CREAM = '#FBF6E9';
-const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24h
+const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 
 type BundledTip = {
   id: number;
@@ -23,10 +24,6 @@ type BundledTip = {
   ur?: { title: string; text: string };
 };
 
-/**
- * Synthesize a `DailyKnowledge` from the bundled JSON so a brand-new install
- * with no network still renders content. Picks one tip seeded by the date.
- */
 function bundledFallback(): DailyKnowledge {
   const tips = KNOWLEDGE_DATA as BundledTip[];
   const seed = new Date().getDate();
@@ -61,14 +58,14 @@ interface PillSpec {
 function pillFor(type: DailyKnowledge['type']): PillSpec {
   switch (type) {
     case 'ayah':
-      return { ur: 'آیت', en: 'Quran Verse', bg: 'rgba(15,110,86,0.12)', fg: Colors.primary };
+      return { ur: 'آیت', en: 'Quran Verse', bg: 'rgba(15,110,86,0.12)', fg: palette.green };
     case 'hadith':
-      return { ur: 'حدیث', en: 'Hadith', bg: 'rgba(239,159,39,0.15)', fg: GOLD };
+      return { ur: 'حدیث', en: 'Hadith', bg: 'rgba(239,159,39,0.18)', fg: palette.goldSoft };
     case 'name_of_allah':
-      return { ur: 'اسماء الحسنیٰ', en: 'Name of Allah', bg: 'rgba(239,159,39,0.15)', fg: GOLD };
+      return { ur: 'اسماء الحسنیٰ', en: 'Name of Allah', bg: 'rgba(239,159,39,0.18)', fg: palette.goldSoft };
     case 'reflection':
     default:
-      return { ur: 'غور و فکر', en: 'Reflection', bg: 'rgba(120,120,120,0.12)', fg: '#5F5E5A' };
+      return { ur: 'غور و فکر', en: 'Reflection', bg: 'rgba(26,61,47,0.10)', fg: palette.textOnCreamSecondary };
   }
 }
 
@@ -76,7 +73,7 @@ interface Props {
   isDark: boolean;
 }
 
-export function DailyKnowledgeCard({ isDark }: Props) {
+export function DailyKnowledgeCard({ isDark: _isDark }: Props) {
   const initial = getCachedDailyKnowledge();
   const [entry, setEntry] = useState<DailyKnowledge | null>(
     initial?.entry ?? null,
@@ -93,43 +90,19 @@ export function DailyKnowledgeCard({ isDark }: Props) {
         setEntry(fresh);
         setFetchedAt(Date.now());
       })
-      .catch(() => {
-        // silent — cache or fallback already on screen
-      });
+      .catch(() => {});
     return () => {
       active = false;
     };
   }, []);
 
-  const theme = isDark ? Colors.dark : Colors.light;
-
-  // Empty state — no cache, no Supabase row. Use bundled fallback only if
-  // the JSON has any entries; otherwise fall through to the muted message.
   const display = entry ?? bundledFallback();
-
-  if (!display) {
-    return (
-      <View style={[styles.empty, { borderColor: theme.border, backgroundColor: theme.card }]}>
-        <Text style={styles.emptyIcon}>🌙</Text>
-        <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-          Daily reflection will appear here once online.
-        </Text>
-      </View>
-    );
-  }
-
   const pill = pillFor(display.type);
   const showStale =
     fetchedAt !== null && Date.now() - fetchedAt > STALE_AFTER_MS;
 
   return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: theme.card, borderColor: theme.border },
-      ]}
-    >
-      {/* Type pill */}
+    <ManuscriptCard variant="bordered">
       <View style={styles.pillRow}>
         <View style={[styles.pill, { backgroundColor: pill.bg }]}>
           <Text style={[styles.pillUr, { color: pill.fg }]}>{pill.ur}</Text>
@@ -137,7 +110,6 @@ export function DailyKnowledgeCard({ isDark }: Props) {
         </View>
       </View>
 
-      {/* Arabic block */}
       {display.arabic_text ? (
         <View style={styles.arabicBlock}>
           <Text style={styles.arabicText} textBreakStrategy="simple">
@@ -146,66 +118,53 @@ export function DailyKnowledgeCard({ isDark }: Props) {
         </View>
       ) : null}
 
-      {/* Translation Urdu (primary) */}
       {display.translation_ur ? (
-        <Text style={[styles.translationUr, { color: theme.text }]}>
+        <Text style={styles.translationUr}>
           {display.translation_ur}
         </Text>
       ) : null}
 
-      {/* Translation English (secondary) */}
       {display.translation_en ? (
-        <Text style={[styles.translationEn, { color: theme.textSecondary }]}>
+        <Text style={styles.translationEn}>
           {display.translation_en}
         </Text>
       ) : null}
 
-      {/* Optional context line */}
       {display.context_ur ? (
-        <Text style={[styles.contextUr, { color: theme.textMuted }]}>
+        <Text style={styles.contextUr}>
           {display.context_ur}
         </Text>
       ) : null}
 
-      {/* Footer row */}
       {(display.source_reference || showStale) ? (
-        <View style={[styles.footer, { borderTopColor: theme.border }]}>
-          <Text
-            style={[styles.source, { color: theme.textMuted }]}
-            numberOfLines={1}
-          >
+        <View style={styles.footer}>
+          <Text style={styles.source} numberOfLines={1}>
             {display.source_reference ?? ''}
           </Text>
           {showStale && fetchedAt !== null ? (
-            <Text style={[styles.stale, { color: theme.textMuted }]}>
+            <Text style={styles.stale}>
               Updated {formatRelativeTime(fetchedAt)}
             </Text>
           ) : null}
         </View>
       ) : null}
-    </View>
+    </ManuscriptCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 16,
-    gap: 10,
-    overflow: 'hidden',
-  },
   pillRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    marginBottom: spacing.sm,
   },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
+    gap: spacing.xs + 2,
+    paddingHorizontal: spacing.md - 2,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.pill,
   },
   pillUr: {
     fontSize: 12,
@@ -213,37 +172,37 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
   },
   pillEn: {
-    fontSize: 10,
+    ...typography.caption,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   arabicBlock: {
-    backgroundColor: CREAM,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    marginTop: 4,
+    backgroundColor: palette.creamSoft,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.md + 2,
+    paddingVertical: spacing.md + 2,
+    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
   },
   arabicText: {
-    fontFamily: 'IndoPakNastaleeq',
-    fontSize: 22,
-    lineHeight: 44,
+    ...typography.arabicBody,
     textAlign: 'center',
-    writingDirection: 'rtl',
-    color: '#1a1a1a',
+    color: palette.textOnCream,
   },
   translationUr: {
+    fontFamily: 'NotoNastaliqUrdu_400Regular',
     fontSize: 16,
     lineHeight: 32,
     textAlign: 'right',
     writingDirection: 'rtl',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    color: palette.textOnCream,
+    marginTop: spacing.xs,
   },
   translationEn: {
-    fontSize: 13,
-    lineHeight: 21,
+    ...typography.bodySmall,
     fontStyle: 'italic',
+    color: palette.textOnCreamSecondary,
+    marginTop: spacing.xs,
   },
   contextUr: {
     fontSize: 12,
@@ -252,32 +211,27 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
     fontStyle: 'italic',
     fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    color: palette.textOnCreamMuted,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
-    paddingTop: 8,
-    marginTop: 4,
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
+    marginTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: palette.dividerOnCream,
   },
   source: {
-    fontSize: 11,
+    ...typography.caption,
     fontWeight: '600',
+    color: palette.textOnCreamSecondary,
     flexShrink: 1,
   },
   stale: {
     fontSize: 10,
     fontStyle: 'italic',
+    color: palette.textOnCreamMuted,
   },
-  empty: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
-    alignItems: 'center',
-    gap: 6,
-  },
-  emptyIcon: { fontSize: 24 },
-  emptyText: { fontSize: 13, textAlign: 'center' },
 });

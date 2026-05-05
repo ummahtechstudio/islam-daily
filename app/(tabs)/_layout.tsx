@@ -3,7 +3,9 @@ import { useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../../src/store';
-import { Colors } from '../../src/constants/colors';
+import { Colors, palette } from '../../src/constants/colors';
+import { typography } from '../../src/constants/typography';
+import { MinaretIcon, PrayerBeadsIcon } from '../../src/components/icons';
 
 function TabIcon({
   name,
@@ -26,27 +28,31 @@ export default function TabLayout() {
     settingsScheme === 'dark' ||
     (settingsScheme === 'system' && colorScheme === 'dark');
 
-  const theme = isDark ? Colors.dark : Colors.light;
+  // Tab bar uses deeper green for slight contrast against main content
+  const tabBarBg = isDark ? palette.greenDeep : Colors.light.tabBar;
+  const tabBarBorder = isDark ? palette.divider : Colors.light.tabBarBorder;
+  const inactiveTint = isDark ? palette.textMuted : Colors.light.textMuted;
 
-  const tabBarHeight = 52 + insets.bottom;
+  const tabBarHeight = 56 + insets.bottom;
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: theme.textMuted,
+        tabBarActiveTintColor: palette.gold,
+        tabBarInactiveTintColor: inactiveTint,
         tabBarStyle: {
-          backgroundColor: theme.tabBar,
-          borderTopColor: theme.tabBarBorder,
+          backgroundColor: tabBarBg,
+          borderTopColor: tabBarBorder,
           borderTopWidth: 1,
           height: tabBarHeight,
           paddingBottom: insets.bottom + 4,
-          paddingTop: 6,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
+          ...typography.caption,
           fontWeight: '600',
+          marginTop: 2,
         },
       }}
     >
@@ -55,7 +61,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="home" color={color} size={size} />
+            <TabIcon name="home-outline" color={color} size={size} />
           ),
         }}
       />
@@ -64,7 +70,7 @@ export default function TabLayout() {
         options={{
           title: 'Quran',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="book" color={color} size={size} />
+            <TabIcon name="book-outline" color={color} size={size} />
           ),
         }}
       />
@@ -73,7 +79,7 @@ export default function TabLayout() {
         options={{
           title: 'Prayer',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="time" color={color} size={size} />
+            <MinaretIcon color={color} size={size} strokeWidth={1.6} />
           ),
         }}
       />
@@ -82,7 +88,7 @@ export default function TabLayout() {
         options={{
           title: 'Dua',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="hand-left" color={color} size={size} />
+            <PrayerBeadsIcon color={color} size={size} />
           ),
         }}
       />
@@ -91,7 +97,7 @@ export default function TabLayout() {
         options={{
           title: 'More',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="grid" color={color} size={size} />
+            <TabIcon name="grid-outline" color={color} size={size} />
           ),
         }}
       />

@@ -12,7 +12,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 
-import { Colors } from '../src/constants/colors';
+import { Colors, palette } from '../src/constants/colors';
+import { typography } from '../src/constants/typography';
+import { spacing, radius } from '../src/constants/spacing';
 import { useStore } from '../src/store';
 import { useResolvedLocation } from '../src/hooks/useResolvedLocation';
 import { computePrayerTimes } from '../src/services/prayerTimesService';
@@ -23,10 +25,8 @@ import {
 } from '../src/utils/formatPrayerTime';
 import { trackScreen } from '../src/services/analytics';
 import type { PrayerName } from '../src/types/prayerTimes';
-
-const GOLD = '#EF9F27';
-const CREAM = '#FBF6E4';
-const GREEN = '#0F6E56';
+import { ManuscriptCard } from '../src/components/ManuscriptCard';
+import { IslamicPattern } from '../src/components/IslamicPattern';
 
 const PRAYER_LABELS: Record<PrayerName, { en: string; ar: string }> = {
   fajr:    { en: 'Fajr',    ar: 'الفجر' },
@@ -53,7 +53,6 @@ const METHOD_LABELS: Record<string, string> = {
 };
 
 type PrayerTimesScreenProps = {
-  /** When true, hide the back chevron — used when this is rendered as a tab. */
   asTab?: boolean;
 };
 
@@ -71,7 +70,6 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
 
   const { settings, source, loading, reload } = useResolvedLocation();
 
-  // Refresh settings on focus — picks up changes made in city-picker / settings.
   useFocusEffect(
     useCallback(() => {
       reload();
@@ -106,7 +104,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
   if (loading) {
     return (
       <View style={[styles.flex, { backgroundColor: theme.background }]}>
-        <ActivityIndicator size="large" color={GREEN} style={{ marginTop: 48 }} />
+        <ActivityIndicator size="large" color={palette.green} style={{ marginTop: 48 }} />
       </View>
     );
   }
@@ -123,13 +121,12 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
       style={[styles.flex, { backgroundColor: theme.background }]}
       edges={asTab ? ['top', 'bottom'] : ['bottom']}
     >
-      {/* Top toolbar: back chevron (when stacked) + title + gear */}
       <View style={styles.toolbar}>
         {asTab ? (
           <View style={styles.toolbarSpacer} />
         ) : (
           <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.toolbarBtn}>
-            <Ionicons name="chevron-back" size={24} color={GREEN} />
+            <Ionicons name="chevron-back" size={24} color={palette.green} />
           </TouchableOpacity>
         )}
         <Text style={[styles.toolbarTitle, { color: theme.text }]}>Prayer Times</Text>
@@ -138,7 +135,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
           hitSlop={12}
           style={styles.toolbarBtn}
         >
-          <Ionicons name="settings-outline" size={22} color={GREEN} />
+          <Ionicons name="settings-outline" size={22} color={palette.green} />
         </TouchableOpacity>
       </View>
 
@@ -146,64 +143,74 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header card */}
-        <View style={[styles.headerCard, { borderColor: GREEN }]}>
-          <View style={styles.headerTop}>
-            <Ionicons name="location" size={16} color={GREEN} />
-            <Text style={styles.cityText}>
-              {settings.location.city}
-              {settings.location.country && settings.location.country !== 'Unknown'
-                ? `, ${settings.location.country}`
-                : ''}
-            </Text>
-          </View>
-          <View style={styles.badgeRow}>
-            <View style={[styles.badge, { backgroundColor: GREEN }]}>
-              <Text style={styles.badgeText}>
-                {METHOD_LABELS[settings.method] ?? settings.method}
+        {/* Header card — manuscript */}
+        <View style={{ marginBottom: spacing.md }}>
+          <ManuscriptCard variant="bordered">
+            <View style={headerStyles.patternWrap} pointerEvents="none">
+              <IslamicPattern size={80} color={palette.green} opacity={0.06} />
+            </View>
+            <View style={headerStyles.cityRow}>
+              <Ionicons name="location" size={16} color={palette.green} />
+              <Text style={headerStyles.cityText}>
+                {settings.location.city}
+                {settings.location.country && settings.location.country !== 'Unknown'
+                  ? `, ${settings.location.country}`
+                  : ''}
               </Text>
             </View>
-            <View style={[styles.badge, { backgroundColor: GOLD }]}>
-              <Text style={styles.badgeText}>
-                {settings.madhab === 'hanafi' ? 'Hanafi' : 'Shafi'}
-              </Text>
+            <View style={headerStyles.badgeRow}>
+              <View style={[headerStyles.badge, { backgroundColor: palette.green }]}>
+                <Text style={headerStyles.badgeText}>
+                  {METHOD_LABELS[settings.method] ?? settings.method}
+                </Text>
+              </View>
+              <View style={[headerStyles.badge, { backgroundColor: palette.gold }]}>
+                <Text style={headerStyles.badgeText}>
+                  {settings.madhab === 'hanafi' ? 'Hanafi' : 'Shafi'}
+                </Text>
+              </View>
             </View>
-          </View>
-          <Text style={styles.gregorianText}>{gregorian}</Text>
-          {hijri ? <Text style={styles.hijriText}>{hijri}</Text> : null}
+            <Text style={headerStyles.gregorianText}>{gregorian}</Text>
+            {hijri ? <Text style={headerStyles.hijriText}>{hijri}</Text> : null}
+          </ManuscriptCard>
         </View>
 
-        {/* Fallback notice */}
         {source === 'fallback' && (
           <TouchableOpacity
             style={styles.fallbackNotice}
             onPress={() => router.push('/city-picker' as any)}
             activeOpacity={0.7}
           >
-            <Ionicons name="information-circle" size={16} color={GREEN} />
+            <Ionicons name="information-circle" size={16} color={palette.green} />
             <Text style={styles.fallbackText}>
               Showing prayer times for Karachi. Tap to change.
             </Text>
-            <Ionicons name="chevron-forward" size={16} color={GREEN} />
+            <Ionicons name="chevron-forward" size={16} color={palette.green} />
           </TouchableOpacity>
         )}
 
-        {/* Next prayer card */}
+        {/* Next prayer — manuscript treatment */}
         {nextEntry && computed.nextPrayerTime && nextLabel && (
-          <View style={[styles.nextCard, { borderColor: GREEN, backgroundColor: GREEN }]}>
-            <Text style={styles.nextLabel}>NEXT PRAYER</Text>
-            <Text style={styles.nextName}>{nextLabel}</Text>
-            <Text style={styles.nextTime}>{formatPrayerTime(computed.nextPrayerTime)}</Text>
-            <Text style={styles.nextCountdown}>
-              {formatCountdown(computed.nextPrayerTime, new Date(tick))}
-            </Text>
-          </View>
+          <TouchableOpacity activeOpacity={1} style={{ marginBottom: spacing.lg }}>
+            <ManuscriptCard variant="bordered">
+              <View style={nextStyles.patternWrap} pointerEvents="none">
+                <IslamicPattern size={100} color={palette.gold} opacity={0.07} />
+              </View>
+              <Text style={nextStyles.label}>NEXT PRAYER</Text>
+              <View style={nextStyles.row}>
+                <Text style={nextStyles.name}>{nextLabel}</Text>
+                <Text style={nextStyles.time}>{formatPrayerTime(computed.nextPrayerTime)}</Text>
+              </View>
+              <Text style={nextStyles.countdown}>
+                {formatCountdown(computed.nextPrayerTime, new Date(tick))}
+              </Text>
+            </ManuscriptCard>
+          </TouchableOpacity>
         )}
 
-        {/* Prayer list */}
         <Text style={[styles.sectionTitle, { color: theme.text }]}>Today's Prayers</Text>
-        <View style={styles.prayerList}>
-          {computed.prayers.map((p) => {
+        <View style={[styles.prayerList, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          {computed.prayers.map((p, idx) => {
             const isCurrent = p.name === computed.currentPrayer;
             const isPast =
               !isCurrent &&
@@ -217,7 +224,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                 key={p.name}
                 style={[
                   styles.prayerRow,
-                  { backgroundColor: theme.card, borderColor: theme.border },
+                  idx < computed.prayers.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.border },
                   isCurrent && styles.prayerRowCurrent,
                 ]}
               >
@@ -227,7 +234,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                       styles.prayerNameEn,
                       {
                         color: isCurrent
-                          ? GREEN
+                          ? palette.green
                           : isPast
                             ? theme.textMuted
                             : theme.text,
@@ -239,7 +246,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                   <Text
                     style={[
                       styles.prayerNameAr,
-                      { color: isCurrent ? GREEN : theme.textSecondary },
+                      { color: isCurrent ? palette.green : theme.textSecondary },
                     ]}
                   >
                     {labels.ar}
@@ -249,8 +256,8 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                   style={[
                     styles.prayerTime,
                     {
-                      color: isCurrent
-                        ? GREEN
+                      color: isCurrent || (!isPast && p.name === computed.nextPrayer)
+                        ? palette.gold
                         : isPast
                           ? theme.textMuted
                           : theme.text,
@@ -264,14 +271,13 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
           })}
         </View>
 
-        {/* Sunnah Times collapsible */}
         <TouchableOpacity
           style={[styles.sunnahHeader, { borderColor: theme.border, backgroundColor: theme.card }]}
           onPress={() => setSunnahOpen((o) => !o)}
           activeOpacity={0.7}
         >
           <View style={styles.sunnahHeaderLeft}>
-            <Ionicons name="moon" size={16} color={GOLD} />
+            <Ionicons name="moon" size={16} color={palette.gold} />
             <Text style={[styles.sunnahHeaderText, { color: theme.text }]}>Sunnah Times</Text>
           </View>
           <Ionicons
@@ -301,7 +307,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
           </View>
         )}
 
-        <View style={{ height: 24 }} />
+        <View style={{ height: spacing.xl }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -312,108 +318,185 @@ function indexOfPrayer(name: PrayerName): number {
   return PRAYER_ORDER.indexOf(name);
 }
 
+const headerStyles = StyleSheet.create({
+  patternWrap: {
+    position: 'absolute',
+    right: -8,
+    top: -8,
+  },
+  cityRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs + 2 },
+  cityText: {
+    ...typography.heading3,
+    color: palette.textOnCream,
+    fontWeight: '700',
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+    marginTop: spacing.sm,
+  },
+  badge: {
+    paddingHorizontal: spacing.md - 2,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
+  },
+  badgeText: {
+    color: palette.cream,
+    ...typography.caption,
+    fontWeight: '700',
+    fontSize: 11,
+  },
+  gregorianText: {
+    ...typography.bodySmall,
+    color: palette.textOnCreamSecondary,
+    marginTop: spacing.sm,
+  },
+  hijriText: {
+    ...typography.bodySmall,
+    color: palette.green,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+});
+
+const nextStyles = StyleSheet.create({
+  patternWrap: {
+    position: 'absolute',
+    right: -10,
+    top: -10,
+  },
+  label: {
+    ...typography.caption,
+    color: palette.textOnCreamSecondary,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginTop: spacing.xs,
+  },
+  name: {
+    ...typography.display,
+    color: palette.textOnCream,
+  },
+  time: {
+    ...typography.display,
+    color: palette.gold,
+  },
+  countdown: {
+    ...typography.bodySmall,
+    color: palette.textOnCreamSecondary,
+    marginTop: spacing.xs,
+  },
+});
+
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  scroll: { padding: 16, paddingTop: 8 },
+  scroll: { padding: spacing.lg, paddingTop: spacing.sm },
 
   toolbar: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
   },
-  toolbarBtn: { padding: 6 },
+  toolbarBtn: { padding: spacing.xs + 2 },
   toolbarSpacer: { width: 36 },
-  toolbarTitle: { flex: 1, fontSize: 17, fontWeight: '800', textAlign: 'center' },
-
-
-  headerCard: {
-    backgroundColor: CREAM,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 12,
-    gap: 8,
+  toolbarTitle: {
+    flex: 1,
+    ...typography.heading3,
+    fontWeight: '800',
+    textAlign: 'center',
   },
-  headerTop: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  cityText: { fontSize: 16, fontWeight: '700', color: GREEN },
-  badgeRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  badgeText: { color: '#fff', fontSize: 11, fontWeight: '700', letterSpacing: 0.3 },
-  gregorianText: { fontSize: 13, color: '#3F3F3F', marginTop: 2 },
-  hijriText: { fontSize: 13, color: GREEN, fontWeight: '600' },
 
   fallbackNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    padding: 10,
-    borderRadius: 10,
+    gap: spacing.xs + 2,
+    padding: spacing.sm + 2,
+    borderRadius: radius.sm + 2,
     backgroundColor: 'rgba(15,110,86,0.08)',
-    marginBottom: 12,
+    marginBottom: spacing.md,
   },
-  fallbackText: { flex: 1, fontSize: 12, color: GREEN },
+  fallbackText: {
+    flex: 1,
+    ...typography.bodySmall,
+    color: palette.green,
+    fontSize: 12,
+  },
 
-  nextCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 18,
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 16,
-  },
-  nextLabel: {
-    fontSize: 11,
+  sectionTitle: {
+    ...typography.heading3,
     fontWeight: '800',
-    letterSpacing: 1,
-    color: 'rgba(255,255,255,0.7)',
+    marginBottom: spacing.sm,
+    marginTop: spacing.xs,
   },
-  nextName: { fontSize: 26, fontWeight: '800', color: '#fff' },
-  nextTime: { fontSize: 22, fontWeight: '700', color: GOLD, marginTop: 2 },
-  nextCountdown: { fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 2 },
-
-  sectionTitle: { fontSize: 16, fontWeight: '800', marginBottom: 8, marginTop: 4 },
-  prayerList: { gap: 6, marginBottom: 16 },
+  prayerList: {
+    borderRadius: radius.md,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: spacing.lg,
+  },
   prayerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   prayerRowCurrent: {
     borderLeftWidth: 4,
-    borderLeftColor: GREEN,
-    backgroundColor: 'rgba(15,110,86,0.08)',
+    borderLeftColor: palette.gold,
+    backgroundColor: 'rgba(239,159,39,0.06)',
   },
-  prayerNameCol: { flexDirection: 'column' },
-  prayerNameEn: { fontSize: 15, fontWeight: '700' },
-  prayerNameAr: { fontSize: 13, fontFamily: 'Amiri_400Regular', marginTop: 1 },
-  prayerTime: { fontSize: 16, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  prayerNameCol: { flexDirection: 'column', gap: 2 },
+  prayerNameEn: {
+    ...typography.heading3,
+    fontWeight: '600',
+  },
+  prayerNameAr: {
+    fontFamily: 'Amiri_400Regular',
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  prayerTime: {
+    ...typography.heading2,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+  },
 
   sunnahHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 14,
-    borderRadius: 12,
+    padding: spacing.md + 2,
+    borderRadius: radius.md,
     borderWidth: 1,
   },
-  sunnahHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  sunnahHeaderText: { fontSize: 14, fontWeight: '700' },
+  sunnahHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  sunnahHeaderText: {
+    ...typography.body,
+    fontWeight: '700',
+  },
   sunnahBody: {
-    borderRadius: 12,
+    borderRadius: radius.md,
     borderWidth: 1,
-    marginTop: 6,
+    marginTop: spacing.xs + 2,
     overflow: 'hidden',
   },
   sunnahRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 14,
+    padding: spacing.md + 2,
   },
-  sunnahLabel: { fontSize: 13 },
-  sunnahTime: { fontSize: 14, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  sunnahLabel: { ...typography.bodySmall },
+  sunnahTime: {
+    ...typography.body,
+    fontWeight: '700',
+    fontVariant: ['tabular-nums'],
+  },
 });

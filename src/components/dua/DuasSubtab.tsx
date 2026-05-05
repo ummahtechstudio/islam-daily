@@ -12,7 +12,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { Colors } from '../../constants/colors';
+import { Colors, palette } from '../../constants/colors';
+import { typography } from '../../constants/typography';
+import { spacing, radius } from '../../constants/spacing';
+import { ManuscriptCard } from '../ManuscriptCard';
 import {
   getBundledDuas,
   getCachedOrBundledDuas,
@@ -158,28 +161,30 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
       )}
 
       {duaOfMoment && !searchQuery && (
-        <View style={[styles.duaMomentCard, { backgroundColor: Colors.primary }]}>
-          <View style={styles.duaMomentHeader}>
-            <View style={styles.duaMomentBadge}>
-              <Text style={styles.duaMomentIcon}>
-                {CATEGORY_ICONS[duaOfMoment.category.id] ?? duaOfMoment.category.icon}
-              </Text>
-              <Text style={styles.duaMomentBadgeText}>Dua of the Moment</Text>
+        <View style={styles.duaMomentWrap}>
+          <ManuscriptCard variant="bordered">
+            <View style={styles.duaMomentHeader}>
+              <View style={styles.duaMomentBadge}>
+                <Text style={styles.duaMomentIcon}>
+                  {CATEGORY_ICONS[duaOfMoment.category.id] ?? duaOfMoment.category.icon}
+                </Text>
+                <Text style={styles.duaMomentBadgeText}>Dua of the Moment</Text>
+              </View>
+              <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
             </View>
-            <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
-          </View>
-          <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
-            {duaOfMoment.dua.arabic}
-          </Text>
-          <Text
-            style={
-              language === 'urdu' && duaOfMoment.dua.urdu
-                ? [styles.duaMomentEnglish, styles.duaMomentUrdu]
-                : styles.duaMomentEnglish
-            }
-          >
-            {translationFor(duaOfMoment.dua)}
-          </Text>
+            <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
+              {duaOfMoment.dua.arabic}
+            </Text>
+            <Text
+              style={
+                language === 'urdu' && duaOfMoment.dua.urdu
+                  ? [styles.duaMomentEnglish, styles.duaMomentUrdu]
+                  : styles.duaMomentEnglish
+              }
+            >
+              {translationFor(duaOfMoment.dua)}
+            </Text>
+          </ManuscriptCard>
         </View>
       )}
 
@@ -251,90 +256,83 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
           {filteredDuas.map((dua, idx) => (
             <TouchableOpacity
               key={idx}
-              style={[
-                styles.duaCard,
-                { backgroundColor: theme.card, borderColor: theme.border },
-              ]}
               onPress={() => setExpanded(expanded === idx ? null : idx)}
-              activeOpacity={0.8}
+              activeOpacity={0.85}
             >
-              <View style={styles.duaGoldAccent} />
-
-              <View style={styles.duaHeader}>
-                <View style={[styles.duaNumBadge, { backgroundColor: Colors.primary + '22' }]}>
-                  <Text style={[styles.duaNum, { color: Colors.primary }]}>{idx + 1}</Text>
-                </View>
-                <Ionicons
-                  name={expanded === idx ? 'chevron-up' : 'chevron-down'}
-                  size={16}
-                  color={theme.textMuted}
-                />
-              </View>
-
-              {dua.description_ur ? (
-                <Text
-                  style={[styles.duaDescription, { color: theme.textSecondary }]}
-                  numberOfLines={2}
-                >
-                  {dua.description_ur}
-                </Text>
-              ) : null}
-
-              <Text
-                style={[styles.duaArabic, { color: theme.text }]}
-                textBreakStrategy="simple"
-                numberOfLines={expanded === idx ? undefined : 3}
-              >
-                {dua.arabic || '—'}
-              </Text>
-
-              {expanded === idx && (
-                <>
-                  <View style={[styles.divider, { backgroundColor: theme.border }]} />
-                  {dua.transliteration ? (
-                    <Text style={[styles.duaTranslit, { color: Colors.primary }]}>
-                      {dua.transliteration}
-                    </Text>
-                  ) : (
-                    <Text style={[styles.duaTranslit, { color: theme.textMuted }]}>
-                      Transliteration not available
-                    </Text>
-                  )}
-                  {language === 'urdu' && dua.urdu ? (
-                    <Text style={[styles.duaEnglish, styles.urduText, { color: theme.textSecondary }]}>
-                      {dua.urdu}
-                    </Text>
-                  ) : (
-                    <Text style={[styles.duaEnglish, { color: theme.textSecondary }]}>
-                      {dua.english || 'Translation not available'}
-                    </Text>
-                  )}
-                  <View style={[styles.referenceContainer, { borderTopColor: theme.border }]}>
-                    <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 Reference:</Text>
-                    <Text style={[styles.referenceText, { color: theme.textMuted }]}>
-                      {dua.reference || 'Hisn al-Muslim'}
-                    </Text>
+              <ManuscriptCard variant={expanded === idx ? 'bordered' : 'standard'}>
+                <View style={styles.duaHeader}>
+                  <View style={styles.duaNumBadge}>
+                    <Text style={styles.duaNum}>{idx + 1}</Text>
                   </View>
-                  <CardActionsRow
-                    bookmark={{
-                      type: 'dua',
-                      id: `dua-${selectedCategory}-${idx}`,
-                      title: `${currentCategory?.title ?? 'Dua'} #${idx + 1}`,
-                      arabic: dua.arabic,
-                      translation: translationFor(dua),
-                      reference: dua.reference || 'Hisn al-Muslim',
-                      category: currentCategory?.title,
-                    }}
-                    shareable={{
-                      arabic: dua.arabic,
-                      translation: translationFor(dua),
-                      reference: dua.reference || 'Hisn al-Muslim',
-                      type: 'dua',
-                    }}
-                    iconColor={theme.textMuted}
+                  <Ionicons
+                    name={expanded === idx ? 'chevron-up' : 'chevron-down'}
+                    size={16}
+                    color={palette.textOnCreamMuted}
                   />
-                </>
-              )}
+                </View>
+
+                {dua.description_ur ? (
+                  <Text style={styles.duaDescription} numberOfLines={2}>
+                    {dua.description_ur}
+                  </Text>
+                ) : null}
+
+                <Text
+                  style={styles.duaArabic}
+                  textBreakStrategy="simple"
+                  numberOfLines={expanded === idx ? undefined : 3}
+                >
+                  {dua.arabic || '—'}
+                </Text>
+
+                {expanded === idx && (
+                  <>
+                    <View style={styles.divider} />
+                    {dua.transliteration ? (
+                      <Text style={styles.duaTranslit}>
+                        {dua.transliteration}
+                      </Text>
+                    ) : (
+                      <Text style={[styles.duaTranslit, { color: palette.textOnCreamMuted }]}>
+                        Transliteration not available
+                      </Text>
+                    )}
+                    {language === 'urdu' && dua.urdu ? (
+                      <Text style={[styles.duaEnglish, styles.urduText]}>
+                        {dua.urdu}
+                      </Text>
+                    ) : (
+                      <Text style={styles.duaEnglish}>
+                        {dua.english || 'Translation not available'}
+                      </Text>
+                    )}
+                    <View style={styles.referenceContainer}>
+                      <Text style={styles.referenceLabel}>Reference:</Text>
+                      <Text style={styles.referenceText}>
+                        {dua.reference || 'Hisn al-Muslim'}
+                      </Text>
+                    </View>
+                    <CardActionsRow
+                      bookmark={{
+                        type: 'dua',
+                        id: `dua-${selectedCategory}-${idx}`,
+                        title: `${currentCategory?.title ?? 'Dua'} #${idx + 1}`,
+                        arabic: dua.arabic,
+                        translation: translationFor(dua),
+                        reference: dua.reference || 'Hisn al-Muslim',
+                        category: currentCategory?.title,
+                      }}
+                      shareable={{
+                        arabic: dua.arabic,
+                        translation: translationFor(dua),
+                        reference: dua.reference || 'Hisn al-Muslim',
+                        type: 'dua',
+                      }}
+                      iconColor={palette.textOnCreamMuted}
+                    />
+                  </>
+                )}
+              </ManuscriptCard>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -344,45 +342,51 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
 }
 
 const styles = StyleSheet.create({
-  duaMomentCard: {
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 4,
-    borderRadius: 16,
-    padding: 18,
+  duaMomentWrap: {
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
   },
   duaMomentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: spacing.sm + 2,
   },
   duaMomentBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: GOLD,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
+    gap: spacing.xs + 2,
+    backgroundColor: 'rgba(239,159,39,0.18)',
+    paddingHorizontal: spacing.sm + 2,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
   },
   duaMomentIcon: { fontSize: 14 },
-  duaMomentBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
-  duaMomentReason: { color: 'rgba(255,255,255,0.6)', fontSize: 11 },
+  duaMomentBadgeText: {
+    color: palette.goldSoft,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+  duaMomentReason: {
+    color: palette.textOnCreamMuted,
+    fontSize: 11,
+  },
   duaMomentArabic: {
     fontFamily: 'Amiri_400Regular',
-    fontSize: 18,
+    fontSize: 20,
     textAlign: 'right',
-    lineHeight: 38,
-    color: '#fff',
+    lineHeight: 40,
+    color: palette.textOnCream,
     writingDirection: 'rtl',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   duaMomentEnglish: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
+    fontSize: 13,
+    color: palette.textOnCreamSecondary,
     fontStyle: 'italic',
-    lineHeight: 18,
+    lineHeight: 20,
   },
 
   searchBar: {
@@ -431,36 +435,21 @@ const styles = StyleSheet.create({
   },
   catPillEmoji: { fontSize: 24, marginBottom: 4, textAlign: 'center' },
   catPillLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
-  duaList: { padding: 12, gap: 12, paddingBottom: 32 },
-  duaCard: {
-    borderRadius: 16,
-    padding: 16,
-    paddingLeft: 20,
-    borderWidth: 1,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  duaGoldAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    backgroundColor: GOLD,
-  },
+  duaList: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing['2xl'] },
   duaDescription: {
     fontSize: 13,
     lineHeight: 24,
-    marginBottom: 10,
+    marginBottom: spacing.sm + 2,
     textAlign: 'right',
     writingDirection: 'rtl',
+    color: palette.textOnCreamSecondary,
     fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
   },
   duaHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: spacing.sm + 2,
   },
   duaNumBadge: {
     width: 28,
@@ -468,18 +457,34 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(239,159,39,0.18)',
   },
-  duaNum: { fontSize: 12, fontWeight: '700' },
+  duaNum: { fontSize: 12, fontWeight: '700', color: palette.goldSoft },
   duaArabic: {
     fontFamily: 'Amiri_400Regular',
     fontSize: 22,
     textAlign: 'right',
     lineHeight: 42,
     writingDirection: 'rtl',
+    color: palette.textOnCream,
   },
-  divider: { height: 1, marginVertical: 10 },
-  duaTranslit: { fontSize: 14, fontStyle: 'italic', marginBottom: 6 },
-  duaEnglish: { fontSize: 14, lineHeight: 22, marginBottom: 6 },
+  divider: {
+    height: 1,
+    marginVertical: spacing.sm + 2,
+    backgroundColor: palette.dividerOnCream,
+  },
+  duaTranslit: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginBottom: spacing.xs + 2,
+    color: palette.green,
+  },
+  duaEnglish: {
+    fontSize: 14,
+    lineHeight: 22,
+    marginBottom: spacing.xs + 2,
+    color: palette.textOnCreamSecondary,
+  },
   urduText: {
     textAlign: 'right',
     writingDirection: 'rtl',
@@ -487,6 +492,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontStyle: 'normal',
     fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    color: palette.textOnCream,
   },
   duaMomentUrdu: {
     textAlign: 'right',
@@ -520,13 +526,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
-    gap: 6,
-    marginTop: 8,
-    paddingTop: 8,
+    gap: spacing.xs + 2,
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: palette.dividerOnCream,
   },
-  referenceLabel: { fontSize: 11, fontWeight: '600' },
-  referenceText: { fontSize: 11, flexShrink: 1, lineHeight: 16 },
+  referenceLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: palette.textOnCreamMuted,
+  },
+  referenceText: {
+    fontSize: 11,
+    flexShrink: 1,
+    lineHeight: 16,
+    color: palette.textOnCreamMuted,
+  },
 
   emptyContainer: {
     flex: 1,
