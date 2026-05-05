@@ -86,7 +86,6 @@ const SECTIONS = [
       { icon: '🕌', label: 'Prayer Times',   sub: 'All 5 daily prayers',    route: '/prayer',        bg: '#0F6E5622' },
       { icon: '🧭', label: 'Qibla Finder',   sub: 'Live compass to Makkah', route: '/qibla',         bg: '#C9A84C22' },
       { icon: '🕍', label: 'Mosque Finder',  sub: 'Find mosques near you',  route: '/mosque-finder', bg: '#3B82F622' },
-      { icon: '🔥', label: 'Prayer Streak',  sub: '7-day completion grid',  route: '/prayer-streak', bg: '#F9731622' },
     ],
   },
   {

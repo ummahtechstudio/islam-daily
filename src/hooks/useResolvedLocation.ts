@@ -20,6 +20,9 @@ export type LocationResolution = {
   reload: () => void;
 };
 
+// Defense in depth: never persist a settings object with missing/"Unknown" city
+// or country. If reverse geocoding returned nothing useful (empty array, missing
+// fields, or whitespace-only strings), the caller must fall back to KARACHI_DEFAULT.
 function looksUseful(top: Location.LocationGeocodedAddress | undefined): boolean {
   if (!top) return false;
   const city = top.city ?? top.region ?? '';

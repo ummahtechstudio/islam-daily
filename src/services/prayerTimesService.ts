@@ -145,3 +145,21 @@ export const KARACHI_DEFAULT: PrayerTimesSettings = {
   iqamahOffsets: null,
   highLatitudeRule: 'middleOfTheNight',
 };
+
+// One-time cleanup for devices that persisted "Unknown" city/country before
+// the P.1b/R.2 guards landed. Safe to call on every startup — no-op when the
+// persisted settings are valid or absent.
+export function migrateInvalidPersistedSettings(): void {
+  const persisted = getPersistedSettings();
+  if (!persisted) return;
+
+  const isInvalid =
+    persisted.location.city === 'Unknown' ||
+    persisted.location.country === 'Unknown' ||
+    !persisted.location.city ||
+    !persisted.location.country;
+
+  if (isInvalid) {
+    persistSettings(KARACHI_DEFAULT);
+  }
+}

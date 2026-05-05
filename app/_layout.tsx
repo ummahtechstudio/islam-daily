@@ -38,6 +38,7 @@ import {
   downloadHadithBook,
   isHadithBookCached,
 } from '../src/services/hadithCache';
+import { migrateInvalidPersistedSettings } from '../src/services/prayerTimesService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,6 +64,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     loadPersistedData();
+    migrateInvalidPersistedSettings();
   }, []);
 
   useEffect(() => {
