@@ -52,7 +52,7 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
           key={`${r}-${c}`}
           d={`M${x},${y - s} L${x + s},${y} L${x},${y + s} L${x - s},${y} Z`}
           fill="none"
-          stroke="rgba(239,159,39,0.05)"
+          stroke="rgba(239,159,39,0.03)"
           strokeWidth="0.8"
         />
       );
@@ -64,6 +64,48 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
     </Svg>
   );
 }
+
+// ─── Greeting Card — manuscript treatment in body ────────────────────────────
+function GreetingCard({ hijriDate }: { hijriDate: string | null }) {
+  return (
+    <View style={{ marginBottom: spacing.md }}>
+      <ManuscriptCard variant="bordered">
+        <View style={greetingStyles.patternWrap} pointerEvents="none">
+          <IslamicPattern size={70} color={palette.green} opacity={0.05} />
+        </View>
+        <Text style={greetingStyles.salamAr}>السلام عليكم</Text>
+        <Text style={greetingStyles.salamEn}>Assalamu Alaikum</Text>
+        {hijriDate ? (
+          <Text style={greetingStyles.hijri}>{hijriDate}</Text>
+        ) : null}
+      </ManuscriptCard>
+    </View>
+  );
+}
+const greetingStyles = StyleSheet.create({
+  patternWrap: {
+    position: 'absolute',
+    right: -6,
+    top: -6,
+  },
+  salamAr: {
+    fontFamily: 'Amiri_400Regular',
+    color: palette.gold,
+    fontSize: 22,
+    letterSpacing: 0.5,
+    lineHeight: 30,
+    marginBottom: 2,
+  },
+  salamEn: {
+    ...typography.heading1,
+    color: palette.textOnCream,
+  },
+  hijri: {
+    ...typography.body,
+    color: palette.textOnCreamSecondary,
+    marginTop: spacing.xs,
+  },
+});
 
 // ─── Compact Prayer Next Card (P.1a) — manuscript treatment ──────────────────
 const PRAYER_LABEL_MAP: Record<PrayerName, string> = {
@@ -581,28 +623,18 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.green }]} edges={['top']}>
 
-      {/* ── Header ── */}
+      {/* ── Header — thin brand strip ── */}
       <View style={styles.header}>
-        <GeometricPattern width={W} height={120} />
-        <View style={styles.headerPatternWrap} pointerEvents="none">
-          <IslamicPattern size={90} color={palette.gold} opacity={0.08} />
-        </View>
+        <GeometricPattern width={W} height={64} />
         <View style={styles.headerContent}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.salamAr}>السلام عليكم</Text>
-            <Text style={styles.salamEn}>Assalamu Alaikum</Text>
-            {prayerData && (
-              <Text style={styles.hijriDate}>
-                {prayerData.date.hijri.day} {prayerData.date.hijri.month.en} {prayerData.date.hijri.year}
-              </Text>
-            )}
-          </View>
+          <View style={{ flex: 1 }} />
+          <Text style={styles.headerSalamAr}>السلام عليكم</Text>
           <TouchableOpacity
             style={styles.headerBtn}
             onPress={() => navigate('/settings')}
             hitSlop={8}
           >
-            <Ionicons name="person-circle-outline" size={28} color={palette.textSecondary} />
+            <Ionicons name="person-circle-outline" size={26} color={palette.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -620,6 +652,14 @@ export default function HomeScreen() {
           />
         }
       >
+        <GreetingCard
+          hijriDate={
+            prayerData
+              ? `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.en} ${prayerData.date.hijri.year}`
+              : null
+          }
+        />
+
         {isRamadan && (
           <TouchableOpacity
             style={styles.ramadanBanner}
@@ -698,39 +738,22 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: palette.green,
-    paddingBottom: spacing.lg,
     overflow: 'hidden',
     position: 'relative',
   },
-  headerPatternWrap: {
-    position: 'absolute',
-    right: -10,
-    top: 8,
-    opacity: 1,
-  },
   headerContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: spacing.xl - 4,
-    paddingTop: spacing.md + 2,
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm + 2,
+    gap: spacing.sm,
   },
-  salamAr: {
+  headerSalamAr: {
     fontFamily: 'Amiri_400Regular',
     color: palette.gold,
-    fontSize: 28,
+    fontSize: 18,
     letterSpacing: 0.5,
-    lineHeight: 36,
-  },
-  salamEn: {
-    ...typography.heading2,
-    color: palette.textPrimary,
-    marginTop: 2,
-  },
-  hijriDate: {
-    ...typography.bodySmall,
-    color: palette.textSecondary,
-    marginTop: 4,
+    lineHeight: 24,
   },
   headerBtn: { padding: 2 },
 

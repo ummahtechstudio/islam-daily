@@ -16,6 +16,7 @@ import { Colors, palette } from '../../constants/colors';
 import { typography } from '../../constants/typography';
 import { spacing, radius } from '../../constants/spacing';
 import { ManuscriptCard } from '../ManuscriptCard';
+import { MinaretIcon } from '../icons';
 import {
   getBundledDuas,
   getCachedOrBundledDuas,
@@ -30,31 +31,50 @@ import type { Dua, DuaCategory } from '../../types/content';
 const URDU_DISCLAIMER_KEY = 'urdu_disclaimer_dismissed';
 const GOLD = '#EF9F27';
 
-const DUA_CATEGORIES: { id: string; emoji: string; label: string }[] = [
-  { id: 'waking',      emoji: '🌞', label: 'Waking' },
-  { id: 'morning',     emoji: '🌅', label: 'Morning' },
-  { id: 'evening',     emoji: '🌆', label: 'Evening' },
-  { id: 'sleep',       emoji: '🌙', label: 'Sleep' },
-  { id: 'prayer',      emoji: '🕌', label: 'Prayer' },
-  { id: 'eating',      emoji: '🍴', label: 'Eating' },
-  { id: 'travel',      emoji: '🛫', label: 'Travel' },
-  { id: 'distress',    emoji: '🤲', label: 'Distress' },
-  { id: 'forgiveness', emoji: '💚', label: 'Forgiveness' },
-  { id: 'protection',  emoji: '🔰', label: 'Protection' },
-  { id: 'sickness',    emoji: '🤒', label: 'Sickness' },
-  { id: 'marriage',    emoji: '💍', label: 'Marriage' },
-  { id: 'rizq',        emoji: '💰', label: 'Rizq' },
-  { id: 'friday',      emoji: '📿', label: 'Friday' },
-  { id: 'dua_parents', emoji: '👪', label: 'Parents' },
-  { id: 'mosque',      emoji: '🕌', label: 'Mosque' },
-  { id: 'knowledge',   emoji: '📚', label: 'Knowledge' },
-  { id: 'rain',        emoji: '💧', label: 'Patience' },
+type CategoryIconSpec =
+  | { kind: 'ionicon'; name: keyof typeof Ionicons.glyphMap }
+  | { kind: 'minaret' };
+
+const DUA_CATEGORIES: { id: string; icon: CategoryIconSpec; label: string }[] = [
+  { id: 'waking',      icon: { kind: 'ionicon', name: 'sunny-outline' },         label: 'Waking' },
+  { id: 'morning',     icon: { kind: 'ionicon', name: 'partly-sunny-outline' },  label: 'Morning' },
+  { id: 'evening',     icon: { kind: 'ionicon', name: 'moon-outline' },          label: 'Evening' },
+  { id: 'sleep',       icon: { kind: 'ionicon', name: 'moon' },                  label: 'Sleep' },
+  { id: 'prayer',      icon: { kind: 'minaret' },                                 label: 'Prayer' },
+  { id: 'eating',      icon: { kind: 'ionicon', name: 'restaurant-outline' },    label: 'Eating' },
+  { id: 'travel',      icon: { kind: 'ionicon', name: 'airplane-outline' },      label: 'Travel' },
+  { id: 'distress',    icon: { kind: 'ionicon', name: 'heart-outline' },         label: 'Distress' },
+  { id: 'forgiveness', icon: { kind: 'ionicon', name: 'leaf-outline' },          label: 'Forgiveness' },
+  { id: 'protection',  icon: { kind: 'ionicon', name: 'shield-outline' },        label: 'Protection' },
+  { id: 'sickness',    icon: { kind: 'ionicon', name: 'medkit-outline' },        label: 'Sickness' },
+  { id: 'marriage',    icon: { kind: 'ionicon', name: 'heart-circle-outline' },  label: 'Marriage' },
+  { id: 'rizq',        icon: { kind: 'ionicon', name: 'cash-outline' },          label: 'Rizq' },
+  { id: 'friday',      icon: { kind: 'ionicon', name: 'calendar-outline' },      label: 'Friday' },
+  { id: 'dua_parents', icon: { kind: 'ionicon', name: 'people-outline' },        label: 'Parents' },
+  { id: 'mosque',      icon: { kind: 'minaret' },                                 label: 'Mosque' },
+  { id: 'knowledge',   icon: { kind: 'ionicon', name: 'book-outline' },          label: 'Knowledge' },
+  { id: 'rain',        icon: { kind: 'ionicon', name: 'water-outline' },         label: 'Patience' },
 ];
 
-const CATEGORY_ICONS: Record<string, string> = DUA_CATEGORIES.reduce(
-  (acc, c) => ({ ...acc, [c.id]: c.emoji }),
-  {} as Record<string, string>,
+const CATEGORY_ICONS: Record<string, CategoryIconSpec> = DUA_CATEGORIES.reduce(
+  (acc, c) => ({ ...acc, [c.id]: c.icon }),
+  {} as Record<string, CategoryIconSpec>,
 );
+
+function CategoryIcon({
+  icon,
+  color,
+  size = 22,
+}: {
+  icon: CategoryIconSpec;
+  color: string;
+  size?: number;
+}) {
+  if (icon.kind === 'minaret') {
+    return <MinaretIcon size={size} color={color} strokeWidth={1.6} />;
+  }
+  return <Ionicons name={icon.name} size={size} color={color} />;
+}
 
 function getDuaOfMoment(
   duas: DuaCategory[],
@@ -165,9 +185,13 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
           <ManuscriptCard variant="bordered">
             <View style={styles.duaMomentHeader}>
               <View style={styles.duaMomentBadge}>
-                <Text style={styles.duaMomentIcon}>
-                  {CATEGORY_ICONS[duaOfMoment.category.id] ?? duaOfMoment.category.icon}
-                </Text>
+                {CATEGORY_ICONS[duaOfMoment.category.id] ? (
+                  <CategoryIcon
+                    icon={CATEGORY_ICONS[duaOfMoment.category.id]}
+                    color={palette.goldSoft}
+                    size={14}
+                  />
+                ) : null}
                 <Text style={styles.duaMomentBadgeText}>Dua of the Moment</Text>
               </View>
               <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
@@ -217,6 +241,7 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
           const isActive = selectedCategory === cat.id;
           const exists = hisnulMuslim.some((c) => c.id === cat.id);
           if (!exists) return null;
+          const iconColor = isActive ? '#FFFFFF' : Colors.primary;
           return (
             <TouchableOpacity
               key={cat.id}
@@ -227,11 +252,13 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
               onPress={() => setSelectedCategory(cat.id)}
               activeOpacity={0.8}
             >
-              <Text style={styles.catPillEmoji}>{cat.emoji}</Text>
+              <View style={styles.catPillIcon}>
+                <CategoryIcon icon={cat.icon} color={iconColor} size={22} />
+              </View>
               <Text
                 style={[
                   styles.catPillLabel,
-                  { color: isActive ? '#FFFFFF' : Colors.primary },
+                  { color: iconColor },
                 ]}
               >
                 {cat.label}
@@ -362,7 +389,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: radius.sm,
   },
-  duaMomentIcon: { fontSize: 14 },
   duaMomentBadgeText: {
     color: palette.goldSoft,
     fontSize: 11,
@@ -433,7 +459,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  catPillEmoji: { fontSize: 24, marginBottom: 4, textAlign: 'center' },
+  catPillIcon: { marginBottom: 4, alignItems: 'center', justifyContent: 'center' },
   catPillLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center' },
   duaList: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing['2xl'] },
   duaDescription: {
