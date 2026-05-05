@@ -330,8 +330,11 @@ export function TasbeehCounterView({
           <Ionicons name="chevron-down" size={16} color={GOLD} />
         </TouchableOpacity>
         <View style={styles.topRight}>
-          <View style={styles.timeBadge}>
-            <Ionicons name="time-outline" size={12} color={GOLD} />
+          <View
+            style={styles.timeBadge}
+            accessibilityLabel={`Session time ${formatTime(elapsed)}`}
+          >
+            <Ionicons name="timer-outline" size={14} color={GOLD} />
             <Text style={styles.timeText}>{formatTime(elapsed)}</Text>
           </View>
           <TouchableOpacity onPress={onShowList} hitSlop={10} style={{ marginLeft: 10 }}>
@@ -636,13 +639,15 @@ const styles = StyleSheet.create({
   timeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 10,
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    backgroundColor: 'rgba(239,159,39,0.18)',
+    borderRadius: 11,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(239,159,39,0.45)',
   },
-  timeText: { color: GOLD, fontSize: 12, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  timeText: { color: GOLD, fontSize: 13, fontWeight: '700', fontVariant: ['tabular-nums'], letterSpacing: 0.2 },
 
   modeTabs: {
     flexDirection: 'row',

@@ -13,10 +13,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-import { Colors } from '../../src/constants/colors';
-import { trackScreen } from '../../src/services/analytics';
-import { searchQuran, QuranSearchResult } from '../../src/services/api';
-import { useStore } from '../../src/store';
+import { Colors } from '../src/constants/colors';
+import { trackScreen } from '../src/services/analytics';
+import { searchQuran, QuranSearchResult } from '../src/services/api';
+import { useStore } from '../src/store';
 
 export default function SearchScreen() {
   useEffect(() => { trackScreen('Search'); }, []);
@@ -64,11 +64,16 @@ export default function SearchScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
+    <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.headerTitle}>Islamic Search</Text>
-        <Text style={styles.headerSub}>Search the Quran by keyword</Text>
+        <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
+          <Ionicons name="chevron-back" size={26} color="#fff" />
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.headerTitle}>Islamic Search</Text>
+          <Text style={styles.headerSub}>Search the Quran by keyword</Text>
+        </View>
       </View>
 
       {/* Search input */}
@@ -146,9 +151,16 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  header: { padding: 16, paddingTop: 14, alignItems: 'center' },
-  headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
-  headerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 2 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+    gap: 4,
+  },
+  backBtn: { padding: 4 },
+  headerTitle: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  headerSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 1 },
 
   searchRow: {
     flexDirection: 'row',

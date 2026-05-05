@@ -69,11 +69,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="prayer"
         options={{
-          title: 'Search',
+          title: 'Prayer',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="search" color={color} size={size} />
+            <TabIcon name="time" color={color} size={size} />
           ),
         }}
       />

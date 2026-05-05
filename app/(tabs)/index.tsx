@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,10 @@ import { Colors } from '../../src/constants/colors';
 import { FONTS, urduStyle } from '../../src/constants/fonts';
 import { useLocation } from '../../src/hooks/useLocation';
 import { usePrayerTimes } from '../../src/hooks/usePrayerTimes';
+import { useResolvedLocation } from '../../src/hooks/useResolvedLocation';
+import { computePrayerTimes } from '../../src/services/prayerTimesService';
+import { formatPrayerTime, formatCountdown } from '../../src/utils/formatPrayerTime';
+import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
 import { useStore } from '../../src/store';
 import { CACHE_KEYS, PRAYER_LIST } from '../../src/constants';
@@ -63,96 +67,113 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
   );
 }
 
-// ─── Next Prayer Hero Card ────────────────────────────────────────────────────
-function NextPrayerCard({
-  name, time, secondsLeft, city, isDark, onPress,
-}: {
-  name: string; time: string; secondsLeft: number; city?: string; isDark: boolean; onPress: () => void;
-}) {
-  const [secs, setSecs] = useState(secondsLeft);
+// ─── Compact Prayer Next Card (P.1a) ──────────────────────────────────────────
+const PRAYER_LABEL_MAP: Record<PrayerName, string> = {
+  fajr: 'Fajr',
+  sunrise: 'Sunrise',
+  dhuhr: 'Dhuhr',
+  asr: 'Asr',
+  maghrib: 'Maghrib',
+  isha: 'Isha',
+};
+const METHOD_LABEL_MAP: Record<string, string> = {
+  Karachi: 'Karachi',
+  Dubai: 'Dubai',
+  UmmAlQura: 'Umm al-Qura',
+  Egyptian: 'Egyptian',
+  Turkey: 'Turkey',
+  Singapore: 'Singapore',
+  MuslimWorldLeague: 'MWL',
+  NorthAmerica: 'North America',
+  MoonsightingCommittee: 'Moonsighting',
+  Tehran: 'Tehran',
+};
 
-  useEffect(() => {
-    setSecs(secondsLeft);
-  }, [secondsLeft, name]);
+function PrayerNextSkeleton({ isDark }: { isDark: boolean }) {
+  const theme = isDark ? Colors.dark : Colors.light;
+  return (
+    <View style={[skelStyles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+      <View style={[skelStyles.bar, { backgroundColor: theme.surface, width: '40%' }]} />
+      <View style={[skelStyles.bar, { backgroundColor: theme.surface, width: '60%', height: 22 }]} />
+      <View style={[skelStyles.bar, { backgroundColor: theme.surface, width: '50%' }]} />
+    </View>
+  );
+}
+const skelStyles = StyleSheet.create({
+  card: { borderRadius: 16, borderWidth: 1, padding: 16, gap: 8, marginBottom: 14 },
+  bar: { height: 12, borderRadius: 6 },
+});
 
+function PrayerNextCard({ isDark, onPress }: { isDark: boolean; onPress: () => void }) {
+  const { settings, loading } = useResolvedLocation();
+  const [tick, setTick] = useState(Date.now());
   useEffect(() => {
-    const id = setInterval(() => setSecs((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(id);
+    const i = setInterval(() => setTick(Date.now()), 60_000);
+    return () => clearInterval(i);
   }, []);
 
-  const h = Math.floor(secs / 3600);
-  const m = Math.floor((secs % 3600) / 60);
-  const s = secs % 60;
-  const countdownStr = h > 0
-    ? `${h}h ${m}m`
-    : m > 0
-    ? `${m}m ${s}s`
-    : `${s}s`;
+  const computed = useMemo(
+    () => (loading ? null : computePrayerTimes(settings, new Date(tick))),
+    [settings, tick, loading]
+  );
+
+  if (loading || !computed) {
+    return <PrayerNextSkeleton isDark={isDark} />;
+  }
+
+  const nextEntry = computed.prayers.find((p) => p.name === computed.nextPrayer);
+  const nextName = nextEntry
+    ? nextEntry.isFriday && nextEntry.name === 'dhuhr'
+      ? "Jumu'ah"
+      : PRAYER_LABEL_MAP[nextEntry.name]
+    : null;
+
+  if (!nextName || !computed.nextPrayerTime) {
+    return null;
+  }
+
+  const time = formatPrayerTime(computed.nextPrayerTime);
+  const countdown = formatCountdown(computed.nextPrayerTime, new Date(tick));
+  const methodLabel = METHOD_LABEL_MAP[settings.method] ?? settings.method;
 
   return (
     <TouchableOpacity
-      style={heroStyles.card}
+      style={pncStyles.card}
       onPress={onPress}
-      activeOpacity={0.92}
+      activeOpacity={0.85}
     >
-      <GeometricPattern width={W - 32} height={140} />
-      <View style={heroStyles.left}>
-        <Text style={heroStyles.nextLabel}>Next Prayer</Text>
-        <Text style={heroStyles.prayerName}>{name}</Text>
-        <Text style={heroStyles.prayerTime}>{time}</Text>
-        {city ? (
-          <View style={heroStyles.locationRow}>
-            <Ionicons name="location" size={11} color="rgba(255,255,255,0.7)" />
-            <Text style={heroStyles.cityText}>{city}</Text>
-          </View>
-        ) : null}
+      <View style={pncStyles.row}>
+        <Text style={pncStyles.label}>Next</Text>
+        <Text style={pncStyles.name}>{nextName}</Text>
       </View>
-      <View style={heroStyles.right}>
-        <Text style={heroStyles.countdownLabel}>Time Left</Text>
-        <Text style={heroStyles.countdown}>{countdownStr}</Text>
-        <View style={heroStyles.tapHint}>
-          <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.6)" />
-        </View>
-      </View>
+      <Text style={pncStyles.time}>{time}</Text>
+      <Text style={pncStyles.countdown}>{countdown}</Text>
+      <Text style={pncStyles.subtitle}>
+        📍 {settings.location.city} · {methodLabel} method
+      </Text>
     </TouchableOpacity>
   );
 }
-
-const heroStyles = StyleSheet.create({
+const pncStyles = StyleSheet.create({
   card: {
     backgroundColor: Colors.primary,
-    borderRadius: 20,
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    borderRadius: 18,
+    padding: 18,
     marginBottom: 14,
-    overflow: 'hidden',
+    gap: 4,
   },
-  left: { gap: 4 },
-  nextLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
-  prayerName: { color: '#fff', fontSize: 28, fontWeight: '800' },
-  prayerTime: { color: GOLD, fontSize: 17, fontWeight: '700' },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 4 },
-  cityText: { color: 'rgba(255,255,255,0.7)', fontSize: 11 },
-  right: { alignItems: 'center', gap: 4 },
-  countdownLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  countdown: { color: '#fff', fontSize: 26, fontWeight: '900', letterSpacing: -0.5 },
-  tapHint: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 4,
-  },
+  row: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  label: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
+  name: { color: '#fff', fontSize: 22, fontWeight: '800' },
+  time: { color: GOLD, fontSize: 30, fontWeight: '900', letterSpacing: -0.5, marginTop: 2 },
+  countdown: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: '600' },
+  subtitle: { color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 4 },
 });
 
 // ─── Quick Access 2×2 Grid ────────────────────────────────────────────────────
 const QUICK_CARDS: { id: string; icon: string; label: string; defaultSub: string; route: string; color: string; bg: string }[] = [
   { id: 'quran',         icon: '📖', label: 'Quran',        defaultSub: 'Read & Listen',    route: '/quran',        color: '#0F6E56', bg: '#0F6E5618' },
-  { id: 'prayer-times',  icon: '🕌', label: 'Prayer Times', defaultSub: 'All 5 prayers',    route: '/prayer-times', color: '#2563EB', bg: '#2563EB18' },
+  { id: 'prayer-times',  icon: '🕌', label: 'Prayer Times', defaultSub: 'All 5 prayers',    route: '/prayer',       color: '#2563EB', bg: '#2563EB18' },
   { id: 'dua',           icon: '🤲', label: 'Duas',         defaultSub: 'Hisnul Muslim',    route: '/dua',          color: '#7C3AED', bg: '#7C3AED18' },
   { id: 'qibla',         icon: '🧭', label: 'Qibla',        defaultSub: 'Find direction',   route: '/qibla',        color: '#F59E0B', bg: '#F59E0B18' },
 ];
@@ -521,17 +542,8 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        {/* ── Next Prayer Hero ── */}
-        {nextPrayer && (
-          <NextPrayerCard
-            name={nextPrayer.name}
-            time={nextPrayer.time}
-            secondsLeft={nextPrayer.secondsLeft}
-            city={location?.city}
-            isDark={isDark}
-            onPress={() => navigate('/prayer-times')}
-          />
-        )}
+        {/* ── Next Prayer (P.1a — adhan-based) ── */}
+        <PrayerNextCard isDark={isDark} onPress={() => navigate('/prayer')} />
 
         {/* ── Quick Access 2×2 ── */}
         {tilesLoaded && visibleQuickCards.length > 0 && (

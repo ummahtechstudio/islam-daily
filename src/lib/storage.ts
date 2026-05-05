@@ -111,3 +111,9 @@ export const CACHE_KEYS = {
   DUAS: 'duas:v1',
   DHIKR: 'dhikr:v1',
 } as const;
+
+export const PREFS_KEYS = {
+  PRAYER_TIMES_SETTINGS: 'prayer_times_settings',
+  PRAYER_TIMES_FORMAT: 'prayer_times_format',
+  PRAYER_TIMES_HIGH_LATITUDE_RULE: 'prayer_times_high_latitude_rule',
+} as const;

@@ -139,7 +139,10 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="prayer-times" options={{ title: 'Prayer Times' }} />
+        <Stack.Screen name="prayer-times" options={{ headerShown: false }} />
+        <Stack.Screen name="prayer-times-settings" options={{ headerShown: false }} />
+        <Stack.Screen name="city-picker" options={{ headerShown: false }} />
+        <Stack.Screen name="search" options={{ headerShown: false }} />
         <Stack.Screen name="qibla" options={{ title: 'Qibla Finder' }} />
         <Stack.Screen name="hadith" options={{ title: 'Hadith Browser' }} />
         <Stack.Screen name="names" options={{ title: '99 Names of Allah' }} />

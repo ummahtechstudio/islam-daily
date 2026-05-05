@@ -83,7 +83,7 @@ const SECTIONS = [
     icon: 'location' as const,
     color: Colors.primary,
     items: [
-      { icon: '🕌', label: 'Prayer Times',   sub: 'All 5 daily prayers',    route: '/prayer-times',  bg: '#0F6E5622' },
+      { icon: '🕌', label: 'Prayer Times',   sub: 'All 5 daily prayers',    route: '/prayer',        bg: '#0F6E5622' },
       { icon: '🧭', label: 'Qibla Finder',   sub: 'Live compass to Makkah', route: '/qibla',         bg: '#C9A84C22' },
       { icon: '🕍', label: 'Mosque Finder',  sub: 'Find mosques near you',  route: '/mosque-finder', bg: '#3B82F622' },
       { icon: '🔥', label: 'Prayer Streak',  sub: '7-day completion grid',  route: '/prayer-streak', bg: '#F9731622' },
@@ -169,8 +169,28 @@ export default function MoreScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ── Featured: Tasbeeh Counter ── */}
+        {/* ── Search ── */}
         <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+          <TouchableOpacity
+            style={[styles.searchCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+            onPress={() => router.push('/search' as any)}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.searchIconBox, { backgroundColor: Colors.primary + '14' }]}>
+              <Ionicons name="search" size={22} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.searchLabel, { color: theme.text }]}>Search</Text>
+              <Text style={[styles.searchSub, { color: theme.textMuted }]}>
+                Search the Quran by keyword
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+          </TouchableOpacity>
+        </View>
+
+        {/* ── Featured: Tasbeeh Counter ── */}
+        <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
           <TouchableOpacity
             style={[styles.tasbeehCard, { backgroundColor: theme.card, borderColor: GOLD + '40' }]}
             onPress={() => router.push('/tasbeeh' as any)}
@@ -408,6 +428,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.5,
   },
+
+  searchCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+  },
+  searchIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchLabel: { fontSize: 16, fontWeight: '800' },
+  searchSub: { fontSize: 12, marginTop: 2 },
 
   tasbeehCard: {
     flexDirection: 'row',

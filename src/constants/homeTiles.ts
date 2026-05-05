@@ -10,7 +10,7 @@ export type HomeTile = {
 export const HOME_TILES: HomeTile[] = [
   // Quick Access (2×2 grid)
   { id: 'quran',          label: 'Quran',           emoji: '📖', route: '/quran',          required: true,  defaultEnabled: true },
-  { id: 'prayer-times',   label: 'Prayer Times',    emoji: '🕌', route: '/prayer-times',   required: true,  defaultEnabled: true },
+  { id: 'prayer-times',   label: 'Prayer Times',    emoji: '🕌', route: '/prayer',         required: true,  defaultEnabled: true },
   { id: 'dua',            label: 'Duas',            emoji: '🤲', route: '/dua',            required: true,  defaultEnabled: true },
   { id: 'qibla',          label: 'Qibla',           emoji: '🧭', route: '/qibla',          required: true,  defaultEnabled: true },
 
