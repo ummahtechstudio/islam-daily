@@ -29,7 +29,9 @@ import {
   refreshDuas,
   refreshNamesOfAllah,
 } from '../src/services/content';
-import { fetchTodaysDailyKnowledge } from '../src/services/dailyKnowledgeService';
+// Daily Knowledge is deferred to v1.1+; the background warm-up is suspended.
+// Re-enable this import (and the call below) when the curated content lands.
+// import { fetchTodaysDailyKnowledge } from '../src/services/dailyKnowledgeService';
 import {
   downloadFullQuran,
   getQuranFromCache,
@@ -94,7 +96,7 @@ export default function RootLayout() {
     refreshNamesOfAllah();
     refreshDuas();
     refreshDhikr();
-    fetchTodaysDailyKnowledge().catch(() => { /* silent */ });
+    // fetchTodaysDailyKnowledge() — suspended; see DailyKnowledgeCard for rationale.
 
     // Re-pull the full Quran in the background if the cache is older than
     // 30 days, in case Tanzil corrects a typo. Silent — bound only by network.

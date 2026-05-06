@@ -29,7 +29,6 @@ import { trackScreen } from '../../src/services/analytics';
 import { getSetting } from '../../src/utils/settings';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 
-import { DailyKnowledgeCard } from '../../src/components/DailyKnowledgeCard';
 import { ManuscriptCard } from '../../src/components/ManuscriptCard';
 import { IslamicPattern } from '../../src/components/IslamicPattern';
 import { MinaretIcon, PrayerBeadsIcon } from '../../src/components/icons';
@@ -697,11 +696,6 @@ export default function HomeScreen() {
             onPress={() => navigate('/quran')}
           />
         ) : null}
-
-        <GoldDivider />
-
-        <SectionTitle title="Daily Knowledge" isDark={isDark} />
-        <DailyKnowledgeCard isDark={isDark} />
 
         <GoldDivider />
 

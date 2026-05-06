@@ -1,3 +1,7 @@
+// DEFERRED to v1.1+ — see memory: 'Islam Daily Daily Knowledge'
+// Component is intentionally unimported as of Phase D.2. Kept in source so we
+// can reactivate it once the curated content (themed weeks, ayahs with context,
+// hadith explanations, reflection questions) is ready.
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 

@@ -15,6 +15,7 @@ import {
   Modal,
   Pressable,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,6 +24,7 @@ import MushafPageItem from './MushafPageItem';
 import { Colors } from '../../constants/colors';
 import { SURAH_META } from '../../constants/surahMeta';
 import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
+import { useDebouncedPositionWriter } from '../../hooks/useQuranLastPosition';
 
 const ALL_PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1);
 const FONT_SCALE_KEY = 'quran_font_scale';
@@ -48,9 +50,17 @@ const SURAH_PAGE_STARTS = [
   603, 604, 604, 604,
 ];
 
-export default function ReciteTab() {
+export type ReciteTabProps = {
+  // Parent can request a jump (e.g. after tapping the resume banner) by
+  // setting `jumpRequest` to a new object. The child watches the nonce so
+  // repeated taps with the same page still re-trigger the scroll.
+  jumpRequest?: { page: number; nonce: number };
+};
+
+export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList<number>>(null);
+  const positionWriter = useDebouncedPositionWriter(500);
 
   const [fontScale, setFontScale] = useState(1.0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,14 +99,19 @@ export default function ReciteTab() {
     };
   }, []);
 
-  // After hydration, scroll to last page if not page 1
+  // After hydration, scroll to last page if not page 1. Uses the same
+  // scrollToOffset-then-snap path as jumpToPage so far jumps land instantly.
   useEffect(() => {
     if (!hydrated || currentPage <= 1) return;
+    const list = flatListRef.current;
+    if (!list) return;
+    const screenHeight = Dimensions.get('window').height;
+    list.scrollToOffset({
+      offset: (currentPage - 1) * screenHeight,
+      animated: false,
+    });
     const t = setTimeout(() => {
-      flatListRef.current?.scrollToIndex({
-        index: currentPage - 1,
-        animated: false,
-      });
+      list.scrollToIndex({ index: currentPage - 1, animated: false });
     }, 250);
     return () => clearTimeout(t);
     // Only fire once after first hydration; intentionally no deps on currentPage.
@@ -116,7 +131,7 @@ export default function ReciteTab() {
     };
   }, [fontScale, hydrated]);
 
-  // Persist currentPage (debounced 1s)
+  // Persist currentPage (debounced 1s) + unified Quran position
   const pageSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!hydrated) return;
@@ -124,10 +139,11 @@ export default function ReciteTab() {
     pageSaveRef.current = setTimeout(() => {
       AsyncStorage.setItem(LAST_PAGE_KEY, String(currentPage)).catch(() => {});
     }, 1000);
+    positionWriter.schedule({ mode: 'mushaf', page: currentPage });
     return () => {
       if (pageSaveRef.current) clearTimeout(pageSaveRef.current);
     };
-  }, [currentPage, hydrated]);
+  }, [currentPage, hydrated, positionWriter]);
 
   const adjustScale = useCallback((delta: number) => {
     setFontScale((prev) => {
@@ -165,14 +181,31 @@ export default function ReciteTab() {
     }, 80);
   }, []);
 
+  // Each Mushaf page renders to roughly screen-height. Using this estimate to
+  // jump via scrollToOffset first avoids onScrollToIndexFailed's intermediate
+  // render that previously made far jumps look like a smooth scroll.
   const jumpToPage = useCallback((page: number) => {
     const clamped = Math.max(1, Math.min(TOTAL_PAGES, page));
+    const list = flatListRef.current;
+    if (!list) return;
     setCurrentPage(clamped);
-    flatListRef.current?.scrollToIndex({
-      index: clamped - 1,
+    const screenHeight = Dimensions.get('window').height;
+    list.scrollToOffset({
+      offset: (clamped - 1) * screenHeight,
       animated: false,
     });
+    // Snap to exact item once it has been measured.
+    setTimeout(() => {
+      list.scrollToIndex({ index: clamped - 1, animated: false });
+    }, 50);
   }, []);
+
+  useEffect(() => {
+    if (!jumpRequest || !hydrated) return;
+    jumpToPage(jumpRequest.page);
+    // Watch nonce so the same page can be re-requested.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jumpRequest?.nonce, hydrated]);
 
   const juz = pageToJuz(currentPage);
 

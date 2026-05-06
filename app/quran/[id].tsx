@@ -33,6 +33,7 @@ import {
   removeBookmark,
 } from '../../src/utils/bookmarks';
 import { shareContent } from '../../src/utils/share';
+import { useDebouncedPositionWriter } from '../../src/hooks/useQuranLastPosition';
 
 // ─── expo-av optional import ─────────────────────────────────────────────────
 let Audio: any = null;
@@ -163,9 +164,11 @@ async function fetchWordMeaning(globalAyahNumber: number): Promise<{ arabic: str
 
 export default function SurahReaderScreen() {
   useEffect(() => { trackScreen('SurahReader'); }, []);
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, ayah: ayahParam } = useLocalSearchParams<{ id: string; ayah?: string }>();
   const surahNum = parseInt(id ?? '1', 10);
   const router = useRouter();
+  const flatListRef = useRef<FlatList<Ayah>>(null);
+  const positionWriter = useDebouncedPositionWriter(1000);
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const updateSettings = useStore((s) => s.updateSettings);
@@ -250,6 +253,55 @@ export default function SurahReaderScreen() {
     }
     refreshBookmarks();
   };
+
+  // ─── Position tracking + scroll-to-ayah on resume ────────────────────────
+  const [visibleAyah, setVisibleAyah] = useState<number>(1);
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 });
+  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+    if (viewableItems.length > 0) {
+      const first = viewableItems[0].item as Ayah;
+      setVisibleAyah(first.numberInSurah);
+    }
+  });
+  const onScrollToIndexFailed = useCallback((info: any) => {
+    flatListRef.current?.scrollToOffset({
+      offset: info.averageItemLength * info.index,
+      animated: false,
+    });
+    setTimeout(() => {
+      flatListRef.current?.scrollToIndex({
+        index: info.index,
+        animated: false,
+      });
+    }, 80);
+  }, []);
+
+  // Save unified position whenever the visible ayah changes (debounced 1s).
+  useEffect(() => {
+    if (!arabic) return;
+    positionWriter.schedule({
+      mode: 'translation',
+      surah: surahNum,
+      ayah: visibleAyah,
+    });
+  }, [arabic, surahNum, visibleAyah, positionWriter]);
+
+  // Resume target from URL query (?ayah=N). Scroll once data is loaded.
+  const targetAyah = (() => {
+    const n = ayahParam ? parseInt(ayahParam, 10) : NaN;
+    return Number.isFinite(n) && n >= 1 ? n : null;
+  })();
+  const didScrollToTarget = useRef(false);
+  useEffect(() => {
+    if (!arabic || !targetAyah || didScrollToTarget.current) return;
+    const idx = arabic.ayahs.findIndex((a) => a.numberInSurah === targetAyah);
+    if (idx < 0) return;
+    didScrollToTarget.current = true;
+    const t = setTimeout(() => {
+      flatListRef.current?.scrollToIndex({ index: idx, animated: false });
+    }, 200);
+    return () => clearTimeout(t);
+  }, [arabic, targetAyah]);
 
   // Word meaning popup
   const [wordPopup, setWordPopup] = useState<WordMeaning | null>(null);
@@ -703,6 +755,7 @@ export default function SurahReaderScreen() {
       )}
 
       <FlatList
+        ref={flatListRef}
         data={arabic.ayahs}
         keyExtractor={(item) => String(item.number)}
         renderItem={renderVerse}
@@ -710,6 +763,9 @@ export default function SurahReaderScreen() {
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
+        onViewableItemsChanged={onViewableItemsChanged.current}
+        viewabilityConfig={viewabilityConfig.current}
+        onScrollToIndexFailed={onScrollToIndexFailed}
         ListHeaderComponent={
           isRecite && surahNum !== 9 ? (
             <View style={styles.reciteBismillahWrap}>

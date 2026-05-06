@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 import { Colors } from '../../src/constants/colors';
 import { trackScreen } from '../../src/services/analytics';
@@ -18,6 +19,8 @@ import QuranDownloadBanner from '../../src/components/quran/QuranDownloadBanner'
 import TranslationTab from '../../src/components/quran/TranslationTab';
 import ReciteTab from '../../src/components/quran/ReciteTab';
 import ListenTab from '../../src/components/quran/ListenTab';
+import { ResumeBanner } from '../../src/components/quran/ResumeBanner';
+import { useResumeBanner } from '../../src/hooks/useQuranLastPosition';
 
 type QuranTab = 'translation' | 'recite' | 'listen';
 const ACTIVE_TAB_KEY = 'quran_active_tab';
@@ -46,8 +49,32 @@ export default function QuranScreen() {
 
   const [activeTab, setActiveTab] = useState<QuranTab>('recite');
   const [hydrated, setHydrated] = useState(false);
+  const [reciteJumpRequest, setReciteJumpRequest] = useState<
+    { page: number; nonce: number } | undefined
+  >(undefined);
 
+  const router = useRouter();
+  const { position: resumePosition, dismiss: dismissResume } = useResumeBanner();
   const { cached, progress, error, isOnline, retry } = useQuranDownload();
+
+  const handleResume = () => {
+    if (!resumePosition) return;
+    if (resumePosition.mode === 'mushaf' && resumePosition.page) {
+      setActiveTab('recite');
+      setReciteJumpRequest({
+        page: resumePosition.page,
+        nonce: Date.now(),
+      });
+    } else if (
+      resumePosition.mode === 'translation' &&
+      resumePosition.surah &&
+      resumePosition.ayah
+    ) {
+      router.push(
+        `/quran/${resumePosition.surah}?ayah=${resumePosition.ayah}` as any,
+      );
+    }
+  };
 
   useEffect(() => {
     AsyncStorage.getItem(ACTIVE_TAB_KEY)
@@ -81,6 +108,14 @@ export default function QuranScreen() {
           error={error}
           isOnline={isOnline}
           onRetry={retry}
+        />
+      )}
+
+      {resumePosition && (
+        <ResumeBanner
+          position={resumePosition}
+          onResume={handleResume}
+          onDismiss={dismissResume}
         />
       )}
 
@@ -125,7 +160,7 @@ export default function QuranScreen() {
 
       <View style={styles.body}>
         {activeTab === 'translation' && <TranslationTab isDark={isDark} />}
-        {activeTab === 'recite' && <ReciteTab />}
+        {activeTab === 'recite' && <ReciteTab jumpRequest={reciteJumpRequest} />}
         {activeTab === 'listen' && <ListenTab isDark={isDark} />}
       </View>
     </SafeAreaView>
