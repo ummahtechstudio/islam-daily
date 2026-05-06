@@ -118,4 +118,6 @@ export const PREFS_KEYS = {
   PRAYER_TIMES_HIGH_LATITUDE_RULE: 'prayer_times_high_latitude_rule',
   QURAN_LAST_POSITION: 'quran_last_position',
   QURAN_LAST_POSITION_DISMISSED_UNTIL: 'quran_last_position_dismissed_until',
+  PRAYER_NOTIFICATION_SETTINGS: 'prayer_notification_settings',
+  NOTIFICATIONS_LAST_SCHEDULED_AT: 'notifications_last_scheduled_at',
 } as const;

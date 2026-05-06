@@ -41,6 +41,7 @@ import {
   isHadithBookCached,
 } from '../src/services/hadithCache';
 import { migrateInvalidPersistedSettings } from '../src/services/prayerTimesService';
+import { refreshNotificationsIfStale } from '../src/services/notificationsService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -67,6 +68,11 @@ export default function RootLayout() {
   useEffect(() => {
     loadPersistedData();
     migrateInvalidPersistedSettings();
+    // Re-arm prayer notifications if last scheduled > 24h ago. Silent on web
+    // and when permission has not been granted; the settings UI surfaces state.
+    refreshNotificationsIfStale().catch((err) =>
+      console.warn('[Layout] notifications refresh failed', err),
+    );
   }, []);
 
   useEffect(() => {

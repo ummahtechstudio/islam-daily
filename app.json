@@ -67,7 +67,8 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#0F6E56"
+          "color": "#0F6E56",
+          "sounds": ["./assets/audio/adhan.mp3"]
         }
       ],
       [

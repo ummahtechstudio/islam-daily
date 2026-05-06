@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,8 @@ import {
 } from '../src/utils/formatPrayerTime';
 import { prefs, PREFS_KEYS } from '../src/lib/storage';
 import { trackScreen } from '../src/services/analytics';
+import { scheduleNotificationsForNext7Days } from '../src/services/notificationsService';
+import { NotificationsSettingsSection } from '../src/components/NotificationsSettingsSection';
 import type {
   CalculationMethod,
   HighLatitudeRule,
@@ -93,6 +95,27 @@ export default function PrayerTimesSettingsScreen() {
 
   const [format, setFormat] = useState<TimeFormatPref>(() => getTimeFormatPref());
   const [highLat, setHighLat] = useState<HighLatitudeRule>(() => loadHighLatRule());
+
+  // Re-arm prayer notifications when location, method, madhab, or high-latitude
+  // rule changes — those affect computed prayer times. Skip the very first run
+  // so opening the screen doesn't trigger a redundant re-schedule (the startup
+  // refresh in _layout already handled that).
+  const initialScheduleSkipped = useRef(false);
+  useEffect(() => {
+    if (!initialScheduleSkipped.current) {
+      initialScheduleSkipped.current = true;
+      return;
+    }
+    scheduleNotificationsForNext7Days().catch((err) =>
+      console.warn('[PrayerTimesSettings] re-schedule failed', err),
+    );
+  }, [
+    settings.location.latitude,
+    settings.location.longitude,
+    settings.method,
+    settings.madhab,
+    settings.highLatitudeRule,
+  ]);
 
   // Pick up settings changes if user navigates to city-picker and returns.
   useFocusEffect(
@@ -367,6 +390,14 @@ export default function PrayerTimesSettingsScreen() {
             </View>
           </>
         )}
+
+        {/* Notifications */}
+        <NotificationsSettingsSection
+          textColor={theme.text}
+          textMutedColor={theme.textMuted}
+          cardColor={theme.card}
+          borderColor={theme.border}
+        />
 
         {/* About */}
         <View style={[styles.aboutCard, { backgroundColor: CREAM }]}>
