@@ -8,7 +8,6 @@ export interface AppSettings {
   calculationMethod: number;
   colorScheme: 'light' | 'dark' | 'system';
   arabicFontSize: number;
-  hadithApiKey: string;
   notificationsEnabled: boolean;
   selectedTranslation: string;
   selectedTranslationName: string;
@@ -32,7 +31,6 @@ const DEFAULT_SETTINGS: AppSettings = {
   calculationMethod: 4,
   colorScheme: 'system',
   arabicFontSize: 26,
-  hadithApiKey: '$2y$10$OVeHKOYpQOnG3P3gE8r657qTqbRhRIJSNStLz5GdzOAioMbhMG',
   notificationsEnabled: false,
   selectedTranslation: 'ur.jalandhry',
   selectedTranslationName: 'Urdu — Jalandhri',
@@ -58,10 +56,6 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       const settingsRaw = await AsyncStorage.getItem(CACHE_KEYS.settings);
       const persisted = settingsRaw ? JSON.parse(settingsRaw) : {};
-      // Always use the bundled key if the persisted value is empty
-      if (!persisted.hadithApiKey) {
-        persisted.hadithApiKey = DEFAULT_SETTINGS.hadithApiKey;
-      }
       const settings = { ...DEFAULT_SETTINGS, ...persisted };
       set({ settings });
     } catch {}

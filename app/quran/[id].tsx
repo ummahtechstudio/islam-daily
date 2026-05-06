@@ -233,6 +233,10 @@ export default function SurahReaderScreen() {
   const [loadingAyah, setLoadingAyah] = useState<number | null>(null);
   const soundRef = useRef<any>(null);
 
+  useEffect(() => () => {
+    soundRef.current?.unloadAsync().catch(() => {});
+  }, []);
+
   const surahBookmarkId = `quran_surah_${surahNum}`;
   const surahBookmarked = bookmarkedAyahs.has(surahBookmarkId);
 

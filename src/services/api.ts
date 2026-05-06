@@ -2,8 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const QURAN_BASE = 'https://api.alquran.cloud/v1';
 const ALADHAN_BASE = 'https://api.aladhan.com/v1';
-const HADITH_BASE = 'https://hadithapi.com/api';
-const HADITH_API_KEY = '$2y$10$OVeHKOYpQOnG3P3gE8r657qTqbRhRIJSNStLz5GdzOAioMbhMG';
 
 // ─── Generic cache helper ────────────────────────────────────────────────────
 
@@ -104,30 +102,6 @@ export async function fetchQiblaDirection(latitude: number, longitude: number) {
 }
 
 // ─── Hadith ───────────────────────────────────────────────────────────────────
-
-export async function fetchHadiths(
-  book: string,
-  page = 1,
-  limit = 10,
-  apiKey = HADITH_API_KEY
-) {
-  const key = apiKey || HADITH_API_KEY;
-  // Include a short fingerprint of the key in the cache key so stale
-  // responses from when the key was empty are never returned.
-  const keyTag = key.slice(-6);
-  return cachedFetch(
-    `api_hadiths_${book}_${page}_${limit}_${keyTag}`,
-    async () => {
-      const url = `${HADITH_BASE}/hadiths?apikey=${key}&book=${book}&paginate=${limit}&page=${page}`;
-      const res = await fetch(url);
-      const json = await res.json();
-      // Don't cache error / unauthenticated responses
-      if (!json?.hadiths?.data) throw new Error('Invalid hadith response');
-      return json as HadithResponse;
-    },
-    60 * 60 * 1000 // 1 hour
-  );
-}
 
 export async function fetchRandomHadith() {
   // Use a small curated list for "hadith of the day" without requiring an API key
@@ -269,28 +243,6 @@ export interface PrayerTimesData {
     method: { id: number; name: string };
     latitudeAdjustmentMethod: string;
   };
-}
-
-export interface HadithResponse {
-  hadiths: {
-    current_page: number;
-    data: HadithItem[];
-    last_page: number;
-  };
-}
-
-export interface HadithItem {
-  id: number;
-  hadithNumber: string;
-  hadithArabic: string;
-  hadithEnglish: string;
-  hadithUrdu: string;
-  bookSlug: string;
-  chapterId: string;
-  headingArabic: string;
-  headingEnglish: string;
-  headingUrdu: string;
-  status: string;
 }
 
 export interface QuranSearchResult {

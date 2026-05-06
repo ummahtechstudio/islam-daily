@@ -88,6 +88,11 @@ export function TasbeehCounterView({
   const sessionStart = useRef<number>(Date.now());
   const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const celebrationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
+  }, []);
 
   const selected = useMemo(
     () => counters.find((c) => c.id === selectedId) || counters[0],
@@ -164,7 +169,11 @@ export function TasbeehCounterView({
       setCounters((prev) => prev.map((c) => (c.id === selected.id ? updated : c)));
       triggerTarget(settings);
       setShowRoundCelebration(true);
-      setTimeout(() => setShowRoundCelebration(false), 1600);
+      if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
+      celebrationTimeoutRef.current = setTimeout(() => {
+        setShowRoundCelebration(false);
+        celebrationTimeoutRef.current = null;
+      }, 1600);
       await updateCounter(selected.id, {
         currentCount: 0,
         rounds: updated.rounds,
@@ -338,7 +347,13 @@ export function TasbeehCounterView({
             <Ionicons name="timer-outline" size={14} color={GOLD} />
             <Text style={styles.timeText}>{formatTime(elapsed)}</Text>
           </View>
-          <TouchableOpacity onPress={onShowList} hitSlop={10} style={{ marginLeft: 10 }}>
+          <TouchableOpacity
+            onPress={onShowList}
+            hitSlop={10}
+            style={{ marginLeft: 10 }}
+            accessibilityLabel="Open tasbeeh list"
+            accessibilityRole="button"
+          >
             <Ionicons name="list" size={22} color="#fff" />
           </TouchableOpacity>
         </View>

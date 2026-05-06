@@ -69,7 +69,7 @@ export default function AudioLibraryScreen() {
   const [recentIds, setRecentIds] = useState<string[]>([]);
 
   const filtered = useMemo(() => {
-    let list = AUDIO_LIBRARY;
+    let list = AUDIO_LIBRARY.filter(i => i.enabled !== false);
     if (langFilter !== 'all') list = list.filter(i => i.language === langFilter);
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -107,8 +107,8 @@ export default function AudioLibraryScreen() {
 
   const recentItems = recentIds
     .map(id => AUDIO_LIBRARY.find(i => i.id === id))
-    .filter((i): i is AudioItem => Boolean(i));
-  const favItems = AUDIO_LIBRARY.filter(i => favorites.has(i.id));
+    .filter((i): i is AudioItem => Boolean(i) && i!.enabled !== false);
+  const favItems = AUDIO_LIBRARY.filter(i => favorites.has(i.id) && i.enabled !== false);
 
   const requestContent = () =>
     Linking.openURL(

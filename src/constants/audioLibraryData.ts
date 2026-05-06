@@ -22,6 +22,8 @@ export interface AudioItem {
   total_episodes?: number;
   cover_image?: string;
   is_favorite: boolean;
+  /** When false, entry is hidden from the user-facing library (unfilled placeholder, awaiting backfill). */
+  enabled?: boolean;
 }
 
 export const AUDIO_CATEGORIES = [
@@ -88,6 +90,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with authoritative archive.org Urdu translation audio URL
     audio_url: 'https://archive.org/download/QuranUrduTranslationJalandhari/001.mp3',
     duration_minutes: 2400, total_episodes: 114, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'q_surah_yasin_abdulbasit',
@@ -152,6 +155,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Tafheem-ul-Quran audio URL from archive.org
     audio_url: 'https://archive.org/download/TafheemulQuranUrdu/tafheem_fatiha.mp3',
     duration_minutes: 30, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'tafseer_tafheem_series',
@@ -163,6 +167,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Tafheem-ul-Quran full series URL from archive.org
     audio_url: 'https://archive.org/download/TafheemulQuranUrdu/tafheem_001.mp3',
     duration_minutes: 60, total_episodes: 30, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'tafseer_bayan_baqarah',
@@ -174,6 +179,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with Dr. Israr Ahmed Bayan-ul-Quran archive.org URL
     audio_url: 'https://archive.org/download/bayanulquran_israr/bayan_baqarah_001.mp3',
     duration_minutes: 90, total_episodes: 20, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'tafseer_bayan_imran',
@@ -185,6 +191,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with Dr. Israr Ahmed archive.org URL
     audio_url: 'https://archive.org/download/bayanulquran_israr/bayan_imran_001.mp3',
     duration_minutes: 85, total_episodes: 15, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'tafseer_bayan_yasin',
@@ -196,6 +203,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with Dr. Israr Ahmed archive.org URL
     audio_url: 'https://archive.org/download/bayanulquran_israr/bayan_yasin_001.mp3',
     duration_minutes: 45, total_episodes: 5, is_favorite: false,
+    enabled: false,
   },
 
   // ─── Hadith ────────────────────────────────────────────────────────────────
@@ -210,6 +218,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Riyadh-us-Saliheen Urdu audio URL from archive.org
     audio_url: 'https://archive.org/download/riyadh_saliheen_urdu/riyadh_pt1.mp3',
     duration_minutes: 45, total_episodes: 20, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'hadith_riyadh_pt2',
@@ -221,6 +230,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Riyadh-us-Saliheen Urdu audio URL from archive.org
     audio_url: 'https://archive.org/download/riyadh_saliheen_urdu/riyadh_pt2.mp3',
     duration_minutes: 45, total_episodes: 20, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'hadith_bukhari_urdu_1',
@@ -232,6 +242,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Sahih Bukhari Urdu audio URL from archive.org
     audio_url: 'https://archive.org/download/sahihbukhari_urdu/bukhari_001.mp3',
     duration_minutes: 60, total_episodes: 97, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'hadith_bukhari_urdu_2',
@@ -243,6 +254,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Sahih Bukhari Urdu audio URL from archive.org
     audio_url: 'https://archive.org/download/sahihbukhari_urdu/bukhari_002.mp3',
     duration_minutes: 55, total_episodes: 97, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'hadith_40_nawawi',
@@ -254,6 +266,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working 40 Hadith Nawawi Urdu audio URL from archive.org
     audio_url: 'https://archive.org/download/40hadith_nawawi_urdu/40hadith.mp3',
     duration_minutes: 120, total_episodes: 40, is_favorite: false,
+    enabled: false,
   },
 
   // ─── Bayans / Lectures ─────────────────────────────────────────────────────
@@ -268,6 +281,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Tariq Jameel bayan archive.org URL
     audio_url: 'https://archive.org/download/tariq_jameel_bayans/tawbah.mp3',
     duration_minutes: 45, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_tj_akhirat',
@@ -279,6 +293,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/tariq_jameel_bayans/akhirat.mp3',
     duration_minutes: 50, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_tj_maa_baap',
@@ -290,6 +305,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/tariq_jameel_bayans/maa_baap.mp3',
     duration_minutes: 40, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_israr_iman',
@@ -301,6 +317,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Dr. Israr Ahmed archive.org URL
     audio_url: 'https://archive.org/download/israr_ahmed_lectures/iman_haqeeqat.mp3',
     duration_minutes: 60, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_israr_khilafat',
@@ -312,6 +329,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/israr_ahmed_lectures/khilafat.mp3',
     duration_minutes: 75, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_israr_qurani_inqilab',
@@ -323,6 +341,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/israr_ahmed_lectures/qurani_inqilab.mp3',
     duration_minutes: 90, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_menk_gratitude',
@@ -334,6 +353,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Mufti Menk archive.org URL
     audio_url: 'https://archive.org/download/mufti_menk_lectures/gratitude.mp3',
     duration_minutes: 45, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_menk_forgiveness',
@@ -345,6 +365,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Mufti Menk archive.org URL
     audio_url: 'https://archive.org/download/mufti_menk_lectures/forgiveness.mp3',
     duration_minutes: 48, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_menk_character',
@@ -356,6 +377,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Mufti Menk archive.org URL
     audio_url: 'https://archive.org/download/mufti_menk_lectures/good_character.mp3',
     duration_minutes: 52, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_nak_quran_miracles',
@@ -367,6 +389,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Nouman Ali Khan archive.org URL
     audio_url: 'https://archive.org/download/nouman_ali_khan/quran_miracles.mp3',
     duration_minutes: 55, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_nak_purpose',
@@ -378,6 +401,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Nouman Ali Khan archive.org URL
     audio_url: 'https://archive.org/download/nouman_ali_khan/purpose_of_life.mp3',
     duration_minutes: 48, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'bayan_nak_salah',
@@ -389,6 +413,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working Nouman Ali Khan archive.org URL
     audio_url: 'https://archive.org/download/nouman_ali_khan/salah_importance.mp3',
     duration_minutes: 40, is_favorite: false,
+    enabled: false,
   },
 
   // ─── Nasheed / Naat ────────────────────────────────────────────────────────
@@ -403,6 +428,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org Urdu naat URL
     audio_url: 'https://archive.org/download/urdu_naats_collection/owais_har_lamha.mp3',
     duration_minutes: 6, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'naat_junaid_muhammad_roza',
@@ -414,6 +440,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/urdu_naats_collection/junaid_muhammad_roza.mp3',
     duration_minutes: 5, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'naat_ya_nabi_salam',
@@ -425,6 +452,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/urdu_naats_collection/ya_nabi_salam.mp3',
     duration_minutes: 4, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'nasheed_tala_al_badr',
@@ -436,6 +464,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org URL
     audio_url: 'https://archive.org/download/arabic_nasheeds/tala_al_badr.mp3',
     duration_minutes: 3, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'nasheed_maher_assalamu',
@@ -447,6 +476,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with official Maher Zain / Awakening Records URL
     audio_url: 'https://archive.org/download/arabic_nasheeds/maher_assalamu_alayka.mp3',
     duration_minutes: 4, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'nasheed_rabbana_sami',
@@ -458,6 +488,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with official Sami Yusuf URL
     audio_url: 'https://archive.org/download/arabic_nasheeds/rabbana_sami_yusuf.mp3',
     duration_minutes: 5, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'nasheed_sami_al_muallim',
@@ -469,6 +500,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with official Sami Yusuf URL
     audio_url: 'https://archive.org/download/english_nasheeds/sami_al_muallim.mp3',
     duration_minutes: 5, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'nasheed_maher_always',
@@ -480,6 +512,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with official Maher Zain URL
     audio_url: 'https://archive.org/download/english_nasheeds/maher_always_be_there.mp3',
     duration_minutes: 4, is_favorite: false,
+    enabled: false,
   },
 
   // ─── Seerah ────────────────────────────────────────────────────────────────
@@ -494,6 +527,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org Sealed Nectar audiobook URL
     audio_url: 'https://archive.org/download/sealed_nectar_audiobook/sealed_nectar_pt1.mp3',
     duration_minutes: 60, total_episodes: 10, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'seerah_sealed_nectar_2',
@@ -505,6 +539,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org Sealed Nectar audiobook URL
     audio_url: 'https://archive.org/download/sealed_nectar_audiobook/sealed_nectar_pt2.mp3',
     duration_minutes: 65, total_episodes: 10, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'seerah_israr_urdu',
@@ -516,6 +551,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with Dr. Israr Ahmed Seerah archive.org URL
     audio_url: 'https://archive.org/download/israr_seerah/seerah_001.mp3',
     duration_minutes: 90, total_episodes: 12, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'seerah_nak_series',
@@ -527,6 +563,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with Nouman Ali Khan Seerah archive.org URL
     audio_url: 'https://archive.org/download/nak_seerah/seerah_001.mp3',
     duration_minutes: 75, total_episodes: 20, is_favorite: false,
+    enabled: false,
   },
 
   // ─── Kids ──────────────────────────────────────────────────────────────────
@@ -541,6 +578,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working kids Islamic stories archive.org URL
     audio_url: 'https://archive.org/download/kids_islamic_stories/prophet_adam.mp3',
     duration_minutes: 15, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'kids_prophet_nuh',
@@ -552,6 +590,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working kids Islamic stories archive.org URL
     audio_url: 'https://archive.org/download/kids_islamic_stories/prophet_nuh.mp3',
     duration_minutes: 12, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'kids_prophet_ibrahim',
@@ -563,6 +602,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working kids Islamic stories archive.org URL
     audio_url: 'https://archive.org/download/kids_islamic_stories/prophet_ibrahim.mp3',
     duration_minutes: 18, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'kids_prophet_yusuf',
@@ -574,6 +614,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working kids Islamic stories archive.org URL
     audio_url: 'https://archive.org/download/kids_islamic_stories/prophet_yusuf.mp3',
     duration_minutes: 20, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'kids_story_honesty',
@@ -585,6 +626,7 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org kids stories URL
     audio_url: 'https://archive.org/download/kids_islamic_stories/honesty_story.mp3',
     duration_minutes: 10, is_favorite: false,
+    enabled: false,
   },
   {
     id: 'kids_story_thankful',
@@ -596,5 +638,6 @@ export const AUDIO_LIBRARY: AudioItem[] = [
     // TODO: Replace with working archive.org kids stories URL
     audio_url: 'https://archive.org/download/kids_islamic_stories/thankful_story.mp3',
     duration_minutes: 8, is_favorite: false,
+    enabled: false,
   },
 ];

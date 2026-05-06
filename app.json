@@ -31,10 +31,6 @@
       },
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "pan",
-      "androidNavigationBar": {
-        "visible": "sticky-immersive",
-        "barStyle": "dark-content"
-      },
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -68,7 +64,9 @@
         {
           "icon": "./assets/icon.png",
           "color": "#0F6E56",
-          "sounds": ["./assets/audio/adhan.mp3"]
+          "sounds": [
+            "./assets/audio/adhan.mp3"
+          ]
         }
       ],
       [
@@ -84,7 +82,8 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

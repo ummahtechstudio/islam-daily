@@ -67,7 +67,13 @@ export default function SearchScreen() {
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.backBtn}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.backBtn}
+          accessibilityLabel="Back"
+          accessibilityRole="button"
+        >
           <Ionicons name="chevron-back" size={26} color="#fff" />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
@@ -90,7 +96,11 @@ export default function SearchScreen() {
             onSubmitEditing={handleSearch}
           />
           {query.length > 0 && (
-            <TouchableOpacity onPress={() => { setQuery(''); setResults([]); setSearched(false); }}>
+            <TouchableOpacity
+              onPress={() => { setQuery(''); setResults([]); setSearched(false); }}
+              accessibilityLabel="Clear search"
+              accessibilityRole="button"
+            >
               <Ionicons name="close-circle" size={18} color={theme.textMuted} />
             </TouchableOpacity>
           )}

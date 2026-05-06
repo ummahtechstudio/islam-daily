@@ -338,7 +338,12 @@ function JumpToModal({
         <Pressable style={modalStyles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={modalStyles.header}>
             <Text style={modalStyles.title}>Jump to</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={8}>
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={8}
+              accessibilityLabel="Close"
+              accessibilityRole="button"
+            >
               <Ionicons name="close" size={22} color="#fff" />
             </TouchableOpacity>
           </View>
