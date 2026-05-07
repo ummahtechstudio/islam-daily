@@ -391,12 +391,6 @@ export function TasbeehCounterView({
           <Text style={styles.dhikrArabic}>{selected.arabic}</Text>
           <View style={styles.dhikrGoldLineRight} />
         </View>
-        <Text style={[styles.dhikrName, { color: theme.text }]}>{selected.name}</Text>
-        {selected.source ? (
-          <Text style={[styles.dhikrSource, { color: theme.textMuted }]} numberOfLines={2}>
-            {selected.source}
-          </Text>
-        ) : null}
       </View>
 
       <View style={styles.ringWrap}>
@@ -434,6 +428,20 @@ export function TasbeehCounterView({
             <Text style={[styles.targetText, { color: theme.textMuted }]}>
               {selected.currentCount} / {selected.target}
             </Text>
+            <Text
+              style={[styles.dhikrNameInner, { color: theme.text }]}
+              numberOfLines={1}
+            >
+              {selected.name}
+            </Text>
+            {selected.source ? (
+              <Text
+                style={[styles.dhikrSourceInner, { color: theme.textMuted }]}
+                numberOfLines={2}
+              >
+                {selected.source}
+              </Text>
+            ) : null}
             <View style={styles.ringMetaRow}>
               <View style={[styles.metaPill, { backgroundColor: Colors.primary + '22' }]}>
                 <Text style={[styles.metaPillText, { color: Colors.primary }]}>
@@ -723,8 +731,19 @@ const styles = StyleSheet.create({
     lineHeight: 46,
     writingDirection: 'rtl',
   },
-  dhikrName: { fontSize: 14, fontWeight: '700', marginTop: spacing.xs + 2 },
-  dhikrSource: { fontSize: 11, textAlign: 'center', marginTop: 2 },
+  dhikrNameInner: {
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'center',
+    paddingHorizontal: 16,
+    marginTop: 2,
+  },
+  dhikrSourceInner: {
+    fontSize: 11,
+    textAlign: 'center',
+    paddingHorizontal: 18,
+    lineHeight: 14,
+  },
 
   ringWrap: {
     flex: 1,
