@@ -58,10 +58,16 @@ export async function fetchSurah(
 }
 
 export async function fetchRandomVerse() {
-  const surahNum = Math.floor(Math.random() * 114) + 1;
+  // Deterministic per local calendar day: same verse for every user on the same day,
+  // rotates at local midnight.
+  const now = new Date();
+  const dayOfYear = Math.floor(
+    (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  const surahNum = (dayOfYear % 114) + 1;
   const data = await fetchSurah(surahNum);
   const [arabic, english] = data;
-  const verseIdx = Math.floor(Math.random() * arabic.ayahs.length);
+  const verseIdx = dayOfYear % arabic.ayahs.length;
   return {
     surahName: arabic.englishName,
     surahNumber: surahNum,

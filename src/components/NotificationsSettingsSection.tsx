@@ -377,8 +377,7 @@ export function NotificationsSettingsSection({
         <Ionicons name="information-circle" size={16} color={GREEN} />
         <Text style={styles.aboutText}>
           Notifications fire at exact prayer time, computed locally from your selected method and
-          city. Custom adhan playback requires a real device — Expo Go and the web preview do not
-          support scheduled audio.
+          city.
         </Text>
       </View>
 
