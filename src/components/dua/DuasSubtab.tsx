@@ -196,18 +196,24 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
               </View>
               <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
             </View>
-            <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
-              {duaOfMoment.dua.arabic}
-            </Text>
-            <Text
-              style={
-                language === 'urdu' && duaOfMoment.dua.urdu
-                  ? [styles.duaMomentEnglish, styles.duaMomentUrdu]
-                  : styles.duaMomentEnglish
-              }
+            <ScrollView
+              style={styles.duaMomentScroll}
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled
             >
-              {translationFor(duaOfMoment.dua)}
-            </Text>
+              <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
+                {duaOfMoment.dua.arabic}
+              </Text>
+              <Text
+                style={
+                  language === 'urdu' && duaOfMoment.dua.urdu
+                    ? [styles.duaMomentEnglish, styles.duaMomentUrdu]
+                    : styles.duaMomentEnglish
+                }
+              >
+                {translationFor(duaOfMoment.dua)}
+              </Text>
+            </ScrollView>
           </ManuscriptCard>
         </View>
       )}
@@ -373,6 +379,9 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.xs,
+  },
+  duaMomentScroll: {
+    maxHeight: 220,
   },
   duaMomentHeader: {
     flexDirection: 'row',

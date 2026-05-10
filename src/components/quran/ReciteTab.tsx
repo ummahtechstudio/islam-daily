@@ -16,6 +16,7 @@ import {
   Pressable,
   Platform,
   Dimensions,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -335,6 +336,10 @@ function JumpToModal({
       onRequestClose={onClose}
     >
       <Pressable style={modalStyles.backdrop} onPress={onClose}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={modalStyles.kavWrap}
+        >
         <Pressable style={modalStyles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={modalStyles.header}>
             <Text style={modalStyles.title}>Jump to</Text>
@@ -412,6 +417,7 @@ function JumpToModal({
             />
           </View>
         </Pressable>
+        </KeyboardAvoidingView>
       </Pressable>
     </Modal>
   );
@@ -485,6 +491,9 @@ const modalStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
+  },
+  kavWrap: {
+    width: '100%',
   },
   sheet: {
     backgroundColor: '#fff',

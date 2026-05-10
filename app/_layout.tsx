@@ -13,6 +13,7 @@ import {
 } from '@expo-google-fonts/amiri';
 import { NotoNastaliqUrdu_400Regular } from '@expo-google-fonts/noto-nastaliq-urdu';
 import * as SplashScreen from 'expo-splash-screen';
+import { useKeepAwake } from 'expo-keep-awake';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -50,6 +51,7 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  useKeepAwake();
   const colorScheme = useColorScheme();
   const loadPersistedData = useStore((s) => s.loadPersistedData);
   const settingsScheme = useStore((s) => s.settings.colorScheme);

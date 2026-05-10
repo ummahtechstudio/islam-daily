@@ -326,7 +326,6 @@ export default function MoreScreen() {
           <Text style={[styles.aboutText, { color: theme.textMuted }]}>
             Built with care for the Muslim community
           </Text>
-          <Text style={[styles.bismillah, { color: Colors.primary }]}>بِسْمِ اللَّهِ</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -543,9 +542,4 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   aboutText: { fontSize: 13 },
-  bismillah: {
-    fontFamily: 'Amiri_400Regular',
-    fontSize: 24,
-    marginTop: 8,
-  },
 });
