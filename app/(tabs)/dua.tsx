@@ -13,15 +13,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
+import { MomentSubtab } from '../../src/components/dua/MomentSubtab';
 import { DuasSubtab } from '../../src/components/dua/DuasSubtab';
 import { DhikrSubtab } from '../../src/components/dua/DhikrSubtab';
 import { TasbeehSubtab } from '../../src/components/tasbeeh/TasbeehSubtab';
 
 const SUBTAB_KEY = 'dua_section_active_subtab';
 
-type Subtab = 'duas' | 'dhikr' | 'tasbeeh';
+type Subtab = 'moment' | 'duas' | 'dhikr' | 'tasbeeh';
 
 const SUBTABS: { id: Subtab; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { id: 'moment',  label: 'Moment',  icon: 'time-outline' },
   { id: 'duas',    label: 'Duas',    icon: 'book-outline' },
   { id: 'dhikr',   label: 'Dhikr',   icon: 'sparkles-outline' },
   { id: 'tasbeeh', label: 'Tasbeeh', icon: 'repeat' },
@@ -36,7 +38,7 @@ export default function DuaScreen() {
     (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
 
-  const [subtab, setSubtab] = useState<Subtab>('duas');
+  const [subtab, setSubtab] = useState<Subtab>('moment');
   const [hydrated, setHydrated] = useState(false);
   const [tasbeehHandoffId, setTasbeehHandoffId] = useState<string | null>(null);
 
@@ -44,7 +46,7 @@ export default function DuaScreen() {
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(SUBTAB_KEY);
-        if (raw === 'duas' || raw === 'dhikr' || raw === 'tasbeeh') {
+        if (raw === 'moment' || raw === 'duas' || raw === 'dhikr' || raw === 'tasbeeh') {
           setSubtab(raw);
         }
       } catch {}
@@ -96,7 +98,9 @@ export default function DuaScreen() {
       </View>
 
       <View style={styles.flex}>
-        {!hydrated ? null : subtab === 'duas' ? (
+        {!hydrated ? null : subtab === 'moment' ? (
+          <MomentSubtab theme={theme} />
+        ) : subtab === 'duas' ? (
           <DuasSubtab theme={theme} />
         ) : subtab === 'dhikr' ? (
           <DhikrSubtab theme={theme} onCountWithTasbeeh={handleCountWithTasbeeh} />
@@ -124,12 +128,15 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 4,
     gap: 4,
+    alignSelf: 'stretch',
   },
   subtabPill: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
+    justifyContent: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     borderRadius: 18,
   },

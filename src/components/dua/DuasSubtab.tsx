@@ -56,11 +56,6 @@ const DUA_CATEGORIES: { id: string; icon: CategoryIconSpec; label: string }[] = 
   { id: 'rain',        icon: { kind: 'ionicon', name: 'water-outline' },         label: 'Patience' },
 ];
 
-const CATEGORY_ICONS: Record<string, CategoryIconSpec> = DUA_CATEGORIES.reduce(
-  (acc, c) => ({ ...acc, [c.id]: c.icon }),
-  {} as Record<string, CategoryIconSpec>,
-);
-
 function CategoryIcon({
   icon,
   color,
@@ -74,37 +69,6 @@ function CategoryIcon({
     return <MinaretIcon size={size} color={color} strokeWidth={1.6} />;
   }
   return <Ionicons name={icon.name} size={size} color={color} />;
-}
-
-function getDuaOfMoment(
-  duas: DuaCategory[],
-): { category: DuaCategory; dua: Dua; reason: string } | null {
-  if (!duas.length) return null;
-  const hour = new Date().getHours();
-  let catId: string;
-  let reason: string;
-
-  if (hour >= 4 && hour < 7) {
-    catId = 'waking'; reason = 'Morning awakening';
-  } else if (hour >= 7 && hour < 12) {
-    catId = 'morning'; reason = 'Morning adhkar time';
-  } else if (hour >= 12 && hour < 13) {
-    catId = 'prayer'; reason = 'Dhuhr prayer time';
-  } else if (hour >= 13 && hour < 16) {
-    catId = 'knowledge'; reason = 'Midday — seek knowledge';
-  } else if (hour >= 15 && hour < 18) {
-    catId = 'evening'; reason = 'Evening adhkar time';
-  } else if (hour >= 18 && hour < 20) {
-    catId = 'evening'; reason = 'Sunset adhkar';
-  } else if (hour >= 20 && hour < 23) {
-    catId = 'sleep'; reason = 'Preparing for sleep';
-  } else {
-    catId = 'sleep'; reason = 'Late night';
-  }
-
-  const category = duas.find((c) => c.id === catId) ?? duas[0];
-  const dua = category.duas[new Date().getDate() % category.duas.length];
-  return dua ? { category, dua, reason } : null;
 }
 
 export interface DuasSubtabProps {
@@ -160,8 +124,6 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
     );
   }, [baseDuas, searchQuery]);
 
-  const duaOfMoment = getDuaOfMoment(hisnulMuslim);
-
   return (
     <View style={{ flex: 1 }}>
       {language === 'urdu' && !disclaimerDismissed && (
@@ -177,44 +139,6 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
           <TouchableOpacity onPress={dismissDisclaimer} hitSlop={8}>
             <Ionicons name="close" size={18} color={theme.textMuted} />
           </TouchableOpacity>
-        </View>
-      )}
-
-      {duaOfMoment && !searchQuery && (
-        <View style={styles.duaMomentWrap}>
-          <ManuscriptCard variant="bordered">
-            <View style={styles.duaMomentHeader}>
-              <View style={styles.duaMomentBadge}>
-                {CATEGORY_ICONS[duaOfMoment.category.id] ? (
-                  <CategoryIcon
-                    icon={CATEGORY_ICONS[duaOfMoment.category.id]}
-                    color={palette.goldSoft}
-                    size={14}
-                  />
-                ) : null}
-                <Text style={styles.duaMomentBadgeText}>Dua of the Moment</Text>
-              </View>
-              <Text style={styles.duaMomentReason}>{duaOfMoment.reason}</Text>
-            </View>
-            <ScrollView
-              style={styles.duaMomentScroll}
-              showsVerticalScrollIndicator={false}
-              nestedScrollEnabled
-            >
-              <Text style={styles.duaMomentArabic} textBreakStrategy="simple">
-                {duaOfMoment.dua.arabic}
-              </Text>
-              <Text
-                style={
-                  language === 'urdu' && duaOfMoment.dua.urdu
-                    ? [styles.duaMomentEnglish, styles.duaMomentUrdu]
-                    : styles.duaMomentEnglish
-                }
-              >
-                {translationFor(duaOfMoment.dua)}
-              </Text>
-            </ScrollView>
-          </ManuscriptCard>
         </View>
       )}
 
@@ -375,55 +299,6 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
 }
 
 const styles = StyleSheet.create({
-  duaMomentWrap: {
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  duaMomentScroll: {
-    maxHeight: 220,
-  },
-  duaMomentHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm + 2,
-  },
-  duaMomentBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs + 2,
-    backgroundColor: 'rgba(239,159,39,0.18)',
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.sm,
-  },
-  duaMomentBadgeText: {
-    color: palette.goldSoft,
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.3,
-  },
-  duaMomentReason: {
-    color: palette.textOnCreamMuted,
-    fontSize: 11,
-  },
-  duaMomentArabic: {
-    fontFamily: 'Amiri_400Regular',
-    fontSize: 20,
-    textAlign: 'right',
-    lineHeight: 40,
-    color: palette.textOnCream,
-    writingDirection: 'rtl',
-    marginBottom: spacing.sm,
-  },
-  duaMomentEnglish: {
-    fontSize: 13,
-    color: palette.textOnCreamSecondary,
-    fontStyle: 'italic',
-    lineHeight: 20,
-  },
-
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -528,14 +403,6 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
     color: palette.textOnCream,
-  },
-  duaMomentUrdu: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    fontSize: 14,
-    lineHeight: 26,
-    fontStyle: 'normal',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
   },
   disclaimerCard: {
     flexDirection: 'row',

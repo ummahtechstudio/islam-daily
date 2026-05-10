@@ -711,7 +711,6 @@ export default function HomeScreen() {
         <View style={[styles.footer, { borderTopColor: theme.border }]}>
           <Text style={[styles.footerVersion, { color: theme.textMuted }]}>Islam Daily v1.0.0</Text>
           <Text style={[styles.footerTagline, { color: theme.textMuted }]}>Built with love for the Ummah</Text>
-          <Text style={[styles.footerBismillah, { color: palette.green }]}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -783,9 +782,4 @@ const styles = StyleSheet.create({
   },
   footerVersion: { ...typography.caption },
   footerTagline: { ...typography.caption },
-  footerBismillah: {
-    fontFamily: 'Amiri_400Regular',
-    fontSize: 20,
-    marginTop: spacing.sm,
-  },
 });

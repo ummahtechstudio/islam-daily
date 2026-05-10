@@ -9,6 +9,7 @@ import {
   Dimensions,
   Alert,
   Modal,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
@@ -385,6 +386,12 @@ export function TasbeehCounterView({
         ))}
       </View>
 
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
       <View style={styles.dhikrOuterWrap}>
         <View style={styles.dhikrBlock}>
           <View style={styles.dhikrGoldLineLeft} />
@@ -507,6 +514,7 @@ export function TasbeehCounterView({
           </View>
         </View>
       ) : null}
+      </ScrollView>
 
       <View style={[styles.controls, { backgroundColor: theme.surface, borderTopColor: theme.border }]}>
         <ControlBtn icon="refresh" label="Reset" theme={theme} onPress={handleReset} />
@@ -746,10 +754,15 @@ const styles = StyleSheet.create({
   },
 
   ringWrap: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 0,
+    flexBasis: RING_SIZE + 16,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   ringPress: {
     width: RING_SIZE,

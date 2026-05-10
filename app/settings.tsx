@@ -1068,7 +1068,6 @@ export default function SettingsScreen() {
         </SectionCard>
 
         <View style={[styles.about, { borderTopColor: themeColors.border }]}>
-          <Text style={[styles.bismillah, { color: Colors.primary }]}>بِسْمِ اللَّهِ</Text>
           <Text style={[styles.aboutText, { color: themeColors.textMuted }]}>
             Built with care for the Muslim community
           </Text>
@@ -1217,8 +1216,4 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   aboutText: { fontSize: 12 },
-  bismillah: {
-    fontFamily: 'Amiri_400Regular',
-    fontSize: 24,
-  },
 });

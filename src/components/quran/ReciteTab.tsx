@@ -493,7 +493,9 @@ const modalStyles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   kavWrap: {
+    flex: 1,
     width: '100%',
+    justifyContent: 'flex-end',
   },
   sheet: {
     backgroundColor: '#fff',
