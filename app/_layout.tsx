@@ -51,7 +51,12 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-  useKeepAwake();
+  // expo-keep-awake uses the WakeLock API on web, which throws
+  // when the browser tab isn't focused. Phone-only feature —
+  // skip on web entirely.
+  if (Platform.OS !== 'web') {
+    useKeepAwake();
+  }
   const colorScheme = useColorScheme();
   const loadPersistedData = useStore((s) => s.loadPersistedData);
   const settingsScheme = useStore((s) => s.settings.colorScheme);
