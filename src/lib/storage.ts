@@ -123,4 +123,8 @@ export const PREFS_KEYS = {
   // Persists `Date.getTimezoneOffset()` from the last schedule so we can
   // detect timezone / DST changes on next startup and re-schedule.
   NOTIFICATIONS_LAST_TIMEZONE_OFFSET: 'notifications_last_timezone_offset',
+  // Zakat calculator: only the *settings* (currency, weight unit, last
+  // entered metal prices, chosen nisab basis) are persisted. Wealth
+  // amounts are not — they change frequently and shouldn't auto-save.
+  ZAKAT_SETTINGS: 'zakat_settings',
 } as const;
