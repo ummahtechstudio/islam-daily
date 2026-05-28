@@ -52,7 +52,12 @@ function toHijri(date: Date): { day: number; month: number; monthName: string; y
   const day = l3 - Math.floor((709 * month) / 24);
   const year = 30 * n + j - 30;
 
-  return { day, month, monthName: HIJRI_MONTHS[month - 1] ?? '', year };
+  // Clamp month into the valid 1..12 range. The Julian approximation can
+  // produce out-of-range values at extreme dates; rather than render an
+  // empty month name with awkward spacing, fall back to a numeric label.
+  const safeMonthName =
+    HIJRI_MONTHS[month - 1] ?? (month >= 1 && month <= 12 ? `Month ${month}` : '—');
+  return { day, month, monthName: safeMonthName, year };
 }
 
 // ─── Islamic events ───────────────────────────────────────────────────────────

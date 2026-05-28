@@ -38,17 +38,33 @@ export async function logSession(): Promise<void> {
     // Use existing permission only — never request here
     const { status } = await Location.getForegroundPermissionsAsync();
     if (status === 'granted') {
-      const loc = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      latitude  = loc.coords.latitude;
-      longitude = loc.coords.longitude;
+      // Cap GPS + geocode at ~10s combined; a sluggish device GPS would
+      // otherwise tie up this fire-and-forget task for tens of seconds.
+      const withTimeout = <T,>(p: Promise<T>, ms: number) =>
+        Promise.race<T>([
+          p,
+          new Promise<T>((_, rej) => setTimeout(() => rej(new Error('timeout')), ms)),
+        ]);
 
-      const [geo] = await Location.reverseGeocodeAsync({ latitude, longitude });
-      if (geo) {
-        city         = geo.city ?? geo.subregion ?? null;
-        country      = geo.country ?? null;
-        country_code = geo.isoCountryCode ?? null;
+      try {
+        const loc = await withTimeout(
+          Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+          7000,
+        );
+        latitude = loc.coords.latitude;
+        longitude = loc.coords.longitude;
+
+        const [geo] = await withTimeout(
+          Location.reverseGeocodeAsync({ latitude, longitude }),
+          3000,
+        );
+        if (geo) {
+          city = geo.city ?? geo.subregion ?? null;
+          country = geo.country ?? null;
+          country_code = geo.isoCountryCode ?? null;
+        }
+      } catch {
+        // GPS / geocoder slow — log the row without location.
       }
     }
 

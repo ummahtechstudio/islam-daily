@@ -16,8 +16,10 @@ import {
 import type { DailyKnowledge } from '../types/content';
 import { formatRelativeTime } from '../utils/time';
 
-import KNOWLEDGE_DATA from '../../assets/daily_knowledge.json';
-
+// Lazy-required so the 83 KB of curated content doesn't ship in the APK
+// while this component is deferred to v1.1+. The require only runs if
+// `bundledFallback()` is actually called, which can't happen until the
+// component is mounted somewhere — currently nowhere.
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 
 type BundledTip = {
@@ -29,7 +31,8 @@ type BundledTip = {
 };
 
 function bundledFallback(): DailyKnowledge {
-  const tips = KNOWLEDGE_DATA as BundledTip[];
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const tips = require('../../assets/daily_knowledge.json') as BundledTip[];
   const seed = new Date().getDate();
   const sorted = [...tips].sort(
     (a, b) => ((a.id * seed) % 13) - ((b.id * seed) % 13),

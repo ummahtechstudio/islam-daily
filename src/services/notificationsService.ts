@@ -136,21 +136,34 @@ export async function setNotificationSettings(
 
 // Forward-compatibility: if a prayer entry is missing on a stored object
 // (e.g. older app version), fill it from defaults rather than throwing.
+const VALID_SOUND_CHOICES: PrayerSoundChoice[] = ['adhan', 'silent', 'system'];
+
+function isValidSound(v: unknown): v is PrayerSoundChoice {
+  return typeof v === 'string' && (VALID_SOUND_CHOICES as string[]).includes(v);
+}
+
 function mergeWithDefaults(
   s: PrayerNotificationSettings,
 ): PrayerNotificationSettings {
   const merged: PrayerNotificationSettings = {
-    enabled: s.enabled,
+    enabled: typeof s.enabled === 'boolean' ? s.enabled : DEFAULT_NOTIFICATION_SETTINGS.enabled,
     perPrayer: { ...DEFAULT_NOTIFICATION_SETTINGS.perPrayer },
     sunnah: { ...DEFAULT_NOTIFICATION_SETTINGS.sunnah },
   };
   for (const p of ALL_PRAYERS) {
-    if (s.perPrayer && s.perPrayer[p]) {
-      merged.perPrayer[p] = s.perPrayer[p];
+    const stored = s.perPrayer?.[p];
+    if (stored) {
+      // Validate sound is one of the known choices — a future schema version
+      // adding e.g. 'custom-mp3' would otherwise leak `undefined` into
+      // channelForChoice and silently no-op the notification.
+      merged.perPrayer[p] = {
+        enabled: typeof stored.enabled === 'boolean' ? stored.enabled : DEFAULT_NOTIFICATION_SETTINGS.perPrayer[p].enabled,
+        sound: isValidSound(stored.sound) ? stored.sound : DEFAULT_NOTIFICATION_SETTINGS.perPrayer[p].sound,
+      };
     }
   }
-  if (s.sunnah?.tahajjud) {
-    merged.sunnah.tahajjud = s.sunnah.tahajjud;
+  if (s.sunnah?.tahajjud && typeof s.sunnah.tahajjud.enabled === 'boolean') {
+    merged.sunnah.tahajjud = { enabled: s.sunnah.tahajjud.enabled };
   }
   return merged;
 }

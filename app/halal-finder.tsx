@@ -95,11 +95,15 @@ function elementsToRestaurants(
   userLat: number,
   userLon: number,
 ): Restaurant[] {
-  const seen = new Set<number>();
+  // Dedupe by `${type}-${id}` — Overpass uses the same numeric id space for
+  // nodes/ways/relations, so a plain `el.id` set can drop legitimate entries
+  // when a node and a way share the same id.
+  const seen = new Set<string>();
   const out: Restaurant[] = [];
   for (const el of elements) {
-    if (seen.has(el.id)) continue;
-    seen.add(el.id);
+    const key = `${el.type}-${el.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
     const lat = el.lat ?? el.center?.lat;
     const lon = el.lon ?? el.center?.lon;
     if (lat == null || lon == null) continue;

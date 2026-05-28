@@ -11,6 +11,12 @@ const NET_TIMEOUT_MS = 15000;
 
 // ─── Generic cache helper ────────────────────────────────────────────────────
 
+// In-memory cooldown so a flaky-network refresh doesn't stampede the same
+// upstream endpoint dozens of times in a few seconds. Doesn't persist;
+// per-process by design.
+const FAILURE_COOLDOWN_MS = 30 * 1000;
+const recentFailures = new Map<string, number>();
+
 async function cachedFetch<T>(
   key: string,
   fetcher: () => Promise<T>,
@@ -22,13 +28,26 @@ async function cachedFetch<T>(
       const { data, ts } = JSON.parse(raw);
       if (Date.now() - ts < ttlMs) return data as T;
     }
-  } catch {}
+  } catch (err) {
+    if (__DEV__) console.warn('[api] cached parse failed for', key, err);
+  }
 
-  const data = await fetcher();
+  const lastFailedAt = recentFailures.get(key) ?? 0;
+  if (Date.now() - lastFailedAt < FAILURE_COOLDOWN_MS) {
+    throw new Error('Network call recently failed; cooling down');
+  }
+
   try {
-    await AsyncStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
-  } catch {}
-  return data;
+    const data = await fetcher();
+    recentFailures.delete(key);
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
+    } catch {}
+    return data;
+  } catch (e) {
+    recentFailures.set(key, Date.now());
+    throw e;
+  }
 }
 
 async function safeJson(res: Response): Promise<any> {
@@ -183,7 +202,13 @@ export async function fetchRandomHadith() {
       reference: 'Bukhari 6465, Muslim 783',
     },
   ];
-  const idx = new Date().getDate() % hadiths.length;
+  // Day-of-year mod length so all entries are seen across a 365-day cycle,
+  // not just three out of every eight per month.
+  const now = new Date();
+  const dayOfYear = Math.floor(
+    (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000,
+  );
+  const idx = ((dayOfYear % hadiths.length) + hadiths.length) % hadiths.length;
   return hadiths[idx];
 }
 

@@ -75,14 +75,25 @@ export default function PrayerStreakScreen() {
     await AsyncStorage.setItem(CACHE_KEYS.prayerStreak, JSON.stringify(nextRecords));
   }, [records]);
 
-  // Calculate streak: consecutive days where all 5 prayers completed
+  // Calculate streak: consecutive days where all 5 prayers completed.
+  // Today counts if (and only if) all 5 are already checked off — otherwise
+  // skip it so a partial day doesn't break the chain. This way a user who
+  // has actually finished Isha sees today included in their streak instead
+  // of having to wait until tomorrow.
   const streak = (() => {
     let s = 0;
     const sortedDays = [...last7].reverse();
     for (const d of sortedDays) {
-      if (d === today) continue; // skip today for streak (partial day)
       const rec = records[d];
       const allDone = PRAYER_LIST.every((p) => rec?.prayers[p]);
+      if (d === today) {
+        if (allDone) {
+          s++;
+          continue;
+        }
+        // Today incomplete — keep counting prior days that were fully done.
+        continue;
+      }
       if (allDone) s++;
       else break;
     }

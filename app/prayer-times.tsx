@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   useColorScheme,
+  AppState,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -79,7 +80,15 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
   const [tick, setTick] = useState(Date.now());
   useEffect(() => {
     const i = setInterval(() => setTick(Date.now()), 60_000);
-    return () => clearInterval(i);
+    // Force a recompute when the user returns to the app so the countdown
+    // isn't stale by up to a minute (interval doesn't tick while paused).
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setTick(Date.now());
+    });
+    return () => {
+      clearInterval(i);
+      sub.remove();
+    };
   }, []);
 
   const computed = useMemo(

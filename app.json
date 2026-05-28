@@ -8,6 +8,14 @@
     "scheme": "islamdaily",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "assets/data/**",
+      "assets/audio/**",
+      "assets/fonts/**",
+      "assets/*.json",
+      "assets/*.png",
+      "assets/images/**"
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

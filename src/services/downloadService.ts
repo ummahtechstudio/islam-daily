@@ -7,6 +7,7 @@ import {
   isHadithBookCached,
   clearHadithCache,
 } from './hadithCache';
+import { clearQuranCache } from './quranCache';
 import type { HadithCollectionKey } from './hadiths';
 
 // Per-request timeout for third-party calls inside the long download loops.
@@ -87,6 +88,10 @@ export async function clearPack(pack: PackId): Promise<void> {
     case 'quranText': {
       const keys = Array.from({ length: 114 }, (_, i) => `offline_surah_${i + 1}`);
       await AsyncStorage.multiRemove(keys);
+      // The legacy per-surah AsyncStorage cache + the newer MMKV full-Quran
+      // cache are both used by different code paths. Clear both so "delete"
+      // is real and not just "delete one of two stores".
+      clearQuranCache();
       break;
     }
     case 'hadiths':

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   useColorScheme,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -62,7 +63,7 @@ export default function CustomAdhanScreen() {
 
   const playPreview = async (soundId: string, url: string) => {
     if (!Audio) {
-      alert('expo-av is not installed. Run: npx expo install expo-av');
+      Alert.alert('Audio unavailable', 'This build does not include audio playback support.');
       return;
     }
     if (playingId === soundId) {
@@ -94,7 +95,7 @@ export default function CustomAdhanScreen() {
       });
     } catch {
       setLoadingId(null);
-      alert('Failed to load audio preview.');
+      Alert.alert('Preview unavailable', 'Failed to load audio preview. Check your connection.');
     }
   };
 

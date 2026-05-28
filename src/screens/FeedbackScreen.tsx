@@ -25,6 +25,7 @@ import { Colors } from '../constants/colors';
 import { useStore } from '../store';
 import { trackScreen } from '../services/analytics';
 import { supabase } from '../lib/supabase';
+import { useIsOnline } from '../hooks/useIsOnline';
 
 const SCREENSHOT_BUCKET = 'feedback-screenshots';
 const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
@@ -73,6 +74,7 @@ export default function FeedbackScreen() {
   const settings = useStore((s) => s.settings);
   const isDark = settings.colorScheme === 'dark' || (settings.colorScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
+  const isOnline = useIsOnline();
 
   const [category, setCategory] = useState<FeedbackCategory>('Other');
   const [message, setMessage] = useState('');
@@ -156,6 +158,14 @@ export default function FeedbackScreen() {
 
     if (trimmedMessage.length < 10) {
       Alert.alert('Message Too Short', 'Please write at least 10 characters.');
+      return;
+    }
+
+    if (!isOnline) {
+      Alert.alert(
+        'You appear to be offline',
+        "Submitting feedback needs an internet connection. Connect and try again.",
+      );
       return;
     }
 

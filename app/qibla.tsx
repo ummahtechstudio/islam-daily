@@ -206,7 +206,9 @@ export default function QiblaScreen() {
     setIsAligned(aligned);
     if (aligned && !wasAligned.current) {
       wasAligned.current = true;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      if (Platform.OS !== 'web') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => {});
+      }
     } else if (!aligned) {
       wasAligned.current = false;
     }

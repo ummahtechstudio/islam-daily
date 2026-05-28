@@ -9,6 +9,7 @@ import {
   Modal,
   ActivityIndicator,
   Pressable,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
@@ -242,9 +243,17 @@ export default function SurahReaderScreen() {
   const [playingAyah, setPlayingAyah] = useState<number | null>(null);
   const [loadingAyah, setLoadingAyah] = useState<number | null>(null);
   const soundRef = useRef<any>(null);
+  // Tracks mount state so playAyah can detect "user navigated away while
+  // I was awaiting Audio.Sound.createAsync" and avoid attaching an orphan
+  // sound to a stale ref.
+  const isMountedRef = useRef(true);
 
-  useEffect(() => () => {
-    soundRef.current?.unloadAsync().catch(() => {});
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      soundRef.current?.unloadAsync().catch(() => {});
+    };
   }, []);
 
   const surahBookmarkId = `quran_surah_${surahNum}`;
@@ -342,7 +351,7 @@ export default function SurahReaderScreen() {
 
   const playAyah = async (ayah: Ayah) => {
     if (!Audio) {
-      alert('Audio requires expo-av. Run: npx expo install expo-av');
+      Alert.alert('Audio unavailable', 'This build does not include audio playback support.');
       return;
     }
     if (playingAyah === ayah.number) {
@@ -360,19 +369,26 @@ export default function SurahReaderScreen() {
       const url = `${QURAN_CDN}/${selectedReciter}/${ayah.number}.mp3`;
       await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
       const { sound } = await Audio.Sound.createAsync({ uri: url }, { shouldPlay: true });
+      // M-43: if the user navigated away while we awaited createAsync, the
+      // unmount cleanup has already run with soundRef.current === null. In
+      // that case unload the orphan we just created instead of attaching it.
+      if (!isMountedRef.current) {
+        sound.unloadAsync().catch(() => {});
+        return;
+      }
       soundRef.current = sound;
       setPlayingAyah(ayah.number);
       setLoadingAyah(null);
       sound.setOnPlaybackStatusUpdate((status: any) => {
         if (status.didJustFinish) {
           setPlayingAyah(null);
-          sound.unloadAsync();
+          sound.unloadAsync().catch(() => {});
           soundRef.current = null;
         }
       });
     } catch {
       setLoadingAyah(null);
-      alert('Failed to load audio.');
+      Alert.alert('Playback failed', 'Could not load audio. Check your connection.');
     }
   };
 

@@ -8,6 +8,7 @@ import {
   RefreshControl,
   useColorScheme,
   Dimensions,
+  AppState,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -137,7 +138,15 @@ function PrayerNextCard({ onPress }: { onPress: () => void }) {
   const [tick, setTick] = useState(Date.now());
   useEffect(() => {
     const i = setInterval(() => setTick(Date.now()), 60_000);
-    return () => clearInterval(i);
+    // Recompute immediately on foreground so the countdown isn't stale by
+    // up to 60 s when the user comes back to the app.
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setTick(Date.now());
+    });
+    return () => {
+      clearInterval(i);
+      sub.remove();
+    };
   }, []);
 
   const computed = useMemo(
@@ -561,13 +570,20 @@ export default function HomeScreen() {
     useCallback(() => {
       let cancelled = false;
       (async () => {
-        const stored = await getSetting<string[]>(
-          HOME_TILES_STORAGE_KEY,
-          DEFAULT_ENABLED_TILE_IDS,
-        );
-        if (!cancelled) {
-          setEnabledIds(stored);
-          setTilesLoaded(true);
+        try {
+          const stored = await getSetting<string[]>(
+            HOME_TILES_STORAGE_KEY,
+            DEFAULT_ENABLED_TILE_IDS,
+          );
+          if (!cancelled) setEnabledIds(stored);
+        } catch (err) {
+          console.warn('[Home] failed to load tile config', err);
+          if (!cancelled) setEnabledIds(DEFAULT_ENABLED_TILE_IDS);
+        } finally {
+          // Always flip the loaded flag so Quick Access + More Features
+          // render — otherwise a one-off AsyncStorage error hides them
+          // forever.
+          if (!cancelled) setTilesLoaded(true);
         }
       })();
       return () => { cancelled = true; };

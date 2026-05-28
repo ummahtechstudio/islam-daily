@@ -41,14 +41,18 @@ export default function CardActionsRow({ bookmark, shareable, iconColor }: Props
   }, [bookmark.type, bookmark.id]);
 
   const onToggleBookmark = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
     const nowSaved = await toggleBookmark(bookmark);
     setSaved(nowSaved);
     showToast(nowSaved ? 'Saved to bookmarks' : 'Removed from bookmarks');
   };
 
   const onShare = async () => {
-    Haptics.selectionAsync().catch(() => {});
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync().catch(() => {});
+    }
     await shareContent(shareable);
   };
 

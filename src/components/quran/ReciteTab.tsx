@@ -89,11 +89,12 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
             setCurrentPage(p);
           }
         }
-        setHydrated(true);
       })
       .catch((err) => {
         console.warn('[ReciteTab] hydrate failed', err);
-        setHydrated(true);
+      })
+      .finally(() => {
+        if (active) setHydrated(true);
       });
     return () => {
       active = false;

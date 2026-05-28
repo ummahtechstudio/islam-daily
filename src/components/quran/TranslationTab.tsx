@@ -66,7 +66,11 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
   useEffect(() => {
     AsyncStorage.getItem(LAST_READ_KEY)
       .then((v) => {
-        if (v) setLastReadSurah(parseInt(v, 10));
+        if (!v) return;
+        const n = parseInt(v, 10);
+        // Reject NaN and out-of-range values silently; "Continue" badge stays
+        // hidden rather than comparing surah.number to NaN forever.
+        if (Number.isFinite(n) && n >= 1 && n <= 114) setLastReadSurah(n);
       })
       .catch((err) => console.warn('[Quran] read LAST_READ_KEY failed', err));
   }, []);

@@ -34,18 +34,19 @@ export default function SearchScreen() {
   const [searched, setSearched] = useState(false);
   const [searchError, setSearchError] = useState(false);
 
-  const handleSearch = useCallback(async () => {
-    if (!query.trim()) return;
+  // Accepts an explicit query override so the suggestion-chip path
+  // (which calls handleSearch right after setQuery) doesn't race the
+  // useState update and end up searching the previous value.
+  const handleSearch = useCallback(async (override?: string) => {
+    const q = (override ?? query).trim();
+    if (!q) return;
     setLoading(true);
     setSearched(true);
     setSearchError(false);
     try {
-      const data = await searchQuran(query.trim());
+      const data = await searchQuran(q);
       setResults(data);
     } catch {
-      // Surface the network failure rather than showing "No results" — the
-      // user otherwise can't tell whether the word is absent from the Quran
-      // or whether they were offline.
       setResults([]);
       setSearchError(true);
     }
@@ -99,7 +100,7 @@ export default function SearchScreen() {
             value={query}
             onChangeText={setQuery}
             returnKeyType="search"
-            onSubmitEditing={handleSearch}
+            onSubmitEditing={() => handleSearch()}
           />
           {query.length > 0 && (
             <TouchableOpacity
@@ -113,7 +114,7 @@ export default function SearchScreen() {
         </View>
         <TouchableOpacity
           style={styles.searchBtn}
-          onPress={handleSearch}
+          onPress={() => handleSearch()}
           disabled={!query.trim()}
           activeOpacity={0.8}
         >
@@ -130,7 +131,7 @@ export default function SearchScreen() {
               <TouchableOpacity
                 key={s}
                 style={[styles.chip, { backgroundColor: theme.card, borderColor: theme.border }]}
-                onPress={() => { setQuery(s); setTimeout(handleSearch, 100); }}
+                onPress={() => { setQuery(s); handleSearch(s); }}
               >
                 <Text style={[styles.chipText, { color: theme.text }]}>{s}</Text>
               </TouchableOpacity>
@@ -158,7 +159,7 @@ export default function SearchScreen() {
                   </Text>
                   <TouchableOpacity
                     style={[styles.chip, { backgroundColor: theme.card, borderColor: theme.border, marginTop: 12 }]}
-                    onPress={handleSearch}
+                    onPress={() => handleSearch()}
                   >
                     <Text style={[styles.chipText, { color: Colors.primary }]}>Retry</Text>
                   </TouchableOpacity>
