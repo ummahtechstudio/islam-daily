@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Redirect } from 'expo-router';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -19,6 +20,7 @@ import {
   BookLanguage,
   openBook,
 } from '../src/services/books';
+import { FEATURES } from '../src/constants/featureFlags';
 
 const TABS: { key: BookLanguage; label: string; icon: string }[] = [
   { key: 'arabic',  label: 'Arabic',  icon: 'text' },
@@ -52,7 +54,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   Kids:      '#F97316',
 };
 
-export default function IslamicBooksScreen() {
+function IslamicBooksScreenInner() {
   useEffect(() => { trackScreen('IslamicBooks'); }, []);
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -162,6 +164,16 @@ export default function IslamicBooksScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+// Hidden in v1 — every book entry is "Coming Soon". The screen still exists
+// (will be re-enabled in v1.1) but a pasted URL or stale deep link redirects
+// to Home rather than landing on an empty list.
+export default function IslamicBooksScreen() {
+  if (!FEATURES.islamicBooks) {
+    return <Redirect href={'/' as any} />;
+  }
+  return <IslamicBooksScreenInner />;
 }
 
 const styles = StyleSheet.create({

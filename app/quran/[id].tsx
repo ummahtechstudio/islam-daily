@@ -19,8 +19,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, palette } from '../../src/constants/colors';
 import { trackScreen } from '../../src/services/analytics';
 import { useSurah } from '../../src/hooks/useQuran';
-import { useQuranDownload } from '../../src/hooks/useQuranDownload';
-import QuranDownloadBanner from '../../src/components/quran/QuranDownloadBanner';
 import { useStore } from '../../src/store';
 import { LoadingSpinner } from '../../src/components/LoadingSpinner';
 import { ErrorView } from '../../src/components/ErrorView';
@@ -204,7 +202,6 @@ export default function SurahReaderScreen() {
   const translationMeta = findTranslation(selectedEdition);
 
   const { arabic, translation, loading, error, fromCache } = useSurah(surahNum, selectedEdition);
-  const quranDownload = useQuranDownload();
 
   const [showTranslation, setShowTranslation] = useState(true);
   const [fontSize, setFontSize] = useState(settings.arabicFontSize);
@@ -398,47 +395,18 @@ export default function SurahReaderScreen() {
     setShowReciterPicker(false);
   };
 
-  const downloadBanner = !quranDownload.cached ? (
-    <QuranDownloadBanner
-      progress={quranDownload.progress}
-      error={quranDownload.error}
-      isOnline={quranDownload.isOnline}
-      onRetry={quranDownload.retry}
-    />
-  ) : null;
-
   if (loading) {
     return (
       <SafeAreaView
         style={{ flex: 1, backgroundColor: theme.background }}
         edges={['top']}
       >
-        {downloadBanner}
         <LoadingSpinner message="Loading surah..." dark={isDark} />
       </SafeAreaView>
     );
   }
 
   if (error || !arabic || !translation) {
-    if (!quranDownload.cached) {
-      return (
-        <SafeAreaView
-          style={{ flex: 1, backgroundColor: theme.background }}
-          edges={['top']}
-        >
-          {downloadBanner}
-          <View style={styles.surahPendingWrap}>
-            <Ionicons name="hourglass-outline" size={36} color={palette.gold} />
-            <Text style={[styles.surahPendingTitle, { color: theme.text }]}>
-              This surah will be ready shortly
-            </Text>
-            <Text style={[styles.surahPendingBody, { color: theme.textMuted }]}>
-              The Quran is downloading once and works offline after that.
-            </Text>
-          </View>
-        </SafeAreaView>
-      );
-    }
     return <ErrorView message={error ?? 'Failed to load surah'} dark={isDark} />;
   }
 
@@ -657,8 +625,6 @@ export default function SurahReaderScreen() {
             ) : null,
         }}
       />
-
-      {downloadBanner}
 
       {/* Surah header (study mode only) */}
       {!isRecite && (

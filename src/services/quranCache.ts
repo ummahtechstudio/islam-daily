@@ -1,22 +1,18 @@
 /**
- * Single source of truth for Quran ayah data after Phase O.2.
+ * Single source of truth for Quran ayah data.
  *
- * On first launch the entire 6,236-ayah Indo-Pak / Tanzil dataset is fetched
- * from Supabase in batches and stored as one indexed object in MMKV under
- * `CACHE_KEYS.QURAN_FULL`. Subsequent reads are synchronous in-memory and
- * the Quran works fully offline.
+ * As of Phase O.2-bundle the entire 6,236-ayah Tanzil / Indo-Pak dataset is
+ * bundled inside the APK at `assets/data/quran.json`. There is no runtime
+ * download, no Supabase call, no first-launch banner — the data is available
+ * the moment the JS bundle loads.
  *
- * Nothing else in the app should call Supabase for ayah data — go through
- * `getAyahsForPage` / `getAyahsForSurah` instead.
+ * Public API (`getAyahsForPage`, `getAyahsForSurah`, `isQuranCached`) is
+ * preserved so callers like `MushafPageItem` and `useQuran` don't change.
  */
 
-import { supabase } from '../lib/supabase';
-import { CACHE_KEYS, cache } from '../lib/storage';
+import { SURAH_META } from '../constants/surahMeta';
 
-const QURAN_CACHE_VERSION = 1;
-const FETCH_BATCH_SIZE = 700;
 export const EXPECTED_AYAH_COUNT = 6236;
-const FETCH_RETRIES = 2;
 
 export type AyahLite = {
   surah: number;
@@ -29,143 +25,116 @@ export type AyahLite = {
 };
 
 export type QuranIndex = {
-  version: number;
-  fetchedAt: number;
   byPage: Record<number, AyahLite[]>;
   bySurah: Record<number, AyahLite[]>;
   totalAyahs: number;
 };
 
-export type DownloadProgress = {
-  fetched: number;
-  total: number;
-  batchIndex: number;
-  totalBatches: number;
+// Compact row shape produced by scripts/export-quran.ts. Short keys keep the
+// bundled JSON ~25% smaller than verbose field names.
+type BundledAyah = {
+  s: number;   // surah_number
+  a: number;   // ayah_number
+  p: number;   // page_indopak
+  ti: string;  // text_indopak
+  ta: string;  // arabic_text (Tanzil Uthmani)
+  tu: string;  // translation_ur
+  te: string;  // translation_en
 };
 
-let inMemoryIndex: QuranIndex | null = null;
+// Lazy-required so we don't pay JSON.parse cost on cold start until the
+// Quran is actually opened. After the first call the index is memoized for
+// the rest of the app session.
+let memoIndex: QuranIndex | null = null;
+
+function buildIndex(): QuranIndex {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const raw = require('../../assets/data/quran.json') as BundledAyah[];
+
+  const byPage: Record<number, AyahLite[]> = {};
+  const bySurah: Record<number, AyahLite[]> = {};
+
+  for (const r of raw) {
+    const ayah: AyahLite = {
+      surah: r.s,
+      ayah: r.a,
+      page_indopak: r.p,
+      text_indopak: r.ti,
+      text_arabic: r.ta || undefined,
+      translation_ur: r.tu || undefined,
+      translation_en: r.te || undefined,
+    };
+    (byPage[ayah.page_indopak] ??= []).push(ayah);
+    (bySurah[ayah.surah] ??= []).push(ayah);
+  }
+
+  return {
+    byPage,
+    bySurah,
+    totalAyahs: raw.length,
+  };
+}
+
+function getIndex(): QuranIndex {
+  if (memoIndex) return memoIndex;
+  memoIndex = buildIndex();
+  return memoIndex;
+}
 
 export function getQuranFromCache(): QuranIndex | null {
-  if (inMemoryIndex) return inMemoryIndex;
-  const stored = cache.getJSON<QuranIndex>(CACHE_KEYS.QURAN_FULL);
-  if (
-    stored &&
-    stored.version === QURAN_CACHE_VERSION &&
-    stored.totalAyahs === EXPECTED_AYAH_COUNT
-  ) {
-    inMemoryIndex = stored;
-    return stored;
-  }
-  return null;
+  // Always available — kept returning a (now never-null) value so callers
+  // that branched on null still type-check.
+  return getIndex();
 }
 
 export function getAyahsForPage(pageNumber: number): AyahLite[] {
-  return getQuranFromCache()?.byPage[pageNumber] ?? [];
+  return getIndex().byPage[pageNumber] ?? [];
 }
 
 export function getAyahsForSurah(surahNumber: number): AyahLite[] {
-  return getQuranFromCache()?.bySurah[surahNumber] ?? [];
+  return getIndex().bySurah[surahNumber] ?? [];
 }
 
 export function isQuranCached(): boolean {
-  const idx = getQuranFromCache();
-  return !!idx && idx.totalAyahs === EXPECTED_AYAH_COUNT;
+  // True from process start — the data ships with the app.
+  return true;
 }
 
 export function clearQuranCache(): void {
-  cache.delete(CACHE_KEYS.QURAN_FULL);
-  inMemoryIndex = null;
+  // No-op: there is nothing to clear. The bundled JSON is part of the APK,
+  // not user storage. Kept exported so existing call sites compile.
+  memoIndex = null;
 }
 
-interface SupabaseAyahRow {
-  surah_number: number;
-  ayah_number: number;
-  text_indopak: string | null;
-  arabic_text: string | null;
-  urdu_translation: string | null;
-  english_translation: string | null;
-  page_indopak: number | null;
+// ── Stats / debugging helpers ────────────────────────────────────────────────
+
+/** Number of distinct pages with at least one ayah. Should be 604. */
+export function pageCount(): number {
+  return Object.keys(getIndex().byPage).length;
 }
 
-const COLUMNS =
-  'surah_number, ayah_number, text_indopak, arabic_text, urdu_translation, english_translation, page_indopak';
-
-async function fetchBatch(from: number, to: number): Promise<SupabaseAyahRow[]> {
-  let lastError: unknown;
-  for (let attempt = 0; attempt <= FETCH_RETRIES; attempt++) {
-    const { data, error } = await supabase
-      .from('quran_ayahs')
-      .select(COLUMNS)
-      .order('surah_number', { ascending: true })
-      .order('ayah_number', { ascending: true })
-      .range(from, to);
-    if (!error && data) return data as unknown as SupabaseAyahRow[];
-    lastError = error;
-  }
-  const msg =
-    lastError instanceof Error
-      ? lastError.message
-      : typeof lastError === 'object' && lastError !== null && 'message' in lastError
-        ? String((lastError as { message: unknown }).message)
-        : 'Unknown Supabase error';
-  throw new Error(`Failed to fetch Quran batch ${from}-${to}: ${msg}`);
-}
-
-export async function downloadFullQuran(
-  onProgress?: (p: DownloadProgress) => void,
-): Promise<QuranIndex> {
-  const totalBatches = Math.ceil(EXPECTED_AYAH_COUNT / FETCH_BATCH_SIZE);
-  const byPage: Record<number, AyahLite[]> = {};
-  const bySurah: Record<number, AyahLite[]> = {};
-  let fetched = 0;
-
-  for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
-    const from = batchIndex * FETCH_BATCH_SIZE;
-    const to = Math.min(from + FETCH_BATCH_SIZE - 1, EXPECTED_AYAH_COUNT - 1);
-    const rows = await fetchBatch(from, to);
-
-    for (const row of rows) {
-      const ayah: AyahLite = {
-        surah: row.surah_number,
-        ayah: row.ayah_number,
-        text_indopak: row.text_indopak ?? '',
-        text_arabic: row.arabic_text ?? undefined,
-        translation_ur: row.urdu_translation ?? undefined,
-        translation_en: row.english_translation ?? undefined,
-        page_indopak: row.page_indopak ?? 0,
-      };
-      (byPage[ayah.page_indopak] ??= []).push(ayah);
-      (bySurah[ayah.surah] ??= []).push(ayah);
-    }
-
-    fetched += rows.length;
-    onProgress?.({
-      fetched,
-      total: EXPECTED_AYAH_COUNT,
-      batchIndex: batchIndex + 1,
-      totalBatches,
-    });
-  }
-
-  if (fetched !== EXPECTED_AYAH_COUNT) {
-    throw new Error(
-      `Quran download incomplete: expected ${EXPECTED_AYAH_COUNT} ayahs, got ${fetched}.`,
+// Defensive runtime sanity check — surface a console warning if the bundled
+// asset is ever out of sync with SURAH_META at app start. Cheap; runs once.
+let didSanityCheck = false;
+function sanityCheck() {
+  if (didSanityCheck) return;
+  didSanityCheck = true;
+  const idx = getIndex();
+  if (idx.totalAyahs !== EXPECTED_AYAH_COUNT) {
+    console.warn(
+      `[quranCache] bundled Quran has ${idx.totalAyahs} ayahs, expected ${EXPECTED_AYAH_COUNT}`,
     );
   }
-
-  const index: QuranIndex = {
-    version: QURAN_CACHE_VERSION,
-    fetchedAt: Date.now(),
-    byPage,
-    bySurah,
-    totalAyahs: fetched,
-  };
-
-  cache.setJSON(CACHE_KEYS.QURAN_FULL, index);
-  inMemoryIndex = index;
-  return index;
+  for (const m of SURAH_META) {
+    const got = idx.bySurah[m.number]?.length ?? 0;
+    if (got !== m.ayah_count) {
+      console.warn(
+        `[quranCache] surah ${m.number} has ${got} ayahs, expected ${m.ayah_count}`,
+      );
+    }
+  }
 }
 
-// TODO: expose a "Re-download Quran content" action from settings once a
-// settings screen is built. For now, support cases can call clearQuranCache()
-// + downloadFullQuran() manually.
+// Run the sanity check after the module is required, but defer one tick so
+// it doesn't slow the first paint.
+setTimeout(sanityCheck, 0);

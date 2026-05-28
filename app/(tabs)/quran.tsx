@@ -14,8 +14,6 @@ import { useRouter } from 'expo-router';
 import { Colors } from '../../src/constants/colors';
 import { trackScreen } from '../../src/services/analytics';
 import { useStore } from '../../src/store';
-import { useQuranDownload } from '../../src/hooks/useQuranDownload';
-import QuranDownloadBanner from '../../src/components/quran/QuranDownloadBanner';
 import TranslationTab from '../../src/components/quran/TranslationTab';
 import ReciteTab from '../../src/components/quran/ReciteTab';
 import ListenTab from '../../src/components/quran/ListenTab';
@@ -55,7 +53,6 @@ export default function QuranScreen() {
 
   const router = useRouter();
   const { position: resumePosition, dismiss: dismissResume } = useResumeBanner();
-  const { cached, progress, error, isOnline, retry } = useQuranDownload();
 
   const handleResume = () => {
     if (!resumePosition) return;
@@ -101,15 +98,6 @@ export default function QuranScreen() {
         <Text style={styles.headerTitle}>The Holy Quran</Text>
         <Text style={styles.headerSub}>القرآن الكريم</Text>
       </View>
-
-      {!cached && (
-        <QuranDownloadBanner
-          progress={progress}
-          error={error}
-          isOnline={isOnline}
-          onRetry={retry}
-        />
-      )}
 
       {resumePosition && (
         <ResumeBanner

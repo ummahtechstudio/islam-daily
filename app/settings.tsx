@@ -449,55 +449,13 @@ export default function SettingsScreen() {
         </SectionCard>
 
         {/* ── APPEARANCE ─────────────────────────────────────────────────── */}
+        {/* v1 ships dark-only; the Theme radio group (Dark/Light/Auto) and
+            the redundant "Dark Mode" toggle row were removed from the UI for
+            launch. Theme persistence + Colors tokens + the store's
+            colorScheme state are intentionally kept so v1.1 can wire real
+            Light + Auto support without rebuilding the foundation. */}
         <SectionLabel>Appearance</SectionLabel>
         <SectionCard>
-          {/* Theme radios */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#8B5CF620' }]}>
-                <Ionicons name="color-palette" size={18} color="#8B5CF6" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Theme</Text>
-            </View>
-            <View style={styles.radioColumn}>
-              {THEME_OPTIONS.map((opt) => (
-                <TouchableOpacity
-                  key={opt.value}
-                  style={styles.radioRow}
-                  onPress={() => onSelectTheme(opt.value)}
-                  activeOpacity={0.7}
-                >
-                  <View style={[styles.radioOuter, { borderColor: theme === opt.value ? Colors.primary : themeColors.border }]}>
-                    {theme === opt.value && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
-                  </View>
-                  <Text style={[styles.radioLabel, { color: themeColors.text }]}>{opt.label}</Text>
-                  {opt.comingSoon && <ComingSoonBadge />}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <Divider />
-
-          {/* Existing Dark Mode functional switch (kept — drives the actual app theme) */}
-          <View style={styles.row}>
-            <View style={[styles.iconBox, { backgroundColor: '#8B5CF620' }]}>
-              <Ionicons name="moon" size={18} color="#8B5CF6" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Dark Mode</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Currently the only available theme</Text>
-            </View>
-            <Switch
-              value={settings.colorScheme === 'dark'}
-              onValueChange={(v) => updateSettings({ colorScheme: v ? 'dark' : 'light' })}
-              trackColor={{ false: themeColors.border, true: Colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-
-          <Divider />
-
           {/* Arabic Font Size slider */}
           <View style={[styles.row, styles.rowColumn]}>
             <View style={styles.rowHeader}>

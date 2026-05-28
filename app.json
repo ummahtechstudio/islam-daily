@@ -28,7 +28,8 @@
         "NSLocationWhenInUseUsageDescription": "Islam Daily uses your location to calculate accurate prayer times and Qibla direction.",
         "NSLocationAlwaysUsageDescription": "Islam Daily uses your location to send prayer time notifications.",
         "NSCameraUsageDescription": "Islam Daily uses your camera for the AR Qibla finder, QR codes, and profile images.",
-        "NSUserNotificationsUsageDescription": "Islam Daily sends prayer time reminders and Islamic daily notifications."
+        "NSUserNotificationsUsageDescription": "Islam Daily sends prayer time reminders and Islamic daily notifications.",
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {

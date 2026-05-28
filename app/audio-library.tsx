@@ -25,6 +25,8 @@ import {
 } from '../src/constants/audioLibraryData';
 import { prefs } from '../src/lib/storage';
 import { safeJsonParse } from '../src/utils/safeJsonParse';
+import { FEATURES } from '../src/constants/featureFlags';
+import { Redirect } from 'expo-router';
 
 // MMKV keys for the Favorites and Recently Played lists. Without these the
 // state lived only in component memory and was wiped on every screen exit.
@@ -58,7 +60,7 @@ const fmtDuration = (m: number) => {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-export default function AudioLibraryScreen() {
+function AudioLibraryScreenInner() {
   useEffect(() => { trackScreen('AudioLibrary'); }, []);
 
   const colorScheme = useColorScheme();
@@ -485,6 +487,15 @@ export default function AudioLibraryScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+// Hidden in v1 — 41 of 50 items are placeholders. Screen stays in the bundle
+// (re-enabled in v1.1) but a pasted URL or stale deep link redirects Home.
+export default function AudioLibraryScreen() {
+  if (!FEATURES.audioLibrary) {
+    return <Redirect href={'/' as any} />;
+  }
+  return <AudioLibraryScreenInner />;
 }
 
 // ─── AudioRow ─────────────────────────────────────────────────────────────────

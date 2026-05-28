@@ -1,3 +1,5 @@
+import { isRouteHidden } from './featureFlags';
+
 export type HomeTile = {
   id: string;
   label: string;
@@ -7,7 +9,9 @@ export type HomeTile = {
   defaultEnabled: boolean;
 };
 
-export const HOME_TILES: HomeTile[] = [
+// Master list — hidden v1 entries are kept here so they're a one-line flip
+// away in v1.1. The exported HOME_TILES below excludes flagged-off routes.
+const ALL_HOME_TILES: HomeTile[] = [
   // Quick Access (2×2 grid)
   { id: 'quran',          label: 'Quran',           emoji: '📖', route: '/quran',          required: true,  defaultEnabled: true },
   { id: 'prayer-times',   label: 'Prayer Times',    emoji: '🕌', route: '/prayer',         required: true,  defaultEnabled: true },
@@ -33,6 +37,10 @@ export const HOME_TILES: HomeTile[] = [
   { id: 'prayer-streak',  label: 'Prayer Streak',     emoji: '🔥', route: '/prayer-streak',  required: false, defaultEnabled: true },
   { id: 'feedback',       label: 'Feedback',          emoji: '💬', route: '/feedback',       required: false, defaultEnabled: false },
 ];
+
+export const HOME_TILES: HomeTile[] = ALL_HOME_TILES.filter(
+  (t) => !isRouteHidden(t.route),
+);
 
 export const HOME_TILES_STORAGE_KEY = 'home_tiles_enabled';
 

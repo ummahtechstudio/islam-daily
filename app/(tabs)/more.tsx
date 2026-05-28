@@ -17,18 +17,17 @@ import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getBookmarks } from '../../src/utils/bookmarks';
+import { isRouteHidden } from '../../src/constants/featureFlags';
 
 const { width: W } = Dimensions.get('window');
 const CARD_W = (W - 48) / 2;
 const GOLD = '#EF9F27';
 
-const COMING_SOON_ROUTES: Record<string, { title: string; message: string }> = {
-  '/audio-library': {
-    title: 'Audio Library — Coming Soon',
-    message:
-      "We're curating a beautiful collection of Quran recitations and Islamic lectures.\n\nAvailable in v1.1, InshaAllah!",
-  },
-};
+// Coming-soon overlay no longer needed in v1 — the audio library entry is
+// filtered out entirely by isRouteHidden(). Kept as an empty record so the
+// rendering code below stays unchanged; future "Coming Soon" features can
+// be added here in v1.1+.
+const COMING_SOON_ROUTES: Record<string, { title: string; message: string }> = {};
 
 // ─── Islamic Quotes (rotating by day) ────────────────────────────────────────
 
@@ -212,7 +211,13 @@ export default function MoreScreen() {
         </View>
 
         {/* ── Sections ── */}
-        {SECTIONS.map((section) => (
+        {SECTIONS.map((section) => {
+          // Hide v1-flagged routes (Islamic Books, Audio Library). If a
+          // section ends up empty after filtering, skip its header too so
+          // there's no awkward "Islamic Knowledge" with nothing under it.
+          const visibleItems = section.items.filter((i) => !isRouteHidden(i.route));
+          if (visibleItems.length === 0) return null;
+          return (
           <View key={section.title} style={styles.section}>
             {/* Section header with colored background */}
             <View style={[styles.sectionHeader, { backgroundColor: section.color + '14' }]}>
@@ -226,7 +231,7 @@ export default function MoreScreen() {
 
             {/* 2-column grid */}
             <View style={styles.grid}>
-              {section.items.map((item) => {
+              {visibleItems.map((item) => {
                 const comingSoon = COMING_SOON_ROUTES[item.route];
                 return (
                   <TouchableOpacity
@@ -267,7 +272,8 @@ export default function MoreScreen() {
               })}
             </View>
           </View>
-        ))}
+          );
+        })}
 
         {/* ── Hifz Tracker — full-width featured card ── */}
         <View style={{ paddingHorizontal: 16, marginTop: 8 }}>

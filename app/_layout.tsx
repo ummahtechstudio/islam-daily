@@ -5,6 +5,8 @@ import { useColorScheme, Platform, AppState, type AppStateStatus } from 'react-n
 import { AudioPlayerProvider } from '../src/context/AudioPlayerContext';
 import { MiniPlayer } from '../src/components/MiniPlayer';
 import { FullPlayerModal } from '../src/components/FullPlayerModal';
+import { QuranAudioProvider } from '../src/context/QuranAudioContext';
+import QuranAudioMiniPlayer from '../src/components/quran/QuranAudioMiniPlayer';
 import {
   useFonts,
   Amiri_400Regular,
@@ -34,10 +36,6 @@ import {
 // Daily Knowledge is deferred to v1.1+; the background warm-up is suspended.
 // Re-enable this import (and the call below) when the curated content lands.
 // import { fetchTodaysDailyKnowledge } from '../src/services/dailyKnowledgeService';
-import {
-  downloadFullQuran,
-  getQuranFromCache,
-} from '../src/services/quranCache';
 import {
   downloadHadithBook,
   isHadithBookCached,
@@ -161,13 +159,8 @@ export default function RootLayout() {
     refreshDhikr();
     // fetchTodaysDailyKnowledge() — suspended; see DailyKnowledgeCard for rationale.
 
-    // Re-pull the full Quran in the background if the cache is older than
-    // 30 days, in case Tanzil corrects a typo. Silent — bound only by network.
-    const idx = getQuranFromCache();
-    const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
-    if (idx && Date.now() - idx.fetchedAt > THIRTY_DAYS) {
-      downloadFullQuran().catch(() => {});
-    }
+    // (The Quran is bundled inside the APK at assets/data/quran.json — no
+    // download needed. The data never changes, so there's nothing to refresh.)
 
     // Quietly pre-warm Bukhari so the first tap is instant. The other 5 books
     // remain lazy on first open — see services/hadithCache.ts.
@@ -197,6 +190,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
     <AudioPlayerProvider>
+    <QuranAudioProvider>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack
         screenOptions={{
@@ -235,6 +229,10 @@ export default function RootLayout() {
       </Stack>
       <MiniPlayer isDark={isDark} />
       <FullPlayerModal isDark={isDark} />
+      {/* Quran-recitation player bar — floats above the tab bar whenever an
+          ayah is loaded. Independent from the Adhkar AudioPlayer (which is
+          hidden in v1 via featureFlags). */}
+      <QuranAudioMiniPlayer />
       <StatusBar style="light" backgroundColor={Colors.primary} />
       {showConsent && (
         <PrivacyConsentModal
@@ -246,6 +244,7 @@ export default function RootLayout() {
           so two modals don't stack on the same layer on first launch. */}
       {consentResolved && <WelcomeModal />}
     </GestureHandlerRootView>
+    </QuranAudioProvider>
     </AudioPlayerProvider>
     </SafeAreaProvider>
   );
