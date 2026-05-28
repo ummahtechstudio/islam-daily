@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme, Platform } from 'react-native';
+import { useColorScheme, Platform, AppState, type AppStateStatus } from 'react-native';
 import { AudioPlayerProvider } from '../src/context/AudioPlayerContext';
 import { MiniPlayer } from '../src/components/MiniPlayer';
 import { FullPlayerModal } from '../src/components/FullPlayerModal';
@@ -43,7 +43,10 @@ import {
   isHadithBookCached,
 } from '../src/services/hadithCache';
 import { migrateInvalidPersistedSettings } from '../src/services/prayerTimesService';
-import { refreshNotificationsIfStale } from '../src/services/notificationsService';
+import {
+  refreshNotificationsIfStale,
+  refreshNotificationsOnForeground,
+} from '../src/services/notificationsService';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -103,6 +106,23 @@ export default function RootLayout() {
       NavigationBar.setPositionAsync('relative').catch(() => {});
       NavigationBar.setVisibilityAsync('visible').catch(() => {});
     }
+  }, []);
+
+  // Re-arm notifications whenever the app comes back to the foreground.
+  // Catches: device left in background past the 7-day window, timezone
+  // crossed during a flight, DST shift overnight, permission toggled in
+  // OS settings while the app was paused. The service itself short-circuits
+  // when nothing has changed, so the cost on a normal foreground is ~one
+  // pref read.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (state === 'active') {
+        refreshNotificationsOnForeground().catch((err) =>
+          console.warn('[Layout] foreground notif refresh failed', err),
+        );
+      }
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {

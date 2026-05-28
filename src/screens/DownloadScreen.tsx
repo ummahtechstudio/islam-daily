@@ -227,23 +227,31 @@ export default function DownloadScreen() {
     : 0;
 
   // ─── WiFi check ─────────────────────────────────────────────────────────
-
-  const checkWifiWarning = (): boolean => {
+  //
+  // Async because the wifi-only confirmation must actually wait for the
+  // user's tap before allowing the download to proceed. Previously this
+  // function returned `true` synchronously the moment the Alert was queued,
+  // so "Wi-Fi Only" was effectively a no-op gate.
+  const checkWifiWarning = (): Promise<boolean> => {
     if (!isOnline) {
       Alert.alert('No Connection', 'You appear to be offline. Downloads are unavailable.');
-      return false;
+      return Promise.resolve(false);
     }
-    if (wifiOnly) {
-      // Can't detect network type without expo-network — show confirmation
+    if (!wifiOnly) return Promise.resolve(true);
+
+    // Can't detect network type without expo-network — show a confirmation
+    // dialog and resolve based on the user's choice.
+    return new Promise<boolean>((resolve) => {
       Alert.alert(
         'Mobile Data Warning',
         'Wi-Fi Only is enabled. We cannot verify your connection type. Are you sure you want to continue?',
-        [{ text: 'Cancel', style: 'cancel' }, { text: 'Continue', style: 'default', onPress: () => {} }]
+        [
+          { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+          { text: 'Continue', style: 'default', onPress: () => resolve(true) },
+        ],
+        { onDismiss: () => resolve(false) },
       );
-      // Return true to proceed (user acknowledged)
-      return true;
-    }
-    return true;
+    });
   };
 
   // ─── Single pack download ─────────────────────────────────────────────────
@@ -258,7 +266,7 @@ export default function DownloadScreen() {
         return;
       }
       if (active.has(pack.id)) return;
-      if (!checkWifiWarning()) return;
+      if (!(await checkWifiWarning())) return;
 
       setActive((prev) => new Set(prev).add(pack.id));
       setProgress((prev) => ({ ...prev, [pack.id]: 0 }));
@@ -295,7 +303,7 @@ export default function DownloadScreen() {
 
   const startDownloadAll = useCallback(async () => {
     if (downloadingAll) return;
-    if (!checkWifiWarning()) return;
+    if (!(await checkWifiWarning())) return;
     setDownloadingAll(true);
 
     try {

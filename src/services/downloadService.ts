@@ -2,6 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { fetchSurahList } from './api';
 import { fetchWithTimeout } from '../utils/network';
+import {
+  downloadHadithBook,
+  isHadithBookCached,
+  clearHadithCache,
+} from './hadithCache';
+import type { HadithCollectionKey } from './hadiths';
 
 // Per-request timeout for third-party calls inside the long download loops.
 // 20 s leaves room for slow mobile networks without letting a single hung
@@ -84,6 +90,10 @@ export async function clearPack(pack: PackId): Promise<void> {
       break;
     }
     case 'hadiths':
+      // Clear the canonical MMKV cache (what the reader actually uses)…
+      clearHadithCache();
+      // …and sweep up any leftover legacy AsyncStorage entries from older
+      // app versions so storage usage is accurate.
       await AsyncStorage.multiRemove(['offline_hadiths_local', 'offline_hadiths_index', 'supabase_hadiths']);
       break;
     case 'names99':
@@ -277,55 +287,49 @@ async function downloadQuranFromApi(
   await markDownloaded('quranText', totalBytes);
 }
 
-// ─── Hadiths (Supabase primary, local JSON fallback) ──────────────────────────
+// ─── Hadiths ──────────────────────────────────────────────────────────────────
+//
+// The user-facing hadith reader reads from MMKV via `hadithCache.ts` (R2 as
+// source). The Downloads screen now drives that same path — fetching all six
+// collections in sequence — so "downloaded" status here matches what the
+// reader actually serves offline.
+//
+// (The previous implementation wrote a totally separate AsyncStorage index
+// from a different schema, so the pack could report "downloaded" while the
+// reader saw nothing cached.)
+
+const ALL_HADITH_BOOKS: HadithCollectionKey[] = [
+  'bukhari',
+  'muslim',
+  'tirmidhi',
+  'abudawud',
+  'ibnmajah',
+  'nasai',
+];
 
 export async function downloadHadiths(
   onProgress: (pct: number) => void
 ): Promise<void> {
-  onProgress(5);
+  onProgress(2);
 
-  try {
-    const { data, error } = await supabase
-      .from('hadiths')
-      .select('*')
-      .order('id');
-
-    if (!error && data && data.length > 0) {
-      onProgress(70);
-      const str = JSON.stringify(data);
-      await AsyncStorage.setItem('supabase_hadiths', str);
-
-      // Also build the collection index
-      const index: Record<string, any[]> = {};
-      for (const h of data) {
-        if (!index[h.collection]) index[h.collection] = [];
-        index[h.collection].push(h);
+  let totalBytes = 0;
+  for (let i = 0; i < ALL_HADITH_BOOKS.length; i++) {
+    const slug = ALL_HADITH_BOOKS[i];
+    if (!isHadithBookCached(slug)) {
+      try {
+        const entry = await downloadHadithBook(slug);
+        // Rough size proxy — hadithCache doesn't expose stored byte size, but
+        // ~1 KB per hadith is the right order of magnitude for status display.
+        totalBytes += entry.totalCount * 1024;
+      } catch (err) {
+        console.warn(`[downloadHadiths] book ${slug} failed`, err);
+        throw err;
       }
-      await AsyncStorage.setItem('offline_hadiths_index', JSON.stringify(index));
-
-      onProgress(100);
-      await markDownloaded('hadiths', str.length);
-      return;
     }
-  } catch {}
-
-  // Fallback: bundle local 30-hadith JSON
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const local = require('../../assets/hadiths.json') as any[];
-  onProgress(40);
-
-  const str = JSON.stringify(local);
-  await AsyncStorage.setItem('offline_hadiths_local', str);
-  onProgress(70);
-
-  const index: Record<string, any[]> = {};
-  for (const h of local) {
-    if (!index[h.collection]) index[h.collection] = [];
-    index[h.collection].push(h);
+    onProgress(Math.round(((i + 1) / ALL_HADITH_BOOKS.length) * 100));
   }
-  await AsyncStorage.setItem('offline_hadiths_index', JSON.stringify(index));
-  onProgress(100);
-  await markDownloaded('hadiths', str.length + JSON.stringify(index).length);
+
+  await markDownloaded('hadiths', Math.max(totalBytes, 5_000_000));
 }
 
 // ─── Duas (Supabase primary, local hisnul_muslim fallback) ───────────────────

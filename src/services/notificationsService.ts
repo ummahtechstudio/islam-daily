@@ -248,6 +248,12 @@ export async function cancelAllPrayerNotifications(): Promise<void> {
   prefs.delete(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT);
 }
 
+// Minimum night length for a Tahajjud reminder to make sense. Arctic
+// summer can squeeze the gap between Maghrib and Fajr down to ~30 min —
+// firing "last third of the night" inside that window is spammy and
+// useless. 4 hours is a conservative floor; below this, skip the day.
+const MIN_TAHAJJUD_NIGHT_MS = 4 * 60 * 60 * 1000;
+
 /**
  * Tahajjud time = the start of the last third of the night.
  *
@@ -255,7 +261,8 @@ export async function cancelAllPrayerNotifications(): Promise<void> {
  *   tahajjud  = next-day Fajr  −  (night / 3)
  *
  * Maghrib and Fajr come from the existing prayer-times service — no hardcoded
- * times. Returns null if either prayer can't be resolved (defensive only).
+ * times. Returns null if either prayer can't be resolved (defensive only),
+ * or if the night is too short to be meaningful (high-latitude summer).
  */
 function computeTahajjudStart(
   prayerSettings: PrayerTimesSettings,
@@ -272,6 +279,7 @@ function computeTahajjudStart(
 
   const nightMs = fajrNext.getTime() - maghrib.getTime();
   if (!Number.isFinite(nightMs) || nightMs <= 0) return null;
+  if (nightMs < MIN_TAHAJJUD_NIGHT_MS) return null;
 
   return new Date(fajrNext.getTime() - nightMs / 3);
 }
@@ -365,41 +373,79 @@ async function scheduleTahajjudNotifications(
   }
 }
 
+// Serializes concurrent scheduler invocations. Without this, rapid toggles
+// in settings can cancel notifications that a previous in-flight call is
+// still creating, leading to a flaky "where did my notifications go" UX.
+let inFlightSchedule: Promise<void> | null = null;
+
 export async function scheduleNotificationsForNext7Days(): Promise<void> {
   if (Platform.OS === 'web') return;
 
-  const perm = await getNotificationPermission();
-  if (perm !== 'granted') {
-    // Without permission, scheduling silently no-ops. UI is responsible
-    // for surfacing the permission state to the user.
-    return;
+  // If another schedule is mid-flight, wait for it to finish and then run
+  // ours. Callers always get the freshest view of settings/prayer times.
+  if (inFlightSchedule) {
+    await inFlightSchedule.catch(() => {});
   }
 
-  await ensureAndroidChannels();
+  inFlightSchedule = (async () => {
+    const perm = await getNotificationPermission();
+    if (perm !== 'granted') {
+      // Without permission, scheduling silently no-ops. UI is responsible
+      // for surfacing the permission state to the user.
+      return;
+    }
 
-  const settings = await getNotificationSettings();
-  const prayerSettings = getPersistedSettings() ?? KARACHI_DEFAULT;
+    await ensureAndroidChannels();
 
-  // The two reminder streams are independent — the master prayer toggle does
-  // not gate Tahajjud, and turning Tahajjud off does not touch the 5 daily
-  // prayers. Both refresh on the same 7-day window via the shared timestamp.
-  await schedulePrayerNotifications(settings, prayerSettings);
-  await scheduleTahajjudNotifications(settings, prayerSettings);
+    const settings = await getNotificationSettings();
+    const prayerSettings = getPersistedSettings() ?? KARACHI_DEFAULT;
 
-  prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
+    // The two reminder streams are independent — the master prayer toggle
+    // does not gate Tahajjud, and turning Tahajjud off does not touch the 5
+    // daily prayers. Both refresh on the same 7-day window via the shared
+    // timestamp.
+    await schedulePrayerNotifications(settings, prayerSettings);
+    await scheduleTahajjudNotifications(settings, prayerSettings);
+
+    prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
+    prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_TIMEZONE_OFFSET, String(new Date().getTimezoneOffset()));
+  })();
+
+  try {
+    await inFlightSchedule;
+  } finally {
+    inFlightSchedule = null;
+  }
 }
 
 /**
- * Called from app startup. No-op if last refresh is < 24h ago.
+ * Called from app startup. No-op if last refresh is < 24h ago AND the device
+ * timezone hasn't changed since the last schedule (timezone change usually
+ * means a flight or DST shift, which invalidates the pre-scheduled absolute
+ * Date objects in the OS queue).
  */
 export async function refreshNotificationsIfStale(): Promise<void> {
   if (Platform.OS === 'web') return;
   const last = prefs.get(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT);
+  const lastTzRaw = prefs.get(PREFS_KEYS.NOTIFICATIONS_LAST_TIMEZONE_OFFSET);
   const lastMs = last ? Number(last) : 0;
-  if (Number.isFinite(lastMs) && Date.now() - lastMs < REFRESH_INTERVAL_MS) {
-    return;
-  }
+  const lastTz = lastTzRaw != null ? Number(lastTzRaw) : NaN;
+  const currentTz = new Date().getTimezoneOffset();
+
+  const freshEnough = Number.isFinite(lastMs) && Date.now() - lastMs < REFRESH_INTERVAL_MS;
+  const sameTimezone = Number.isFinite(lastTz) && lastTz === currentTz;
+
+  if (freshEnough && sameTimezone) return;
   await scheduleNotificationsForNext7Days();
+}
+
+/**
+ * Re-run the scheduler if conditions warrant it — used by an AppState→active
+ * listener so notifications stay correct even when the app is left in
+ * background across timezone changes, DST shifts, or just for >24h.
+ */
+export async function refreshNotificationsOnForeground(): Promise<void> {
+  await refreshNotificationsIfStale();
 }
 
 // ─── Test ─────────────────────────────────────────────────────────────────────

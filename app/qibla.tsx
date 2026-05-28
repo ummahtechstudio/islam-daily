@@ -8,6 +8,7 @@ import {
   Platform,
   TouchableOpacity,
   Dimensions,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Magnetometer } from 'expo-sensors';
@@ -71,10 +72,19 @@ export default function QiblaScreen() {
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const cameraGranted = cameraPermission?.granted === true;
+  const cameraDeniedPermanently =
+    cameraPermission?.status === 'denied' && cameraPermission?.canAskAgain === false;
 
-  useEffect(() => {
-    requestCameraPermission();
-  }, []);
+  // Don't fire the OS prompt the instant the screen opens — let the visible
+  // "Enable camera for AR view" button trigger it so the user has context.
+  // (The compass still works fully without camera; AR is opt-in.)
+  const handleEnableCamera = useCallback(async () => {
+    if (cameraDeniedPermanently) {
+      await Linking.openSettings().catch(() => {});
+      return;
+    }
+    await requestCameraPermission();
+  }, [cameraDeniedPermanently, requestCameraPermission]);
 
   const requestOrientationPermission = useCallback(async () => {
     if (Platform.OS !== 'web') return;
@@ -317,6 +327,17 @@ export default function QiblaScreen() {
               ? 'Rotate your phone until the line and Kaaba point straight up.'
               : 'Enable camera for AR Qibla view.'}
           </Text>
+          {!cameraGranted && (
+            <TouchableOpacity
+              onPress={handleEnableCamera}
+              style={styles.cameraCta}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.cameraCtaText}>
+                {cameraDeniedPermanently ? 'Open Settings' : 'Enable Camera'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Aligned banner */}
@@ -439,6 +460,16 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   sub: { fontSize: 13, color: 'rgba(255,255,255,0.85)', textAlign: 'center', marginTop: 4 },
+  cameraCta: {
+    marginTop: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+  },
+  cameraCtaText: { color: '#fff', fontSize: 13, fontWeight: '600' },
 
   // AR center line
   arCenter: {

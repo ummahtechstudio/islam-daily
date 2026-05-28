@@ -23,6 +23,14 @@ import {
   AudioItem,
   AudioLanguage,
 } from '../src/constants/audioLibraryData';
+import { prefs } from '../src/lib/storage';
+import { safeJsonParse } from '../src/utils/safeJsonParse';
+
+// MMKV keys for the Favorites and Recently Played lists. Without these the
+// state lived only in component memory and was wiped on every screen exit.
+const FAVS_KEY = 'audio_library_favorites_v1';
+const RECENTS_KEY = 'audio_library_recents_v1';
+const RECENTS_MAX = 10;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -65,8 +73,26 @@ export default function AudioLibraryScreen() {
   const [langFilter, setLangFilter] = useState<LangFilter>('all');
   const [query, setQuery] = useState('');
   const [activeCat, setActiveCat] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [recentIds, setRecentIds] = useState<string[]>([]);
+  // Hydrate from MMKV on mount. Defensive parse: a corrupt stored list won't
+  // crash the screen — we just start from an empty list and re-build.
+  const [favorites, setFavorites] = useState<Set<string>>(() => {
+    const arr = safeJsonParse<string[]>(prefs.get(FAVS_KEY), []);
+    return new Set(Array.isArray(arr) ? arr : []);
+  });
+  const [recentIds, setRecentIds] = useState<string[]>(() => {
+    const arr = safeJsonParse<string[]>(prefs.get(RECENTS_KEY), []);
+    return Array.isArray(arr) ? arr.slice(0, RECENTS_MAX) : [];
+  });
+
+  // Persist favorites whenever they change.
+  useEffect(() => {
+    prefs.setJSON(FAVS_KEY, Array.from(favorites));
+  }, [favorites]);
+
+  // Persist recents whenever they change.
+  useEffect(() => {
+    prefs.setJSON(RECENTS_KEY, recentIds);
+  }, [recentIds]);
 
   const filtered = useMemo(() => {
     let list = AUDIO_LIBRARY.filter(i => i.enabled !== false);

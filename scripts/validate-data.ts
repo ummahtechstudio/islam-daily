@@ -466,7 +466,7 @@ function validateReference(file: string, location: string, ref: string) {
 // ─── CATEGORY A + G: hisnul_muslim.json ──────────────────────────────────────
 
 function validateHisnulMuslim() {
-  const FILE = 'assets/hisnul_muslim.json';
+  const FILE = 'assets/data/duas-core.json';
   let data: unknown;
   try {
     data = readJson(FILE);
@@ -574,7 +574,7 @@ function validateHisnulMuslim() {
 // ─── CATEGORY A + H: dhikr.json ──────────────────────────────────────────────
 
 function validateDhikr() {
-  const FILE = 'assets/dhikr.json';
+  const FILE = 'assets/data/dhikr-core.json';
   let data: unknown;
   try {
     data = readJson(FILE);
@@ -654,7 +654,7 @@ function validateDhikr() {
 // ─── CATEGORY A + F: names_of_allah.json ─────────────────────────────────────
 
 function validateNamesOfAllah() {
-  const FILE = 'assets/names_of_allah.json';
+  const FILE = 'assets/data/names99.json';
   let data: unknown;
   try {
     data = readJson(FILE);

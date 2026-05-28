@@ -139,6 +139,7 @@ export default function HalalFinderScreen() {
   const [places, setPlaces] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLon, setUserLon] = useState<number | null>(null);
   const [radius, setRadius] = useState<Radius>(DEFAULT_RADIUS_KM);
@@ -179,10 +180,12 @@ export default function HalalFinderScreen() {
     async (km: Radius) => {
       setLoading(true);
       setError(null);
+      setPermissionDenied(false);
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           setError('Location permission denied. Please enable location access in Settings.');
+          setPermissionDenied(true);
           setLoading(false);
           return;
         }
@@ -297,12 +300,21 @@ export default function HalalFinderScreen() {
         <View style={styles.centerBox}>
           <Ionicons name="warning-outline" size={40} color={Colors.warning} />
           <Text style={[styles.errorText, { color: theme.text }]}>{error}</Text>
-          <TouchableOpacity
-            style={[styles.actionBtn, { backgroundColor: ACCENT }]}
-            onPress={handleRefresh}
-          >
-            <Text style={styles.actionBtnText}>Try Again</Text>
-          </TouchableOpacity>
+          {permissionDenied ? (
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: ACCENT }]}
+              onPress={() => Linking.openSettings().catch(() => {})}
+            >
+              <Text style={styles.actionBtnText}>Open Settings</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: ACCENT }]}
+              onPress={handleRefresh}
+            >
+              <Text style={styles.actionBtnText}>Try Again</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : places.length === 0 ? (
         <View style={styles.centerBox}>

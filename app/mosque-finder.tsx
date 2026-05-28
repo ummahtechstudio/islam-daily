@@ -129,6 +129,7 @@ export default function MosqueFinder() {
   const [mosques, setMosques] = useState<Mosque[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
   const [radiusKm, setRadiusKm] = useState<number>(DEFAULT_RADIUS_KM);
@@ -169,10 +170,12 @@ export default function MosqueFinder() {
     async (km: number) => {
       setLoading(true);
       setError(null);
+      setPermissionDenied(false);
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           setError('Location permission denied. Please enable location access.');
+          setPermissionDenied(true);
           setLoading(false);
           return;
         }
@@ -286,12 +289,21 @@ export default function MosqueFinder() {
         <View style={styles.centerBox}>
           <Ionicons name="warning-outline" size={40} color={Colors.warning} />
           <Text style={[styles.errorText, { color: theme.text }]}>{error}</Text>
-          <TouchableOpacity
-            style={[styles.retryBtn, { backgroundColor: Colors.primary }]}
-            onPress={handleRefresh}
-          >
-            <Text style={styles.retryText}>Try Again</Text>
-          </TouchableOpacity>
+          {permissionDenied ? (
+            <TouchableOpacity
+              style={[styles.retryBtn, { backgroundColor: Colors.primary }]}
+              onPress={() => Linking.openSettings().catch(() => {})}
+            >
+              <Text style={styles.retryText}>Open Settings</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.retryBtn, { backgroundColor: Colors.primary }]}
+              onPress={handleRefresh}
+            >
+              <Text style={styles.retryText}>Try Again</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : mosques.length === 0 ? (
         <View style={styles.centerBox}>

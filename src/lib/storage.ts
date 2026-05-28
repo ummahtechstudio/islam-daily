@@ -120,4 +120,7 @@ export const PREFS_KEYS = {
   QURAN_LAST_POSITION_DISMISSED_UNTIL: 'quran_last_position_dismissed_until',
   PRAYER_NOTIFICATION_SETTINGS: 'prayer_notification_settings',
   NOTIFICATIONS_LAST_SCHEDULED_AT: 'notifications_last_scheduled_at',
+  // Persists `Date.getTimezoneOffset()` from the last schedule so we can
+  // detect timezone / DST changes on next startup and re-schedule.
+  NOTIFICATIONS_LAST_TIMEZONE_OFFSET: 'notifications_last_timezone_offset',
 } as const;

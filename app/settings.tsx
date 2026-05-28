@@ -126,30 +126,59 @@ export default function SettingsScreen() {
   const [cacheSizeKB, setCacheSizeKB] = useState<number | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem('@privacy_consent').then((v) => {
-      setAnalyticsEnabled(v === 'granted');
-    });
-    AsyncStorage.getItem(CONTENT_LANGUAGE_KEY).then((v) => {
-      setContentLang((v as ContentLanguage | 'auto') ?? 'auto');
-    });
+    AsyncStorage.getItem('@privacy_consent')
+      .then((v) => setAnalyticsEnabled(v === 'granted'))
+      .catch(() => setAnalyticsEnabled(false));
+    AsyncStorage.getItem(CONTENT_LANGUAGE_KEY)
+      .then((v) => setContentLang((v as ContentLanguage | 'auto') ?? 'auto'))
+      .catch(() => setContentLang('auto'));
 
-    // Load all settings_* prefs
+    // Load all settings_* prefs. If any individual read fails we fall through
+    // to the per-setting default rather than letting one bad MMKV value stop
+    // the whole screen from populating.
     (async () => {
-      setTheme(await getSetting<ThemeOption>('theme', 'dark'));
-      setArabicFontSize(await getSetting<FontSize>('arabic_font_size', 'medium'));
-      setEnglishFontSize(await getSetting<FontSize>('english_font_size', 'medium'));
-      setCalcMethod(await getSetting<string>('calc_method', 'MuslimWorldLeague'));
-      setMadhab(await getSetting<Madhab>('madhab', 'standard'));
-      setHijriOffset(await getSetting<number>('hijri_offset', 0));
-      setQuranTranslation(await getSetting<string>('quran_translation', 'sahih_international'));
-      setShowTransliteration(await getSetting<boolean>('show_transliteration', true));
-      setReciter(await getSetting<string>('reciter', 'alafasy'));
-      setAdhanEnabled(await getSetting<boolean>('adhan_enabled', true));
-      setPreAdhan(await getSetting<boolean>('pre_adhan', false));
-      setDailyHadith(await getSetting<boolean>('daily_hadith', true));
-      setDailyHadithTime(await getSetting<string>('daily_hadith_time', '08:00'));
-      setFridayReminder(await getSetting<boolean>('friday_reminder', true));
-      setTranslationLang(await getTranslationLanguage());
+      try {
+        const [
+          themeV, arabicV, englishV, calcV, madhabV, hijriV,
+          translationV, transliterationV, reciterV, adhanV, preAdhanV,
+          dailyHadithV, dailyHadithTimeV, fridayV, translationLangV,
+        ] = await Promise.all([
+          getSetting<ThemeOption>('theme', 'dark'),
+          getSetting<FontSize>('arabic_font_size', 'medium'),
+          getSetting<FontSize>('english_font_size', 'medium'),
+          getSetting<string>('calc_method', 'MuslimWorldLeague'),
+          getSetting<Madhab>('madhab', 'standard'),
+          getSetting<number>('hijri_offset', 0),
+          getSetting<string>('quran_translation', 'sahih_international'),
+          getSetting<boolean>('show_transliteration', true),
+          getSetting<string>('reciter', 'alafasy'),
+          getSetting<boolean>('adhan_enabled', true),
+          getSetting<boolean>('pre_adhan', false),
+          getSetting<boolean>('daily_hadith', true),
+          getSetting<string>('daily_hadith_time', '08:00'),
+          getSetting<boolean>('friday_reminder', true),
+          getTranslationLanguage(),
+        ]);
+        setTheme(themeV);
+        setArabicFontSize(arabicV);
+        setEnglishFontSize(englishV);
+        setCalcMethod(calcV);
+        setMadhab(madhabV);
+        setHijriOffset(hijriV);
+        setQuranTranslation(translationV);
+        setShowTransliteration(transliterationV);
+        setReciter(reciterV);
+        setAdhanEnabled(adhanV);
+        setPreAdhan(preAdhanV);
+        setDailyHadith(dailyHadithV);
+        setDailyHadithTime(dailyHadithTimeV);
+        setFridayReminder(fridayV);
+        setTranslationLang(translationLangV);
+      } catch (err) {
+        // Hard storage failure — the screen keeps its default initial state
+        // and the user can still navigate around. Better than a frozen blank.
+        console.warn('[Settings] failed to load some prefs', err);
+      }
     })();
 
     computeCacheSize();
