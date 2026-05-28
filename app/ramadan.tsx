@@ -15,6 +15,9 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { LoadingSpinner } from '../src/components/LoadingSpinner';
 import { trackScreen } from '../src/services/analytics';
+import { fetchWithTimeout } from '../src/utils/network';
+
+const NET_TIMEOUT_MS = 15000;
 
 interface DayEntry {
   day: number;
@@ -44,6 +47,7 @@ export default function RamadanScreen() {
   const [currentHijriDay, setCurrentHijriDay] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
@@ -54,15 +58,22 @@ export default function RamadanScreen() {
           lat = loc.coords.latitude;
           lon = loc.coords.longitude;
         }
+        if (cancelled) return;
 
         const today = new Date();
         const todayStr = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
 
         // Get today's timing to check Hijri month
-        const todayRes = await fetch(
-          `${ALADHAN}/timings/${todayStr}?latitude=${lat}&longitude=${lon}&method=${settings.calculationMethod}`
+        const todayRes = await fetchWithTimeout(
+          `${ALADHAN}/timings/${todayStr}?latitude=${lat}&longitude=${lon}&method=${settings.calculationMethod}`,
+          {},
+          NET_TIMEOUT_MS,
         );
+        if (!todayRes.ok) throw new Error(`HTTP ${todayRes.status}`);
         const todayJson = await todayRes.json();
+        if (todayJson?.code !== 200) throw new Error('Ramadan API error');
+        if (cancelled) return;
+
         const hijriMonth: number = todayJson.data?.date?.hijri?.month?.number ?? 0;
         const hijriDay: string = todayJson.data?.date?.hijri?.day ?? '';
         setCurrentHijriDay(hijriDay);
@@ -76,10 +87,14 @@ export default function RamadanScreen() {
 
         // Fetch full Hijri month 9 calendar
         const year = todayJson.data?.date?.hijri?.year ?? '1446';
-        const calRes = await fetch(
-          `${ALADHAN}/hijriCalendar/9/${year}?latitude=${lat}&longitude=${lon}&method=${settings.calculationMethod}`
+        const calRes = await fetchWithTimeout(
+          `${ALADHAN}/hijriCalendar/9/${year}?latitude=${lat}&longitude=${lon}&method=${settings.calculationMethod}`,
+          {},
+          NET_TIMEOUT_MS,
         );
+        if (!calRes.ok) throw new Error(`HTTP ${calRes.status}`);
         const calJson = await calRes.json();
+        if (cancelled) return;
         if (calJson.code === 200) {
           const entries: DayEntry[] = (calJson.data ?? []).map((d: any) => ({
             day: parseInt(d.date?.hijri?.day ?? '0', 10),
@@ -91,12 +106,16 @@ export default function RamadanScreen() {
           setTimetable(entries);
         }
       } catch {
-        setError('Failed to load Ramadan data. Please check your connection.');
+        if (!cancelled) setError('Failed to load Ramadan data. Please check your connection.');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     load();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [settings.calculationMethod]);
 
   if (loading) return <LoadingSpinner message="Loading Ramadan timetable..." dark={isDark} />;
 

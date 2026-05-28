@@ -69,15 +69,22 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     playlistIndex: 0,
   });
 
+  // Mirror of state for callbacks that need the freshest values without
+  // forcing themselves into setState updaters (which must be pure).
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   // Configure audio session once on mount
   useEffect(() => {
     Audio.setAudioModeAsync({
       staysActiveInBackground: true,
       playsInSilentModeIOS: true,
       shouldDuckAndroid: true,
-    });
+    }).catch((err) => console.warn('[AudioPlayer] setAudioMode failed', err));
     return () => {
-      soundRef.current?.unloadAsync();
+      soundRef.current?.unloadAsync().catch(() => {});
       if (sleepRef.current) clearTimeout(sleepRef.current);
       if (saveRef.current) clearInterval(saveRef.current);
     };
@@ -167,37 +174,37 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     await soundRef.current?.setPositionAsync(Math.max(0, seconds) * 1000);
   }, []);
 
-  // skipNext / skipPrev read current state via setState callback to avoid stale closure
+  // Read the freshest playlist/position from stateRef so callbacks stay
+  // closure-stable and never fire side effects from inside a setState updater
+  // (which must be pure — StrictMode would double-invoke and race playTrack).
   const skipNext = useCallback(() => {
-    setState(prev => {
-      if (prev.playlistIndex < prev.playlist.length - 1) {
-        const nextIdx = prev.playlistIndex + 1;
-        playTrack(prev.playlist[nextIdx], prev.playlist, nextIdx);
-      }
-      return prev;
-    });
+    const { playlist, playlistIndex } = stateRef.current;
+    if (playlistIndex < playlist.length - 1) {
+      const nextIdx = playlistIndex + 1;
+      playTrack(playlist[nextIdx], playlist, nextIdx);
+    }
   }, [playTrack]);
 
   const skipPrev = useCallback(() => {
-    setState(prev => {
-      if (prev.positionSec > 5) {
-        seekTo(0);
-      } else if (prev.playlistIndex > 0) {
-        const prevIdx = prev.playlistIndex - 1;
-        playTrack(prev.playlist[prevIdx], prev.playlist, prevIdx);
-      }
-      return prev;
-    });
+    const { positionSec, playlist, playlistIndex } = stateRef.current;
+    if (positionSec > 5) {
+      seekTo(0);
+      return;
+    }
+    if (playlistIndex > 0) {
+      const prevIdx = playlistIndex - 1;
+      playTrack(playlist[prevIdx], playlist, prevIdx);
+    }
   }, [playTrack, seekTo]);
 
   const cycleSpeed = useCallback(async () => {
-    setState(prev => {
-      const idx = SPEEDS.indexOf(prev.speed);
-      const next = SPEEDS[(idx + 1) % SPEEDS.length];
-      speedRef.current = next;
-      soundRef.current?.setRateAsync(next, true);
-      return { ...prev, speed: next };
-    });
+    // Read current speed from ref so we don't have side effects inside a
+    // setState updater (StrictMode safety).
+    const idx = SPEEDS.indexOf(stateRef.current.speed);
+    const next = SPEEDS[(idx + 1) % SPEEDS.length];
+    speedRef.current = next;
+    soundRef.current?.setRateAsync(next, true).catch(() => {});
+    setState(prev => ({ ...prev, speed: next }));
   }, []);
 
   const setSleepTimer = useCallback((minutes: number | null) => {

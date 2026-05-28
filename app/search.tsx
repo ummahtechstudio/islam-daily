@@ -32,16 +32,22 @@ export default function SearchScreen() {
   const [results, setResults] = useState<QuranSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [searchError, setSearchError] = useState(false);
 
   const handleSearch = useCallback(async () => {
     if (!query.trim()) return;
     setLoading(true);
     setSearched(true);
+    setSearchError(false);
     try {
       const data = await searchQuran(query.trim());
       setResults(data);
     } catch {
+      // Surface the network failure rather than showing "No results" — the
+      // user otherwise can't tell whether the word is absent from the Quran
+      // or whether they were offline.
       setResults([]);
+      setSearchError(true);
     }
     setLoading(false);
   }, [query]);
@@ -144,12 +150,27 @@ export default function SearchScreen() {
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             searched ? (
-              <View style={styles.empty}>
-                <Text style={styles.emptyIcon}>🔍</Text>
-                <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-                  No results found for "{query}"
-                </Text>
-              </View>
+              searchError ? (
+                <View style={styles.empty}>
+                  <Text style={styles.emptyIcon}>📡</Text>
+                  <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+                    Couldn't reach the search service. Check your connection and try again.
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.chip, { backgroundColor: theme.card, borderColor: theme.border, marginTop: 12 }]}
+                    onPress={handleSearch}
+                  >
+                    <Text style={[styles.chipText, { color: Colors.primary }]}>Retry</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.empty}>
+                  <Text style={styles.emptyIcon}>🔍</Text>
+                  <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+                    No results found for "{query}"
+                  </Text>
+                </View>
+              )
             ) : null
           }
           showsVerticalScrollIndicator={false}

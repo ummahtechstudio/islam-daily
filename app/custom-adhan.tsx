@@ -16,6 +16,7 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { ADHAN_SOUNDS, CACHE_KEYS, PRAYER_LIST } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
+import { safeJsonParse } from '../src/utils/safeJsonParse';
 
 type AdhanPrefs = Record<string, string>; // prayerName -> soundId
 
@@ -42,7 +43,7 @@ export default function CustomAdhanScreen() {
   useEffect(() => {
     AsyncStorage.getItem(CACHE_KEYS.customAdhan)
       .then((raw) => {
-        if (raw) setPrefs(JSON.parse(raw));
+        setPrefs(safeJsonParse<AdhanPrefs>(raw, {}));
       })
       .catch((err) => console.warn('[CustomAdhan] load prefs failed', err));
     return () => {

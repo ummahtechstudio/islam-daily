@@ -20,6 +20,9 @@ let state: State = {
   error: null,
 };
 let inFlight = false;
+// Tracks the previous isOnline so we can detect offline→online transitions
+// and auto-retry a previously failed download without user intervention.
+let wasOnline = true;
 const listeners = new Set<Listener>();
 
 function setState(patch: Partial<State>) {
@@ -56,6 +59,14 @@ export function useQuranDownload() {
   }, []);
 
   useEffect(() => {
+    // When connectivity returns after a previous failure, clear the error and
+    // retry automatically — otherwise the user is stuck having to tap "Retry"
+    // even though the network came back on its own.
+    const cameOnline = !wasOnline && isOnline;
+    wasOnline = isOnline;
+    if (cameOnline && state.error && !state.cached) {
+      setState({ error: null });
+    }
     startIfNeeded(isOnline);
   }, [isOnline]);
 

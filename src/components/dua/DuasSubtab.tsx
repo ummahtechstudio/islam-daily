@@ -77,7 +77,12 @@ export interface DuasSubtabProps {
 
 export function DuasSubtab({ theme }: DuasSubtabProps) {
   const [hisnulMuslim, setHisnulMuslim] = useState<DuaCategory[]>(() => getBundledDuas());
-  const [selectedCategory, setSelectedCategory] = useState(hisnulMuslim[0].id);
+  // Defensive: if the bundle is ever empty (broken JSON, content not yet
+  // populated), fall back to an empty sentinel id rather than crashing on
+  // `[0].id`. The id is a category slug (e.g. 'waking'), not a number.
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    hisnulMuslim[0]?.id ?? '',
+  );
   const [expanded, setExpanded] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [language, setLanguage] = useState<TranslationLanguage>('urdu');

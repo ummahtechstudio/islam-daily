@@ -34,6 +34,7 @@ import {
 } from '../../src/utils/bookmarks';
 import { shareContent } from '../../src/utils/share';
 import { useDebouncedPositionWriter } from '../../src/hooks/useQuranLastPosition';
+import { fetchWithTimeout } from '../../src/utils/network';
 
 // ─── expo-av optional import ─────────────────────────────────────────────────
 let Audio: any = null;
@@ -146,9 +147,13 @@ interface WordMeaning {
 
 async function fetchWordMeaning(globalAyahNumber: number): Promise<{ arabic: string; transliteration: string } | null> {
   try {
-    const res = await fetch(
-      `https://api.alquran.cloud/v1/ayah/${globalAyahNumber}/editions/quran-uthmani,en.transliteration`
+    // 10s — this fires from a tap-and-wait popup; longer feels broken.
+    const res = await fetchWithTimeout(
+      `https://api.alquran.cloud/v1/ayah/${globalAyahNumber}/editions/quran-uthmani,en.transliteration`,
+      {},
+      10000,
     );
+    if (!res.ok) return null;
     const json = await res.json();
     if (json.code !== 200) return null;
     return {
@@ -165,7 +170,12 @@ async function fetchWordMeaning(globalAyahNumber: number): Promise<{ arabic: str
 export default function SurahReaderScreen() {
   useEffect(() => { trackScreen('SurahReader'); }, []);
   const { id, ayah: ayahParam } = useLocalSearchParams<{ id: string; ayah?: string }>();
-  const surahNum = parseInt(id ?? '1', 10);
+  // Guard against non-numeric route params (deep links, typos): clamp to 1..114
+  // so useSurah never sees NaN — which would otherwise propagate to .findIndex
+  // and silently render the wrong surah or crash on null data.
+  const surahRaw = parseInt(id ?? '1', 10);
+  const surahNum =
+    Number.isFinite(surahRaw) && surahRaw >= 1 && surahRaw <= 114 ? surahRaw : 1;
   const router = useRouter();
   const flatListRef = useRef<FlatList<Ayah>>(null);
   const positionWriter = useDebouncedPositionWriter(1000);

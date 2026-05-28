@@ -552,6 +552,7 @@ export default function HomeScreen() {
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [verseLoading, setVerseLoading] = useState(true);
+  const [verseError, setVerseError] = useState(false);
 
   const [enabledIds, setEnabledIds] = useState<string[]>(DEFAULT_ENABLED_TILE_IDS);
   const [tilesLoaded, setTilesLoaded] = useState(false);
@@ -592,10 +593,16 @@ export default function HomeScreen() {
 
   const loadContent = useCallback(async () => {
     setVerseLoading(true);
+    setVerseError(false);
     try {
       const v = await fetchRandomVerse();
       setVerse(v);
-    } catch {}
+    } catch {
+      // Verse-of-the-Day depends on alquran.cloud — on first launch offline
+      // we have nothing cached yet. Surface a small inline retry instead of
+      // hiding the section so users know what's missing.
+      setVerseError(true);
+    }
     setVerseLoading(false);
   }, []);
 
@@ -695,6 +702,16 @@ export default function HomeScreen() {
             reference={`${verse.surahName} ${verse.surahNumber}:${verse.verseNumber}`}
             onPress={() => navigate('/quran')}
           />
+        ) : verseError ? (
+          <TouchableOpacity
+            style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+            onPress={loadContent}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+              Couldn't load today's verse. Tap to retry.
+            </Text>
+          </TouchableOpacity>
         ) : null}
 
         <GoldDivider />

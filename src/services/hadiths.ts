@@ -7,6 +7,11 @@
  */
 
 import { SupabaseHadith } from '../lib/supabase';
+import { fetchWithTimeout } from '../utils/network';
+
+// Hadith collections are large (Bukhari ~12 MB). Give them more headroom than
+// the default 15s so slow connections don't abort mid-download.
+const HADITH_TIMEOUT_MS = 45000;
 
 export const R2_HADITHS_BASE_URL =
   'https://pub-3f76e9c4da264c6ba85283d8af8108a0.r2.dev/hadiths';
@@ -107,7 +112,7 @@ export async function fetchCollectionText(
   onProgress?: ProgressCallback,
 ): Promise<string> {
   onProgress?.({ receivedBytes: 0, totalBytes: null, phase: 'downloading' });
-  const res = await fetch(url);
+  const res = await fetchWithTimeout(url, {}, HADITH_TIMEOUT_MS);
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
 
   const totalHeader = res.headers.get('content-length');

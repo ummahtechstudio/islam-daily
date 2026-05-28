@@ -1,6 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { fetchSurahList } from './api';
+import { fetchWithTimeout } from '../utils/network';
+
+// Per-request timeout for third-party calls inside the long download loops.
+// 20 s leaves room for slow mobile networks without letting a single hung
+// request stall the entire 114-surah / 12-month batch.
+const DL_TIMEOUT_MS = 20000;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -246,14 +252,21 @@ async function downloadQuranFromApi(
         const existing = await AsyncStorage.getItem(`offline_surah_${n}`);
         if (existing) { totalBytes += existing.length; return; }
 
-        const res = await fetch(
-          `https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,en.asad`
-        );
-        const json = await res.json();
-        if (json.code === 200) {
-          const str = JSON.stringify(json.data);
-          await AsyncStorage.setItem(`offline_surah_${n}`, str);
-          totalBytes += str.length;
+        try {
+          const res = await fetchWithTimeout(
+            `https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,en.asad`,
+            {},
+            DL_TIMEOUT_MS,
+          );
+          if (!res.ok) return;
+          const json = await res.json();
+          if (json.code === 200) {
+            const str = JSON.stringify(json.data);
+            await AsyncStorage.setItem(`offline_surah_${n}`, str);
+            totalBytes += str.length;
+          }
+        } catch {
+          // A single surah failure shouldn't kill the loop — skip and continue.
         }
       })
     );
@@ -402,12 +415,16 @@ export async function downloadCalendar(
   for (let i = 0; i < months.length; i++) {
     const { month, year } = months[i];
     try {
-      const res = await fetch(
-        `https://api.aladhan.com/v1/calendar?month=${month}&year=${year}`
+      const res = await fetchWithTimeout(
+        `https://api.aladhan.com/v1/calendar?month=${month}&year=${year}`,
+        {},
+        DL_TIMEOUT_MS,
       );
-      const json = await res.json();
-      if (json.code === 200 && Array.isArray(json.data)) {
-        allMonths.push({ month, year, data: json.data });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.code === 200 && Array.isArray(json.data)) {
+          allMonths.push({ month, year, data: json.data });
+        }
       }
     } catch {}
     onProgress(Math.round(((i + 1) / months.length) * 100));

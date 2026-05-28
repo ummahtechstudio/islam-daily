@@ -1,7 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchWithTimeout } from '../utils/network';
 
 const QURAN_BASE = 'https://api.alquran.cloud/v1';
 const ALADHAN_BASE = 'https://api.aladhan.com/v1';
+
+// Single source of truth for timeouts so all third-party calls behave the same
+// on flaky networks. 15 s matches network.ts's default and is the upper bound
+// before the spinner-of-doom UX problem kicks in.
+const NET_TIMEOUT_MS = 15000;
 
 // ─── Generic cache helper ────────────────────────────────────────────────────
 
@@ -25,12 +31,21 @@ async function cachedFetch<T>(
   return data;
 }
 
+async function safeJson(res: Response): Promise<any> {
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  try {
+    return await res.json();
+  } catch {
+    throw new Error('Malformed response');
+  }
+}
+
 // ─── Quran ───────────────────────────────────────────────────────────────────
 
 export async function fetchSurahList() {
   return cachedFetch('api_surah_list', async () => {
-    const res = await fetch(`${QURAN_BASE}/surah`);
-    const json = await res.json();
+    const res = await fetchWithTimeout(`${QURAN_BASE}/surah`, {}, NET_TIMEOUT_MS);
+    const json = await safeJson(res);
     if (json.code !== 200) throw new Error('Quran API error');
     return json.data as SurahMeta[];
   }, 24 * 60 * 60 * 1000);
@@ -48,10 +63,12 @@ export async function fetchSurah(
 
   // Cache key includes translation so switching languages fetches fresh data
   return cachedFetch(`api_surah_${number}_${translation}`, async () => {
-    const res = await fetch(
-      `${QURAN_BASE}/surah/${number}/editions/quran-uthmani,${translation}`
+    const res = await fetchWithTimeout(
+      `${QURAN_BASE}/surah/${number}/editions/quran-uthmani,${translation}`,
+      {},
+      NET_TIMEOUT_MS,
     );
-    const json = await res.json();
+    const json = await safeJson(res);
     if (json.code !== 200) throw new Error('Quran API error');
     return json.data as [SurahEdition, SurahEdition];
   }, 7 * 24 * 60 * 60 * 1000);
@@ -90,8 +107,8 @@ export async function fetchPrayerTimes(
 
   return cachedFetch(key, async () => {
     const url = `${ALADHAN_BASE}/timings/${dateStr}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
-    const res = await fetch(url);
-    const json = await res.json();
+    const res = await fetchWithTimeout(url, {}, NET_TIMEOUT_MS);
+    const json = await safeJson(res);
     if (json.code !== 200) throw new Error('Prayer API error');
     return json.data as PrayerTimesData;
   }, 60 * 60 * 1000); // 1 h
@@ -100,8 +117,12 @@ export async function fetchPrayerTimes(
 export async function fetchQiblaDirection(latitude: number, longitude: number) {
   const key = `api_qibla_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
   return cachedFetch(key, async () => {
-    const res = await fetch(`${ALADHAN_BASE}/qibla/${latitude}/${longitude}`);
-    const json = await res.json();
+    const res = await fetchWithTimeout(
+      `${ALADHAN_BASE}/qibla/${latitude}/${longitude}`,
+      {},
+      NET_TIMEOUT_MS,
+    );
+    const json = await safeJson(res);
     if (json.code !== 200) throw new Error('Qibla API error');
     return json.data as { latitude: number; longitude: number; direction: number };
   }, 30 * 24 * 60 * 60 * 1000);
@@ -169,11 +190,14 @@ export async function fetchRandomHadith() {
 // ─── Islamic Search (client-side across Quran) ────────────────────────────────
 
 export async function searchQuran(query: string) {
-  const res = await fetch(
-    `${QURAN_BASE}/search/${encodeURIComponent(query)}/all/en.asad`
+  const res = await fetchWithTimeout(
+    `${QURAN_BASE}/search/${encodeURIComponent(query)}/all/en.asad`,
+    {},
+    NET_TIMEOUT_MS,
   );
-  const json = await res.json();
-  if (json.code !== 200) return [];
+  if (!res.ok) return [];
+  const json = await res.json().catch(() => null);
+  if (!json || json.code !== 200) return [];
   return (json.data?.matches ?? []) as QuranSearchResult[];
 }
 

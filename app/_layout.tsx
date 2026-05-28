@@ -13,13 +13,14 @@ import {
 } from '@expo-google-fonts/amiri';
 import { NotoNastaliqUrdu_400Regular } from '@expo-google-fonts/noto-nastaliq-urdu';
 import * as SplashScreen from 'expo-splash-screen';
-import { useKeepAwake } from 'expo-keep-awake';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useStore } from '../src/store';
 import { Colors } from '../src/constants/colors';
 import { PrivacyConsentModal } from '../src/components/PrivacyConsentModal';
+import { WelcomeModal } from '../src/components/WelcomeModal';
 import {
   hasConsentBeenShown,
   saveConsent,
@@ -50,18 +51,25 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
+const KEEP_AWAKE_TAG = 'islam-daily-root';
+
 export default function RootLayout() {
-  // expo-keep-awake uses the WakeLock API on web, which throws
-  // when the browser tab isn't focused. Phone-only feature —
-  // skip on web entirely.
-  if (Platform.OS !== 'web') {
-    useKeepAwake();
-  }
+  // expo-keep-awake's WakeLock API throws on web when the tab isn't focused.
+  // Use the imperative API inside an effect with a platform guard so the hook
+  // order stays stable across renders (Rules of Hooks safe).
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {});
+    return () => {
+      deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => {});
+    };
+  }, []);
+
   const colorScheme = useColorScheme();
   const loadPersistedData = useStore((s) => s.loadPersistedData);
   const settingsScheme = useStore((s) => s.settings.colorScheme);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Amiri_400Regular,
     Amiri_700Bold,
     Amiri_400Regular_Italic,
@@ -69,7 +77,15 @@ export default function RootLayout() {
     IndoPakNastaleeq: require('../assets/fonts/IndoPakNastaleeq.ttf'),
   });
 
+  // If any font fails to load (corrupted asset, network for Google fonts on
+  // first run), don't block the splash forever. Log and proceed — text will
+  // render in the system font as a fallback.
+  const fontsReady = fontsLoaded || !!fontError;
+
   const [showConsent, setShowConsent] = useState(false);
+  // Gates first-launch modal stacking. WelcomeModal must not mount while the
+  // consent modal is still on screen; both render through the same Modal layer.
+  const [consentResolved, setConsentResolved] = useState(false);
   const analyticsRan = useRef(false);
 
   useEffect(() => {
@@ -84,25 +100,39 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setPositionAsync('relative');
-      NavigationBar.setVisibilityAsync('visible');
+      NavigationBar.setPositionAsync('relative').catch(() => {});
+      NavigationBar.setVisibilityAsync('visible').catch(() => {});
     }
   }, []);
 
   useEffect(() => {
-    if (!fontsLoaded) return;
-    SplashScreen.hideAsync();
+    if (fontError) {
+      console.warn('[Layout] font load failed, proceeding with fallback', fontError);
+    }
+  }, [fontError]);
+
+  useEffect(() => {
+    if (!fontsReady) return;
+    SplashScreen.hideAsync().catch(() => {});
     // Check consent once after app is ready
     hasConsentBeenShown()
       .then((shown) => {
         if (!shown) {
           setShowConsent(true);
-        } else if (!analyticsRan.current) {
-          analyticsRan.current = true;
-          logSession(); // fire-and-forget
+        } else {
+          setConsentResolved(true);
+          if (!analyticsRan.current) {
+            analyticsRan.current = true;
+            logSession(); // fire-and-forget
+          }
         }
       })
-      .catch((err) => console.warn('[Layout] consent check failed', err));
+      .catch((err) => {
+        console.warn('[Layout] consent check failed', err);
+        // Don't block the app: treat the failure as "consent flow done"
+        // so the Welcome modal can still appear.
+        setConsentResolved(true);
+      });
 
     // Silent background refresh of bundled content. Failures are swallowed;
     // the screens always render from bundled JSON regardless.
@@ -124,10 +154,11 @@ export default function RootLayout() {
     if (!isHadithBookCached('bukhari')) {
       downloadHadithBook('bukhari').catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [fontsReady]);
 
   const handleConsent = async (granted: boolean) => {
     setShowConsent(false);
+    setConsentResolved(true);
     await saveConsent(granted);
     if (granted && !analyticsRan.current) {
       analyticsRan.current = true;
@@ -135,7 +166,7 @@ export default function RootLayout() {
     }
   };
 
-  if (!fontsLoaded) return null;
+  if (!fontsReady) return null;
 
   const isDark =
     settingsScheme === 'dark' ||
@@ -191,6 +222,9 @@ export default function RootLayout() {
           onDecline={() => handleConsent(false)}
         />
       )}
+      {/* Welcome modal only mounts after consent is dismissed (or already shown),
+          so two modals don't stack on the same layer on first launch. */}
+      {consentResolved && <WelcomeModal />}
     </GestureHandlerRootView>
     </AudioPlayerProvider>
     </SafeAreaProvider>

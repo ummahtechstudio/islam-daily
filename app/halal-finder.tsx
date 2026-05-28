@@ -19,6 +19,8 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { fetchWithTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
+import { useIsOnline } from '../src/hooks/useIsOnline';
+import MosqueFinderEmptyState from '../src/components/MosqueFinderEmptyState';
 
 const RADIUS_OPTIONS = [1, 5, 10, 25, 50] as const;
 type Radius = (typeof RADIUS_OPTIONS)[number];
@@ -128,6 +130,7 @@ export default function HalalFinderScreen() {
 
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
+  const isOnline = useIsOnline();
   const isDark =
     settings.colorScheme === 'dark' ||
     (settings.colorScheme === 'system' && colorScheme === 'dark');
@@ -208,6 +211,13 @@ export default function HalalFinderScreen() {
   };
 
   const handleRefresh = () => fetchAtCurrentLocation(radius);
+
+  // This feature fundamentally needs the Overpass API; show the same offline
+  // empty state that mosque-finder uses instead of letting the request go
+  // out, time out, and surface a generic "Failed to find restaurants" toast.
+  if (!isOnline) {
+    return <MosqueFinderEmptyState onRetry={handleRefresh} />;
+  }
 
   const openDirections = (lat: number, lon: number, name: string) => {
     const url = Platform.select({

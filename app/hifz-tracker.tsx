@@ -17,6 +17,8 @@ import { CACHE_KEYS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
 import { fetchSurahList, SurahMeta } from '../src/services/api';
 import { LoadingSpinner } from '../src/components/LoadingSpinner';
+import { ErrorView } from '../src/components/ErrorView';
+import { safeJsonParse } from '../src/utils/safeJsonParse';
 
 type HifzProgress = Record<number, boolean>;
 
@@ -32,19 +34,31 @@ export default function HifzTrackerScreen() {
   const [surahs, setSurahs] = useState<SurahMeta[]>([]);
   const [progress, setProgress] = useState<HifzProgress>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const [list, raw] = await Promise.all([
         fetchSurahList(),
         AsyncStorage.getItem(CACHE_KEYS.hifzProgress),
       ]);
       setSurahs(list);
-      setProgress(raw ? JSON.parse(raw) : {});
+      setProgress(safeJsonParse<HifzProgress>(raw, {}));
+    } catch (err) {
+      // Whether the surah list fetch failed (offline) or AsyncStorage threw,
+      // we surface a retriable error instead of an infinite spinner.
+      console.warn('[HifzTracker] load failed', err);
+      setError('Could not load the surah list. Check your connection and try again.');
+    } finally {
       setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const toggleSurah = useCallback(async (num: number) => {
     const next = { ...progress, [num]: !progress[num] };
@@ -56,6 +70,7 @@ export default function HifzTrackerScreen() {
   const pct = surahs.length ? Math.round((memorized / surahs.length) * 100) : 0;
 
   if (loading) return <LoadingSpinner message="Loading surahs..." dark={isDark} />;
+  if (error) return <ErrorView message={error} onRetry={load} dark={isDark} />;
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>

@@ -15,6 +15,7 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { CACHE_KEYS, PRAYER_LIST } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
+import { safeJsonParse } from '../src/utils/safeJsonParse';
 
 type DayRecord = {
   date: string; // YYYY-MM-DD
@@ -58,7 +59,7 @@ export default function PrayerStreakScreen() {
   useEffect(() => {
     AsyncStorage.getItem(CACHE_KEYS.prayerStreak)
       .then((raw) => {
-        if (raw) setRecords(JSON.parse(raw));
+        setRecords(safeJsonParse<Record<string, DayRecord>>(raw, {}));
       })
       .catch((err) => console.warn('[PrayerStreak] load records failed', err));
   }, []);

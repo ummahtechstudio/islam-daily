@@ -346,7 +346,8 @@ export default function AudioLibraryScreen() {
 
             {/* ── Selected category items ── */}
             {activeCat && catItems.length > 0 && (() => {
-              const cat = AUDIO_CATEGORIES.find(c => c.id === activeCat)!;
+              const cat = AUDIO_CATEGORIES.find(c => c.id === activeCat);
+              if (!cat) return null;
               return (
                 <View style={styles.section}>
                   <View style={styles.sectionHeaderRow}>
