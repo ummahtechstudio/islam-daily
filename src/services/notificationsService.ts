@@ -12,6 +12,7 @@ import {
   KARACHI_DEFAULT,
 } from './prayerTimesService';
 import { formatPrayerTime } from '../utils/formatPrayerTime';
+import type { PrayerTimesSettings } from '../types/prayerTimes';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,12 +22,19 @@ export type PrayerName = 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
 
 export type PrayerSoundChoice = 'adhan' | 'silent' | 'system';
 
+export type SunnahNotificationSettings = {
+  tahajjud: {
+    enabled: boolean;
+  };
+};
+
 export type PrayerNotificationSettings = {
   enabled: boolean;
   perPrayer: Record<PrayerName, {
     enabled: boolean;
     sound: PrayerSoundChoice;
   }>;
+  sunnah: SunnahNotificationSettings;
 };
 
 export const DEFAULT_NOTIFICATION_SETTINGS: PrayerNotificationSettings = {
@@ -38,17 +46,27 @@ export const DEFAULT_NOTIFICATION_SETTINGS: PrayerNotificationSettings = {
     maghrib: { enabled: true, sound: 'adhan' },
     isha:    { enabled: true, sound: 'adhan' },
   },
+  sunnah: {
+    // Optional Sunnah reminders default to OFF — users opt in explicitly.
+    tahajjud: { enabled: false },
+  },
 };
 
 const SCHEDULE_AHEAD_DAYS = 7;
 const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24h
 const SCHEDULED_TAG = 'prayer-notification';
+const TAHAJJUD_TAG = 'tahajjud-notification';
 
 // Android notification channels — one per sound choice. On API 26+, the
 // channel determines the sound, not the per-notification field.
 const CHANNEL_ADHAN = 'prayer-adhan';
 const CHANNEL_SYSTEM = 'prayer-system';
 const CHANNEL_SILENT = 'prayer-silent';
+const CHANNEL_TAHAJJUD = 'sunnah-tahajjud';
+
+const TAHAJJUD_TITLE = 'Tahajjud — The Last Third of the Night';
+const TAHAJJUD_BODY =
+  '"And rise at night and pray, as an extra offering — that your Lord may raise you to a praiseworthy station." (Quran 17:79)';
 
 const PRAYER_ARABIC: Record<PrayerName, string> = {
   fajr:    'الفجر',
@@ -124,11 +142,15 @@ function mergeWithDefaults(
   const merged: PrayerNotificationSettings = {
     enabled: s.enabled,
     perPrayer: { ...DEFAULT_NOTIFICATION_SETTINGS.perPrayer },
+    sunnah: { ...DEFAULT_NOTIFICATION_SETTINGS.sunnah },
   };
   for (const p of ALL_PRAYERS) {
     if (s.perPrayer && s.perPrayer[p]) {
       merged.perPrayer[p] = s.perPrayer[p];
     }
+  }
+  if (s.sunnah?.tahajjud) {
+    merged.sunnah.tahajjud = s.sunnah.tahajjud;
   }
   return merged;
 }
@@ -163,6 +185,15 @@ async function ensureAndroidChannels(): Promise<void> {
       vibrationPattern: [0, 400, 200, 400],
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     });
+    // Sunnah / Tahajjud reminders are optional and personal — medium importance,
+    // system tone, so they don't blast adhan audio in the middle of the night.
+    await Notifications.setNotificationChannelAsync(CHANNEL_TAHAJJUD, {
+      name: 'Tahajjud reminder',
+      importance: AndroidImportance.DEFAULT,
+      sound: 'default',
+      vibrationPattern: [0, 250, 150, 250],
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    });
     channelsConfigured = true;
   } catch (err) {
     console.warn('[notifications] failed to configure channels', err);
@@ -187,48 +218,71 @@ function soundForContent(choice: PrayerSoundChoice): string | boolean {
 
 // ─── Scheduling ───────────────────────────────────────────────────────────────
 
-async function cancelExistingPrayerNotifications(): Promise<void> {
+async function cancelByTag(tag: string): Promise<void> {
   try {
     const all = await Notifications.getAllScheduledNotificationsAsync();
     await Promise.all(
       all
         .filter((n) => {
           const data = n.content?.data as { tag?: string } | undefined;
-          return data?.tag === SCHEDULED_TAG;
+          return data?.tag === tag;
         })
         .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
     );
   } catch (err) {
-    console.warn('[notifications] cancel pre-existing failed', err);
+    console.warn(`[notifications] cancel tag=${tag} failed`, err);
   }
+}
+
+async function cancelExistingPrayerNotifications(): Promise<void> {
+  await cancelByTag(SCHEDULED_TAG);
+}
+
+async function cancelExistingTahajjudNotifications(): Promise<void> {
+  await cancelByTag(TAHAJJUD_TAG);
 }
 
 export async function cancelAllPrayerNotifications(): Promise<void> {
   await cancelExistingPrayerNotifications();
+  await cancelExistingTahajjudNotifications();
   prefs.delete(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT);
 }
 
-export async function scheduleNotificationsForNext7Days(): Promise<void> {
-  if (Platform.OS === 'web') return;
+/**
+ * Tahajjud time = the start of the last third of the night.
+ *
+ *   night     = next-day Fajr  −  today's Maghrib
+ *   tahajjud  = next-day Fajr  −  (night / 3)
+ *
+ * Maghrib and Fajr come from the existing prayer-times service — no hardcoded
+ * times. Returns null if either prayer can't be resolved (defensive only).
+ */
+function computeTahajjudStart(
+  prayerSettings: PrayerTimesSettings,
+  date: Date,
+): Date | null {
+  const today = computePrayerTimes(prayerSettings, date);
+  const tomorrowDate = new Date(date);
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+  const tomorrow = computePrayerTimes(prayerSettings, tomorrowDate);
 
-  const perm = await getNotificationPermission();
-  if (perm !== 'granted') {
-    // Without permission, scheduling silently no-ops. UI is responsible
-    // for surfacing the permission state to the user.
-    return;
-  }
+  const maghrib = today.prayers.find((p) => p.name === 'maghrib')?.time;
+  const fajrNext = tomorrow.prayers.find((p) => p.name === 'fajr')?.time;
+  if (!maghrib || !fajrNext) return null;
 
-  const settings = await getNotificationSettings();
-  if (!settings.enabled) {
-    await cancelExistingPrayerNotifications();
-    prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
-    return;
-  }
+  const nightMs = fajrNext.getTime() - maghrib.getTime();
+  if (!Number.isFinite(nightMs) || nightMs <= 0) return null;
 
-  await ensureAndroidChannels();
+  return new Date(fajrNext.getTime() - nightMs / 3);
+}
+
+async function schedulePrayerNotifications(
+  settings: PrayerNotificationSettings,
+  prayerSettings: PrayerTimesSettings,
+): Promise<void> {
   await cancelExistingPrayerNotifications();
+  if (!settings.enabled) return;
 
-  const prayerSettings = getPersistedSettings() ?? KARACHI_DEFAULT;
   const city = prayerSettings.location.city;
   const now = Date.now();
 
@@ -245,7 +299,6 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
       if (!entry) continue;
 
       const fireTime = entry.time.getTime();
-      // Skip past times; the OS would reject them anyway.
       if (fireTime <= now + 1000) continue;
 
       const arabic = PRAYER_ARABIC[prayer];
@@ -273,6 +326,65 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
       }
     }
   }
+}
+
+async function scheduleTahajjudNotifications(
+  settings: PrayerNotificationSettings,
+  prayerSettings: PrayerTimesSettings,
+): Promise<void> {
+  await cancelExistingTahajjudNotifications();
+  if (!settings.sunnah.tahajjud.enabled) return;
+
+  const now = Date.now();
+
+  for (let dayOffset = 0; dayOffset < SCHEDULE_AHEAD_DAYS; dayOffset++) {
+    const date = new Date();
+    date.setDate(date.getDate() + dayOffset);
+
+    const fireAt = computeTahajjudStart(prayerSettings, date);
+    if (!fireAt) continue;
+    if (fireAt.getTime() <= now + 1000) continue;
+
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: TAHAJJUD_TITLE,
+          body: TAHAJJUD_BODY,
+          sound: 'default',
+          data: { tag: TAHAJJUD_TAG, dayOffset },
+        },
+        trigger: {
+          type: SchedulableTriggerInputTypes.DATE,
+          date: fireAt,
+          ...(Platform.OS === 'android' ? { channelId: CHANNEL_TAHAJJUD } : {}),
+        },
+      });
+    } catch (err) {
+      console.warn(`[notifications] schedule tahajjud day ${dayOffset} failed`, err);
+    }
+  }
+}
+
+export async function scheduleNotificationsForNext7Days(): Promise<void> {
+  if (Platform.OS === 'web') return;
+
+  const perm = await getNotificationPermission();
+  if (perm !== 'granted') {
+    // Without permission, scheduling silently no-ops. UI is responsible
+    // for surfacing the permission state to the user.
+    return;
+  }
+
+  await ensureAndroidChannels();
+
+  const settings = await getNotificationSettings();
+  const prayerSettings = getPersistedSettings() ?? KARACHI_DEFAULT;
+
+  // The two reminder streams are independent — the master prayer toggle does
+  // not gate Tahajjud, and turning Tahajjud off does not touch the 5 daily
+  // prayers. Both refresh on the same 7-day window via the shared timestamp.
+  await schedulePrayerNotifications(settings, prayerSettings);
+  await scheduleTahajjudNotifications(settings, prayerSettings);
 
   prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
 }

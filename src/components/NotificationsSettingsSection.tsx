@@ -72,6 +72,7 @@ export function NotificationsSettingsSection({
   const [settings, setSettings] = useState<PrayerNotificationSettings>(DEFAULT_NOTIFICATION_SETTINGS);
   const [permission, setPermission] = useState<NotificationPermissionStatus>('undetermined');
   const [showExplainer, setShowExplainer] = useState(false);
+  const [showTahajjudExplainer, setShowTahajjudExplainer] = useState(false);
   const [showTestPicker, setShowTestPicker] = useState(false);
   const [todayTimes, setTodayTimes] = useState<Partial<Record<PrayerName, Date>>>({});
 
@@ -207,6 +208,74 @@ export function NotificationsSettingsSection({
     };
     persistAndReschedule(next);
   }, [persistAndReschedule, settings]);
+
+  // ─── Sunnah / Tahajjud handlers ────────────────────────────────────────────
+
+  const setTahajjudEnabled = useCallback(
+    (enabled: boolean) => {
+      const next: PrayerNotificationSettings = {
+        ...settings,
+        sunnah: {
+          ...settings.sunnah,
+          tahajjud: { ...settings.sunnah.tahajjud, enabled },
+        },
+      };
+      persistAndReschedule(next);
+    },
+    [persistAndReschedule, settings],
+  );
+
+  const enableTahajjud = useCallback(async () => {
+    lightHaptic();
+    const current = await getNotificationPermission();
+
+    if (current === 'granted') {
+      setTahajjudEnabled(true);
+      return;
+    }
+
+    if (current === 'undetermined') {
+      setShowTahajjudExplainer(true);
+      return;
+    }
+
+    Alert.alert(
+      'Notifications disabled',
+      'Permissions were denied previously. You can enable them in your device settings.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Open Settings', onPress: () => Linking.openSettings().catch(() => {}) },
+      ],
+    );
+  }, [setTahajjudEnabled]);
+
+  const disableTahajjud = useCallback(() => {
+    lightHaptic();
+    setTahajjudEnabled(false);
+  }, [setTahajjudEnabled]);
+
+  const handleTahajjudToggle = useCallback(
+    (value: boolean) => {
+      if (value) enableTahajjud();
+      else disableTahajjud();
+    },
+    [enableTahajjud, disableTahajjud],
+  );
+
+  const handleTahajjudExplainerAllow = useCallback(async () => {
+    setShowTahajjudExplainer(false);
+    const result = await requestNotificationPermission();
+    setPermission(result);
+    if (result === 'granted') {
+      setTahajjudEnabled(true);
+    } else {
+      setTahajjudEnabled(false);
+    }
+  }, [setTahajjudEnabled]);
+
+  const handleTahajjudExplainerCancel = useCallback(() => {
+    setShowTahajjudExplainer(false);
+  }, []);
 
   // ─── Test ──────────────────────────────────────────────────────────────────
 
@@ -381,6 +450,42 @@ export function NotificationsSettingsSection({
         </Text>
       </View>
 
+      {/* ── Sunnah Reminders (optional / extra) ──────────────────────────── */}
+      <SectionHeader
+        title="Sunnah Reminders"
+        subtitle="Optional voluntary reminders — separate from the five daily prayers"
+      />
+
+      <View style={[styles.card, { backgroundColor: cardColor, borderColor }]}>
+        <View style={styles.tahajjudRow}>
+          <View style={styles.tahajjudIconWrap}>
+            <Ionicons name="moon" size={18} color={GREEN} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.tahajjudName, { color: textColor }]}>
+              Tahajjud reminder
+            </Text>
+            <Text style={[styles.tahajjudSub, { color: textMutedColor }]}>
+              Fires once at the start of the last third of the night (Maghrib → Fajr)
+            </Text>
+          </View>
+          <Switch
+            value={settings.sunnah.tahajjud.enabled && permission !== 'denied'}
+            onValueChange={handleTahajjudToggle}
+            trackColor={{ false: '#D1D5DB', true: GREEN }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+      </View>
+
+      <View style={[styles.aboutCard, { backgroundColor: CREAM }]}>
+        <Ionicons name="information-circle" size={16} color={GREEN} />
+        <Text style={styles.aboutText}>
+          Off by default. When on, the reminder time is recomputed from your prayer settings each
+          day, so it always matches your Maghrib and Fajr.
+        </Text>
+      </View>
+
       {/* ── Pre-explainer modal ───────────────────────────────────────────── */}
       <Modal visible={showExplainer} transparent animationType="fade" onRequestClose={handleExplainerCancel}>
         <View style={styles.modalBackdrop}>
@@ -404,6 +509,43 @@ export function NotificationsSettingsSection({
               <TouchableOpacity
                 style={[styles.modalBtn, styles.modalBtnPrimary]}
                 onPress={handleExplainerAllow}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalBtnPrimaryText}>Allow notifications</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── Tahajjud pre-explainer modal ──────────────────────────────────── */}
+      <Modal
+        visible={showTahajjudExplainer}
+        transparent
+        animationType="fade"
+        onRequestClose={handleTahajjudExplainerCancel}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalIconWrap}>
+              <Ionicons name="moon" size={32} color={GREEN} />
+            </View>
+            <Text style={styles.modalTitle}>Allow Tahajjud reminders?</Text>
+            <Text style={styles.modalBody}>
+              We&apos;ll send one quiet reminder at the start of the last third of the night, with
+              a verse to encourage night prayer. You can turn it off anytime.
+            </Text>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnGhost]}
+                onPress={handleTahajjudExplainerCancel}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalBtnGhostText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnPrimary]}
+                onPress={handleTahajjudExplainerAllow}
                 activeOpacity={0.85}
               >
                 <Text style={styles.modalBtnPrimaryText}>Allow notifications</Text>
@@ -542,6 +684,24 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   aboutText: { flex: 1, fontSize: 12, color: '#3F3F3F', lineHeight: 18 },
+
+  tahajjudRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    gap: spacing.md,
+  },
+  tahajjudIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: 'rgba(15,110,86,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tahajjudName: { fontSize: 15, fontWeight: '700' },
+  tahajjudSub: { fontSize: 12, marginTop: 2, lineHeight: 17 },
 
   modalBackdrop: {
     flex: 1,
