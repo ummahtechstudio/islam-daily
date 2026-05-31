@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '../constants/colors';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ErrorView({ message, onRetry, dark }: Props) {
+  const { t } = useTranslation();
   const theme = dark ? Colors.dark : Colors.light;
   return (
     <View style={styles.container}>
@@ -16,7 +18,7 @@ export function ErrorView({ message, onRetry, dark }: Props) {
       <Text style={[styles.message, { color: theme.text }]}>{message}</Text>
       {onRetry && (
         <TouchableOpacity style={styles.btn} onPress={onRetry} activeOpacity={0.8}>
-          <Text style={styles.btnText}>Try Again</Text>
+          <Text style={styles.btnText}>{t('common.tryAgain')}</Text>
         </TouchableOpacity>
       )}
     </View>

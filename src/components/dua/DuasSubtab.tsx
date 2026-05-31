@@ -11,10 +11,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../../constants/colors';
 import { typography } from '../../constants/typography';
 import { spacing, radius } from '../../constants/spacing';
+import { urduStyle } from '../../constants/fonts';
 import { ManuscriptCard } from '../ManuscriptCard';
 import { MinaretIcon } from '../icons';
 import {
@@ -35,25 +37,25 @@ type CategoryIconSpec =
   | { kind: 'ionicon'; name: keyof typeof Ionicons.glyphMap }
   | { kind: 'minaret' };
 
-const DUA_CATEGORIES: { id: string; icon: CategoryIconSpec; label: string }[] = [
-  { id: 'waking',      icon: { kind: 'ionicon', name: 'sunny-outline' },         label: 'Waking' },
-  { id: 'morning',     icon: { kind: 'ionicon', name: 'partly-sunny-outline' },  label: 'Morning' },
-  { id: 'evening',     icon: { kind: 'ionicon', name: 'moon-outline' },          label: 'Evening' },
-  { id: 'sleep',       icon: { kind: 'ionicon', name: 'moon' },                  label: 'Sleep' },
-  { id: 'prayer',      icon: { kind: 'minaret' },                                 label: 'Prayer' },
-  { id: 'eating',      icon: { kind: 'ionicon', name: 'restaurant-outline' },    label: 'Eating' },
-  { id: 'travel',      icon: { kind: 'ionicon', name: 'airplane-outline' },      label: 'Travel' },
-  { id: 'distress',    icon: { kind: 'ionicon', name: 'heart-outline' },         label: 'Distress' },
-  { id: 'forgiveness', icon: { kind: 'ionicon', name: 'leaf-outline' },          label: 'Forgiveness' },
-  { id: 'protection',  icon: { kind: 'ionicon', name: 'shield-outline' },        label: 'Protection' },
-  { id: 'sickness',    icon: { kind: 'ionicon', name: 'medkit-outline' },        label: 'Sickness' },
-  { id: 'marriage',    icon: { kind: 'ionicon', name: 'heart-circle-outline' },  label: 'Marriage' },
-  { id: 'rizq',        icon: { kind: 'ionicon', name: 'cash-outline' },          label: 'Rizq' },
-  { id: 'friday',      icon: { kind: 'ionicon', name: 'calendar-outline' },      label: 'Friday' },
-  { id: 'dua_parents', icon: { kind: 'ionicon', name: 'people-outline' },        label: 'Parents' },
-  { id: 'mosque',      icon: { kind: 'minaret' },                                 label: 'Mosque' },
-  { id: 'knowledge',   icon: { kind: 'ionicon', name: 'book-outline' },          label: 'Knowledge' },
-  { id: 'rain',        icon: { kind: 'ionicon', name: 'water-outline' },         label: 'Patience' },
+const DUA_CATEGORIES: { id: string; icon: CategoryIconSpec }[] = [
+  { id: 'waking',      icon: { kind: 'ionicon', name: 'sunny-outline' } },
+  { id: 'morning',     icon: { kind: 'ionicon', name: 'partly-sunny-outline' } },
+  { id: 'evening',     icon: { kind: 'ionicon', name: 'moon-outline' } },
+  { id: 'sleep',       icon: { kind: 'ionicon', name: 'moon' } },
+  { id: 'prayer',      icon: { kind: 'minaret' } },
+  { id: 'eating',      icon: { kind: 'ionicon', name: 'restaurant-outline' } },
+  { id: 'travel',      icon: { kind: 'ionicon', name: 'airplane-outline' } },
+  { id: 'distress',    icon: { kind: 'ionicon', name: 'heart-outline' } },
+  { id: 'forgiveness', icon: { kind: 'ionicon', name: 'leaf-outline' } },
+  { id: 'protection',  icon: { kind: 'ionicon', name: 'shield-outline' } },
+  { id: 'sickness',    icon: { kind: 'ionicon', name: 'medkit-outline' } },
+  { id: 'marriage',    icon: { kind: 'ionicon', name: 'heart-circle-outline' } },
+  { id: 'rizq',        icon: { kind: 'ionicon', name: 'cash-outline' } },
+  { id: 'friday',      icon: { kind: 'ionicon', name: 'calendar-outline' } },
+  { id: 'dua_parents', icon: { kind: 'ionicon', name: 'people-outline' } },
+  { id: 'mosque',      icon: { kind: 'minaret' } },
+  { id: 'knowledge',   icon: { kind: 'ionicon', name: 'book-outline' } },
+  { id: 'rain',        icon: { kind: 'ionicon', name: 'water-outline' } },
 ];
 
 function CategoryIcon({
@@ -76,6 +78,7 @@ export interface DuasSubtabProps {
 }
 
 export function DuasSubtab({ theme }: DuasSubtabProps) {
+  const { t } = useTranslation();
   const [hisnulMuslim, setHisnulMuslim] = useState<DuaCategory[]>(() => getBundledDuas());
   // Defensive: if the bundle is ever empty (broken JSON, content not yet
   // populated), fall back to an empty sentinel id rather than crashing on
@@ -135,7 +138,7 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
         <View style={[styles.disclaimerCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <View style={{ flex: 1 }}>
             <Text style={[styles.disclaimerText, { color: theme.textSecondary }]}>
-              ℹ️ Urdu translations are based on authentic Islamic sources. For verification, please refer to printed Hisn al-Muslim Urdu edition.
+              {t('dua.duas.disclaimer')}
             </Text>
             <Text style={[styles.disclaimerTextUrdu, { color: theme.textMuted }]}>
               ℹ️ اردو تراجم مستند اسلامی ذرائع پر مبنی ہیں۔ تصدیق کے لیے براہ کرم حصن المسلم کی اردو طبع شدہ کتاب سے رجوع کریں۔
@@ -152,7 +155,7 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
         <TextInput
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholder="Search English, transliteration, or reference (e.g. Bukhari)…"
+          placeholder={t('dua.duas.search.placeholder')}
           placeholderTextColor={theme.textMuted}
           style={[styles.searchInput, { color: theme.text }]}
           autoCorrect={false}
@@ -196,7 +199,7 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
                   { color: iconColor },
                 ]}
               >
-                {cat.label}
+                {t(`dua.duas.categories.${cat.id}`)}
               </Text>
             </TouchableOpacity>
           );
@@ -207,10 +210,10 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyEmoji}>{searchQuery ? '🔍' : '🤲'}</Text>
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
-            {searchQuery ? 'No duas match your search' : 'No duas in this category yet'}
+            {searchQuery ? t('dua.duas.empty.searchTitle') : t('dua.duas.empty.categoryTitle')}
           </Text>
           <Text style={[styles.emptySubtitle, { color: theme.textMuted }]}>
-            {searchQuery ? 'Try different keywords or clear the search' : 'We\'re adding more soon InshaAllah'}
+            {searchQuery ? t('dua.duas.empty.searchSubtitle') : t('dua.duas.empty.categorySubtitle')}
           </Text>
         </View>
       ) : (
@@ -232,6 +235,20 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
                     color={palette.textOnCreamMuted}
                   />
                 </View>
+
+                {/* Bilingual title block — sits above Arabic so the user can
+                    scan by purpose. English in body font, Urdu in Nastaliq
+                    with RTL alignment. */}
+                {dua.title_en ? (
+                  <Text style={styles.duaTitleEn} numberOfLines={2}>
+                    {dua.title_en}
+                  </Text>
+                ) : null}
+                {dua.title_ur ? (
+                  <Text style={styles.duaTitleUr} numberOfLines={2}>
+                    {dua.title_ur}
+                  </Text>
+                ) : null}
 
                 {dua.description_ur ? (
                   <Text style={styles.duaDescription} numberOfLines={2}>
@@ -256,7 +273,7 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
                       </Text>
                     ) : (
                       <Text style={[styles.duaTranslit, { color: palette.textOnCreamMuted }]}>
-                        Transliteration not available
+                        {t('dua.duas.transliterationUnavailable')}
                       </Text>
                     )}
                     {language === 'urdu' && dua.urdu ? (
@@ -265,11 +282,11 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
                       </Text>
                     ) : (
                       <Text style={styles.duaEnglish}>
-                        {dua.english || 'Translation not available'}
+                        {dua.english || t('dua.duas.translationUnavailable')}
                       </Text>
                     )}
                     <View style={styles.referenceContainer}>
-                      <Text style={styles.referenceLabel}>Reference:</Text>
+                      <Text style={styles.referenceLabel}>{t('dua.duas.reference')}</Text>
                       <Text style={styles.referenceText}>
                         {dua.reference || 'Hisn al-Muslim'}
                       </Text>
@@ -375,6 +392,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239,159,39,0.18)',
   },
   duaNum: { fontSize: 12, fontWeight: '700', color: palette.goldSoft },
+  // Bilingual title labels — English in body font, Urdu in Nastaliq via the
+  // shared urduStyle helper. Both sit just above the Arabic so users can
+  // identify each dua at a glance.
+  duaTitleEn: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: palette.green,
+    letterSpacing: 0.3,
+    marginBottom: 2,
+  },
+  duaTitleUr: {
+    ...urduStyle(15),
+    color: palette.textOnCreamSecondary,
+    marginBottom: spacing.sm,
+  },
   duaArabic: {
     fontFamily: 'Amiri_400Regular',
     fontSize: 22,

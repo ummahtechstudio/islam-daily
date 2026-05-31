@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
@@ -29,35 +30,24 @@ import type { PrayerName } from '../src/types/prayerTimes';
 import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import { IslamicPattern } from '../src/components/IslamicPattern';
 
-const PRAYER_LABELS: Record<PrayerName, { en: string; ar: string }> = {
-  fajr:    { en: 'Fajr',    ar: 'الفجر' },
-  sunrise: { en: 'Sunrise', ar: 'الشروق' },
-  dhuhr:   { en: 'Dhuhr',   ar: 'الظهر' },
-  asr:     { en: 'Asr',     ar: 'العصر' },
-  maghrib: { en: 'Maghrib', ar: 'المغرب' },
-  isha:    { en: 'Isha',    ar: 'العشاء' },
+const PRAYER_AR: Record<PrayerName, string> = {
+  fajr:    'الفجر',
+  sunrise: 'الشروق',
+  dhuhr:   'الظهر',
+  asr:     'العصر',
+  maghrib: 'المغرب',
+  isha:    'العشاء',
 };
 
-const JUMUAH_LABEL = { en: "Jumu'ah", ar: 'الجمعة' };
-
-const METHOD_LABELS: Record<string, string> = {
-  Karachi: 'Karachi',
-  Dubai: 'Dubai',
-  UmmAlQura: 'Umm al-Qura',
-  Egyptian: 'Egyptian',
-  Turkey: 'Turkey',
-  Singapore: 'Singapore',
-  MuslimWorldLeague: 'Muslim World League',
-  NorthAmerica: 'North America',
-  MoonsightingCommittee: 'Moonsighting',
-  Tehran: 'Tehran',
-};
+const JUMUAH_AR = 'الجمعة';
 
 type PrayerTimesScreenProps = {
   asTab?: boolean;
 };
 
 export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     trackScreen('PrayerTimes');
   }, []);
@@ -121,8 +111,8 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
   const nextEntry = computed.prayers.find((p) => p.name === computed.nextPrayer);
   const nextLabel = nextEntry
     ? nextEntry.isFriday && nextEntry.name === 'dhuhr'
-      ? JUMUAH_LABEL.en
-      : PRAYER_LABELS[nextEntry.name].en
+      ? t('prayers.names.jumuah')
+      : t(`prayers.names.${nextEntry.name}`)
     : null;
 
   return (
@@ -138,7 +128,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
             <Ionicons name="chevron-back" size={24} color={palette.green} />
           </TouchableOpacity>
         )}
-        <Text style={[styles.toolbarTitle, { color: theme.text }]}>Prayer Times</Text>
+        <Text style={[styles.toolbarTitle, { color: theme.text }]}>{t('prayer.header.title')}</Text>
         <TouchableOpacity
           onPress={() => router.push('/prayer-times-settings' as any)}
           hitSlop={12}
@@ -170,12 +160,12 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
             <View style={headerStyles.badgeRow}>
               <View style={[headerStyles.badge, { backgroundColor: palette.green }]}>
                 <Text style={headerStyles.badgeText}>
-                  {METHOD_LABELS[settings.method] ?? settings.method}
+                  {t(`prayer.methods.${settings.method}`) ?? settings.method}
                 </Text>
               </View>
               <View style={[headerStyles.badge, { backgroundColor: palette.gold }]}>
                 <Text style={headerStyles.badgeText}>
-                  {settings.madhab === 'hanafi' ? 'Hanafi' : 'Shafi'}
+                  {settings.madhab === 'hanafi' ? t('prayer.madhab.hanafi') : t('prayer.madhab.shafi')}
                 </Text>
               </View>
             </View>
@@ -192,7 +182,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
           >
             <Ionicons name="information-circle" size={16} color={palette.green} />
             <Text style={styles.fallbackText}>
-              Showing prayer times for Karachi. Tap to change.
+              {t('prayer.fallback.notice')}
             </Text>
             <Ionicons name="chevron-forward" size={16} color={palette.green} />
           </TouchableOpacity>
@@ -205,7 +195,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
               <View style={nextStyles.patternWrap} pointerEvents="none">
                 <IslamicPattern size={100} color={palette.gold} opacity={0.07} />
               </View>
-              <Text style={nextStyles.label}>NEXT PRAYER</Text>
+              <Text style={nextStyles.label}>{t('prayer.next.label')}</Text>
               <View style={nextStyles.row}>
                 <Text style={nextStyles.name}>{nextLabel}</Text>
                 <Text style={nextStyles.time}>{formatPrayerTime(computed.nextPrayerTime)}</Text>
@@ -217,7 +207,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
           </TouchableOpacity>
         )}
 
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Today's Prayers</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>{t('prayer.todaysPrayers')}</Text>
         <View style={[styles.prayerList, { backgroundColor: theme.card, borderColor: theme.border }]}>
           {computed.prayers.map((p, idx) => {
             const isCurrent = p.name === computed.currentPrayer;
@@ -225,8 +215,14 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
               !isCurrent &&
               computed.currentPrayer !== null &&
               indexOfPrayer(p.name) < indexOfPrayer(computed.currentPrayer);
-            const labels =
-              p.isFriday && p.name === 'dhuhr' ? JUMUAH_LABEL : PRAYER_LABELS[p.name];
+            const prayerNameEn =
+              p.isFriday && p.name === 'dhuhr'
+                ? t('prayers.names.jumuah')
+                : t(`prayers.names.${p.name}`);
+            const prayerNameAr =
+              p.isFriday && p.name === 'dhuhr'
+                ? JUMUAH_AR
+                : PRAYER_AR[p.name];
 
             return (
               <View
@@ -250,7 +246,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                       },
                     ]}
                   >
-                    {labels.en}
+                    {prayerNameEn}
                   </Text>
                   <Text
                     style={[
@@ -258,7 +254,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                       { color: isCurrent ? palette.green : theme.textSecondary },
                     ]}
                   >
-                    {labels.ar}
+                    {prayerNameAr}
                   </Text>
                 </View>
                 <Text
@@ -287,7 +283,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
         >
           <View style={styles.sunnahHeaderLeft}>
             <Ionicons name="moon" size={16} color={palette.gold} />
-            <Text style={[styles.sunnahHeaderText, { color: theme.text }]}>Sunnah Times</Text>
+            <Text style={[styles.sunnahHeaderText, { color: theme.text }]}>{t('prayer.sunnah.header')}</Text>
           </View>
           <Ionicons
             name={sunnahOpen ? 'chevron-up' : 'chevron-down'}
@@ -299,7 +295,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
           <View style={[styles.sunnahBody, { borderColor: theme.border, backgroundColor: theme.card }]}>
             <View style={styles.sunnahRow}>
               <Text style={[styles.sunnahLabel, { color: theme.textSecondary }]}>
-                Last Third of Night
+                {t('prayer.sunnah.lastThird')}
               </Text>
               <Text style={[styles.sunnahTime, { color: theme.text }]}>
                 {formatPrayerTime(computed.sunnah.lastThirdOfTheNight)}
@@ -307,7 +303,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
             </View>
             <View style={[styles.sunnahRow, { borderTopWidth: 1, borderTopColor: theme.border }]}>
               <Text style={[styles.sunnahLabel, { color: theme.textSecondary }]}>
-                Middle of Night
+                {t('prayer.sunnah.middleOfNight')}
               </Text>
               <Text style={[styles.sunnahTime, { color: theme.text }]}>
                 {formatPrayerTime(computed.sunnah.middleOfTheNight)}

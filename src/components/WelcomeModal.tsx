@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
+import { useTranslation } from 'react-i18next';
 
 const STORAGE_KEY = '@islam_daily:welcome_shown_v1';
 
@@ -22,26 +23,6 @@ const BODY_TEXT = '#2D2D2D';
 const NASTALIQ_FONT = 'NotoNastaliqUrdu_400Regular';
 
 type Lang = 'ur' | 'en';
-
-const URDU_CONTENT = {
-  greeting: 'السلام علیکم ورحمۃ اللہ',
-  body1:
-    'یہ ایپ امتِ مسلمہ کے لیے اس نیت سے بنائی گئی ہے کہ ہم سب دین کو بہتر سمجھ سکیں اور ایک اچھے مسلمان بننے کی کوشش کریں۔',
-  body2:
-    'چونکہ یہ ایک انسانی کاوش ہے، ممکن ہے کہیں کوئی کمی یا غلطی رہ گئی ہو۔ اگر آپ کو ایسی کوئی بات نظر آئے یا کوئی تجویز ہو، تو براہِ کرم اسکرین شاٹ لے کر ہمیں بھیج دیں — ان شاء اللہ ہم جلد ہی اسے درست کر دیں گے۔',
-  closing: 'آپ کی دعاؤں کا طلبگار،\nجزاک اللہ خیراً',
-  button: 'سمجھ گیا',
-};
-
-const ENGLISH_CONTENT = {
-  greeting: 'Assalamu alaikum wa rahmatullah',
-  body1:
-    "This app has been built with the sincere intention of serving the Muslim Ummah — to help us understand our deen better and strive to become better Muslims, in sha Allah.",
-  body2:
-    "As this is a human effort, there may be mistakes or shortcomings we haven't noticed. If you come across any error or have a suggestion, please take a screenshot and send it to us — we will address it as soon as we can.",
-  closing: 'JazakAllah khair for your duas and support.',
-  button: 'Got it',
-};
 
 function detectLanguage(): Lang {
   try {
@@ -57,6 +38,7 @@ function detectLanguage(): Lang {
 }
 
 export function WelcomeModal() {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [lang, setLang] = useState<Lang>('en');
 
@@ -99,8 +81,8 @@ export function WelcomeModal() {
 
   if (!visible) return null;
 
-  const content = lang === 'ur' ? URDU_CONTENT : ENGLISH_CONTENT;
   const isUrdu = lang === 'ur';
+  const ns = isUrdu ? 'welcome.ur' : 'welcome.en';
 
   return (
     <Modal
@@ -119,31 +101,31 @@ export function WelcomeModal() {
             showsVerticalScrollIndicator={false}
           >
             {isUrdu ? (
-              <Text style={[styles.urduGreeting]}>{content.greeting}</Text>
+              <Text style={[styles.urduGreeting]}>{t(`${ns}.greeting`)}</Text>
             ) : (
-              <Text style={styles.enGreeting}>{content.greeting}</Text>
+              <Text style={styles.enGreeting}>{t(`${ns}.greeting`)}</Text>
             )}
 
             <View style={styles.divider} />
 
             {isUrdu ? (
               <>
-                <Text style={styles.urduBody}>{content.body1}</Text>
+                <Text style={styles.urduBody}>{t(`${ns}.body1`)}</Text>
                 <Text style={[styles.urduBody, styles.bodySpacing]}>
-                  {content.body2}
+                  {t(`${ns}.body2`)}
                 </Text>
                 <Text style={[styles.urduClosing, styles.closingSpacing]}>
-                  {content.closing}
+                  {t(`${ns}.closing`)}
                 </Text>
               </>
             ) : (
               <>
-                <Text style={styles.enBody}>{content.body1}</Text>
+                <Text style={styles.enBody}>{t(`${ns}.body1`)}</Text>
                 <Text style={[styles.enBody, styles.bodySpacing]}>
-                  {content.body2}
+                  {t(`${ns}.body2`)}
                 </Text>
                 <Text style={[styles.enClosing, styles.closingSpacing]}>
-                  {content.closing}
+                  {t(`${ns}.closing`)}
                 </Text>
               </>
             )}
@@ -155,7 +137,7 @@ export function WelcomeModal() {
             activeOpacity={0.85}
           >
             <Text style={isUrdu ? styles.urduButtonText : styles.enButtonText}>
-              {content.button}
+              {t(`${ns}.button`)}
             </Text>
           </TouchableOpacity>
         </View>

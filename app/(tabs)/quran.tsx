@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../src/constants/colors';
 import { trackScreen } from '../../src/services/analytics';
@@ -25,15 +26,16 @@ const ACTIVE_TAB_KEY = 'quran_active_tab';
 
 const TABS: Array<{
   key: QuranTab;
-  label: string;
   icon: keyof typeof Feather.glyphMap;
 }> = [
-  { key: 'translation', label: 'Translation', icon: 'book-open' },
-  { key: 'recite',      label: 'Recite',      icon: 'bookmark'  },
-  { key: 'listen',      label: 'Listen',      icon: 'headphones' },
+  { key: 'translation', icon: 'book-open' },
+  { key: 'recite',      icon: 'bookmark'  },
+  { key: 'listen',      icon: 'headphones' },
 ];
 
 export default function QuranScreen() {
+  const { t } = useTranslation();
+
   useEffect(() => {
     trackScreen('Quran');
   }, []);
@@ -95,7 +97,7 @@ export default function QuranScreen() {
       edges={['top']}
     >
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.headerTitle}>The Holy Quran</Text>
+        <Text style={styles.headerTitle}>{t('quran.header.title')}</Text>
         <Text style={styles.headerSub}>القرآن الكريم</Text>
       </View>
 
@@ -139,7 +141,7 @@ export default function QuranScreen() {
                   { color: isActive ? '#fff' : theme.textMuted },
                 ]}
               >
-                {tab.label}
+                {t(`quran.tabs.${tab.key}`)}
               </Text>
             </TouchableOpacity>
           );

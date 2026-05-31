@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useTranslation } from 'react-i18next';
+// Initialise i18n before any screen renders (the import runs init synchronously).
+import '../src/i18n';
 import { useColorScheme, Platform, AppState, type AppStateStatus } from 'react-native';
 import { AudioPlayerProvider } from '../src/context/AudioPlayerContext';
 import { MiniPlayer } from '../src/components/MiniPlayer';
@@ -55,6 +58,7 @@ export const unstable_settings = {
 const KEEP_AWAKE_TAG = 'islam-daily-root';
 
 export default function RootLayout() {
+  const { t } = useTranslation();
   // expo-keep-awake's WakeLock API throws on web when the tab isn't focused.
   // Use the imperative API inside an effect with a platform guard so the hook
   // order stays stable across renders (Rules of Hooks safe).
@@ -205,24 +209,24 @@ export default function RootLayout() {
         <Stack.Screen name="prayer-times-settings" options={{ headerShown: false }} />
         <Stack.Screen name="city-picker" options={{ headerShown: false }} />
         <Stack.Screen name="search" options={{ headerShown: false }} />
-        <Stack.Screen name="qibla" options={{ title: 'Qibla Finder' }} />
-        <Stack.Screen name="hadith" options={{ title: 'Hadith Browser' }} />
-        <Stack.Screen name="names" options={{ title: '99 Names of Allah' }} />
-        <Stack.Screen name="calendar" options={{ title: 'Islamic Calendar' }} />
-        <Stack.Screen name="quran/[id]" options={{ title: 'Quran Reader' }} />
-        <Stack.Screen name="downloads" options={{ title: 'Offline Downloads' }} />
-        <Stack.Screen name="language" options={{ title: 'Translation Language' }} />
-        <Stack.Screen name="settings" options={{ title: 'Settings' }} />
-        <Stack.Screen name="customize-home" options={{ title: 'Customize Home Screen' }} />
-        <Stack.Screen name="hifz-tracker" options={{ title: 'Hifz Tracker' }} />
-        <Stack.Screen name="prayer-streak" options={{ title: 'Prayer Streak' }} />
-        <Stack.Screen name="mosque-finder" options={{ title: 'Mosque Finder' }} />
-        <Stack.Screen name="zakat-calculator" options={{ title: 'Zakat Calculator' }} />
-        <Stack.Screen name="islamic-books" options={{ title: 'Islamic Library' }} />
-        <Stack.Screen name="custom-adhan" options={{ title: 'Custom Adhan' }} />
-        <Stack.Screen name="halal-finder" options={{ title: 'Halal Restaurant Finder' }} />
-        <Stack.Screen name="ramadan" options={{ title: 'Ramadan' }} />
-        <Stack.Screen name="audio-library" options={{ title: 'Audio Library — آڈیو لائبریری' }} />
+        <Stack.Screen name="qibla" options={{ title: t('nav.titles.qibla') }} />
+        <Stack.Screen name="hadith" options={{ title: t('nav.titles.hadith') }} />
+        <Stack.Screen name="names" options={{ title: t('nav.titles.names') }} />
+        <Stack.Screen name="calendar" options={{ title: t('nav.titles.calendar') }} />
+        <Stack.Screen name="quran/[id]" options={{ title: t('nav.titles.quranReader') }} />
+        <Stack.Screen name="downloads" options={{ title: t('nav.titles.downloads') }} />
+        <Stack.Screen name="language" options={{ title: t('nav.titles.language') }} />
+        <Stack.Screen name="settings" options={{ title: t('nav.titles.settings') }} />
+        <Stack.Screen name="customize-home" options={{ title: t('nav.titles.customizeHome') }} />
+        <Stack.Screen name="hifz-tracker" options={{ title: t('nav.titles.hifzTracker') }} />
+        <Stack.Screen name="prayer-streak" options={{ title: t('nav.titles.prayerStreak') }} />
+        <Stack.Screen name="mosque-finder" options={{ title: t('nav.titles.mosqueFinder') }} />
+        <Stack.Screen name="zakat-calculator" options={{ title: t('nav.titles.zakatCalculator') }} />
+        <Stack.Screen name="islamic-books" options={{ title: t('nav.titles.islamicBooks') }} />
+        <Stack.Screen name="custom-adhan" options={{ title: t('nav.titles.customAdhan') }} />
+        <Stack.Screen name="halal-finder" options={{ title: t('nav.titles.halalFinder') }} />
+        <Stack.Screen name="ramadan" options={{ title: t('nav.titles.ramadan') }} />
+        <Stack.Screen name="audio-library" options={{ title: t('nav.titles.audioLibrary') }} />
         <Stack.Screen name="tasbeeh" options={{ headerShown: false }} />
         <Stack.Screen name="tasbeeh-list" options={{ headerShown: false }} />
         <Stack.Screen name="tasbeeh-edit" options={{ headerShown: false }} />

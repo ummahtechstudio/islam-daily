@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -63,6 +64,7 @@ function lightHaptic() {
 }
 
 export default function CityPickerScreen() {
+  const { t } = useTranslation();
   useEffect(() => { trackScreen('CityPicker'); }, []);
 
   const router = useRouter();
@@ -145,7 +147,7 @@ export default function CityPickerScreen() {
         <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.headerBack}>
           <Ionicons name="chevron-back" size={26} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Select City</Text>
+        <Text style={styles.headerTitle}>{t('cityPicker.header.title')}</Text>
         <View style={styles.headerSpacer} />
       </View>
 
@@ -155,7 +157,7 @@ export default function CityPickerScreen() {
           <Ionicons name="search" size={18} color={theme.textMuted} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Search city, country or لاہور"
+            placeholder={t('cityPicker.searchPlaceholder')}
             placeholderTextColor={theme.textMuted}
             value={query}
             onChangeText={setQuery}
@@ -177,7 +179,7 @@ export default function CityPickerScreen() {
         activeOpacity={0.85}
       >
         <Ionicons name="locate" size={16} color={GREEN} />
-        <Text style={styles.gpsText}>Use my current location</Text>
+        <Text style={styles.gpsText}>{t('cityPicker.useCurrentLocation')}</Text>
       </TouchableOpacity>
 
       {/* List */}
@@ -219,8 +221,7 @@ export default function CityPickerScreen() {
           <View style={styles.empty}>
             <Ionicons name="search-outline" size={40} color={GOLD} />
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-              No cities match your search.{'\n'}Try another spelling, or use "Use my current
-              location".
+              {t('cityPicker.empty.text')}
             </Text>
           </View>
         }

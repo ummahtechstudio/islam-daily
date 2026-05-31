@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
+import { useTranslation } from 'react-i18next';
 
 const ICONS: Record<string, string> = {
   Fajr: '🌙',
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function PrayerCard({ name, time, isNext, dark }: Props) {
+  const { t } = useTranslation();
   const theme = dark ? Colors.dark : Colors.light;
 
   return (
@@ -32,7 +34,7 @@ export function PrayerCard({ name, time, isNext, dark }: Props) {
       <Text style={styles.icon}>{ICONS[name] ?? '🕌'}</Text>
       <View style={styles.info}>
         <Text style={[styles.name, { color: isNext ? '#fff' : theme.text }]}>{name}</Text>
-        {isNext && <Text style={styles.nextLabel}>NEXT</Text>}
+        {isNext && <Text style={styles.nextLabel}>{t('prayerCard.nextLabel')}</Text>}
       </View>
       <Text style={[styles.time, { color: isNext ? '#fff' : Colors.primary }]}>{time}</Text>
     </View>

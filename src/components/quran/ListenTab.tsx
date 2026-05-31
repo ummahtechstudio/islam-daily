@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../../constants/colors';
 import { spacing } from '../../constants/spacing';
@@ -21,6 +22,7 @@ import { prefs } from '../../lib/storage';
 const LAST_LISTEN_SURAH_KEY = 'quran_audio_last_surah_v1';
 
 export default function ListenTab({ isDark }: { isDark: boolean }) {
+  const { t } = useTranslation();
   const theme = isDark ? Colors.dark : Colors.light;
   const audio = useQuranAudio();
 
@@ -98,7 +100,7 @@ export default function ListenTab({ isDark }: { isDark: boolean }) {
       {/* ── Reciter picker ── */}
       <View style={[styles.reciterStrip, { borderBottomColor: theme.border }]}>
         <Text style={[styles.reciterLabel, { color: theme.textMuted }]}>
-          Reciter
+          {t('quran.listen.reciterLabel')}
         </Text>
         <ScrollView
           horizontal
@@ -142,7 +144,7 @@ export default function ListenTab({ isDark }: { isDark: boolean }) {
       >
         <View style={{ flex: 1 }}>
           <Text style={[styles.surahHeaderLabel, { color: theme.textMuted }]}>
-            Surah
+            {t('quran.listen.surahLabel')}
           </Text>
           <Text style={[styles.surahHeaderName, { color: theme.text }]}>
             {surahMeta ? `${surahMeta.number}. ${surahMeta.name_english}` : '—'}
@@ -202,7 +204,7 @@ export default function ListenTab({ isDark }: { isDark: boolean }) {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-                No ayahs available for this surah.
+                {t('quran.listen.noAyahs')}
               </Text>
             </View>
           }

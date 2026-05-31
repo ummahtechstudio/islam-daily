@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { palette } from '../constants/colors';
 import { spacing, radius } from '../constants/spacing';
@@ -37,19 +38,21 @@ const GREEN = '#0F6E56';
 const GOLD = '#EF9F27';
 const CREAM = '#FBF6E4';
 
-const PRAYERS: { key: PrayerName; english: string; arabic: string }[] = [
-  { key: 'fajr',    english: 'Fajr',    arabic: 'الفجر'   },
-  { key: 'dhuhr',   english: 'Dhuhr',   arabic: 'الظهر'   },
-  { key: 'asr',     english: 'Asr',     arabic: 'العصر'   },
-  { key: 'maghrib', english: 'Maghrib', arabic: 'المغرب'  },
-  { key: 'isha',    english: 'Isha',    arabic: 'العشاء'  },
+const PRAYERS: { key: PrayerName; arabic: string }[] = [
+  { key: 'fajr',    arabic: 'الفجر'   },
+  { key: 'dhuhr',   arabic: 'الظهر'   },
+  { key: 'asr',     arabic: 'العصر'   },
+  { key: 'maghrib', arabic: 'المغرب'  },
+  { key: 'isha',    arabic: 'العشاء'  },
 ];
 
-const SOUND_OPTIONS: { key: PrayerSoundChoice; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { key: 'adhan',  label: 'Adhan',  icon: 'volume-high' },
-  { key: 'system', label: 'System', icon: 'notifications' },
-  { key: 'silent', label: 'Silent', icon: 'volume-mute' },
-];
+const SOUND_OPTION_KEYS: PrayerSoundChoice[] = ['adhan', 'system', 'silent'];
+
+const SOUND_ICONS: Record<PrayerSoundChoice, keyof typeof Ionicons.glyphMap> = {
+  adhan:  'volume-high',
+  system: 'notifications',
+  silent: 'volume-mute',
+};
 
 function lightHaptic() {
   if (Platform.OS === 'web') return;
@@ -69,6 +72,7 @@ export function NotificationsSettingsSection({
   cardColor,
   borderColor,
 }: Props) {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<PrayerNotificationSettings>(DEFAULT_NOTIFICATION_SETTINGS);
   const [permission, setPermission] = useState<NotificationPermissionStatus>('undetermined');
   const [showExplainer, setShowExplainer] = useState(false);
@@ -145,14 +149,14 @@ export function NotificationsSettingsSection({
 
     // denied previously — direct user to OS settings
     Alert.alert(
-      'Notifications disabled',
-      'Permissions were denied previously. You can enable them in your device settings.',
+      t('notifications.alerts.disabledTitle'),
+      t('notifications.alerts.disabledMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Open Settings', onPress: () => Linking.openSettings().catch(() => {}) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('notifications.alerts.openSettings'), onPress: () => Linking.openSettings().catch(() => {}) },
       ],
     );
-  }, [persistAndReschedule, settings]);
+  }, [persistAndReschedule, settings, t]);
 
   const disableMaster = useCallback(async () => {
     lightHaptic();
@@ -240,14 +244,14 @@ export function NotificationsSettingsSection({
     }
 
     Alert.alert(
-      'Notifications disabled',
-      'Permissions were denied previously. You can enable them in your device settings.',
+      t('notifications.alerts.disabledTitle'),
+      t('notifications.alerts.disabledMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Open Settings', onPress: () => Linking.openSettings().catch(() => {}) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('notifications.alerts.openSettings'), onPress: () => Linking.openSettings().catch(() => {}) },
       ],
     );
-  }, [setTahajjudEnabled]);
+  }, [setTahajjudEnabled, t]);
 
   const disableTahajjud = useCallback(() => {
     lightHaptic();
@@ -283,16 +287,26 @@ export function NotificationsSettingsSection({
     setShowTestPicker(false);
     lightHaptic();
     if (Platform.OS === 'web') {
-      Alert.alert('Test on device', 'Test notifications fire only on a real device or development build, not in the web preview.');
+      Alert.alert(
+        t('notifications.alerts.webOnlyTitle'),
+        t('notifications.alerts.webOnlyMessage'),
+      );
       return;
     }
     if (permission !== 'granted') {
-      Alert.alert('Permission required', 'Allow notifications first to send a test.');
+      Alert.alert(
+        t('notifications.alerts.permRequiredTitle'),
+        t('notifications.alerts.permRequiredMessage'),
+      );
       return;
     }
     await fireTestNotification(prayer);
-    Alert.alert('Test sent', `${prayer.charAt(0).toUpperCase() + prayer.slice(1)} test notification will arrive in a moment.`);
-  }, [permission]);
+    const prayerLabel = prayer.charAt(0).toUpperCase() + prayer.slice(1);
+    Alert.alert(
+      t('notifications.alerts.testSentTitle'),
+      t('notifications.alerts.testSentMessage', { prayer: prayerLabel }),
+    );
+  }, [permission, t]);
 
   // ─── Permission status row ─────────────────────────────────────────────────
 
@@ -301,7 +315,7 @@ export function NotificationsSettingsSection({
       return (
         <View style={styles.permRow}>
           <Ionicons name="checkmark-circle" size={14} color={GREEN} />
-          <Text style={[styles.permText, { color: GREEN }]}>Permissions granted</Text>
+          <Text style={[styles.permText, { color: GREEN }]}>{t('notifications.permission.granted')}</Text>
         </View>
       );
     }
@@ -314,7 +328,7 @@ export function NotificationsSettingsSection({
         >
           <Ionicons name="warning" size={14} color={palette.error} />
           <Text style={[styles.permText, { color: palette.error }]}>
-            Permissions denied. Tap to open settings.
+            {t('notifications.permission.denied')}
           </Text>
         </TouchableOpacity>
       );
@@ -323,7 +337,7 @@ export function NotificationsSettingsSection({
       <View style={styles.permRow}>
         <Ionicons name="information-circle-outline" size={14} color={textMutedColor} />
         <Text style={[styles.permText, { color: textMutedColor }]}>
-          Tap "Enable prayer notifications" to grant permission.
+          {t('notifications.permission.undetermined')}
         </Text>
       </View>
     );
@@ -334,15 +348,18 @@ export function NotificationsSettingsSection({
 
   return (
     <>
-      <SectionHeader title="Notifications" subtitle="Adhan reminders for the five daily prayers" />
+      <SectionHeader
+        title={t('notifications.sections.prayers.title')}
+        subtitle={t('notifications.sections.prayers.subtitle')}
+      />
 
       {/* Master toggle card */}
       <View style={[styles.card, { backgroundColor: cardColor, borderColor }]}>
         <View style={styles.masterRow}>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.masterLabel, { color: textColor }]}>Enable prayer notifications</Text>
+            <Text style={[styles.masterLabel, { color: textColor }]}>{t('notifications.master.label')}</Text>
             <Text style={[styles.masterSub, { color: textMutedColor }]}>
-              Master switch — turn off to silence all five prayers
+              {t('notifications.master.sub')}
             </Text>
           </View>
           <Switch
@@ -364,6 +381,8 @@ export function NotificationsSettingsSection({
           const last = idx === PRAYERS.length - 1;
           const today = todayTimes[p.key];
           const dimmed = rowsDisabled || !cfg.enabled;
+          // Capitalise the prayer key for the English name label
+          const englishName = p.key.charAt(0).toUpperCase() + p.key.slice(1);
           return (
             <View
               key={p.key}
@@ -376,11 +395,11 @@ export function NotificationsSettingsSection({
               <View style={styles.prayerHead}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.prayerName, { color: textColor }]}>
-                    {p.english} <Text style={[styles.prayerArabic, { color: textMutedColor }]}>· {p.arabic}</Text>
+                    {englishName} <Text style={[styles.prayerArabic, { color: textMutedColor }]}>· {p.arabic}</Text>
                   </Text>
                   {today && (
                     <Text style={[styles.prayerTime, { color: textMutedColor }]}>
-                      Today · {formatPrayerTime(today)}
+                      {t('notifications.prayerRow.today', { time: formatPrayerTime(today) })}
                     </Text>
                   )}
                 </View>
@@ -394,26 +413,26 @@ export function NotificationsSettingsSection({
               </View>
 
               <View style={[styles.pillRow, dimmed && { opacity: 0.6 }]}>
-                {SOUND_OPTIONS.map((opt) => {
-                  const selected = cfg.sound === opt.key;
+                {SOUND_OPTION_KEYS.map((key) => {
+                  const selected = cfg.sound === key;
                   return (
                     <TouchableOpacity
-                      key={opt.key}
+                      key={key}
                       style={[
                         styles.pill,
                         selected && styles.pillSelected,
                       ]}
-                      onPress={() => setPrayerSound(p.key, opt.key)}
+                      onPress={() => setPrayerSound(p.key, key)}
                       disabled={rowsDisabled || !cfg.enabled}
                       activeOpacity={0.75}
                     >
                       <Ionicons
-                        name={opt.icon}
+                        name={SOUND_ICONS[key]}
                         size={13}
                         color={selected ? '#FFFFFF' : GREEN}
                       />
                       <Text style={[styles.pillLabel, selected && styles.pillLabelSelected]}>
-                        {opt.label}
+                        {t(`notifications.sound.options.${key}`)}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -439,21 +458,20 @@ export function NotificationsSettingsSection({
         activeOpacity={0.85}
       >
         <Ionicons name="paper-plane" size={14} color={GREEN} />
-        <Text style={styles.testBtnText}>Test notification</Text>
+        <Text style={styles.testBtnText}>{t('notifications.testBtn')}</Text>
       </TouchableOpacity>
 
       <View style={[styles.aboutCard, { backgroundColor: CREAM }]}>
         <Ionicons name="information-circle" size={16} color={GREEN} />
         <Text style={styles.aboutText}>
-          Notifications fire at exact prayer time, computed locally from your selected method and
-          city.
+          {t('notifications.aboutCard')}
         </Text>
       </View>
 
       {/* ── Sunnah Reminders (optional / extra) ──────────────────────────── */}
       <SectionHeader
-        title="Sunnah Reminders"
-        subtitle="Optional voluntary reminders — separate from the five daily prayers"
+        title={t('notifications.sections.sunnah.title')}
+        subtitle={t('notifications.sections.sunnah.subtitle')}
       />
 
       <View style={[styles.card, { backgroundColor: cardColor, borderColor }]}>
@@ -463,10 +481,10 @@ export function NotificationsSettingsSection({
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.tahajjudName, { color: textColor }]}>
-              Tahajjud reminder
+              {t('notifications.tahajjud.name')}
             </Text>
             <Text style={[styles.tahajjudSub, { color: textMutedColor }]}>
-              Fires once at the start of the last third of the night (Maghrib → Fajr)
+              {t('notifications.tahajjud.sub')}
             </Text>
           </View>
           <Switch
@@ -481,8 +499,7 @@ export function NotificationsSettingsSection({
       <View style={[styles.aboutCard, { backgroundColor: CREAM }]}>
         <Ionicons name="information-circle" size={16} color={GREEN} />
         <Text style={styles.aboutText}>
-          Off by default. When on, the reminder time is recomputed from your prayer settings each
-          day, so it always matches your Maghrib and Fajr.
+          {t('notifications.tahajjud.aboutCard')}
         </Text>
       </View>
 
@@ -493,10 +510,9 @@ export function NotificationsSettingsSection({
             <View style={styles.modalIconWrap}>
               <Ionicons name="notifications" size={32} color={GREEN} />
             </View>
-            <Text style={styles.modalTitle}>Allow Islam Daily to send prayer notifications?</Text>
+            <Text style={styles.modalTitle}>{t('notifications.explainerModal.title')}</Text>
             <Text style={styles.modalBody}>
-              We&apos;ll notify you at each prayer time with your chosen sound — adhan, silent, or
-              system tone. You can customize each prayer individually.
+              {t('notifications.explainerModal.body')}
             </Text>
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -504,14 +520,14 @@ export function NotificationsSettingsSection({
                 onPress={handleExplainerCancel}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalBtnGhostText}>Cancel</Text>
+                <Text style={styles.modalBtnGhostText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalBtn, styles.modalBtnPrimary]}
                 onPress={handleExplainerAllow}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalBtnPrimaryText}>Allow notifications</Text>
+                <Text style={styles.modalBtnPrimaryText}>{t('notifications.explainerModal.allowBtn')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -530,10 +546,9 @@ export function NotificationsSettingsSection({
             <View style={styles.modalIconWrap}>
               <Ionicons name="moon" size={32} color={GREEN} />
             </View>
-            <Text style={styles.modalTitle}>Allow Tahajjud reminders?</Text>
+            <Text style={styles.modalTitle}>{t('notifications.tahajjudModal.title')}</Text>
             <Text style={styles.modalBody}>
-              We&apos;ll send one quiet reminder at the start of the last third of the night, with
-              a verse to encourage night prayer. You can turn it off anytime.
+              {t('notifications.tahajjudModal.body')}
             </Text>
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -541,14 +556,14 @@ export function NotificationsSettingsSection({
                 onPress={handleTahajjudExplainerCancel}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalBtnGhostText}>Cancel</Text>
+                <Text style={styles.modalBtnGhostText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalBtn, styles.modalBtnPrimary]}
                 onPress={handleTahajjudExplainerAllow}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalBtnPrimaryText}>Allow notifications</Text>
+                <Text style={styles.modalBtnPrimaryText}>{t('notifications.tahajjudModal.allowBtn')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -559,27 +574,30 @@ export function NotificationsSettingsSection({
       <Modal visible={showTestPicker} transparent animationType="fade" onRequestClose={() => setShowTestPicker(false)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Send test for which prayer?</Text>
-            <Text style={styles.modalBody}>The test fires immediately using that prayer&apos;s sound.</Text>
+            <Text style={styles.modalTitle}>{t('notifications.testPickerModal.title')}</Text>
+            <Text style={styles.modalBody}>{t('notifications.testPickerModal.body')}</Text>
             <View style={styles.testList}>
-              {PRAYERS.map((p) => (
-                <TouchableOpacity
-                  key={p.key}
-                  style={styles.testRow}
-                  onPress={() => handleTestPress(p.key)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.testRowLabel}>{p.english}</Text>
-                  <Ionicons name="chevron-forward" size={16} color={GREEN} />
-                </TouchableOpacity>
-              ))}
+              {PRAYERS.map((p) => {
+                const englishName = p.key.charAt(0).toUpperCase() + p.key.slice(1);
+                return (
+                  <TouchableOpacity
+                    key={p.key}
+                    style={styles.testRow}
+                    onPress={() => handleTestPress(p.key)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.testRowLabel}>{englishName}</Text>
+                    <Ionicons name="chevron-forward" size={16} color={GREEN} />
+                  </TouchableOpacity>
+                );
+              })}
             </View>
             <TouchableOpacity
               style={[styles.modalBtn, styles.modalBtnGhost, { alignSelf: 'stretch' }]}
               onPress={() => setShowTestPicker(false)}
               activeOpacity={0.85}
             >
-              <Text style={styles.modalBtnGhostText}>Cancel</Text>
+              <Text style={styles.modalBtnGhostText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -112,9 +113,9 @@ function elementsToRestaurants(
     const cuisine: string | undefined = tags.cuisine;
     const halalTag: string | undefined = tags.halal || tags['diet:halal'];
     let halalCert: string | undefined;
-    if (halalTag === 'yes') halalCert = 'Halal certified';
-    else if (cuisine?.toLowerCase().includes('halal')) halalCert = 'Halal cuisine';
-    else if (/halal/i.test(name)) halalCert = 'Halal (by name)';
+    if (halalTag === 'yes') halalCert = 'certified';
+    else if (cuisine?.toLowerCase().includes('halal')) halalCert = 'cuisine';
+    else if (/halal/i.test(name)) halalCert = 'byName';
     out.push({
       id: el.id,
       lat,
@@ -131,6 +132,7 @@ function elementsToRestaurants(
 
 export default function HalalFinderScreen() {
   useEffect(() => { trackScreen('HalalFinder'); }, []);
+  const { t } = useTranslation();
 
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -173,12 +175,12 @@ export default function HalalFinderScreen() {
       if (e instanceof OfflineError) {
         setError(OFFLINE_MESSAGE);
       } else {
-        setError('Failed to find restaurants. Please try again in a moment.');
+        setError(t('halalFinder.errors.fetchFailed'));
       }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchAtCurrentLocation = useCallback(
     async (km: Radius) => {
@@ -188,7 +190,7 @@ export default function HalalFinderScreen() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          setError('Location permission denied. Please enable location access in Settings.');
+          setError(t('halalFinder.errors.locationDenied'));
           setPermissionDenied(true);
           setLoading(false);
           return;
@@ -199,11 +201,11 @@ export default function HalalFinderScreen() {
         setUserLon(longitude);
         await search(latitude, longitude, km);
       } catch (e) {
-        setError('Failed to get your location.');
+        setError(t('halalFinder.errors.locationFailed'));
         setLoading(false);
       }
     },
-    [search],
+    [search, t],
   );
 
   useEffect(() => { fetchAtCurrentLocation(DEFAULT_RADIUS_KM); }, [fetchAtCurrentLocation]);
@@ -241,15 +243,19 @@ export default function HalalFinderScreen() {
       <View style={[styles.header, { backgroundColor: ACCENT }]}>
         <Text style={styles.headerEmoji}>🥩</Text>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Halal Restaurants</Text>
+          <Text style={styles.headerTitle}>{t('halalFinder.header.title')}</Text>
           <Text style={styles.headerSub} numberOfLines={1}>
             {loading
-              ? 'Finding halal restaurants near you...'
+              ? t('halalFinder.header.loading')
               : userLat != null && places.length > 0
-              ? `Found ${places.length} ${places.length === 1 ? 'restaurant' : 'restaurants'} within ${effectiveRadiusKm}km`
+              ? t('halalFinder.header.found', {
+                  count: places.length,
+                  restaurantWord: places.length === 1 ? 'restaurant' : 'restaurants',
+                  radius: effectiveRadiusKm,
+                })
               : userLat != null
-              ? `No restaurants within ${effectiveRadiusKm}km`
-              : 'Finding your location...'}
+              ? t('halalFinder.header.none', { radius: effectiveRadiusKm })
+              : t('halalFinder.header.locating')}
           </Text>
         </View>
         <TouchableOpacity onPress={handleRefresh} style={styles.refreshBtn} hitSlop={8} disabled={loading}>
@@ -289,7 +295,7 @@ export default function HalalFinderScreen() {
 
       {autoExpanded ? (
         <Text style={[styles.autoExpandText, { color: theme.textMuted }]}>
-          No restaurants within {radius}km — showing within {effectiveRadiusKm}km
+          {t('halalFinder.autoExpand', { requested: radius, effective: effectiveRadiusKm })}
         </Text>
       ) : null}
 
@@ -297,7 +303,7 @@ export default function HalalFinderScreen() {
         <View style={styles.centerBox}>
           <ActivityIndicator size="large" color={ACCENT} />
           <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
-            Finding halal restaurants nearby...
+            {t('halalFinder.loading')}
           </Text>
         </View>
       ) : error ? (
@@ -309,14 +315,14 @@ export default function HalalFinderScreen() {
               style={[styles.actionBtn, { backgroundColor: ACCENT }]}
               onPress={() => Linking.openSettings().catch(() => {})}
             >
-              <Text style={styles.actionBtnText}>Open Settings</Text>
+              <Text style={styles.actionBtnText}>{t('halalFinder.openSettings')}</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
               style={[styles.actionBtn, { backgroundColor: ACCENT }]}
               onPress={handleRefresh}
             >
-              <Text style={styles.actionBtnText}>Try Again</Text>
+              <Text style={styles.actionBtnText}>{t('common.tryAgain')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -324,7 +330,7 @@ export default function HalalFinderScreen() {
         <View style={styles.centerBox}>
           <Text style={{ fontSize: 40 }}>🔍</Text>
           <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-            No halal restaurants found within {effectiveRadiusKm}km. Try expanding your radius.
+            {t('halalFinder.empty', { radius: effectiveRadiusKm })}
           </Text>
         </View>
       ) : (
@@ -344,7 +350,7 @@ export default function HalalFinderScreen() {
                 {item.halalCert && (
                   <View style={styles.certRow}>
                     <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
-                    <Text style={styles.certText}>{item.halalCert}</Text>
+                    <Text style={styles.certText}>{t(`halalFinder.halalCert.${item.halalCert}`)}</Text>
                   </View>
                 )}
                 {item.cuisine && (
@@ -354,8 +360,8 @@ export default function HalalFinderScreen() {
                 )}
                 <Text style={styles.distance}>
                   📍 {item.distance < 1
-                    ? `${Math.round(item.distance * 1000)} m away`
-                    : `${item.distance.toFixed(1)} km away`}
+                    ? t('halalFinder.distance.meters', { m: Math.round(item.distance * 1000) })
+                    : t('halalFinder.distance.km', { km: item.distance.toFixed(1) })}
                 </Text>
               </View>
               <TouchableOpacity
@@ -363,7 +369,7 @@ export default function HalalFinderScreen() {
                 onPress={() => openDirections(item.lat, item.lon, item.name)}
               >
                 <Ionicons name="navigate" size={14} color="#fff" />
-                <Text style={styles.dirBtnText}>Go</Text>
+                <Text style={styles.dirBtnText}>{t('halalFinder.directions')}</Text>
               </TouchableOpacity>
             </View>
           )}

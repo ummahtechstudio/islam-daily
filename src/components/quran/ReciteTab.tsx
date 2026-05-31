@@ -19,6 +19,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MushafPageItem from './MushafPageItem';
@@ -59,6 +60,7 @@ export type ReciteTabProps = {
 };
 
 export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList<number>>(null);
   const positionWriter = useDebouncedPositionWriter(500);
@@ -215,7 +217,7 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     <View style={styles.flex}>
       {/* Font-scale toolbar */}
       <View style={styles.toolbar}>
-        <Text style={styles.toolbarLabel}>Text size</Text>
+        <Text style={styles.toolbarLabel}>{t('quran.reciteTab.textSize')}</Text>
         <View style={styles.toolbarBtns}>
           <TouchableOpacity
             style={[
@@ -224,7 +226,7 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
             ]}
             onPress={() => adjustScale(-FONT_SCALE_STEP)}
             disabled={fontScale <= FONT_SCALE_MIN}
-            accessibilityLabel="Decrease text size"
+            accessibilityLabel={t('quran.reciteTab.decreaseSize')}
           >
             <Text style={styles.scaleBtnText}>A−</Text>
           </TouchableOpacity>
@@ -238,7 +240,7 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
             ]}
             onPress={() => adjustScale(FONT_SCALE_STEP)}
             disabled={fontScale >= FONT_SCALE_MAX}
-            accessibilityLabel="Increase text size"
+            accessibilityLabel={t('quran.reciteTab.increaseSize')}
           >
             <Text style={styles.scaleBtnText}>A+</Text>
           </TouchableOpacity>
@@ -269,11 +271,11 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
         ]}
         onPress={() => setJumpModalOpen(true)}
         activeOpacity={0.85}
-        accessibilityLabel="Jump to page or surah"
+        accessibilityLabel={t('quran.reciteTab.jumpToPageOrSurah')}
       >
         <Ionicons name="book" size={14} color={GOLD} />
         <Text style={styles.floatingText}>
-          Page {currentPage} / {TOTAL_PAGES} · Juz {juz}
+          {t('quran.reciteTab.floatingIndicator', { page: currentPage, total: TOTAL_PAGES, juz })}
         </Text>
         <Ionicons name="chevron-up" size={14} color={GOLD} />
       </TouchableOpacity>
@@ -301,6 +303,7 @@ function JumpToModal({
   onClose: () => void;
   onJump: (page: number) => void;
 }) {
+  const { t } = useTranslation();
   const [pageInput, setPageInput] = useState('');
   const [surahQuery, setSurahQuery] = useState('');
 
@@ -343,11 +346,11 @@ function JumpToModal({
         >
         <Pressable style={modalStyles.sheet} onPress={(e) => e.stopPropagation()}>
           <View style={modalStyles.header}>
-            <Text style={modalStyles.title}>Jump to</Text>
+            <Text style={modalStyles.title}>{t('quran.jumpModal.title')}</Text>
             <TouchableOpacity
               onPress={onClose}
               hitSlop={8}
-              accessibilityLabel="Close"
+              accessibilityLabel={t('quran.jumpModal.close')}
               accessibilityRole="button"
             >
               <Ionicons name="close" size={22} color="#fff" />
@@ -356,13 +359,13 @@ function JumpToModal({
 
           {/* Page jump */}
           <View style={modalStyles.section}>
-            <Text style={modalStyles.sectionLabel}>Page (1–{TOTAL_PAGES})</Text>
+            <Text style={modalStyles.sectionLabel}>{t('quran.jumpModal.pageLabel', { total: TOTAL_PAGES })}</Text>
             <View style={modalStyles.pageRow}>
               <TextInput
                 style={modalStyles.pageInput}
                 value={pageInput}
                 onChangeText={setPageInput}
-                placeholder="e.g. 50"
+                placeholder={t('quran.jumpModal.pagePlaceholder')}
                 placeholderTextColor="#888"
                 keyboardType="number-pad"
                 maxLength={3}
@@ -373,21 +376,21 @@ function JumpToModal({
                 onPress={handlePageJump}
                 style={modalStyles.pageGoBtn}
               >
-                <Text style={modalStyles.pageGoText}>Go</Text>
+                <Text style={modalStyles.pageGoText}>{t('quran.jumpModal.go')}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Surah search */}
           <View style={[modalStyles.section, { flex: 1 }]}>
-            <Text style={modalStyles.sectionLabel}>Surah</Text>
+            <Text style={modalStyles.sectionLabel}>{t('quran.jumpModal.surahLabel')}</Text>
             <View style={modalStyles.searchRow}>
               <Ionicons name="search" size={16} color="#888" />
               <TextInput
                 style={modalStyles.surahSearch}
                 value={surahQuery}
                 onChangeText={setSurahQuery}
-                placeholder="Search surah by name or number"
+                placeholder={t('quran.jumpModal.surahSearchPlaceholder')}
                 placeholderTextColor="#888"
               />
             </View>
@@ -408,8 +411,7 @@ function JumpToModal({
                       {item.name_english}
                     </Text>
                     <Text style={modalStyles.surahMeta}>
-                      {item.ayah_count} ayahs · Page{' '}
-                      {SURAH_PAGE_STARTS[item.number]}
+                      {t('quran.jumpModal.surahMeta', { count: item.ayah_count, page: SURAH_PAGE_STARTS[item.number] })}
                     </Text>
                   </View>
                   <Text style={modalStyles.surahArabic}>{item.name_arabic}</Text>

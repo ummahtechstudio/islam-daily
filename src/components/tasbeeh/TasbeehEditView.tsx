@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../constants/colors';
 import {
@@ -43,6 +44,7 @@ export function TasbeehEditView({
   onDeleted,
   onCancel,
 }: TasbeehEditViewProps) {
+  const { t } = useTranslation();
   const isEditing = !!editingId;
 
   const [name, setName] = useState('');
@@ -71,15 +73,15 @@ export function TasbeehEditView({
     const targetNum = parseInt(target, 10);
 
     if (trimmedName.length < 1 || trimmedName.length > 50) {
-      Alert.alert('Invalid name', 'Name must be 1–50 characters.');
+      Alert.alert(t('tasbeeh.edit.alerts.invalidName.title'), t('tasbeeh.edit.alerts.invalidName.message'));
       return;
     }
     if (trimmedArabic.length < 1) {
-      Alert.alert('Arabic required', 'Please enter Arabic text for this counter.');
+      Alert.alert(t('tasbeeh.edit.alerts.arabicRequired.title'), t('tasbeeh.edit.alerts.arabicRequired.message'));
       return;
     }
     if (!Number.isFinite(targetNum) || targetNum < 1 || targetNum > 9999) {
-      Alert.alert('Invalid target', 'Target must be a number between 1 and 9999.');
+      Alert.alert(t('tasbeeh.edit.alerts.invalidTarget.title'), t('tasbeeh.edit.alerts.invalidTarget.message'));
       return;
     }
 
@@ -115,12 +117,12 @@ export function TasbeehEditView({
   const handleDelete = () => {
     if (!original || original.isDefault) return;
     Alert.alert(
-      'Delete counter?',
-      `This will permanently remove "${original.name}" and its progress.`,
+      t('tasbeeh.edit.alerts.deleteCounter.title'),
+      t('tasbeeh.edit.alerts.deleteCounter.message', { name: original.name }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             await deleteCounter(original.id);
@@ -142,7 +144,7 @@ export function TasbeehEditView({
           </TouchableOpacity>
         ) : null}
         <Text style={styles.topTitle}>
-          {isEditing ? 'Edit Counter' : 'New Counter'}
+          {isEditing ? t('tasbeeh.edit.titleEdit') : t('tasbeeh.edit.titleNew')}
         </Text>
         <View style={{ width: 26 }} />
       </View>
@@ -156,36 +158,36 @@ export function TasbeehEditView({
           keyboardShouldPersistTaps="handled"
         >
           <Field
-            label="Name (English)"
+            label={t('tasbeeh.edit.fields.name')}
             theme={theme}
             value={name}
             onChange={setName}
-            placeholder="e.g. SubhanAllah"
+            placeholder={t('tasbeeh.edit.fields.namePlaceholder')}
             maxLength={50}
           />
           <Field
-            label="Arabic Text"
+            label={t('tasbeeh.edit.fields.arabic')}
             theme={theme}
             value={arabic}
             onChange={setArabic}
-            placeholder="سُبْحَانَ اللَّهِ"
+            placeholder={t('tasbeeh.edit.fields.arabicPlaceholder')}
             arabic
           />
           <Field
-            label="Target Count"
+            label={t('tasbeeh.edit.fields.target')}
             theme={theme}
             value={target}
             onChange={(v) => setTarget(v.replace(/[^0-9]/g, ''))}
-            placeholder="33"
+            placeholder={t('tasbeeh.edit.fields.targetPlaceholder')}
             keyboardType="number-pad"
             maxLength={4}
           />
           <Field
-            label="Source / Reference (optional)"
+            label={t('tasbeeh.edit.fields.source')}
             theme={theme}
             value={source}
             onChange={setSource}
-            placeholder="e.g. Bukhari 843"
+            placeholder={t('tasbeeh.edit.fields.sourcePlaceholder')}
             maxLength={120}
           />
 
@@ -195,7 +197,7 @@ export function TasbeehEditView({
               onPress={onCancel}
               activeOpacity={0.8}
             >
-              <Text style={[styles.btnGhostText, { color: theme.textSecondary }]}>Cancel</Text>
+              <Text style={[styles.btnGhostText, { color: theme.textSecondary }]}>{t('common.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.btn, { backgroundColor: Colors.primary }]}
@@ -203,7 +205,7 @@ export function TasbeehEditView({
               activeOpacity={0.8}
             >
               <Ionicons name="checkmark" size={16} color="#fff" />
-              <Text style={styles.btnText}>{isEditing ? 'Save Changes' : 'Create Counter'}</Text>
+              <Text style={styles.btnText}>{isEditing ? t('tasbeeh.edit.saveChanges') : t('tasbeeh.edit.createCounter')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -214,7 +216,7 @@ export function TasbeehEditView({
               activeOpacity={0.8}
             >
               <Ionicons name="trash-outline" size={16} color="#EF4444" />
-              <Text style={styles.deleteText}>Delete Counter</Text>
+              <Text style={styles.deleteText}>{t('tasbeeh.edit.deleteCounter')}</Text>
             </TouchableOpacity>
           ) : null}
         </ScrollView>

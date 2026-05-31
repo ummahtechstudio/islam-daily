@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../constants/colors';
 import {
@@ -45,6 +46,7 @@ export function TasbeehListView({
   onNewCounter,
   onEditCounter,
 }: TasbeehListViewProps) {
+  const { t } = useTranslation();
   const [counters, setCounters] = useState<TasbeehCounter[]>([]);
   const templates = useMemo(() => loadDhikrTemplates(), []);
 
@@ -62,15 +64,15 @@ export function TasbeehListView({
   const sections = useMemo(
     () => [
       {
-        title: 'My Counters',
+        title: t('tasbeeh.list.sections.myCounters'),
         data: counters.map<Row>((c) => ({ kind: 'counter', data: c })),
       },
       {
-        title: `Templates from Dhikr (${templates.length})`,
-        data: templates.map<Row>((t) => ({ kind: 'template', data: t })),
+        title: t('tasbeeh.list.sections.templates', { count: templates.length }),
+        data: templates.map<Row>((tpl) => ({ kind: 'template', data: tpl })),
       },
     ],
-    [counters, templates],
+    [counters, templates, t],
   );
 
   const handleSelect = useCallback(
@@ -85,12 +87,12 @@ export function TasbeehListView({
     (counter: TasbeehCounter) => {
       if (counter.isDefault) return;
       Alert.alert(
-        'Delete counter?',
-        `This will permanently remove "${counter.name}" and its progress.`,
+        t('tasbeeh.edit.alerts.deleteCounter.title'),
+        t('tasbeeh.edit.alerts.deleteCounter.message', { name: counter.name }),
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: t('common.cancel'), style: 'cancel' },
           {
-            text: 'Delete',
+            text: t('common.delete'),
             style: 'destructive',
             onPress: async () => {
               await deleteCounter(counter.id);
@@ -100,7 +102,7 @@ export function TasbeehListView({
         ],
       );
     },
-    [reload],
+    [reload, t],
   );
 
   const handleUseTemplate = useCallback(
@@ -120,14 +122,14 @@ export function TasbeehListView({
             <Ionicons name="chevron-back" size={26} color="#fff" />
           </TouchableOpacity>
         ) : null}
-        <Text style={styles.topTitle}>Counters</Text>
+        <Text style={styles.topTitle}>{t('tasbeeh.list.title')}</Text>
         <TouchableOpacity
           style={styles.newBtn}
           onPress={onNewCounter}
           activeOpacity={0.8}
         >
           <Ionicons name="add" size={16} color={Colors.primary} />
-          <Text style={styles.newBtnText}>New</Text>
+          <Text style={styles.newBtnText}>{t('tasbeeh.list.newBtn')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -146,10 +148,10 @@ export function TasbeehListView({
           counters.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={[styles.emptyTitle, { color: theme.text }]}>
-                No saved counters yet
+                {t('tasbeeh.list.empty.title')}
               </Text>
               <Text style={[styles.emptySubtitle, { color: theme.textMuted }]}>
-                Tap "Use" on a template below to create your first one.
+                {t('tasbeeh.list.empty.subtitle')}
               </Text>
             </View>
           ) : null
@@ -201,6 +203,7 @@ function CounterCard({
   onEdit?: () => void;
   onDelete?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}
@@ -218,11 +221,11 @@ function CounterCard({
           </Text>
           <Text style={[styles.cardMetaDot, { color: theme.textMuted }]}>•</Text>
           <Text style={[styles.cardMetaText, { color: theme.textMuted }]}>
-            Round {counter.rounds}
+            {t('tasbeeh.list.counter.round', { round: counter.rounds })}
           </Text>
           <Text style={[styles.cardMetaDot, { color: theme.textMuted }]}>•</Text>
           <Text style={[styles.cardMetaText, { color: GOLD }]}>
-            Total {counter.totalCount.toLocaleString()}
+            {t('tasbeeh.list.counter.total', { total: counter.totalCount.toLocaleString() })}
           </Text>
         </View>
         {counter.source ? (
@@ -257,6 +260,7 @@ function TemplateCard({
   theme: typeof Colors.dark;
   onUse: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
       <View style={styles.cardLeft}>
@@ -266,7 +270,7 @@ function TemplateCard({
         </Text>
         <View style={styles.cardMeta}>
           <Text style={[styles.cardMetaText, { color: theme.textSecondary }]}>
-            Target: {template.target}
+            {t('tasbeeh.list.counter.target', { target: template.target })}
           </Text>
           {template.category ? (
             <>
@@ -289,7 +293,7 @@ function TemplateCard({
         activeOpacity={0.8}
       >
         <Ionicons name="add" size={14} color="#fff" />
-        <Text style={styles.useBtnText}>Use</Text>
+        <Text style={styles.useBtnText}>{t('tasbeeh.list.useBtn')}</Text>
       </TouchableOpacity>
     </View>
   );

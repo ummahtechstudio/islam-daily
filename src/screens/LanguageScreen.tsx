@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../constants/colors';
 import { trackScreen } from '../services/analytics';
@@ -18,6 +19,7 @@ import { useStore } from '../store';
 
 export default function LanguageScreen() {
   useEffect(() => { trackScreen('Language'); }, []);
+  const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -96,9 +98,9 @@ export default function LanguageScreen() {
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.headerTitle}>Translation Language</Text>
+        <Text style={styles.headerTitle}>{t('language.header.title')}</Text>
         <Text style={styles.headerSub}>
-          Selected: {settings.selectedTranslationName ?? 'Urdu — Jalandhri'}
+          {t('language.header.selected', { name: settings.selectedTranslationName ?? t('language.defaultName') })}
         </Text>
       </View>
 
@@ -111,7 +113,7 @@ export default function LanguageScreen() {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
-            Choose a translation for the Quran reader. This applies across the app.
+            {t('language.listHeader')}
           </Text>
         }
       />

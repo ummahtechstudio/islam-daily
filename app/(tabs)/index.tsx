@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 
@@ -67,13 +68,14 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
 
 // ─── Greeting Card — manuscript treatment in body ────────────────────────────
 function GreetingCard({ hijriDate }: { hijriDate: string | null }) {
+  const { t } = useTranslation();
   return (
     <View style={{ marginBottom: spacing.md }}>
       <ManuscriptCard variant="bordered">
         <View style={greetingStyles.patternWrap} pointerEvents="none">
           <IslamicPattern size={70} color={palette.green} opacity={0.05} />
         </View>
-        <Text style={greetingStyles.salamEn}>Assalamu Alaikum</Text>
+        <Text style={greetingStyles.salamEn}>{t('home.greeting.salam')}</Text>
         {hijriDate ? (
           <Text style={greetingStyles.hijri}>{hijriDate}</Text>
         ) : null}
@@ -99,14 +101,6 @@ const greetingStyles = StyleSheet.create({
 });
 
 // ─── Compact Prayer Next Card (P.1a) — manuscript treatment ──────────────────
-const PRAYER_LABEL_MAP: Record<PrayerName, string> = {
-  fajr: 'Fajr',
-  sunrise: 'Sunrise',
-  dhuhr: 'Dhuhr',
-  asr: 'Asr',
-  maghrib: 'Maghrib',
-  isha: 'Isha',
-};
 const METHOD_LABEL_MAP: Record<string, string> = {
   Karachi: 'Karachi',
   Dubai: 'Dubai',
@@ -134,6 +128,7 @@ const skelStyles = StyleSheet.create({
 });
 
 function PrayerNextCard({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation();
   const { settings, loading } = useResolvedLocation();
   const [tick, setTick] = useState(Date.now());
   useEffect(() => {
@@ -161,8 +156,8 @@ function PrayerNextCard({ onPress }: { onPress: () => void }) {
   const nextEntry = computed.prayers.find((p) => p.name === computed.nextPrayer);
   const nextName = nextEntry
     ? nextEntry.isFriday && nextEntry.name === 'dhuhr'
-      ? "Jumu'ah"
-      : PRAYER_LABEL_MAP[nextEntry.name]
+      ? t('prayers.names.jumuah')
+      : t(`prayers.names.${nextEntry.name}`)
     : null;
 
   if (!nextName || !computed.nextPrayerTime) {
@@ -179,7 +174,7 @@ function PrayerNextCard({ onPress }: { onPress: () => void }) {
         <View style={pncStyles.patternWrap} pointerEvents="none">
           <IslamicPattern size={90} color={palette.green} opacity={0.06} />
         </View>
-        <Text style={pncStyles.label}>NEXT PRAYER</Text>
+        <Text style={pncStyles.label}>{t('home.prayerNext.label')}</Text>
         <View style={pncStyles.row}>
           <Text style={pncStyles.name}>{nextName}</Text>
           <Text style={pncStyles.time}>{time}</Text>
@@ -267,14 +262,15 @@ function QuickGrid({ nextPrayer, onPress, cards }: {
   onPress: (route: string) => void;
   cards: QuickCard[];
 }) {
+  const { t } = useTranslation();
   const half = Math.floor((W - 32 - 12) / 2);
 
   return (
     <View style={quickStyles.grid}>
       {cards.map((card) => {
-        let sub = card.defaultSub;
-        if (card.label === 'Prayer Times' && nextPrayer) {
-          sub = `Next: ${nextPrayer.name} ${nextPrayer.time}`;
+        let sub = t(`home.quick.${card.id}.sub`);
+        if (card.id === 'prayer-times' && nextPrayer) {
+          sub = t('home.quick.prayerNextSub', { name: nextPrayer.name, time: nextPrayer.time });
         }
         return (
           <TouchableOpacity
@@ -286,7 +282,7 @@ function QuickGrid({ nextPrayer, onPress, cards }: {
             <View style={quickStyles.iconBg}>
               <QuickIconRender id={card.id} />
             </View>
-            <Text style={quickStyles.label}>{card.label}</Text>
+            <Text style={quickStyles.label}>{t(`home.quick.${card.id}.label`)}</Text>
             <Text style={quickStyles.sub} numberOfLines={1}>{sub}</Text>
           </TouchableOpacity>
         );
@@ -328,6 +324,7 @@ function VerseCard({
 }: {
   arabic: string; english: string; reference: string; onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -338,7 +335,7 @@ function VerseCard({
         <Text style={verseStyles.bismillah}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
         <View style={verseStyles.refRow}>
           <View style={verseStyles.refBadge}>
-            <Text style={verseStyles.refBadgeText}>Verse of the Day</Text>
+            <Text style={verseStyles.refBadgeText}>{t('home.verseOfDay.badge')}</Text>
           </View>
           <Text style={verseStyles.reference}>{reference}</Text>
         </View>
@@ -348,7 +345,7 @@ function VerseCard({
         <View style={verseStyles.divider} />
         <Text style={verseStyles.english}>{english}</Text>
         <View style={verseStyles.readRow}>
-          <Text style={verseStyles.readBtn}>Continue Reading →</Text>
+          <Text style={verseStyles.readBtn}>{t('home.verseOfDay.continue')}</Text>
         </View>
       </ManuscriptCard>
     </TouchableOpacity>
@@ -414,10 +411,11 @@ const verseStyles = StyleSheet.create({
 
 // ─── More Features Section ────────────────────────────────────────────────────
 type MoreItem = { id: string; icon: keyof typeof Ionicons.glyphMap | string; label: string; sub: string; route: string; useCustomIcon?: 'minaret' };
-type MoreSection = { title: string; ionicon: keyof typeof Ionicons.glyphMap; color: string; items: MoreItem[] };
+type MoreSection = { id: string; title: string; ionicon: keyof typeof Ionicons.glyphMap; color: string; items: MoreItem[] };
 
 const MORE_SECTIONS: MoreSection[] = [
   {
+    id: 'islamicKnowledge',
     title: 'Islamic Knowledge',
     ionicon: 'library-outline',
     color: '#2563EB',
@@ -428,6 +426,7 @@ const MORE_SECTIONS: MoreSection[] = [
     ],
   },
   {
+    id: 'calculators',
     title: 'Calculators',
     ionicon: 'calculator-outline',
     color: '#0D9488',
@@ -437,6 +436,7 @@ const MORE_SECTIONS: MoreSection[] = [
     ],
   },
   {
+    id: 'tools',
     title: 'Tools',
     ionicon: 'construct-outline',
     color: '#7C3AED',
@@ -447,6 +447,7 @@ const MORE_SECTIONS: MoreSection[] = [
     ],
   },
   {
+    id: 'personal',
     title: 'Personal',
     ionicon: 'person-outline',
     color: '#F59E0B',
@@ -467,6 +468,7 @@ function MoreItemIcon({ item }: { item: MoreItem }) {
 function MoreSectionView({ section, isDark, onPress }: {
   section: MoreSection; isDark: boolean; onPress: (route: string) => void;
 }) {
+  const { t } = useTranslation();
   const theme = isDark ? Colors.dark : Colors.light;
   return (
     <View style={{ marginBottom: spacing.lg }}>
@@ -474,7 +476,7 @@ function MoreSectionView({ section, isDark, onPress }: {
         <View style={[moreStyles.sectionIconBox, { backgroundColor: section.color + '20' }]}>
           <Ionicons name={section.ionicon} size={14} color={section.color} />
         </View>
-        <Text style={[moreStyles.sectionTitle, { color: theme.text }]}>{section.title}</Text>
+        <Text style={[moreStyles.sectionTitle, { color: theme.text }]}>{t(`home.moreSections.${section.id}`)}</Text>
       </View>
       <View style={[moreStyles.sectionCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
         {section.items.map((item, idx) => (
@@ -491,8 +493,8 @@ function MoreSectionView({ section, isDark, onPress }: {
               <MoreItemIcon item={item} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[moreStyles.itemLabel, { color: theme.text }]}>{item.label}</Text>
-              <Text style={[moreStyles.itemSub, { color: theme.textMuted }]}>{item.sub}</Text>
+              <Text style={[moreStyles.itemLabel, { color: theme.text }]}>{t(`home.moreSections.items.${item.id}.label`)}</Text>
+              <Text style={[moreStyles.itemSub, { color: theme.textMuted }]}>{t(`home.moreSections.items.${item.id}.sub`)}</Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color={theme.textMuted} />
           </TouchableOpacity>
@@ -547,6 +549,7 @@ const stStyles = StyleSheet.create({
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settingsScheme = useStore((s) => s.settings.colorScheme);
@@ -679,13 +682,13 @@ export default function HomeScreen() {
             onPress={() => navigate('/ramadan')}
             activeOpacity={0.85}
           >
-            <Text style={styles.ramadanTitle}>🌙 Ramadan Mubarak</Text>
+            <Text style={styles.ramadanTitle}>{t('home.ramadan.banner')}</Text>
             <View style={styles.ramadanTimes}>
               {prayerData?.timings?.Fajr && (
-                <Text style={styles.ramadanTime}>Sehri: {prayerData.timings.Fajr.split(' ')[0]}</Text>
+                <Text style={styles.ramadanTime}>{t('home.ramadan.sehri', { time: prayerData.timings.Fajr.split(' ')[0] })}</Text>
               )}
               {prayerData?.timings?.Maghrib && (
-                <Text style={styles.ramadanTime}>Iftar: {prayerData.timings.Maghrib.split(' ')[0]}</Text>
+                <Text style={styles.ramadanTime}>{t('home.ramadan.iftar', { time: prayerData.timings.Maghrib.split(' ')[0] })}</Text>
               )}
             </View>
           </TouchableOpacity>
@@ -695,7 +698,7 @@ export default function HomeScreen() {
 
         {tilesLoaded && visibleQuickCards.length > 0 && (
           <>
-            <SectionTitle title="Quick Access" isDark={isDark} />
+            <SectionTitle title={t('home.sections.quickAccess')} isDark={isDark} />
             <QuickGrid
               nextPrayer={nextPrayer}
               onPress={navigate}
@@ -706,10 +709,10 @@ export default function HomeScreen() {
 
         <GoldDivider />
 
-        <SectionTitle title="Verse of the Day" isDark={isDark} />
+        <SectionTitle title={t('home.verseOfDay.title')} isDark={isDark} />
         {verseLoading ? (
           <View style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <Text style={[styles.loadingText, { color: theme.textMuted }]}>Loading verse...</Text>
+            <Text style={[styles.loadingText, { color: theme.textMuted }]}>{t('home.verseOfDay.loading')}</Text>
           </View>
         ) : verse ? (
           <VerseCard
@@ -725,7 +728,7 @@ export default function HomeScreen() {
             activeOpacity={0.8}
           >
             <Text style={[styles.loadingText, { color: theme.textMuted }]}>
-              Couldn't load today's verse. Tap to retry.
+              {t('home.verseOfDay.error')}
             </Text>
           </TouchableOpacity>
         ) : null}
@@ -734,7 +737,7 @@ export default function HomeScreen() {
 
         {tilesLoaded && visibleMoreSections.length > 0 && (
           <>
-            <SectionTitle title="More Features" isDark={isDark} />
+            <SectionTitle title={t('home.sections.moreFeatures')} isDark={isDark} />
             {visibleMoreSections.map((section) => (
               <MoreSectionView key={section.title} section={section} isDark={isDark} onPress={navigate} />
             ))}
@@ -742,8 +745,8 @@ export default function HomeScreen() {
         )}
 
         <View style={[styles.footer, { borderTopColor: theme.border }]}>
-          <Text style={[styles.footerVersion, { color: theme.textMuted }]}>Islam Daily v1.0.0</Text>
-          <Text style={[styles.footerTagline, { color: theme.textMuted }]}>Built with love for the Ummah</Text>
+          <Text style={[styles.footerVersion, { color: theme.textMuted }]}>{t('home.footer.version')}</Text>
+          <Text style={[styles.footerTagline, { color: theme.textMuted }]}>{t('home.footer.tagline')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

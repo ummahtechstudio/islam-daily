@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -41,27 +42,23 @@ const GREEN = '#0F6E56';
 const GOLD = '#EF9F27';
 const CREAM = '#FBF6E4';
 
-const METHOD_OPTIONS: {
-  value: CalculationMethod;
-  label: string;
-  region?: string;
-}[] = [
-  { value: 'Karachi',               label: 'Karachi (University of Islamic Sciences)', region: 'Pakistan / India / Bangladesh' },
-  { value: 'Dubai',                 label: 'Dubai (UAE General Authority)', region: 'UAE' },
-  { value: 'UmmAlQura',             label: 'Umm Al-Qura (Makkah)', region: 'Saudi Arabia' },
-  { value: 'Egyptian',              label: 'Egyptian (General Authority of Survey)', region: 'Egypt' },
-  { value: 'Turkey',                label: 'Turkey (Diyanet İşleri Başkanlığı)', region: 'Turkey' },
-  { value: 'Singapore',             label: 'Singapore (MUIS)', region: 'Singapore / Malaysia' },
-  { value: 'MuslimWorldLeague',     label: 'Muslim World League', region: 'Europe / global default' },
-  { value: 'NorthAmerica',          label: 'North America (ISNA)', region: 'USA / Canada' },
-  { value: 'MoonsightingCommittee', label: 'Moonsighting Committee', region: 'North America (alt)' },
-  { value: 'Tehran',                label: 'Tehran', region: 'Iran' },
+const METHOD_OPTION_VALUES: CalculationMethod[] = [
+  'Karachi',
+  'Dubai',
+  'UmmAlQura',
+  'Egyptian',
+  'Turkey',
+  'Singapore',
+  'MuslimWorldLeague',
+  'NorthAmerica',
+  'MoonsightingCommittee',
+  'Tehran',
 ];
 
-const HIGH_LAT_OPTIONS: { value: HighLatitudeRule; label: string; sub: string }[] = [
-  { value: 'middleOfTheNight',  label: 'Middle of the night', sub: 'Recommended' },
-  { value: 'seventhOfTheNight', label: 'Seventh of the night', sub: 'Stricter alternative' },
-  { value: 'twilightAngle',     label: 'Twilight angle',       sub: 'Method-specific angle' },
+const HIGH_LAT_OPTION_VALUES: HighLatitudeRule[] = [
+  'middleOfTheNight',
+  'seventhOfTheNight',
+  'twilightAngle',
 ];
 
 function loadHighLatRule(): HighLatitudeRule {
@@ -82,6 +79,7 @@ function lightHaptic() {
 }
 
 export default function PrayerTimesSettingsScreen() {
+  const { t } = useTranslation();
   useEffect(() => { trackScreen('PrayerTimesSettings'); }, []);
 
   const router = useRouter();
@@ -205,7 +203,13 @@ export default function PrayerTimesSettingsScreen() {
   const showHighLat = Math.abs(settings.location.latitude) > 48;
 
   const sourceLabel =
-    source === 'gps' ? 'GPS' : source === 'manual' ? 'Manual' : source === 'cached' ? 'Saved' : 'Default';
+    source === 'gps'
+      ? t('prayerSettings.location.sources.gps')
+      : source === 'manual'
+        ? t('prayerSettings.location.sources.manual')
+        : source === 'cached'
+          ? t('prayerSettings.location.sources.cached')
+          : t('prayerSettings.location.sources.default');
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['top', 'bottom']}>
@@ -214,13 +218,13 @@ export default function PrayerTimesSettingsScreen() {
         <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.toolbarBtn}>
           <Ionicons name="chevron-back" size={24} color={GREEN} />
         </TouchableOpacity>
-        <Text style={[styles.toolbarTitle, { color: theme.text }]}>Prayer Settings</Text>
+        <Text style={[styles.toolbarTitle, { color: theme.text }]}>{t('prayerSettings.header.title')}</Text>
         <View style={styles.toolbarBtn} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Location */}
-        <SectionHeader title="Location" subtitle="Where prayer times are calculated for" />
+        <SectionHeader title={t('prayerSettings.location.sectionTitle')} subtitle={t('prayerSettings.location.sectionSubtitle')} />
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <View style={styles.locRow}>
             <Ionicons name="location" size={18} color={GREEN} />
@@ -240,7 +244,7 @@ export default function PrayerTimesSettingsScreen() {
               activeOpacity={0.85}
             >
               <Ionicons name="search" size={14} color="#fff" />
-              <Text style={styles.btnPrimaryText}>Change city</Text>
+              <Text style={styles.btnPrimaryText}>{t('prayerSettings.location.changeCity')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.btn, styles.btnGhost]}
@@ -248,31 +252,32 @@ export default function PrayerTimesSettingsScreen() {
               activeOpacity={0.85}
             >
               <Ionicons name="locate" size={14} color={GREEN} />
-              <Text style={styles.btnGhostText}>Use GPS</Text>
+              <Text style={styles.btnGhostText}>{t('prayerSettings.location.useGps')}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Calculation method */}
-        <SectionHeader title="Calculation Method" subtitle="Which prayer time method to use" />
+        <SectionHeader title={t('prayerSettings.method.sectionTitle')} subtitle={t('prayerSettings.method.sectionSubtitle')} />
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          {METHOD_OPTIONS.map((opt, idx) => {
-            const selected = settings.method === opt.value;
-            const isLast = idx === METHOD_OPTIONS.length - 1;
+          {METHOD_OPTION_VALUES.map((value, idx) => {
+            const selected = settings.method === value;
+            const isLast = idx === METHOD_OPTION_VALUES.length - 1;
+            const region = t(`prayerSettings.method.options.${value}.region`);
             return (
               <TouchableOpacity
-                key={opt.value}
+                key={value}
                 style={[
                   styles.optRow,
                   !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.border },
                 ]}
-                onPress={() => handleMethodChange(opt.value)}
+                onPress={() => handleMethodChange(value)}
                 activeOpacity={0.7}
               >
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.optLabel, { color: theme.text }]}>{opt.label}</Text>
-                  {opt.region ? (
-                    <Text style={styles.optRegion}>{opt.region}</Text>
+                  <Text style={[styles.optLabel, { color: theme.text }]}>{t(`prayerSettings.method.options.${value}.label`)}</Text>
+                  {region ? (
+                    <Text style={styles.optRegion}>{region}</Text>
                   ) : null}
                 </View>
                 {selected ? (
@@ -284,18 +289,18 @@ export default function PrayerTimesSettingsScreen() {
         </View>
         <View style={styles.helperRow}>
           <Text style={[styles.helperText, { color: theme.textMuted }]}>
-            Auto-detected from your location:{' '}
+            {t('prayerSettings.method.autoDetected')}
             <Text style={{ color: GREEN, fontWeight: '700' }}>{autoDetected.method}</Text>
           </Text>
           {!isAutoMethod && (
             <TouchableOpacity onPress={handleResetToAuto} hitSlop={6}>
-              <Text style={styles.resetLink}>Reset to auto</Text>
+              <Text style={styles.resetLink}>{t('prayerSettings.method.resetToAuto')}</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Madhab */}
-        <SectionHeader title="Asr (Madhab)" subtitle="When Asr begins" />
+        <SectionHeader title={t('prayerSettings.madhab.sectionTitle')} subtitle={t('prayerSettings.madhab.sectionSubtitle')} />
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, padding: 6 }]}>
           {(['hanafi', 'shafi'] as Madhab[]).map((m) => {
             const selected = settings.madhab === m;
@@ -308,12 +313,12 @@ export default function PrayerTimesSettingsScreen() {
               >
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.madhabLabel, { color: theme.text }]}>
-                    {m === 'hanafi' ? 'Hanafi' : "Standard (Shafi'i, Maliki, Hanbali)"}
+                    {m === 'hanafi' ? t('prayerSettings.madhab.hanafi.label') : t('prayerSettings.madhab.shafi.label')}
                   </Text>
                   <Text style={[styles.madhabSub, { color: theme.textMuted }]}>
                     {m === 'hanafi'
-                      ? 'Asr begins when shadow = 2× height'
-                      : 'Asr begins when shadow = 1× height'}
+                      ? t('prayerSettings.madhab.hanafi.sub')
+                      : t('prayerSettings.madhab.shafi.sub')}
                   </Text>
                 </View>
                 {selected ? <Ionicons name="checkmark-circle" size={22} color={GOLD} /> : null}
@@ -323,23 +328,19 @@ export default function PrayerTimesSettingsScreen() {
         </View>
         {todayAsr ? (
           <Text style={[styles.previewText, { color: theme.textSecondary }]}>
-            Today: <Text style={{ color: GREEN, fontWeight: '700' }}>Asr at {fmt(todayAsr)}</Text>{' '}
-            ({settings.madhab === 'hanafi' ? 'Hanafi' : 'Standard'})
+            {t('prayerSettings.madhab.preview.today')}
+            <Text style={{ color: GREEN, fontWeight: '700' }}>{t('prayerSettings.madhab.preview.asrAt', { time: fmt(todayAsr) })}</Text>{' '}
+            ({settings.madhab === 'hanafi' ? t('prayerSettings.madhab.preview.hanafi') : t('prayerSettings.madhab.preview.standard')})
           </Text>
         ) : null}
 
         {/* Time format */}
-        <SectionHeader title="Time format" subtitle="How prayer times are displayed" />
+        <SectionHeader title={t('prayerSettings.timeFormat.sectionTitle')} subtitle={t('prayerSettings.timeFormat.sectionSubtitle')} />
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, padding: 6 }]}>
           {(['auto', '12h', '24h'] as TimeFormatPref[]).map((f) => {
             const selected = format === f;
-            const label = f === 'auto' ? 'Auto' : f === '12h' ? '12-hour' : '24-hour';
-            const sub =
-              f === 'auto'
-                ? 'Match device locale'
-                : f === '12h'
-                  ? 'e.g. 5:42 PM'
-                  : 'e.g. 17:42';
+            const label = t(`prayerSettings.timeFormat.${f}.label`);
+            const sub = t(`prayerSettings.timeFormat.${f}.sub`);
             return (
               <TouchableOpacity
                 key={f}
@@ -358,7 +359,7 @@ export default function PrayerTimesSettingsScreen() {
         </View>
         {todayFajr ? (
           <Text style={[styles.previewText, { color: theme.textSecondary }]}>
-            Today: Fajr at <Text style={{ color: GREEN, fontWeight: '700' }}>{fmt(todayFajr)}</Text>
+            {t('prayerSettings.timeFormat.preview', { time: fmt(todayFajr) })}
           </Text>
         ) : null}
 
@@ -366,22 +367,22 @@ export default function PrayerTimesSettingsScreen() {
         {showHighLat && (
           <>
             <SectionHeader
-              title="High latitude rule"
-              subtitle="How to calculate Fajr/Isha during long days"
+              title={t('prayerSettings.highLat.sectionTitle')}
+              subtitle={t('prayerSettings.highLat.sectionSubtitle')}
             />
             <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, padding: 6 }]}>
-              {HIGH_LAT_OPTIONS.map((opt) => {
-                const selected = highLat === opt.value;
+              {HIGH_LAT_OPTION_VALUES.map((value) => {
+                const selected = highLat === value;
                 return (
                   <TouchableOpacity
-                    key={opt.value}
+                    key={value}
                     style={[styles.madhabRow, selected && { backgroundColor: 'rgba(15,110,86,0.08)', borderRadius: 12 }]}
-                    onPress={() => handleHighLatChange(opt.value)}
+                    onPress={() => handleHighLatChange(value)}
                     activeOpacity={0.7}
                   >
                     <View style={{ flex: 1 }}>
-                      <Text style={[styles.madhabLabel, { color: theme.text }]}>{opt.label}</Text>
-                      <Text style={[styles.madhabSub, { color: theme.textMuted }]}>{opt.sub}</Text>
+                      <Text style={[styles.madhabLabel, { color: theme.text }]}>{t(`prayerSettings.highLat.options.${value}.label`)}</Text>
+                      <Text style={[styles.madhabSub, { color: theme.textMuted }]}>{t(`prayerSettings.highLat.options.${value}.sub`)}</Text>
                     </View>
                     {selected ? <Ionicons name="checkmark-circle" size={22} color={GOLD} /> : null}
                   </TouchableOpacity>
@@ -403,8 +404,7 @@ export default function PrayerTimesSettingsScreen() {
         <View style={[styles.aboutCard, { backgroundColor: CREAM }]}>
           <Ionicons name="information-circle" size={16} color={GREEN} />
           <Text style={styles.aboutText}>
-            Prayer times are calculated locally on your device using the {settings.method} method. They are
-            based on your geographic location and update automatically each day.
+            {t('prayerSettings.about.text', { method: settings.method })}
           </Text>
         </View>
 

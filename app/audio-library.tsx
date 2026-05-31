@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { urduStyle } from '../src/constants/fonts';
@@ -62,6 +63,7 @@ const fmtDuration = (m: number) => {
 
 function AudioLibraryScreenInner() {
   useEffect(() => { trackScreen('AudioLibrary'); }, []);
+  const { t } = useTranslation();
 
   const colorScheme = useColorScheme();
   const settings = useStore(s => s.settings);
@@ -153,13 +155,13 @@ function AudioLibraryScreenInner() {
         <View style={styles.headerLeft}>
           <Ionicons name="headset" size={22} color="#fff" />
           <View>
-            <Text style={styles.headerTitle}>Audio Library</Text>
+            <Text style={styles.headerTitle}>{t('audioLibrary.header.title')}</Text>
             <Text style={[urduStyle(15), styles.headerUrdu]}>آڈیو لائبریری</Text>
           </View>
         </View>
         <TouchableOpacity onPress={requestContent} style={styles.requestBtn}>
           <Ionicons name="add-circle-outline" size={14} color={GOLD} />
-          <Text style={styles.requestTxt}>Request</Text>
+          <Text style={styles.requestTxt}>{t('audioLibrary.header.request')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -172,7 +174,7 @@ function AudioLibraryScreenInner() {
       >
         <Ionicons name="search-outline" size={16} color={theme.textMuted} />
         <TextInput
-          placeholder="Search by title, scholar, reciter…"
+          placeholder={t('audioLibrary.search.placeholder')}
           placeholderTextColor={theme.textMuted}
           value={query}
           onChangeText={t => {
@@ -195,12 +197,12 @@ function AudioLibraryScreenInner() {
           { backgroundColor: theme.card, borderBottomColor: theme.border },
         ]}
       >
-        {LANG_TABS.map(t => {
-          const active = langFilter === t.key;
+        {LANG_TABS.map(tab => {
+          const active = langFilter === tab.key;
           return (
             <TouchableOpacity
-              key={t.key}
-              onPress={() => setLangFilter(t.key)}
+              key={tab.key}
+              onPress={() => setLangFilter(tab.key)}
               style={[
                 styles.langTab,
                 active && {
@@ -215,7 +217,7 @@ function AudioLibraryScreenInner() {
                   { color: active ? Colors.primary : theme.textMuted },
                 ]}
               >
-                {t.label}
+                {t(`audioLibrary.langTabs.${tab.key}`)}
               </Text>
             </TouchableOpacity>
           );
@@ -231,11 +233,11 @@ function AudioLibraryScreenInner() {
         {query.trim() ? (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>
-              Search Results ({filtered.length})
+              {t('audioLibrary.sections.searchResults', { count: filtered.length })}
             </Text>
             {filtered.length === 0 ? (
               <Text style={[styles.emptyTxt, { color: theme.textMuted }]}>
-                No results found.
+                {t('audioLibrary.sections.noResults')}
               </Text>
             ) : (
               filtered.map(item => (
@@ -260,7 +262,7 @@ function AudioLibraryScreenInner() {
                 <View style={styles.sectionHeaderRow}>
                   <Ionicons name="heart" size={15} color="#EF4444" />
                   <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                    Favorites
+                    {t('audioLibrary.sections.favorites')}
                   </Text>
                 </View>
                 {favItems.map(item => (
@@ -284,7 +286,7 @@ function AudioLibraryScreenInner() {
                 <View style={styles.sectionHeaderRow}>
                   <Ionicons name="time-outline" size={15} color={Colors.primary} />
                   <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                    Recently Played
+                    {t('audioLibrary.sections.recentlyPlayed')}
                   </Text>
                 </View>
                 <ScrollView
@@ -308,7 +310,7 @@ function AudioLibraryScreenInner() {
             {/* ── Category grid ── */}
             <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: theme.text }]}>
-                Browse by Category
+                {t('audioLibrary.sections.browseByCategory')}
               </Text>
               <View style={styles.catGrid}>
                 {AUDIO_CATEGORIES.map(cat => {
@@ -337,7 +339,7 @@ function AudioLibraryScreenInner() {
                         ]}
                         numberOfLines={2}
                       >
-                        {cat.label_english}
+                        {t(`audioLibrary.categories.${cat.id}`)}
                       </Text>
                       <Text
                         style={[
@@ -381,7 +383,7 @@ function AudioLibraryScreenInner() {
                   <View style={styles.sectionHeaderRow}>
                     <Text style={{ fontSize: 16 }}>{cat.icon}</Text>
                     <Text style={[styles.sectionTitle, { color: cat.color }]}>
-                      {cat.label_english}
+                      {t(`audioLibrary.categories.${cat.id}`)}
                     </Text>
                     <Text
                       style={[urduStyle(13), { color: theme.textMuted }]}
@@ -416,7 +418,7 @@ function AudioLibraryScreenInner() {
                     <View style={styles.sectionHeaderRow}>
                       <Text style={{ fontSize: 14 }}>{cat.icon}</Text>
                       <Text style={[styles.sectionTitle, { color: cat.color }]}>
-                        {cat.label_english}
+                        {t(`audioLibrary.categories.${cat.id}`)}
                       </Text>
                       <Text
                         style={[urduStyle(12), { color: theme.textMuted, flex: 1 }]}
@@ -446,7 +448,7 @@ function AudioLibraryScreenInner() {
                         ]}
                       >
                         <Text style={[styles.seeMoreTxt, { color: cat.color }]}>
-                          See all {items.length} {cat.label_english}
+                          {t('audioLibrary.sections.seeAll', { count: items.length, category: t(`audioLibrary.categories.${cat.id}`) })}
                         </Text>
                         <Ionicons
                           name="chevron-forward"
@@ -475,10 +477,10 @@ function AudioLibraryScreenInner() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={[styles.requestCardTitle, { color: theme.text }]}>
-              Request Audio Content
+              {t('audioLibrary.request.title')}
             </Text>
             <Text style={[styles.requestCardSub, { color: theme.textMuted }]}>
-              Missing a scholar or series? Let us know.
+              {t('audioLibrary.request.sub')}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={16} color={theme.textMuted} />
@@ -517,6 +519,7 @@ function AudioRow({
   onPlay: () => void;
   onFav: () => void;
 }) {
+  const { t } = useTranslation();
   const theme = isDark ? Colors.dark : Colors.light;
   const cat = AUDIO_CATEGORIES.find(c => c.id === item.category);
   const accent = cat?.color ?? Colors.primary;
@@ -572,7 +575,7 @@ function AudioRow({
           </View>
           <Text style={[styles.rowDur, { color: theme.textMuted }]}>
             {fmtDuration(item.duration_minutes)}
-            {item.total_episodes != null ? `  ·  ${item.total_episodes} ep` : ''}
+            {item.total_episodes != null ? `  ·  ${t('audioLibrary.episodes', { count: item.total_episodes })}` : ''}
           </Text>
         </View>
       </View>

@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../constants/colors';
 import { useSurahList } from '../../hooks/useQuran';
@@ -56,6 +57,7 @@ const JUZ_DATA = [
 type SurahTab = 'surahs' | 'juz';
 
 export default function TranslationTab({ isDark }: { isDark: boolean }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const theme = isDark ? Colors.dark : Colors.light;
   const { surahs, loading, error } = useSurahList();
@@ -75,7 +77,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
       .catch((err) => console.warn('[Quran] read LAST_READ_KEY failed', err));
   }, []);
 
-  if (loading) return <LoadingSpinner message="Loading Quran..." dark={isDark} />;
+  if (loading) return <LoadingSpinner message={t('quran.surahList.loading')} dark={isDark} />;
   if (error) return <ErrorView message={error} dark={isDark} />;
 
   const filtered = query
@@ -117,7 +119,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
                 style={[styles.lastReadBadge, { backgroundColor: GOLD + '22' }]}
               >
                 <Text style={[styles.lastReadText, { color: GOLD }]}>
-                  Continue
+                  {t('quran.surahList.continueBadge')}
                 </Text>
               </View>
             )}
@@ -143,7 +145,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
               </Text>
             </View>
             <Text style={[styles.surahMeta, { color: theme.textMuted }]}>
-              · {item.numberOfAyahs} verses
+              {t('quran.surahList.versesCount', { count: item.numberOfAyahs })}
             </Text>
           </View>
         </View>
@@ -173,12 +175,12 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
       <View style={styles.juzInfo}>
         <Text style={[styles.juzName, { color: theme.text }]}>{item.name}</Text>
         <Text style={[styles.juzSurah, { color: theme.textSecondary }]}>
-          Starts: Surah {item.surah}, Ayah {item.ayah}
+          {t('quran.juz.starts', { surah: item.surah, ayah: item.ayah })}
         </Text>
       </View>
       <View style={[styles.juzPageBadge, { backgroundColor: theme.surface }]}>
         <Text style={[styles.juzPageLabel, { color: theme.textMuted }]}>
-          Page
+          {t('quran.juz.pageLabel')}
         </Text>
         <Text style={[styles.juzPageNum, { color: Colors.primary }]}>
           {item.page}
@@ -198,7 +200,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
         <Ionicons name="search" size={18} color={theme.textMuted} />
         <TextInput
           style={[styles.searchInput, { color: theme.text }]}
-          placeholder="Search surah by name or number..."
+          placeholder={t('quran.surahList.searchPlaceholder')}
           placeholderTextColor={theme.textMuted}
           value={query}
           onChangeText={setQuery}
@@ -235,7 +237,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
               },
             ]}
           >
-            Surah (114)
+            {t('quran.surahList.tabSurahs')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -256,7 +258,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
               },
             ]}
           >
-            Juz / Para (30)
+            {t('quran.surahList.tabJuz')}
           </Text>
         </TouchableOpacity>
       </View>

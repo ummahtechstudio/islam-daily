@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -28,6 +29,7 @@ try {
 } catch {}
 
 export default function CustomAdhanScreen() {
+  const { t } = useTranslation();
   useEffect(() => { trackScreen('CustomAdhan'); }, []);
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -63,7 +65,7 @@ export default function CustomAdhanScreen() {
 
   const playPreview = async (soundId: string, url: string) => {
     if (!Audio) {
-      Alert.alert('Audio unavailable', 'This build does not include audio playback support.');
+      Alert.alert(t('customAdhan.audioUnavailable.title'), t('customAdhan.audioUnavailable.message'));
       return;
     }
     if (playingId === soundId) {
@@ -95,7 +97,7 @@ export default function CustomAdhanScreen() {
       });
     } catch {
       setLoadingId(null);
-      Alert.alert('Preview unavailable', 'Failed to load audio preview. Check your connection.');
+      Alert.alert(t('customAdhan.previewError.title'), t('customAdhan.previewError.message'));
     }
   };
 
@@ -104,15 +106,15 @@ export default function CustomAdhanScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
 
         <View style={[styles.banner, { backgroundColor: Colors.primary }]}>
-          <Text style={styles.bannerTitle}>Custom Adhan</Text>
-          <Text style={styles.bannerSub}>Choose a different Adhan sound for each prayer</Text>
+          <Text style={styles.bannerTitle}>{t('customAdhan.title')}</Text>
+          <Text style={styles.bannerSub}>{t('customAdhan.subtitle')}</Text>
         </View>
 
         {PRAYER_LIST.map((prayer) => {
           const selected = prefs[prayer] ?? 'makkah';
           return (
             <View key={prayer} style={{ marginBottom: 20 }}>
-              <Text style={[styles.prayerLabel, { color: theme.textSecondary }]}>{prayer}</Text>
+              <Text style={[styles.prayerLabel, { color: theme.textSecondary }]}>{t(`prayers.names.${prayer.toLowerCase()}`)}</Text>
               <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
                 {ADHAN_SOUNDS.map((sound, idx) => {
                   const isSelected = selected === sound.id;
@@ -159,8 +161,8 @@ export default function CustomAdhanScreen() {
         })}
 
         <Text style={[styles.note, { color: theme.textMuted }]}>
-          Note: Tap the play button to preview each Adhan sound. Your selection is saved automatically.
-          {!Audio && '\n\nAudio preview requires expo-av. Run: npx expo install expo-av'}
+          {t('customAdhan.note')}
+          {!Audio && t('customAdhan.noteNoAudio')}
         </Text>
       </ScrollView>
     </SafeAreaView>

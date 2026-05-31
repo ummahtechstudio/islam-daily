@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { useAudioPlayer } from '../context/AudioPlayerContext';
 import { Colors } from '../constants/colors';
 import { urduStyle } from '../constants/fonts';
@@ -31,6 +32,7 @@ interface Props {
 }
 
 export function FullPlayerModal({ isDark }: Props) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const {
     currentTrack,
@@ -123,7 +125,7 @@ export function FullPlayerModal({ isDark }: Props) {
           </Text>
           {currentTrack.total_episodes != null && (
             <Text style={[styles.epCount, { color: theme.textMuted }]}>
-              {playlistIndex + 1} / {currentTrack.total_episodes} episodes
+              {t('player.episodes', { current: playlistIndex + 1, total: currentTrack.total_episodes })}
             </Text>
           )}
         </View>

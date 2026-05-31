@@ -5,6 +5,7 @@ import {
   SchedulableTriggerInputTypes,
 } from 'expo-notifications';
 
+import i18n from '../i18n';
 import { prefs, PREFS_KEYS } from '../lib/storage';
 import {
   computePrayerTimes,
@@ -64,9 +65,14 @@ const CHANNEL_SYSTEM = 'prayer-system';
 const CHANNEL_SILENT = 'prayer-silent';
 const CHANNEL_TAHAJJUD = 'sunnah-tahajjud';
 
-const TAHAJJUD_TITLE = 'Tahajjud — The Last Third of the Night';
-const TAHAJJUD_BODY =
-  '"And rise at night and pray, as an extra offering — that your Lord may raise you to a praiseworthy station." (Quran 17:79)';
+// Notification text is resolved at schedule time via i18n so future locale
+// support only requires updating the locale JSON files.
+function getTahajjudTitle(): string {
+  return i18n.t('notifications.tahajjudNotif.title');
+}
+function getTahajjudBody(): string {
+  return i18n.t('notifications.tahajjudNotif.body');
+}
 
 const PRAYER_ARABIC: Record<PrayerName, string> = {
   fajr:    'الفجر',
@@ -325,12 +331,13 @@ async function schedulePrayerNotifications(
       const arabic = PRAYER_ARABIC[prayer];
       const english = PRAYER_ENGLISH[prayer];
       const formatted = formatPrayerTime(entry.time);
+      const cityPart = city ? ` · ${city}` : '';
 
       try {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: english,
-            body: `${arabic} · ${formatted}${city ? ` · ${city}` : ''}`,
+            body: i18n.t('notifications.prayerNotif.body', { arabic, time: formatted, cityPart }),
             sound: soundForContent(cfg.sound),
             data: { tag: SCHEDULED_TAG, prayer, dayOffset },
           },
@@ -369,8 +376,8 @@ async function scheduleTahajjudNotifications(
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: TAHAJJUD_TITLE,
-          body: TAHAJJUD_BODY,
+          title: getTahajjudTitle(),
+          body: getTahajjudBody(),
           sound: 'default',
           data: { tag: TAHAJJUD_TAG, dayOffset },
         },
@@ -478,8 +485,8 @@ export async function fireTestNotification(prayerName: PrayerName): Promise<void
 
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: `${english} · Test`,
-      body: `${arabic} · test notification`,
+      title: i18n.t('notifications.testNotif.title', { prayer: english }),
+      body: i18n.t('notifications.testNotif.body', { arabic }),
       sound: soundForContent(cfg.sound),
       data: { tag: SCHEDULED_TAG, prayer: prayerName, test: true },
     },

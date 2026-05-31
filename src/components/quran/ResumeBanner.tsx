@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { palette } from '../../constants/colors';
 import { typography } from '../../constants/typography';
@@ -9,16 +10,16 @@ import type { QuranLastPosition } from '../../hooks/useQuranLastPosition';
 import { pageToJuz } from '../../utils/quranNav';
 import { SURAH_META } from '../../constants/surahMeta';
 
-function describePosition(pos: QuranLastPosition): string {
+function describePosition(pos: QuranLastPosition, t: (key: string, vars?: Record<string, unknown>) => string): string {
   if (pos.mode === 'mushaf' && pos.page) {
-    return `Continue from Page ${pos.page} · Juz ${pageToJuz(pos.page)}`;
+    return t('quran.resume.fromPage', { page: pos.page, juz: pageToJuz(pos.page) });
   }
   if (pos.mode === 'translation' && pos.surah && pos.ayah) {
     const meta = SURAH_META.find((s) => s.number === pos.surah);
     const name = meta?.name_english ?? `Surah ${pos.surah}`;
-    return `Continue from ${name}, Ayah ${pos.ayah}`;
+    return t('quran.resume.fromAyah', { name, ayah: pos.ayah });
   }
-  return 'Continue reading';
+  return t('quran.resume.continueReading');
 }
 
 type Props = {
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export function ResumeBanner({ position, onResume, onDismiss }: Props) {
+  const { t } = useTranslation();
   return (
     <View style={styles.outer}>
       <TouchableOpacity
@@ -39,7 +41,7 @@ export function ResumeBanner({ position, onResume, onDismiss }: Props) {
           <Ionicons name="book-outline" size={18} color={palette.green} />
         </View>
         <Text style={styles.text} numberOfLines={1}>
-          {describePosition(position)}
+          {describePosition(position, t)}
         </Text>
         <Ionicons name="arrow-forward" size={16} color={palette.gold} />
       </TouchableOpacity>
@@ -47,7 +49,7 @@ export function ResumeBanner({ position, onResume, onDismiss }: Props) {
         onPress={onDismiss}
         hitSlop={10}
         style={styles.dismiss}
-        accessibilityLabel="Dismiss resume banner"
+        accessibilityLabel={t('quran.resume.dismiss')}
       >
         <Ionicons name="close" size={16} color={palette.textOnCreamSecondary} />
       </TouchableOpacity>

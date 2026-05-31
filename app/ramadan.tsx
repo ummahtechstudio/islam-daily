@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -31,6 +32,7 @@ const ALADHAN = 'https://api.aladhan.com/v1';
 
 export default function RamadanScreen() {
   useEffect(() => { trackScreen('Ramadan'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -106,7 +108,7 @@ export default function RamadanScreen() {
           setTimetable(entries);
         }
       } catch {
-        if (!cancelled) setError('Failed to load Ramadan data. Please check your connection.');
+        if (!cancelled) setError(t('ramadan.error'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -117,7 +119,7 @@ export default function RamadanScreen() {
     };
   }, [settings.calculationMethod]);
 
-  if (loading) return <LoadingSpinner message="Loading Ramadan timetable..." dark={isDark} />;
+  if (loading) return <LoadingSpinner message={t('ramadan.loading')} dark={isDark} />;
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
@@ -125,10 +127,16 @@ export default function RamadanScreen() {
 
         {/* Header */}
         <View style={[styles.header]}>
+          {/* Arabic "رَمَضَان" is content — not translated */}
           <Text style={styles.headerArabic}>رَمَضَان</Text>
-          <Text style={styles.headerTitle}>Ramadan Mubarak</Text>
+          <Text style={styles.headerTitle}>{t('ramadan.header.title')}</Text>
           {currentHijriDay && (
-            <Text style={styles.headerSub}>Hijri Day {currentHijriDay} · Month {isRamadan ? '9 (Ramadan)' : '—'}</Text>
+            <Text style={styles.headerSub}>
+              {t('ramadan.header.hijriDay', {
+                day: currentHijriDay,
+                month: isRamadan ? '9 (Ramadan)' : '—',
+              })}
+            </Text>
           )}
         </View>
 
@@ -136,7 +144,7 @@ export default function RamadanScreen() {
           <View style={[styles.noticeCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <Ionicons name="moon-outline" size={28} color={Colors.accent} />
             <Text style={[styles.noticeText, { color: theme.text }]}>
-              Ramadan has not started yet. This screen will show live countdowns and the timetable during Ramadan.
+              {t('ramadan.notice.notStarted')}
             </Text>
           </View>
         )}
@@ -145,13 +153,17 @@ export default function RamadanScreen() {
           <View style={[styles.timingsCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <View style={styles.timingBox}>
               <Text style={styles.timingIcon}>🌙</Text>
-              <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>Sehri (Fajr)</Text>
+              <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>
+                {t('ramadan.timings.sehriLabel')}
+              </Text>
               <Text style={[styles.timingTime, { color: theme.text }]}>{todaySehri.replace(' (PST)', '').trim()}</Text>
             </View>
             <View style={[styles.timingDivider, { backgroundColor: theme.border }]} />
             <View style={styles.timingBox}>
               <Text style={styles.timingIcon}>🌅</Text>
-              <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>Iftar (Maghrib)</Text>
+              <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>
+                {t('ramadan.timings.iftarLabel')}
+              </Text>
               <Text style={[styles.timingTime, { color: theme.text }]}>{todayIftar.replace(' (PST)', '').trim()}</Text>
             </View>
           </View>
@@ -168,13 +180,13 @@ export default function RamadanScreen() {
         {timetable.length > 0 && (
           <View style={{ padding: 16 }}>
             <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
-              Full Ramadan Timetable — 1446 AH
+              {t('ramadan.timetable.sectionLabel')}
             </Text>
             <View style={[styles.tableHeader, { backgroundColor: Colors.primary }]}>
-              <Text style={[styles.colDay, styles.tableHeaderText]}>Day</Text>
-              <Text style={[styles.colDate, styles.tableHeaderText]}>Date</Text>
-              <Text style={[styles.colTime, styles.tableHeaderText]}>Sehri</Text>
-              <Text style={[styles.colTime, styles.tableHeaderText]}>Iftar</Text>
+              <Text style={[styles.colDay, styles.tableHeaderText]}>{t('ramadan.timetable.colDay')}</Text>
+              <Text style={[styles.colDate, styles.tableHeaderText]}>{t('ramadan.timetable.colDate')}</Text>
+              <Text style={[styles.colTime, styles.tableHeaderText]}>{t('ramadan.timetable.colSehri')}</Text>
+              <Text style={[styles.colTime, styles.tableHeaderText]}>{t('ramadan.timetable.colIftar')}</Text>
             </View>
             {timetable.map((entry, idx) => {
               const isToday = entry.hijriDay === currentHijriDay && isRamadan;

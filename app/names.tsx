@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
@@ -58,6 +59,7 @@ function chunkRTL<T>(arr: T[], chunkSize: number): T[] {
 
 export default function NamesScreen() {
   useEffect(() => { trackScreen('NamesOfAllah'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -86,7 +88,9 @@ export default function NamesScreen() {
       activeOpacity={0.75}
     >
       <Text style={[styles.nameNum, { color: Colors.primary }]}>{item.id === 0 ? '✦' : item.id}</Text>
+      {/* item.name is Arabic content — not translated */}
       <Text style={[styles.nameArabic, { color: theme.text }]}>{item.name}</Text>
+      {/* item.transliteration is content — not translated */}
       <Text style={[styles.nameTranslit, { color: theme.textSecondary }]} numberOfLines={1}>
         {item.transliteration}
       </Text>
@@ -96,7 +100,8 @@ export default function NamesScreen() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.headerTitle}>99 Names of Allah</Text>
+        <Text style={styles.headerTitle}>{t('names.header.title')}</Text>
+        {/* Arabic header text is content, not translated */}
         <Text style={styles.headerAr}>أسماء الله الحسنى</Text>
       </View>
 
@@ -116,7 +121,9 @@ export default function NamesScreen() {
               activeOpacity={0.75}
             >
               <Text style={[styles.heroSymbol, { color: Colors.primary }]}>✦</Text>
+              {/* greatestName.name is Arabic content — not translated */}
               <Text style={[styles.nameArabic, { color: theme.text }]}>{greatestName.name}</Text>
+              {/* greatestName.transliteration is content — not translated */}
               <Text style={[styles.nameTranslit, { color: theme.textSecondary }]} numberOfLines={1}>
                 {greatestName.transliteration}
               </Text>
@@ -138,12 +145,18 @@ export default function NamesScreen() {
               <TouchableOpacity onPress={() => setSelected(null)} style={styles.closeBtn}>
                 <Text style={{ color: '#fff', fontSize: 24 }}>✕</Text>
               </TouchableOpacity>
-              <Text style={styles.detailNum}>{selected.id === 0 ? '✦ The Greatest Name' : `${selected.id} / 99`}</Text>
+              <Text style={styles.detailNum}>
+                {selected.id === 0
+                  ? t('names.detail.greatestName')
+                  : t('names.detail.counter', { id: selected.id })}
+              </Text>
             </View>
             <ScrollView contentContainerStyle={styles.detailContent}>
               <ManuscriptCard variant="bordered" withCornerOrnaments style={{ width: '100%' }}>
                 <View style={{ alignItems: 'center', gap: spacing.sm }}>
+                  {/* selected.name is Arabic content — not translated */}
                   <Text style={styles.detailArabic}>{selected.name}</Text>
+                  {/* selected.transliteration is content — not translated */}
                   <Text style={styles.detailTranslit}>{selected.transliteration}</Text>
                   {selected.pronunciation && (
                     <Text style={styles.detailPronounce}>
@@ -151,7 +164,8 @@ export default function NamesScreen() {
                     </Text>
                   )}
                   <View style={styles.meaningInner}>
-                    <Text style={styles.meaningLabel}>Meaning</Text>
+                    <Text style={styles.meaningLabel}>{t('names.detail.meaningLabel')}</Text>
+                    {/* selected.meaning is English meaning content — not translated */}
                     <Text style={styles.meaningText}>{selected.meaning}</Text>
                   </View>
                   {selected.description && (

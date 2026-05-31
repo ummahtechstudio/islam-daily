@@ -9,6 +9,7 @@ import {
   useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../store';
 import { Colors } from '../constants/colors';
 
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function PrivacyConsentModal({ onAccept, onDecline }: Props) {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settingsScheme = useStore((s) => s.settings.colorScheme);
   const isDark =
@@ -34,7 +36,7 @@ export function PrivacyConsentModal({ onAccept, onDecline }: Props) {
           {/* Header */}
           <View style={[styles.header, { backgroundColor: Colors.primary }]}>
             <Text style={{ fontSize: 28 }}>🌙</Text>
-            <Text style={styles.headerTitle}>Islam Daily</Text>
+            <Text style={styles.headerTitle}>{t('privacy.header')}</Text>
           </View>
 
           <ScrollView
@@ -44,26 +46,27 @@ export function PrivacyConsentModal({ onAccept, onDecline }: Props) {
             {!detail ? (
               <>
                 <Text style={[styles.title, { color: theme.text }]}>
-                  A quick note on privacy
+                  {t('privacy.consent.title')}
                 </Text>
                 <Text style={[styles.para, { color: theme.textSecondary }]}>
-                  Islam Daily collects <Text style={{ fontWeight: '700' }}>anonymous location data</Text> to
-                  understand where our users are and improve the app experience for Muslims worldwide.
+                  {t('privacy.consent.body1Before')}{' '}
+                  <Text style={{ fontWeight: '700' }}>{t('privacy.consent.body1Highlight')}</Text>
+                  {' '}{t('privacy.consent.body1After')}
                 </Text>
                 <Text style={[styles.para, { color: theme.textSecondary }]}>
-                  No personal information — no name, email, or device ID — is ever stored or shared.
+                  {t('privacy.consent.body2')}
                 </Text>
 
                 <View style={[styles.bullets, { borderColor: theme.border }]}>
-                  {[
-                    { icon: 'location-outline',  text: 'Approximate city & country only' },
-                    { icon: 'shield-checkmark-outline', text: 'Never sold or shared with third parties' },
-                    { icon: 'eye-off-outline',   text: 'Not linked to your identity' },
-                    { icon: 'settings-outline',  text: 'Can be disabled any time in Settings' },
-                  ].map(({ icon, text }) => (
-                    <View key={text} style={styles.bulletRow}>
+                  {([
+                    { icon: 'location-outline',        bulletKey: 'location' },
+                    { icon: 'shield-checkmark-outline', bulletKey: 'noShare' },
+                    { icon: 'eye-off-outline',          bulletKey: 'noIdentity' },
+                    { icon: 'settings-outline',         bulletKey: 'optOut' },
+                  ] as const).map(({ icon, bulletKey }) => (
+                    <View key={bulletKey} style={styles.bulletRow}>
                       <Ionicons name={icon as any} size={16} color={Colors.primary} />
-                      <Text style={[styles.bulletText, { color: theme.textSecondary }]}>{text}</Text>
+                      <Text style={[styles.bulletText, { color: theme.textSecondary }]}>{t(`privacy.consent.bullets.${bulletKey}`)}</Text>
                     </View>
                   ))}
                 </View>
@@ -72,23 +75,17 @@ export function PrivacyConsentModal({ onAccept, onDecline }: Props) {
               <>
                 <TouchableOpacity onPress={() => setDetail(false)} style={styles.backRow}>
                   <Ionicons name="chevron-back" size={16} color={Colors.primary} />
-                  <Text style={[styles.backText, { color: Colors.primary }]}>Back</Text>
+                  <Text style={[styles.backText, { color: Colors.primary }]}>{t('common.back')}</Text>
                 </TouchableOpacity>
-                <Text style={[styles.title, { color: theme.text }]}>What we collect</Text>
-                {[
-                  ['City & country', 'Derived from GPS coordinates via on-device reverse geocoding. Only the text (e.g. "London, GB") is stored — raw coordinates are stored rounded to 4 decimal places (~11 m precision).'],
-                  ['Platform & device', 'Android or iOS, OS version, and device model (e.g. "Pixel 7"). No device ID or advertising ID.'],
-                  ['App version', 'So we know which build a session came from.'],
-                  ['Session timestamp', 'The UTC time the app was opened.'],
-                ].map(([heading, desc]) => (
-                  <View key={heading} style={styles.detailBlock}>
-                    <Text style={[styles.detailHeading, { color: theme.text }]}>{heading}</Text>
-                    <Text style={[styles.detailBody, { color: theme.textSecondary }]}>{desc}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{t('privacy.detail.title')}</Text>
+                {(['cityCountry', 'platformDevice', 'appVersion', 'sessionTimestamp'] as const).map((key) => (
+                  <View key={key} style={styles.detailBlock}>
+                    <Text style={[styles.detailHeading, { color: theme.text }]}>{t(`privacy.detail.items.${key}.heading`)}</Text>
+                    <Text style={[styles.detailBody, { color: theme.textSecondary }]}>{t(`privacy.detail.items.${key}.desc`)}</Text>
                   </View>
                 ))}
                 <Text style={[styles.para, { color: theme.textSecondary, marginTop: 8 }]}>
-                  Data is stored in Supabase (EU region) and is only accessible to the Islam Daily development team.
-                  You can opt out at any time from Settings → Privacy.
+                  {t('privacy.detail.footer')}
                 </Text>
               </>
             )}
@@ -101,20 +98,20 @@ export function PrivacyConsentModal({ onAccept, onDecline }: Props) {
                 style={styles.learnMore}
                 onPress={() => setDetail(true)}
               >
-                <Text style={[styles.learnMoreText, { color: Colors.primary }]}>Learn More</Text>
+                <Text style={[styles.learnMoreText, { color: Colors.primary }]}>{t('privacy.consent.learnMore')}</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
               style={[styles.declineBtn, { borderColor: theme.border }]}
               onPress={onDecline}
             >
-              <Text style={[styles.declineBtnText, { color: theme.textSecondary }]}>No thanks</Text>
+              <Text style={[styles.declineBtnText, { color: theme.textSecondary }]}>{t('privacy.consent.noThanks')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.acceptBtn, { backgroundColor: Colors.primary }]}
               onPress={onAccept}
             >
-              <Text style={styles.acceptBtnText}>OK, I understand</Text>
+              <Text style={styles.acceptBtnText}>{t('privacy.consent.accept')}</Text>
             </TouchableOpacity>
           </View>
         </View>

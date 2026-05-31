@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../constants/colors';
 import { useStore } from '../store';
@@ -39,8 +40,6 @@ import {
 interface PackConfig {
   id: PackId;
   icon: string;
-  title: string;
-  subtitle: string;
   sizeMB: number;
   accentColor: string;
   unavailable?: string;
@@ -51,8 +50,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'quranText',
     icon: '📖',
-    title: 'Quran Text',
-    subtitle: 'Full Arabic + English · 114 surahs · via Supabase',
     sizeMB: 8,
     accentColor: '#0F6E56',
     download: downloadQuran,
@@ -60,8 +57,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'quranAudioAlafasy',
     icon: '🔊',
-    title: 'Quran Audio — Alafasy',
-    subtitle: 'Mishary Alafasy recitation · Full 114 surahs',
     sizeMB: 480,
     accentColor: '#8B5CF6',
     unavailable: 'Audio downloads require expo-file-system',
@@ -70,8 +65,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'quranAudioAbdulBasit',
     icon: '🎙️',
-    title: 'Quran Audio — Abdul Basit',
-    subtitle: 'Abdul Basit Abdus Samad · Murattal style',
     sizeMB: 380,
     accentColor: '#7C3AED',
     unavailable: 'Audio downloads require expo-file-system',
@@ -80,8 +73,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'hadiths',
     icon: '📚',
-    title: 'Hadith Collections',
-    subtitle: 'Bukhari · Muslim · Tirmidhi · Abu Dawud · Ibn Majah · Nasai',
     sizeMB: 22,
     accentColor: '#3B82F6',
     download: downloadHadiths,
@@ -89,8 +80,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'duas',
     icon: '🤲',
-    title: 'Duas & Dhikr',
-    subtitle: 'Hisnul Muslim complete + Supabase duas',
     sizeMB: 2,
     accentColor: '#F59E0B',
     download: downloadDuas,
@@ -98,8 +87,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'names99',
     icon: '☪️',
-    title: '99 Names of Allah',
-    subtitle: 'Arabic · transliteration · full meanings',
     sizeMB: 1,
     accentColor: '#C9A84C',
     download: downloadNames,
@@ -107,8 +94,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'islamicBooks',
     icon: '📕',
-    title: 'Islamic Books',
-    subtitle: 'Curated Islamic literature library',
     sizeMB: 45,
     accentColor: '#EF4444',
     unavailable: 'Islamic Books pack coming soon',
@@ -117,8 +102,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'adhanSounds',
     icon: '🕌',
-    title: 'Adhan Sounds',
-    subtitle: '8 authentic Adhan recordings',
     sizeMB: 12,
     accentColor: '#22C55E',
     unavailable: 'Adhan sounds require expo-file-system',
@@ -127,8 +110,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'calendar',
     icon: '📅',
-    title: 'Islamic Calendar',
-    subtitle: 'Hijri dates + events · 12 months ahead',
     sizeMB: 1,
     accentColor: '#EC4899',
     download: downloadCalendar,
@@ -136,8 +117,6 @@ const PACKS: PackConfig[] = [
   {
     id: 'prayerTimes',
     icon: '🕐',
-    title: 'Prayer Times Cache',
-    subtitle: 'Pre-cached prayer times for your location',
     sizeMB: 0.05,
     accentColor: '#14B8A6',
     download: downloadPrayerTimes,
@@ -198,6 +177,7 @@ const pb = StyleSheet.create({
 
 export default function DownloadScreen() {
   useEffect(() => { trackScreen('Downloads'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isOnline = useNetworkStatus();
@@ -234,7 +214,7 @@ export default function DownloadScreen() {
   // so "Wi-Fi Only" was effectively a no-op gate.
   const checkWifiWarning = (): Promise<boolean> => {
     if (!isOnline) {
-      Alert.alert('No Connection', 'You appear to be offline. Downloads are unavailable.');
+      Alert.alert(t('downloads.alerts.noConnection.title'), t('downloads.alerts.noConnection.message'));
       return Promise.resolve(false);
     }
     if (!wifiOnly) return Promise.resolve(true);
@@ -243,11 +223,11 @@ export default function DownloadScreen() {
     // dialog and resolve based on the user's choice.
     return new Promise<boolean>((resolve) => {
       Alert.alert(
-        'Mobile Data Warning',
-        'Wi-Fi Only is enabled. We cannot verify your connection type. Are you sure you want to continue?',
+        t('downloads.alerts.mobileData.title'),
+        t('downloads.alerts.mobileData.message'),
         [
-          { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-          { text: 'Continue', style: 'default', onPress: () => resolve(true) },
+          { text: t('common.cancel'), style: 'cancel', onPress: () => resolve(false) },
+          { text: t('downloads.alerts.mobileData.continue'), style: 'default', onPress: () => resolve(true) },
         ],
         { onDismiss: () => resolve(false) },
       );
@@ -260,8 +240,8 @@ export default function DownloadScreen() {
     async (pack: PackConfig) => {
       if (pack.unavailable) {
         Alert.alert(
-          'Not Available',
-          pack.unavailable === 'COMING_SOON' ? 'This pack is coming in a future update.' : pack.unavailable
+          t('downloads.alerts.notAvailable.title'),
+          pack.unavailable === 'COMING_SOON' ? t('downloads.alerts.notAvailable.comingSoon') : pack.unavailable
         );
         return;
       }
@@ -278,11 +258,11 @@ export default function DownloadScreen() {
         await refresh();
       } catch (e: any) {
         const msg = e?.message?.startsWith('NEEDS_FILE_SYSTEM')
-          ? 'This pack requires expo-file-system. Run: npx expo install expo-file-system'
+          ? t('downloads.alerts.downloadError.needsFileSystem')
           : e?.message?.startsWith('COMING_SOON')
-          ? 'This pack is coming soon!'
-          : 'Download failed. Check your internet connection and try again.';
-        Alert.alert('Download Error', msg);
+          ? t('downloads.alerts.downloadError.comingSoon')
+          : t('downloads.alerts.downloadError.generic');
+        Alert.alert(t('downloads.alerts.downloadError.title'), msg);
       }
 
       setActive((prev) => {
@@ -320,7 +300,7 @@ export default function DownloadScreen() {
       });
       await refresh();
     } catch {
-      Alert.alert('Download Error', 'One or more packs failed. Check your connection.');
+      Alert.alert(t('downloads.alerts.downloadError.title'), t('downloads.alerts.downloadError.oneOrMore'));
     }
 
     setDownloadingAll(false);
@@ -332,13 +312,14 @@ export default function DownloadScreen() {
 
   const deletePack = useCallback(
     (pack: PackConfig) => {
+      const packTitle = t(`downloads.packs.${pack.id}.title`);
       Alert.alert(
-        `Remove "${pack.title}"?`,
-        'Offline data for this pack will be deleted from your device.',
+        t('downloads.alerts.removePack.title', { title: packTitle }),
+        t('downloads.alerts.removePack.message'),
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: t('common.cancel'), style: 'cancel' },
           {
-            text: 'Delete',
+            text: t('downloads.alerts.removePack.confirm'),
             style: 'destructive',
             onPress: async () => {
               await clearPack(pack.id);
@@ -348,7 +329,7 @@ export default function DownloadScreen() {
         ]
       );
     },
-    [refresh]
+    [refresh, t]
   );
 
   // ─── Pack card ────────────────────────────────────────────────────────────
@@ -363,11 +344,11 @@ export default function DownloadScreen() {
       ? new Date(packStatus.downloadedAt).toLocaleDateString()
       : null;
 
-    let statusLabel = 'Not Downloaded';
+    let statusLabel = t('downloads.status.notDownloaded');
     let statusColor = theme.textMuted;
-    if (isActive) { statusLabel = `Downloading ${pct}%`; statusColor = pack.accentColor; }
-    else if (isDownloaded) { statusLabel = 'Downloaded'; statusColor = Colors.success; }
-    else if (isUnavailable) { statusLabel = 'Unavailable'; statusColor = theme.textMuted; }
+    if (isActive) { statusLabel = t('downloads.status.downloading', { pct }); statusColor = pack.accentColor; }
+    else if (isDownloaded) { statusLabel = t('downloads.status.downloaded'); statusColor = Colors.success; }
+    else if (isUnavailable) { statusLabel = t('downloads.status.unavailable'); statusColor = theme.textMuted; }
 
     return (
       <View
@@ -385,7 +366,7 @@ export default function DownloadScreen() {
         <View style={styles.packInfo}>
           <View style={styles.packTitleRow}>
             <Text style={[styles.packTitle, { color: theme.text }]} numberOfLines={1}>
-              {pack.title}
+              {t(`downloads.packs.${pack.id}.title`)}
             </Text>
             <Text style={[styles.packSize, { color: theme.textMuted }]}>
               {formatMB(pack.sizeMB)}
@@ -393,7 +374,7 @@ export default function DownloadScreen() {
           </View>
 
           <Text style={[styles.packSub, { color: theme.textSecondary }]} numberOfLines={2}>
-            {pack.subtitle}
+            {t(`downloads.packs.${pack.id}.subtitle`)}
           </Text>
 
           {/* Status row */}
@@ -472,14 +453,14 @@ export default function DownloadScreen() {
         <View style={[styles.storageCard, { backgroundColor: Colors.primary }]}>
           <View style={styles.storageRow}>
             <View>
-              <Text style={styles.storageLabel}>Storage Used</Text>
+              <Text style={styles.storageLabel}>{t('downloads.storage.label')}</Text>
               <Text style={styles.storageValue}>{storageMB.toFixed(1)} MB</Text>
-              <Text style={styles.storageTotal}>of ~{totalSizeMB} MB total</Text>
+              <Text style={styles.storageTotal}>{t('downloads.storage.total', { total: totalSizeMB })}</Text>
             </View>
             <View style={styles.storageStats}>
               <Text style={styles.storageCountNum}>{downloadedCount}</Text>
               <Text style={styles.storageCountLabel}>
-                of {availablePacks.length} packs
+                {t('downloads.storage.packsCount', { total: availablePacks.length })}
               </Text>
             </View>
           </View>
@@ -498,7 +479,7 @@ export default function DownloadScreen() {
           <View style={[styles.banner, { backgroundColor: Colors.error + '18', borderColor: Colors.error + '40' }]}>
             <Ionicons name="cloud-offline-outline" size={16} color={Colors.error} />
             <Text style={[styles.bannerText, { color: Colors.error }]}>
-              You are offline — downloads unavailable
+              {t('downloads.offline.banner')}
             </Text>
           </View>
         )}
@@ -508,11 +489,11 @@ export default function DownloadScreen() {
           <View style={styles.wifiLeft}>
             <Ionicons name="wifi" size={18} color={wifiOnly ? Colors.primary : theme.textMuted} />
             <View>
-              <Text style={[styles.wifiTitle, { color: theme.text }]}>Wi-Fi Only</Text>
+              <Text style={[styles.wifiTitle, { color: theme.text }]}>{t('downloads.wifi.title')}</Text>
               <Text style={[styles.wifiSub, { color: theme.textMuted }]}>
                 {wifiOnly
-                  ? 'Remind me to check connection before downloading'
-                  : 'Downloads may use mobile data'}
+                  ? t('downloads.wifi.subOn')
+                  : t('downloads.wifi.subOff')}
               </Text>
             </View>
           </View>
@@ -542,14 +523,14 @@ export default function DownloadScreen() {
               color={Colors.primary}
             />
             <Text style={[styles.downloadAllText, { color: Colors.primary }]}>
-              {downloadingAll ? 'Downloading…' : 'Download All Available Packs'}
+              {downloadingAll ? t('downloads.downloading') : t('downloads.downloadAll')}
             </Text>
           </TouchableOpacity>
         ) : (
           <View style={[styles.allDoneCard, { backgroundColor: Colors.success + '18', borderColor: Colors.success + '40' }]}>
             <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
             <Text style={[styles.allDoneText, { color: Colors.success }]}>
-              All packs downloaded — full offline access!
+              {t('downloads.allDone')}
             </Text>
           </View>
         )}
@@ -558,12 +539,12 @@ export default function DownloadScreen() {
         <View style={[styles.infoBanner, { backgroundColor: Colors.info + '12', borderColor: Colors.info + '30' }]}>
           <Ionicons name="server-outline" size={14} color={Colors.info} />
           <Text style={[styles.infoText, { color: Colors.info }]}>
-            Quran, Hadiths, Duas & Names are synced from your Supabase database when available.
+            {t('downloads.supabaseNote')}
           </Text>
         </View>
 
         {/* ── Pack list ── */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Content Packs</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('downloads.sectionLabel')}</Text>
         <View style={[styles.packList, { borderColor: theme.border }]}>
           {PACKS.map((pack, idx) => (
             <View key={pack.id}>
@@ -576,8 +557,7 @@ export default function DownloadScreen() {
         </View>
 
         <Text style={[styles.footer, { color: theme.textMuted }]}>
-          Tap the refresh icon to re-download a pack. Tap trash to remove it.
-          Audio and book packs require additional packages.
+          {t('downloads.footer')}
         </Text>
       </ScrollView>
     </SafeAreaView>

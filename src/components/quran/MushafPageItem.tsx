@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { getAyahsForPage } from '../../services/quranCache';
 import { getSurahMeta } from '../../constants/surahMeta';
 import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
@@ -45,10 +46,13 @@ function SurahHeader({
   surahNumber: number;
   scale: number;
 }) {
+  const { t } = useTranslation();
   const meta = getSurahMeta(surahNumber);
   if (!meta) return null;
   const place =
-    meta.revelation_place === 'makkah' ? 'MAKKIYYAH' : 'MADANIYYAH';
+    meta.revelation_place === 'makkah'
+      ? t('quran.mushaf.makkiyyah')
+      : t('quran.mushaf.madaniyyah');
   return (
     <View style={surahHeaderStyles.wrap}>
       <View style={surahHeaderStyles.banner}>
@@ -58,7 +62,7 @@ function SurahHeader({
           سُورَةُ {meta.name_arabic}
         </Text>
         <Text style={[surahHeaderStyles.meta, { fontSize: 10 * scale }]}>
-          {meta.ayah_count} AYAHS · {place}
+          {t('quran.mushaf.ayahsCount', { count: meta.ayah_count })} · {place}
         </Text>
       </View>
     </View>
@@ -137,6 +141,7 @@ function PageBreak({
   juzNumber: number;
   scale: number;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={breakStyles.wrap}>
       <View style={breakStyles.dashedRow}>
@@ -147,7 +152,7 @@ function PageBreak({
       <View style={breakStyles.pillRow}>
         <View style={breakStyles.pill}>
           <Text style={[breakStyles.pillText, { fontSize: 11 * scale }]}>
-            Page {pageNumber} / {TOTAL_PAGES} · Juz {juzNumber}
+            {t('quran.mushaf.pageJuz', { n: pageNumber, total: TOTAL_PAGES, juz: juzNumber })}
           </Text>
         </View>
       </View>
@@ -197,6 +202,7 @@ export default function MushafPageItem({
   fontScale = 1,
   onAyahLongPress,
 }: MushafPageItemProps) {
+  const { t } = useTranslation();
   const ayahs = useMemo<MushafAyah[]>(
     () =>
       getAyahsForPage(pageNumber).map((a) => ({
@@ -215,7 +221,7 @@ export default function MushafPageItem({
             {ayahs.length === 0 ? (
               <View style={styles.statusWrap}>
                 <Text style={styles.statusText}>
-                  No ayahs on page {pageNumber}
+                  {t('quran.mushaf.noAyahsOnPage', { n: pageNumber })}
                 </Text>
               </View>
             ) : (

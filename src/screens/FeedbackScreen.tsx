@@ -20,6 +20,7 @@ import * as Device from 'expo-device';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../constants/colors';
 import { useStore } from '../store';
@@ -69,6 +70,7 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error';
 export default function FeedbackScreen() {
   useEffect(() => { trackScreen('Feedback'); }, []);
 
+  const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -88,7 +90,7 @@ export default function FeedbackScreen() {
     try {
       const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!perm.granted) {
-        Alert.alert('Permission needed', 'Please allow photo library access to attach a screenshot.');
+        Alert.alert(t('feedback.alerts.permissionNeeded.title'), t('feedback.alerts.permissionNeeded.message'));
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -100,7 +102,7 @@ export default function FeedbackScreen() {
       setScreenshot({ uri: a.uri, width: a.width ?? 0, height: a.height ?? 0 });
     } catch (err: any) {
       console.error('[Feedback] image pick failed', err);
-      Alert.alert('Could not open picker', err?.message ?? 'Try again.');
+      Alert.alert(t('feedback.alerts.pickerError.title'), err?.message ?? t('common.tryAgain'));
     }
   };
 
@@ -147,8 +149,8 @@ export default function FeedbackScreen() {
     setEmail('');
     setRating(0);
     setScreenshot(null);
-    Alert.alert('JazakAllah Khair!', 'Your feedback has been received.', [
-      { text: 'OK', onPress: () => router.back() },
+    Alert.alert(t('feedback.alerts.success.title'), t('feedback.alerts.success.message'), [
+      { text: t('common.ok'), onPress: () => router.back() },
     ]);
   };
 
@@ -157,14 +159,14 @@ export default function FeedbackScreen() {
     const trimmedMessage = message.trim();
 
     if (trimmedMessage.length < 10) {
-      Alert.alert('Message Too Short', 'Please write at least 10 characters.');
+      Alert.alert(t('feedback.alerts.tooShort.title'), t('feedback.alerts.tooShort.message'));
       return;
     }
 
     if (!isOnline) {
       Alert.alert(
-        'You appear to be offline',
-        "Submitting feedback needs an internet connection. Connect and try again.",
+        t('feedback.alerts.offline.title'),
+        t('feedback.alerts.offline.message'),
       );
       return;
     }
@@ -180,12 +182,12 @@ export default function FeedbackScreen() {
       } catch (uploadErr: any) {
         console.warn('[Feedback] screenshot upload failed', uploadErr);
         Alert.alert(
-          'Screenshot upload failed',
-          'Submit feedback without the screenshot?',
+          t('feedback.alerts.screenshotFailed.title'),
+          t('feedback.alerts.screenshotFailed.message'),
           [
-            { text: 'Cancel', style: 'cancel', onPress: () => setSubmitState('idle') },
+            { text: t('common.cancel'), style: 'cancel', onPress: () => setSubmitState('idle') },
             {
-              text: 'Submit anyway',
+              text: t('feedback.alerts.screenshotFailed.submitAnyway'),
               onPress: () => {
                 void (async () => {
                   try {
@@ -193,7 +195,7 @@ export default function FeedbackScreen() {
                   } catch (err: any) {
                     console.error('[Feedback] Submit failed:', JSON.stringify(err));
                     setSubmitState('error');
-                    Alert.alert('Submit Failed', err?.message ?? 'Please check your connection and try again.');
+                    Alert.alert(t('feedback.alerts.submitFailed.title'), err?.message ?? t('feedback.errorNote'));
                   }
                 })();
               },
@@ -209,7 +211,7 @@ export default function FeedbackScreen() {
     } catch (err: any) {
       console.error('[Feedback] Submit failed:', JSON.stringify(err));
       setSubmitState('error');
-      Alert.alert('Submit Failed', err?.message ?? 'Please check your connection and try again.');
+      Alert.alert(t('feedback.alerts.submitFailed.title'), err?.message ?? t('feedback.errorNote'));
     }
   };
 
@@ -220,21 +222,21 @@ export default function FeedbackScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn} hitSlop={8}>
             <Ionicons name="close" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Share Feedback</Text>
+          <Text style={styles.headerTitle}>{t('feedback.header.title')}</Text>
         </View>
         <View style={styles.successContainer}>
           <View style={[styles.successIcon, { backgroundColor: Colors.success + '20' }]}>
             <Ionicons name="checkmark-circle" size={64} color={Colors.success} />
           </View>
-          <Text style={[styles.successTitle, { color: theme.text }]}>JazakAllah Khair!</Text>
+          <Text style={[styles.successTitle, { color: theme.text }]}>{t('feedback.success.title')}</Text>
           <Text style={[styles.successText, { color: theme.textSecondary }]}>
-            Your feedback has been submitted. We read every message.
+            {t('feedback.success.text')}
           </Text>
           <TouchableOpacity
             style={[styles.backBtn, { backgroundColor: Colors.primary }]}
             onPress={() => { setSubmitState('idle'); router.back(); }}
           >
-            <Text style={styles.backBtnText}>Go Back</Text>
+            <Text style={styles.backBtnText}>{t('feedback.success.goBack')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -250,8 +252,8 @@ export default function FeedbackScreen() {
             <Ionicons name="close" size={22} color="#fff" />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
-            <Text style={styles.headerTitle}>Share Feedback</Text>
-            <Text style={styles.headerSub}>Help us improve Islam Daily</Text>
+            <Text style={styles.headerTitle}>{t('feedback.header.title')}</Text>
+            <Text style={styles.headerSub}>{t('feedback.header.sub')}</Text>
           </View>
         </View>
 
@@ -261,7 +263,7 @@ export default function FeedbackScreen() {
           contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         >
           {/* Rating */}
-          <Text style={[styles.label, { color: theme.textSecondary }]}>RATING (OPTIONAL)</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{t('feedback.labels.rating')}</Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <View style={styles.starsRow}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -277,12 +279,14 @@ export default function FeedbackScreen() {
           </View>
 
           {/* Category */}
-          <Text style={[styles.label, { color: theme.textSecondary }]}>CATEGORY</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{t('feedback.labels.category')}</Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <View style={styles.categoryGrid}>
               {CATEGORIES.map((cat) => {
                 const active = category === cat;
                 const color = CATEGORY_COLORS[cat];
+                // Map category value to i18n key (spaces removed for key)
+                const catKey = cat.replace(' ', '') as 'Bug' | 'Suggestion' | 'ContentIssue' | 'Other';
                 return (
                   <TouchableOpacity
                     key={cat}
@@ -294,7 +298,7 @@ export default function FeedbackScreen() {
                     activeOpacity={0.7}
                   >
                     <Ionicons name={CATEGORY_ICONS[cat] as any} size={14} color={active ? color : theme.textMuted} />
-                    <Text style={[styles.categoryLabel, { color: active ? color : theme.textSecondary }]}>{cat}</Text>
+                    <Text style={[styles.categoryLabel, { color: active ? color : theme.textSecondary }]}>{t(`feedback.categories.${catKey}`)}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -302,11 +306,11 @@ export default function FeedbackScreen() {
           </View>
 
           {/* Message */}
-          <Text style={[styles.label, { color: theme.textSecondary }]}>MESSAGE *</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{t('feedback.labels.message')}</Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <TextInput
               style={[styles.textArea, { color: theme.text }]}
-              placeholder="Share your thoughts, suggestions, or issues... (min 10 characters)"
+              placeholder={t('feedback.placeholders.message')}
               placeholderTextColor={theme.textMuted}
               multiline
               maxLength={1000}
@@ -315,19 +319,19 @@ export default function FeedbackScreen() {
               textAlignVertical="top"
             />
             <Text style={[styles.charCount, { color: message.length >= 10 ? Colors.success : theme.textMuted }]}>
-              {message.length}/1000{message.length > 0 && message.length < 10 ? ` (${10 - message.length} more needed)` : ''}
+              {message.length}/1000{message.length > 0 && message.length < 10 ? ` ${t('feedback.charCount.remaining', { n: 10 - message.length })}` : ''}
             </Text>
           </View>
 
           {/* Screenshot (optional) */}
-          <Text style={[styles.label, { color: theme.textSecondary }]}>SCREENSHOT (OPTIONAL)</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{t('feedback.labels.screenshot')}</Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
             {screenshot ? (
               <View style={styles.screenshotPreviewRow}>
                 <Image source={{ uri: screenshot.uri }} style={styles.screenshotThumb} />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.screenshotMeta, { color: theme.text }]} numberOfLines={1}>
-                    Image attached
+                    {t('feedback.screenshot.attached')}
                   </Text>
                   <Text style={[styles.screenshotMetaSub, { color: theme.textMuted }]} numberOfLines={1}>
                     {screenshot.width}×{screenshot.height}
@@ -345,29 +349,29 @@ export default function FeedbackScreen() {
               >
                 <Ionicons name="image-outline" size={20} color={Colors.primary} />
                 <Text style={[styles.screenshotPickerText, { color: Colors.primary }]}>
-                  Attach screenshot
+                  {t('feedback.screenshot.attach')}
                 </Text>
               </TouchableOpacity>
             )}
           </View>
 
           {/* Optional: Name & Email */}
-          <Text style={[styles.label, { color: theme.textSecondary }]}>YOUR NAME (OPTIONAL)</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{t('feedback.labels.name')}</Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, padding: 0 }]}>
             <TextInput
               style={[styles.inlineInput, { color: theme.text, borderBottomColor: theme.border }]}
-              placeholder="Anonymous"
+              placeholder={t('feedback.placeholders.name')}
               placeholderTextColor={theme.textMuted}
               value={name}
               onChangeText={setName}
             />
           </View>
 
-          <Text style={[styles.label, { color: theme.textSecondary }]}>EMAIL (OPTIONAL)</Text>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>{t('feedback.labels.email')}</Text>
           <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, padding: 0 }]}>
             <TextInput
               style={[styles.inlineInput, { color: theme.text }]}
-              placeholder="So we can follow up"
+              placeholder={t('feedback.placeholders.email')}
               placeholderTextColor={theme.textMuted}
               value={email}
               onChangeText={setEmail}
@@ -380,7 +384,7 @@ export default function FeedbackScreen() {
           <View style={[styles.infoBox, { backgroundColor: Colors.primary + '12', borderColor: Colors.primary + '30' }]}>
             <Ionicons name="information-circle-outline" size={15} color={Colors.primary} />
             <Text style={[styles.infoText, { color: Colors.primary }]}>
-              Your app version, OS, and device model will be included automatically.
+              {t('feedback.deviceNote')}
             </Text>
           </View>
 
@@ -389,7 +393,7 @@ export default function FeedbackScreen() {
             <View style={[styles.errorBox, { backgroundColor: Colors.error + '12', borderColor: Colors.error + '30' }]}>
               <Ionicons name="alert-circle-outline" size={15} color={Colors.error} />
               <Text style={[styles.infoText, { color: Colors.error }]}>
-                Submission failed. Please check your connection and try again.
+                {t('feedback.errorNote')}
               </Text>
             </View>
           )}
@@ -412,7 +416,7 @@ export default function FeedbackScreen() {
             ) : (
               <>
                 <Ionicons name="send" size={18} color="#fff" />
-                <Text style={styles.submitText}>Submit Feedback</Text>
+                <Text style={styles.submitText}>{t('feedback.submit')}</Text>
               </>
             )}
           </TouchableOpacity>

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -26,6 +27,7 @@ import {
 export default function CustomizeHomeScreen() {
   useEffect(() => { trackScreen('CustomizeHome'); }, []);
 
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -60,17 +62,17 @@ export default function CustomizeHomeScreen() {
 
   const onResetToDefault = () => {
     Alert.alert(
-      'Reset to Default?',
-      'This will restore the home screen tiles to their default selection.',
+      t('customizeHome.alerts.reset.title'),
+      t('customizeHome.alerts.reset.message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Reset',
+          text: t('customizeHome.alerts.reset.confirm'),
           style: 'destructive',
           onPress: async () => {
             setEnabledIds(DEFAULT_ENABLED_TILE_IDS);
             await setSetting(HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS);
-            Alert.alert('Reset Complete', 'Home tiles restored to default.');
+            Alert.alert(t('customizeHome.alerts.resetComplete.title'), t('customizeHome.alerts.resetComplete.message'));
           },
         },
       ],
@@ -97,7 +99,7 @@ export default function CustomizeHomeScreen() {
         <View style={[styles.emojiBox, { backgroundColor: themeColors.surface }]}>
           <Text style={styles.emoji}>{tile.emoji}</Text>
         </View>
-        <Text style={[styles.rowLabel, { color: themeColors.text }]}>{tile.label}</Text>
+        <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t(`home.tiles.${tile.id}`)}</Text>
         <Ionicons name="lock-closed" size={16} color={themeColors.textMuted} />
       </View>
       {!last && <Divider />}
@@ -112,7 +114,7 @@ export default function CustomizeHomeScreen() {
           <View style={[styles.emojiBox, { backgroundColor: themeColors.surface }]}>
             <Text style={styles.emoji}>{tile.emoji}</Text>
           </View>
-          <Text style={[styles.rowLabel, { color: themeColors.text }]}>{tile.label}</Text>
+          <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t(`home.tiles.${tile.id}`)}</Text>
           <Switch
             value={enabled}
             onValueChange={(v) => onToggle(tile.id, v)}
@@ -132,10 +134,10 @@ export default function CustomizeHomeScreen() {
         contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
       >
         <Text style={[styles.subtitle, { color: themeColors.textSecondary }]}>
-          Choose which features appear on your home screen
+          {t('customizeHome.subtitle')}
         </Text>
 
-        <SectionLabel>Always Shown</SectionLabel>
+        <SectionLabel>{t('customizeHome.sections.alwaysShown')}</SectionLabel>
         <SectionCard>
           {requiredTiles.map((tile, idx) => (
             <RequiredRow
@@ -146,10 +148,10 @@ export default function CustomizeHomeScreen() {
           ))}
         </SectionCard>
         <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
-          These core features cannot be hidden
+          {t('customizeHome.explainer')}
         </Text>
 
-        <SectionLabel>Optional</SectionLabel>
+        <SectionLabel>{t('customizeHome.sections.optional')}</SectionLabel>
         <SectionCard>
           {loaded
             ? optionalTiles.map((tile, idx) => (
@@ -168,7 +170,7 @@ export default function CustomizeHomeScreen() {
           activeOpacity={0.7}
         >
           <Ionicons name="refresh" size={18} color={Colors.error} />
-          <Text style={[styles.resetText, { color: Colors.error }]}>Reset to Default</Text>
+          <Text style={[styles.resetText, { color: Colors.error }]}>{t('customizeHome.resetBtn')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

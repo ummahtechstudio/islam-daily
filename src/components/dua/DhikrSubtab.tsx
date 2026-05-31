@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../constants/colors';
 import {
@@ -54,6 +55,7 @@ export interface DhikrSubtabProps {
 }
 
 export function DhikrSubtab({ theme, onCountWithTasbeeh }: DhikrSubtabProps) {
+  const { t } = useTranslation();
   // SSR-safe: bundled-only on first render, upgrade in useEffect.
   const [data, setData] = useState<DhikrCategory[]>(() => getBundledDhikr());
   const [language, setLanguage] = useState<TranslationLanguage>('urdu');
@@ -98,10 +100,10 @@ export function DhikrSubtab({ theme, onCountWithTasbeeh }: DhikrSubtabProps) {
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyEmoji}>📿</Text>
         <Text style={[styles.emptyTitle, { color: theme.text }]}>
-          Dhikr content is loading
+          {t('dhikr.loading.title')}
         </Text>
         <Text style={[styles.emptySubtitle, { color: theme.textMuted }]}>
-          Please come back in a moment, in shaa Allah.
+          {t('dhikr.loading.subtitle')}
         </Text>
       </View>
     );
@@ -136,6 +138,7 @@ function DhikrCard({
   language: TranslationLanguage;
   onCount: () => void;
 }) {
+  const { t } = useTranslation();
   const { item } = entry;
   return (
     <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
@@ -196,7 +199,7 @@ function DhikrCard({
       >
         <Ionicons name="repeat" size={14} color={Colors.primary} />
         <Text style={[styles.countBtnText, { color: Colors.primary }]}>
-          Count this with Tasbeeh →
+          {t('dhikr.countWithTasbeeh')}
         </Text>
       </TouchableOpacity>
     </View>

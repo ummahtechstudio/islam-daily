@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
@@ -75,59 +76,61 @@ const ISLAMIC_QUOTES = [
 ];
 
 // ─── Section data ────────────────────────────────────────────────────────────
+// Labels and subtitles are translated at render time via stable item keys.
 
 const SECTIONS = [
   {
-    title: 'Prayer & Location',
+    titleKey: 'more.sections.prayerLocation' as const,
     icon: 'location' as const,
     color: Colors.primary,
     items: [
-      { icon: '🕌', label: 'Prayer Times',   sub: 'All 5 daily prayers',    route: '/prayer',        bg: '#0F6E5622' },
-      { icon: '🧭', label: 'Qibla Finder',   sub: 'Live compass to Makkah', route: '/qibla',         bg: '#C9A84C22' },
-      { icon: '🕍', label: 'Mosque Finder',  sub: 'Find mosques near you',  route: '/mosque-finder', bg: '#3B82F622' },
+      { icon: '🕌', itemKey: 'prayerTimes',     route: '/prayer',        bg: '#0F6E5622' },
+      { icon: '🧭', itemKey: 'qibla',           route: '/qibla',         bg: '#C9A84C22' },
+      { icon: '🕍', itemKey: 'mosqueFinder',    route: '/mosque-finder', bg: '#3B82F622' },
     ],
   },
   {
-    title: 'Islamic Knowledge',
+    titleKey: 'more.sections.islamicKnowledge' as const,
     icon: 'book' as const,
     color: '#3B82F6',
     items: [
-      { icon: '🔖', label: 'My Bookmarks',   sub: 'Saved hadith, duas & dhikr', route: '/bookmarks',    bg: '#EF9F2722' },
-      { icon: '📚', label: 'Hadith Browser', sub: '6 major collections',    route: '/hadith',         bg: '#3B82F622' },
-      { icon: '☪️',  label: '99 Names',      sub: 'Asma ul-Husna',          route: '/names',          bg: '#8B5CF622' },
-      { icon: '📖', label: 'Islamic Books',  sub: 'Free classic texts',     route: '/islamic-books',  bg: '#22C55E22' },
-      { icon: '🎧', label: 'Audio Books',   sub: 'Lectures, Quran & Naats', route: '/audio-library',  bg: '#0F6E5622' },
+      { icon: '🔖', itemKey: 'myBookmarks',     route: '/bookmarks',     bg: '#EF9F2722' },
+      { icon: '📚', itemKey: 'hadithBrowser',   route: '/hadith',        bg: '#3B82F622' },
+      { icon: '☪️',  itemKey: 'names99',         route: '/names',         bg: '#8B5CF622' },
+      { icon: '📖', itemKey: 'islamicBooks',    route: '/islamic-books', bg: '#22C55E22' },
+      { icon: '🎧', itemKey: 'audioBooks',      route: '/audio-library', bg: '#0F6E5622' },
     ],
   },
   {
-    title: 'Tools & Calculators',
+    titleKey: 'more.sections.toolsCalculators' as const,
     icon: 'calculator' as const,
     color: '#8B5CF6',
     items: [
-      { icon: '💰', label: 'Zakat Calculator', sub: 'Calculate your Zakat',      route: '/zakat-calculator', bg: '#F59E0B22' },
-      { icon: '📅', label: 'Islamic Calendar', sub: 'Hijri & Gregorian dates',   route: '/calendar',         bg: '#EC489922' },
-      { icon: '🌙', label: 'Ramadan Mode',     sub: 'Sehri, Iftar & timetable',  route: '/ramadan',          bg: '#1A103522' },
-      { icon: '🥩', label: 'Halal Finder',     sub: 'Halal restaurants near you', route: '/halal-finder',    bg: '#EF444422' },
+      { icon: '💰', itemKey: 'zakatCalculator', route: '/zakat-calculator', bg: '#F59E0B22' },
+      { icon: '📅', itemKey: 'islamicCalendar', route: '/calendar',         bg: '#EC489922' },
+      { icon: '🌙', itemKey: 'ramadanMode',     route: '/ramadan',          bg: '#1A103522' },
+      { icon: '🥩', itemKey: 'halalFinder',     route: '/halal-finder',     bg: '#EF444422' },
     ],
   },
   {
-    title: 'Settings & More',
+    titleKey: 'more.sections.settingsMore' as const,
     icon: 'settings' as const,
     color: '#6B7280',
     items: [
-      { icon: '🌐', label: 'Translation',   sub: 'Quran translation language',  route: '/language',     bg: '#3B82F622' },
-      { icon: '🔔', label: 'Custom Adhan',  sub: 'Choose Adhan per prayer',     route: '/custom-adhan', bg: '#F9731622' },
-      { icon: '⬇️', label: 'Downloads',    sub: 'Save content offline',        route: '/downloads',    bg: '#22C55E22' },
-      { icon: '⚙️', label: 'Settings',     sub: 'Theme, font, preferences',    route: '/settings',     bg: '#6B728022' },
-      { icon: '💬', label: 'Feedback',     sub: 'Help us improve the app',     route: '/feedback',     bg: '#0F6E5622' },
+      { icon: '🌐', itemKey: 'translation',     route: '/language',     bg: '#3B82F622' },
+      { icon: '🔔', itemKey: 'customAdhan',     route: '/custom-adhan', bg: '#F9731622' },
+      { icon: '⬇️', itemKey: 'downloads',       route: '/downloads',    bg: '#22C55E22' },
+      { icon: '⚙️', itemKey: 'settings',        route: '/settings',     bg: '#6B728022' },
+      { icon: '💬', itemKey: 'feedback',        route: '/feedback',     bg: '#0F6E5622' },
     ],
   },
-] as const;
+];
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function MoreScreen() {
   useEffect(() => { trackScreen('More'); }, []);
+  const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -155,15 +158,15 @@ export default function MoreScreen() {
         {/* ── Header ── */}
         <View style={[styles.header, { backgroundColor: Colors.primary }]}>
           <View>
-            <Text style={styles.headerTitle}>More</Text>
-            <Text style={styles.headerSub}>Features & Settings</Text>
+            <Text style={styles.headerTitle}>{t('more.header.title')}</Text>
+            <Text style={styles.headerSub}>{t('more.header.sub')}</Text>
           </View>
           <TouchableOpacity
             style={styles.bookmarkBadge}
             onPress={() => router.push('/bookmarks' as any)}
           >
             <Ionicons name="bookmark" size={14} color={GOLD} />
-            <Text style={styles.bookmarkCount}>{bookmarkCount} saved</Text>
+            <Text style={styles.bookmarkCount}>{t('more.bookmark.saved', { count: bookmarkCount })}</Text>
           </TouchableOpacity>
         </View>
 
@@ -178,9 +181,9 @@ export default function MoreScreen() {
               <Ionicons name="search" size={22} color={Colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.searchLabel, { color: theme.text }]}>Search</Text>
+              <Text style={[styles.searchLabel, { color: theme.text }]}>{t('more.search.label')}</Text>
               <Text style={[styles.searchSub, { color: theme.textMuted }]}>
-                Search the Quran by keyword
+                {t('more.search.sub')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
@@ -198,10 +201,10 @@ export default function MoreScreen() {
               <Text style={styles.tasbeehIcon}>📿</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.tasbeehLabel, { color: theme.text }]}>Tasbeeh Counter</Text>
+              <Text style={[styles.tasbeehLabel, { color: theme.text }]}>{t('more.tasbeeh.label')}</Text>
               <Text style={[styles.tasbeehUrdu, { color: theme.textSecondary }]}>تسبیح کاؤنٹر</Text>
               <Text style={[styles.tasbeehSub, { color: theme.textMuted }]}>
-                Count your dhikr with timer
+                {t('more.tasbeeh.sub')}
               </Text>
             </View>
             <View style={[styles.tasbeehChevron, { backgroundColor: Colors.primary + '14' }]}>
@@ -218,14 +221,14 @@ export default function MoreScreen() {
           const visibleItems = section.items.filter((i) => !isRouteHidden(i.route));
           if (visibleItems.length === 0) return null;
           return (
-          <View key={section.title} style={styles.section}>
+          <View key={section.titleKey} style={styles.section}>
             {/* Section header with colored background */}
             <View style={[styles.sectionHeader, { backgroundColor: section.color + '14' }]}>
               <View style={[styles.sectionIconBox, { backgroundColor: section.color }]}>
                 <Ionicons name={section.icon} size={14} color="#fff" />
               </View>
               <Text style={[styles.sectionTitle, { color: section.color }]}>
-                {section.title.toUpperCase()}
+                {t(section.titleKey).toUpperCase()}
               </Text>
             </View>
 
@@ -242,7 +245,7 @@ export default function MoreScreen() {
                     ]}
                     onPress={() => {
                       if (comingSoon) {
-                        Alert.alert(comingSoon.title, comingSoon.message, [{ text: 'OK' }]);
+                        Alert.alert(comingSoon.title, comingSoon.message, [{ text: t('common.ok') }]);
                         return;
                       }
                       router.push(item.route as any);
@@ -253,14 +256,14 @@ export default function MoreScreen() {
                       <Text style={styles.cardIcon}>{item.icon}</Text>
                     </View>
                     <Text style={[styles.cardLabel, { color: theme.text }]} numberOfLines={1}>
-                      {item.label}
+                      {t(`more.items.${item.itemKey}.label`)}
                     </Text>
                     <Text style={[styles.cardSub, { color: theme.textMuted }]} numberOfLines={2}>
-                      {item.sub}
+                      {t(`more.items.${item.itemKey}.sub`)}
                     </Text>
                     {comingSoon ? (
                       <View style={styles.soonBadge}>
-                        <Text style={styles.soonBadgeText}>SOON</Text>
+                        <Text style={styles.soonBadgeText}>{t('more.soon')}</Text>
                       </View>
                     ) : (
                       <View style={styles.cardArrow}>
@@ -281,7 +284,7 @@ export default function MoreScreen() {
             <View style={[styles.sectionIconBox, { backgroundColor: Colors.primary }]}>
               <Ionicons name="star" size={14} color="#fff" />
             </View>
-            <Text style={[styles.sectionTitle, { color: Colors.primary }]}>QURAN MEMORIZATION</Text>
+            <Text style={[styles.sectionTitle, { color: Colors.primary }]}>{t('more.sections.quranMemorization').toUpperCase()}</Text>
           </View>
           <TouchableOpacity
             style={[styles.featuredCard, { backgroundColor: Colors.primary }]}
@@ -291,8 +294,8 @@ export default function MoreScreen() {
             <View style={styles.featuredLeft}>
               <Text style={styles.featuredIcon}>📿</Text>
               <View>
-                <Text style={styles.featuredLabel}>Hifz Tracker</Text>
-                <Text style={styles.featuredSub}>Track your Quran memorization progress</Text>
+                <Text style={styles.featuredLabel}>{t('more.items.hifzTracker.label')}</Text>
+                <Text style={styles.featuredSub}>{t('more.items.hifzTracker.sub')}</Text>
               </View>
             </View>
             <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.8)" />
@@ -309,7 +312,7 @@ export default function MoreScreen() {
         {/* ── Islamic Quote of the Day ── */}
         <View style={styles.quoteSection}>
           <View style={[styles.quoteBadge, { backgroundColor: GOLD + '22' }]}>
-            <Text style={[styles.quoteBadgeText, { color: GOLD }]}>✨ Hadith of Wisdom</Text>
+            <Text style={[styles.quoteBadgeText, { color: GOLD }]}>{t('more.quote.badge')}</Text>
           </View>
           <View style={[styles.quoteCard, { backgroundColor: theme.card, borderColor: GOLD + '40' }]}>
             <View style={styles.quoteGoldBar} />
@@ -328,9 +331,9 @@ export default function MoreScreen() {
 
         {/* ── About ── */}
         <View style={[styles.about, { borderTopColor: theme.border }]}>
-          <Text style={[styles.aboutText, { color: theme.textMuted }]}>Islam Daily v1.0.0</Text>
+          <Text style={[styles.aboutText, { color: theme.textMuted }]}>{t('more.about.version')}</Text>
           <Text style={[styles.aboutText, { color: theme.textMuted }]}>
-            Built with care for the Muslim community
+            {t('more.about.tagline')}
           </Text>
         </View>
       </ScrollView>

@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -24,6 +25,7 @@ type HifzProgress = Record<number, boolean>;
 
 export default function HifzTrackerScreen() {
   useEffect(() => { trackScreen('HifzTracker'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -50,11 +52,11 @@ export default function HifzTrackerScreen() {
       // Whether the surah list fetch failed (offline) or AsyncStorage threw,
       // we surface a retriable error instead of an infinite spinner.
       console.warn('[HifzTracker] load failed', err);
-      setError('Could not load the surah list. Check your connection and try again.');
+      setError(t('hifz.error'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();
@@ -69,15 +71,15 @@ export default function HifzTrackerScreen() {
   const memorized = Object.values(progress).filter(Boolean).length;
   const pct = surahs.length ? Math.round((memorized / surahs.length) * 100) : 0;
 
-  if (loading) return <LoadingSpinner message="Loading surahs..." dark={isDark} />;
+  if (loading) return <LoadingSpinner message={t('hifz.loading')} dark={isDark} />;
   if (error) return <ErrorView message={error} onRetry={load} dark={isDark} />;
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
       {/* Progress header */}
       <View style={[styles.progressCard, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.progressTitle}>Hifz Progress</Text>
-        <Text style={styles.progressStats}>{memorized} / {surahs.length} Surahs Memorized</Text>
+        <Text style={styles.progressTitle}>{t('hifz.progress.title')}</Text>
+        <Text style={styles.progressStats}>{t('hifz.progress.stats', { memorized, total: surahs.length })}</Text>
         <View style={styles.barBg}>
           <View style={[styles.barFill, { width: `${pct}%` }]} />
         </View>
@@ -108,7 +110,7 @@ export default function HifzTrackerScreen() {
               <View style={styles.surahInfo}>
                 <Text style={[styles.surahName, { color: theme.text }]}>{item.englishName}</Text>
                 <Text style={[styles.surahSub, { color: theme.textMuted }]}>
-                  {item.revelationType} · {item.numberOfAyahs} verses
+                  {item.revelationType} · {t('hifz.surah.verses', { count: item.numberOfAyahs })}
                 </Text>
               </View>
               <Text style={[styles.surahArabic, { color: done ? Colors.primary : theme.textSecondary }]}>

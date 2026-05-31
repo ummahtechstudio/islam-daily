@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../constants/colors';
 import { useStore } from '../store';
@@ -20,6 +21,7 @@ export type MosqueFinderEmptyStateProps = {
 };
 
 export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptyStateProps) {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -33,9 +35,9 @@ export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptySta
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
         <Ionicons name="location" size={24} color="#fff" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Mosque Finder</Text>
+          <Text style={styles.headerTitle}>{t('mosqueFinder.header.title')}</Text>
           <Text style={styles.headerSub} numberOfLines={1}>
-            Discover masjids near you
+            {t('mosqueFinder.header.sub')}
           </Text>
         </View>
       </View>
@@ -45,9 +47,9 @@ export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptySta
           <Ionicons name="map-outline" size={56} color={GREEN} />
         </View>
 
-        <Text style={[styles.title, { color: theme.text }]}>Find Mosques Nearby</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('mosqueFinder.empty.title')}</Text>
         <Text style={[styles.body_text, { color: theme.textSecondary }]}>
-          Connect to the internet to discover masjids around you with directions, prayer times, and reviews.
+          {t('mosqueFinder.empty.body')}
         </Text>
 
         <TouchableOpacity
@@ -61,11 +63,11 @@ export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptySta
           activeOpacity={0.85}
         >
           <Ionicons name="refresh" size={16} color="#fff" />
-          <Text style={styles.retryText}>{isOnline ? 'Retry' : 'Waiting for connection…'}</Text>
+          <Text style={styles.retryText}>{isOnline ? t('mosqueFinder.empty.retryOnline') : t('mosqueFinder.empty.retryOffline')}</Text>
         </TouchableOpacity>
 
         <Text style={[styles.note, { color: theme.textMuted }]}>
-          Mosque locations need real-time data and can&apos;t be saved offline.
+          {t('mosqueFinder.empty.note')}
         </Text>
       </View>
     </SafeAreaView>

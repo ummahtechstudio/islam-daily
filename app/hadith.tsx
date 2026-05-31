@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
@@ -79,10 +80,13 @@ function CollectionsGrid({
   isDark: boolean;
   counts: Record<string, number>;
 }) {
+  const { t } = useTranslation();
   const theme = isDark ? Colors.dark : Colors.light;
   return (
     <View style={gridStyles.container}>
-      <Text style={[gridStyles.heading, { color: theme.textSecondary }]}>SELECT A COLLECTION</Text>
+      <Text style={[gridStyles.heading, { color: theme.textSecondary }]}>
+        {t('hadith.collections.selectLabel')}
+      </Text>
       <View style={gridStyles.grid}>
         {HADITH_COLLECTIONS.map((col) => {
           const meta = COLLECTION_META[col.key];
@@ -97,10 +101,11 @@ function CollectionsGrid({
               <View style={[gridStyles.iconBg, { backgroundColor: meta.bg }]}>
                 <Text style={gridStyles.icon}>{meta.icon}</Text>
               </View>
+              {/* col.name is the proper-noun collection name (e.g. "Sahih Bukhari") — content, not translated */}
               <Text style={[gridStyles.name, { color: theme.text }]} numberOfLines={2}>{col.name}</Text>
               <View style={[gridStyles.countBadge, { backgroundColor: meta.color + '20' }]}>
                 <Text style={[gridStyles.count, { color: meta.color }]}>
-                  {(count ?? DEFAULT_COLLECTION_COUNTS[col.key] ?? 0).toLocaleString()} hadiths
+                  {t('hadith.collections.hadithsCount', { count: (count ?? DEFAULT_COLLECTION_COUNTS[col.key] ?? 0).toLocaleString() })}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -128,6 +133,7 @@ const gridStyles = StyleSheet.create({
 export default function HadithScreen() {
   useEffect(() => { trackScreen('Hadith'); }, []);
 
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark = settings.colorScheme === 'dark' || (settings.colorScheme === 'system' && colorScheme === 'dark');
@@ -273,6 +279,7 @@ export default function HadithScreen() {
           <GradeBadge grade={item.grade ?? 'Sahih'} theme={theme} />
         </View>
 
+        {/* collName is the proper-noun collection name (e.g. "Sahih Bukhari") — content, not translated */}
         <Text style={cardStyles.bookName}>{collName}</Text>
 
         {item.arabic ? (
@@ -345,14 +352,15 @@ export default function HadithScreen() {
           ) : null}
           <View style={{ flex: 1 }}>
             <Text style={styles.headerTitle}>
-              {viewMode === 'collections' ? 'Hadith Collections' : collName}
+              {/* collName is a proper-noun collection name when in hadiths view — content, not translated */}
+              {viewMode === 'collections' ? t('hadith.header.title') : collName}
             </Text>
             <Text style={styles.headerSub}>
               {viewMode === 'collections'
-                ? 'Authentic narrations of the Prophet ﷺ'
+                ? t('hadith.header.subtitle')
                 : searchQuery
-                ? `${totalCount.toLocaleString()} results`
-                : `${totalCount.toLocaleString()} hadiths`}
+                ? t('hadith.search.resultsCount', { count: totalCount.toLocaleString() })
+                : t('hadith.search.hadithsCount', { count: totalCount.toLocaleString() })}
             </Text>
           </View>
         </View>
@@ -375,10 +383,10 @@ export default function HadithScreen() {
         <View style={styles.empty}>
           <Ionicons name="book-outline" size={56} color={GOLD} />
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
-            {collName} not yet downloaded
+            {t('hadith.empty.notDownloaded', { name: collName })}
           </Text>
           <Text style={[styles.emptyBody, { color: theme.textMuted }]}>
-            Connect to the internet once and {collName} will be available offline forever.
+            {t('hadith.empty.notDownloadedBody', { name: collName })}
           </Text>
           <TouchableOpacity
             style={[
@@ -391,17 +399,17 @@ export default function HadithScreen() {
             activeOpacity={0.85}
           >
             <Ionicons name="refresh" size={16} color="#fff" />
-            <Text style={styles.retryText}>Try again</Text>
+            <Text style={styles.retryText}>{t('hadith.actions.tryAgain')}</Text>
           </TouchableOpacity>
         </View>
       ) : isDownloading && allHadiths.length === 0 ? (
         <View style={styles.empty}>
           <ActivityIndicator color={Colors.primary} size="large" />
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
-            Preparing {collName}…
+            {t('hadith.empty.preparing', { name: collName })}
           </Text>
           <Text style={[styles.emptyBody, { color: theme.textMuted }]}>
-            First load only — cached forever after this.
+            {t('hadith.empty.preparingBody')}
           </Text>
         </View>
       ) : (
@@ -410,10 +418,10 @@ export default function HadithScreen() {
             <Ionicons name="search" size={16} color={theme.textMuted} />
             <TextInput
               style={[styles.searchInput, { color: theme.text }]}
-              placeholder="Search by number or keyword..."
+              placeholder={t('hadith.search.placeholder')}
               placeholderTextColor={theme.textMuted}
               value={searchQuery}
-              onChangeText={(t) => { setSearchQuery(t); setPage(1); }}
+              onChangeText={(txt) => { setSearchQuery(txt); setPage(1); }}
               returnKeyType="search"
             />
             {searchQuery ? (
@@ -423,7 +431,7 @@ export default function HadithScreen() {
             ) : null}
           </View>
           <Text style={[styles.searchHint, { color: theme.textMuted }]}>
-            Type a hadith number (e.g. 35) for exact match, or text to search content
+            {t('hadith.search.hint')}
           </Text>
 
           <FlatList
@@ -448,7 +456,9 @@ export default function HadithScreen() {
             }
             ListEmptyComponent={
               <View style={styles.empty}>
-                <Text style={[styles.emptyBody, { color: theme.textMuted }]}>No hadiths found.</Text>
+                <Text style={[styles.emptyBody, { color: theme.textMuted }]}>
+                  {t('hadith.empty.noResults')}
+                </Text>
               </View>
             }
             ListFooterComponent={

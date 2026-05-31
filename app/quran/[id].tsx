@@ -34,6 +34,7 @@ import {
 import { shareContent } from '../../src/utils/share';
 import { useDebouncedPositionWriter } from '../../src/hooks/useQuranLastPosition';
 import { fetchWithTimeout } from '../../src/utils/network';
+import { useTranslation } from 'react-i18next';
 
 // ─── expo-av optional import ─────────────────────────────────────────────────
 let Audio: any = null;
@@ -167,6 +168,7 @@ async function fetchWordMeaning(globalAyahNumber: number): Promise<{ arabic: str
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function SurahReaderScreen() {
+  const { t } = useTranslation();
   useEffect(() => { trackScreen('SurahReader'); }, []);
   const { id, ayah: ayahParam } = useLocalSearchParams<{ id: string; ayah?: string }>();
   // Guard against non-numeric route params (deep links, typos): clamp to 1..114
@@ -348,7 +350,7 @@ export default function SurahReaderScreen() {
 
   const playAyah = async (ayah: Ayah) => {
     if (!Audio) {
-      Alert.alert('Audio unavailable', 'This build does not include audio playback support.');
+      Alert.alert(t('quran.reader.audioUnavailableTitle'), t('quran.reader.audioUnavailableBody'));
       return;
     }
     if (playingAyah === ayah.number) {
@@ -385,7 +387,7 @@ export default function SurahReaderScreen() {
       });
     } catch {
       setLoadingAyah(null);
-      Alert.alert('Playback failed', 'Could not load audio. Check your connection.');
+      Alert.alert(t('quran.reader.playbackFailedTitle'), t('quran.reader.playbackFailedBody'));
     }
   };
 
@@ -401,13 +403,13 @@ export default function SurahReaderScreen() {
         style={{ flex: 1, backgroundColor: theme.background }}
         edges={['top']}
       >
-        <LoadingSpinner message="Loading surah..." dark={isDark} />
+        <LoadingSpinner message={t('quran.reader.loading')} dark={isDark} />
       </SafeAreaView>
     );
   }
 
   if (error || !arabic || !translation) {
-    return <ErrorView message={error ?? 'Failed to load surah'} dark={isDark} />;
+    return <ErrorView message={error ?? t('quran.reader.error')} dark={isDark} />;
   }
 
   // ─── Verse renderer ───────────────────────────────────────────────────────
@@ -632,7 +634,7 @@ export default function SurahReaderScreen() {
           <Text style={styles.surahName}>{arabic.englishName}</Text>
           <Text style={styles.surahArabicName}>{arabic.name}</Text>
           <Text style={styles.surahMeta}>
-            {arabic.revelationType} · {arabic.numberOfAyahs} Verses
+            {arabic.revelationType} · {t('quran.reader.verses', { count: arabic.numberOfAyahs })}
           </Text>
           {surahNum !== 9 && (
             <Text style={styles.bismillah}>{BISMILLAH}</Text>
@@ -649,7 +651,7 @@ export default function SurahReaderScreen() {
             activeOpacity={0.8}
           >
             <Text style={[styles.modePillText, { color: theme.textMuted }]}>
-              🔊 Recite
+              {t('quran.reader.modeRecite')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -662,7 +664,7 @@ export default function SurahReaderScreen() {
             activeOpacity={0.8}
           >
             <Text style={[styles.modePillText, { color: '#fff' }]}>
-              📖 Study
+              {t('quran.reader.modeStudy')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -742,11 +744,11 @@ export default function SurahReaderScreen() {
       {/* Tajweed legend */}
       {quranMode === 'study' && tajweedOn && (
         <View style={[styles.legend, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
-          <Text style={[styles.legendItem, { color: '#4B9BFF' }]}>■ Qalqala</Text>
-          <Text style={[styles.legendItem, { color: '#4CAF50' }]}>■ Ghunna</Text>
-          <Text style={[styles.legendItem, { color: '#F5C518' }]}>■ Madd</Text>
-          <Text style={[styles.legendItem, { color: '#FF9800' }]}>■ Ikhfa</Text>
-          <Text style={[styles.legendTip, { color: theme.textMuted }]}>Tap word for meaning</Text>
+          <Text style={[styles.legendItem, { color: '#4B9BFF' }]}>{t('quran.tajweed.qalqala')}</Text>
+          <Text style={[styles.legendItem, { color: '#4CAF50' }]}>{t('quran.tajweed.ghunna')}</Text>
+          <Text style={[styles.legendItem, { color: '#F5C518' }]}>{t('quran.tajweed.madd')}</Text>
+          <Text style={[styles.legendItem, { color: '#FF9800' }]}>{t('quran.tajweed.ikhfa')}</Text>
+          <Text style={[styles.legendTip, { color: theme.textMuted }]}>{t('quran.tajweed.tapForMeaning')}</Text>
         </View>
       )}
 
@@ -776,7 +778,7 @@ export default function SurahReaderScreen() {
         <Pressable style={styles.modalOverlay} onPress={() => setShowReciterPicker(false)}>
           <Pressable style={[styles.modalSheet, { backgroundColor: theme.card }]}>
             <View style={[styles.modalHandle, { backgroundColor: theme.border }]} />
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Select Reciter</Text>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>{t('quran.reciterPicker.title')}</Text>
             {RECITERS.map((r, idx) => (
               <TouchableOpacity
                 key={r.id}
@@ -810,7 +812,7 @@ export default function SurahReaderScreen() {
         <Pressable style={styles.modalOverlay} onPress={() => setShowReciteSettings(false)}>
           <Pressable style={[styles.modalSheet, { backgroundColor: theme.card }]}>
             <View style={[styles.modalHandle, { backgroundColor: theme.border }]} />
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Recite Settings</Text>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>{t('quran.reciteSettings.title')}</Text>
 
             {/* Switch to Study mode */}
             <TouchableOpacity
@@ -821,7 +823,7 @@ export default function SurahReaderScreen() {
               }}
             >
               <Ionicons name="book-outline" size={20} color={Colors.primary} />
-              <Text style={[styles.reciteSettingLabel, { color: theme.text }]}>Switch to Study Mode</Text>
+              <Text style={[styles.reciteSettingLabel, { color: theme.text }]}>{t('quran.reader.switchToStudy')}</Text>
               <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
             </TouchableOpacity>
 
@@ -836,7 +838,7 @@ export default function SurahReaderScreen() {
                 color={surahBookmarked ? Colors.accent : Colors.primary}
               />
               <Text style={[styles.reciteSettingLabel, { color: theme.text }]}>
-                {surahBookmarked ? 'Bookmarked' : 'Bookmark this Surah'}
+                {surahBookmarked ? t('quran.reader.bookmarked') : t('quran.reader.bookmarkSurah')}
               </Text>
               {surahBookmarked && (
                 <Ionicons name="checkmark-circle" size={18} color={Colors.accent} />
@@ -845,7 +847,7 @@ export default function SurahReaderScreen() {
 
             {/* Font size */}
             <View style={styles.reciteSettingFontRow}>
-              <Text style={[styles.reciteSettingLabel, { color: theme.text, flex: 0 }]}>Font Size</Text>
+              <Text style={[styles.reciteSettingLabel, { color: theme.text, flex: 0 }]}>{t('quran.reader.fontSize')}</Text>
               <View style={styles.reciteSettingFontPills}>
                 {RECITE_FONT_SIZES.map((size, idx) => {
                   const labels = ['A-', 'A', 'A+'];
@@ -890,7 +892,7 @@ export default function SurahReaderScreen() {
                   <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 8 }} />
                 ) : (
                   <>
-                    <Text style={[styles.wordLabel, { color: theme.textMuted }]}>Transliteration</Text>
+                    <Text style={[styles.wordLabel, { color: theme.textMuted }]}>{t('quran.wordPopup.transliteration')}</Text>
                     <Text style={[styles.wordTranslit, { color: theme.text }]}>{wordPopup.transliteration}</Text>
                     <Text style={[styles.wordRef, { color: Colors.primary }]}>{wordPopup.ayahRef}</Text>
                   </>

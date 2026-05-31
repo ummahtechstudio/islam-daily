@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -17,6 +18,7 @@ import { trackScreen } from '../src/services/analytics';
 // ─── Hijri conversion (Umm al-Qura approximation) ────────────────────────────
 
 function toHijri(date: Date): { day: number; month: number; monthName: string; year: number } {
+  // HIJRI_MONTHS are Islamic month names — content, not translated via i18n keys
   const HIJRI_MONTHS = [
     'Muharram', 'Safar', "Rabi' al-Awwal", "Rabi' al-Thani",
     'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', "Sha'ban",
@@ -62,6 +64,8 @@ function toHijri(date: Date): { day: number; month: number; monthName: string; y
 
 // ─── Islamic events ───────────────────────────────────────────────────────────
 
+// ISLAMIC_EVENTS names are proper Islamic event names (content) — not extracted to i18n keys.
+// The abbreviated Hijri month names in the eventDate display are also Islamic calendar content.
 const ISLAMIC_EVENTS: { hijriMonth: number; hijriDay: number; name: string; icon: string }[] = [
   { hijriMonth: 1, hijriDay: 1, name: 'Islamic New Year', icon: '🎊' },
   { hijriMonth: 1, hijriDay: 10, name: 'Day of Ashura', icon: '🌙' },
@@ -76,14 +80,22 @@ const ISLAMIC_EVENTS: { hijriMonth: number; hijriDay: number; name: string; icon
   { hijriMonth: 12, hijriDay: 10, name: 'Eid al-Adha', icon: '🎊' },
 ];
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+// Stable keys for the weekday and Gregorian month labels (UI strings).
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+const MONTH_KEYS = [
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december',
+] as const;
+
+// Abbreviated Hijri month names used in event date display — Islamic calendar content.
+const HIJRI_MONTH_ABBR = [
+  'Muharram','Safar',"Rabi' I","Rabi' II","Jumada I","Jumada II",
+  'Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhu al-Qi'dah",'Dhu al-Hijjah',
 ];
 
 export default function CalendarScreen() {
   useEffect(() => { trackScreen('Calendar'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -109,14 +121,23 @@ export default function CalendarScreen() {
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
 
+  // Translate weekday labels at render time using stable keys
+  const dayLabels = DAY_KEYS.map((key) => t(`calendar.weekdays.${key}`));
+  // Translate Gregorian month label at render time using stable key
+  const monthLabel = t(`calendar.months.${MONTH_KEYS[month]}`);
+
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-          <Text style={styles.headerTitle}>Islamic Calendar</Text>
+          <Text style={styles.headerTitle}>{t('calendar.header.title')}</Text>
           <Text style={styles.hijriToday}>
-            Today: {todayHijri.day} {todayHijri.monthName} {todayHijri.year} AH
+            {t('calendar.header.todayHijri', {
+              day: todayHijri.day,
+              monthName: todayHijri.monthName,
+              year: todayHijri.year,
+            })}
           </Text>
         </View>
 
@@ -126,7 +147,7 @@ export default function CalendarScreen() {
             <Ionicons name="chevron-back" size={24} color={theme.text} />
           </TouchableOpacity>
           <Text style={[styles.monthLabel, { color: theme.text }]}>
-            {MONTHS[month]} {year}
+            {monthLabel} {year}
           </Text>
           <TouchableOpacity onPress={nextMonth} hitSlop={10}>
             <Ionicons name="chevron-forward" size={24} color={theme.text} />
@@ -135,15 +156,15 @@ export default function CalendarScreen() {
 
         {/* Day headers */}
         <View style={styles.dayHeaders}>
-          {DAYS.map((d) => (
+          {DAY_KEYS.map((key, idx) => (
             <Text
-              key={d}
+              key={key}
               style={[
                 styles.dayHeader,
-                { color: d === 'Fri' ? Colors.primary : theme.textSecondary },
+                { color: key === 'fri' ? Colors.primary : theme.textSecondary },
               ]}
             >
-              {d}
+              {dayLabels[idx]}
             </Text>
           ))}
         </View>
@@ -196,7 +217,9 @@ export default function CalendarScreen() {
         </View>
 
         {/* Upcoming events */}
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>Upcoming Islamic Events</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>
+          {t('calendar.events.sectionTitle')}
+        </Text>
         <View style={styles.eventsList}>
           {ISLAMIC_EVENTS.map((event, idx) => (
             <View
@@ -205,11 +228,11 @@ export default function CalendarScreen() {
             >
               <Text style={styles.eventIcon}>{event.icon}</Text>
               <View style={styles.eventInfo}>
+                {/* event.name is a proper Islamic event name — content, not translated */}
                 <Text style={[styles.eventName, { color: theme.text }]}>{event.name}</Text>
+                {/* HIJRI_MONTH_ABBR entries are Islamic calendar content — not translated */}
                 <Text style={[styles.eventDate, { color: Colors.primary }]}>
-                  {event.hijriDay} {
-                    ['Muharram','Safar',"Rabi' I","Rabi' II","Jumada I","Jumada II",'Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhu al-Qi'dah",'Dhu al-Hijjah'][event.hijriMonth - 1]
-                  }
+                  {event.hijriDay} {HIJRI_MONTH_ABBR[event.hijriMonth - 1]}
                 </Text>
               </View>
             </View>

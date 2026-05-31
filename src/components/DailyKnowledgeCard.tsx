@@ -4,6 +4,7 @@
 // hadith explanations, reflection questions) is ready.
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { palette } from '../constants/colors';
 import { typography } from '../constants/typography';
@@ -62,25 +63,21 @@ interface PillSpec {
   fg: string;
 }
 
-function pillFor(type: DailyKnowledge['type']): PillSpec {
-  switch (type) {
-    case 'ayah':
-      return { ur: 'آیت', en: 'Quran Verse', bg: 'rgba(15,110,86,0.12)', fg: palette.green };
-    case 'hadith':
-      return { ur: 'حدیث', en: 'Hadith', bg: 'rgba(239,159,39,0.18)', fg: palette.goldSoft };
-    case 'name_of_allah':
-      return { ur: 'اسماء الحسنیٰ', en: 'Name of Allah', bg: 'rgba(239,159,39,0.18)', fg: palette.goldSoft };
-    case 'reflection':
-    default:
-      return { ur: 'غور و فکر', en: 'Reflection', bg: 'rgba(26,61,47,0.10)', fg: palette.textOnCreamSecondary };
-  }
-}
+// pill.ur values are Urdu content strings — not extracted to i18n keys.
+// pill.en label keys map to dailyKnowledge.pills.* in en.json.
+const PILL_SPEC_BASE: Record<DailyKnowledge['type'], Omit<PillSpec, 'en'>> = {
+  ayah:         { ur: 'آیت',          bg: 'rgba(15,110,86,0.12)',  fg: palette.green },
+  hadith:       { ur: 'حدیث',         bg: 'rgba(239,159,39,0.18)', fg: palette.goldSoft },
+  name_of_allah:{ ur: 'اسماء الحسنیٰ', bg: 'rgba(239,159,39,0.18)', fg: palette.goldSoft },
+  reflection:   { ur: 'غور و فکر',    bg: 'rgba(26,61,47,0.10)',  fg: palette.textOnCreamSecondary },
+};
 
 interface Props {
   isDark: boolean;
 }
 
 export function DailyKnowledgeCard({ isDark: _isDark }: Props) {
+  const { t } = useTranslation();
   const initial = getCachedDailyKnowledge();
   const [entry, setEntry] = useState<DailyKnowledge | null>(
     initial?.entry ?? null,
@@ -104,7 +101,17 @@ export function DailyKnowledgeCard({ isDark: _isDark }: Props) {
   }, []);
 
   const display = entry ?? bundledFallback();
-  const pill = pillFor(display.type);
+  const base = PILL_SPEC_BASE[display.type] ?? PILL_SPEC_BASE.reflection;
+
+  // Resolve the English pill label at render time via i18n
+  const pillEnKey: Record<DailyKnowledge['type'], string> = {
+    ayah:          'dailyKnowledge.pills.quranVerse',
+    hadith:        'dailyKnowledge.pills.hadith',
+    name_of_allah: 'dailyKnowledge.pills.nameOfAllah',
+    reflection:    'dailyKnowledge.pills.reflection',
+  };
+  const pill: PillSpec = { ...base, en: t(pillEnKey[display.type] ?? 'dailyKnowledge.pills.reflection') };
+
   const showStale =
     fetchedAt !== null && Date.now() - fetchedAt > STALE_AFTER_MS;
 
@@ -112,6 +119,7 @@ export function DailyKnowledgeCard({ isDark: _isDark }: Props) {
     <ManuscriptCard variant="bordered">
       <View style={styles.pillRow}>
         <View style={[styles.pill, { backgroundColor: pill.bg }]}>
+          {/* pill.ur is Urdu content — not translated via i18n */}
           <Text style={[styles.pillUr, { color: pill.fg }]}>{pill.ur}</Text>
           <Text style={[styles.pillEn, { color: pill.fg }]}>{pill.en}</Text>
         </View>
@@ -150,7 +158,7 @@ export function DailyKnowledgeCard({ isDark: _isDark }: Props) {
           </Text>
           {showStale && fetchedAt !== null ? (
             <Text style={styles.stale}>
-              Updated {formatRelativeTime(fetchedAt)}
+              {t('dailyKnowledge.stale', { time: formatRelativeTime(fetchedAt) })}
             </Text>
           ) : null}
         </View>

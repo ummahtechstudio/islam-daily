@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { useQuranAudio } from '../../context/QuranAudioContext';
 import { palette } from '../../constants/colors';
@@ -22,6 +23,7 @@ import { getSurahMeta } from '../../constants/surahMeta';
  * it via absolute positioning.
  */
 export default function QuranAudioMiniPlayer() {
+  const { t } = useTranslation();
   const {
     current,
     isPlaying,
@@ -38,7 +40,7 @@ export default function QuranAudioMiniPlayer() {
   if (!current) return null;
 
   const meta = getSurahMeta(current.surah);
-  const surahLabel = meta?.name_english ?? `Surah ${current.surah}`;
+  const surahLabel = meta?.name_english ?? t('quran.miniPlayer.surahFallback', { n: current.surah });
   const reference = `${surahLabel} · ${current.surah}:${current.ayah}`;
 
   return (

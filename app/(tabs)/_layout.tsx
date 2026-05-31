@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../../src/store';
@@ -20,6 +21,7 @@ function TabIcon({
 }
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settingsScheme = useStore((s) => s.settings.colorScheme);
   const insets = useSafeAreaInsets();
@@ -59,7 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <TabIcon name="home-outline" color={color} size={size} />
           ),
@@ -68,7 +70,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="quran"
         options={{
-          title: 'Quran',
+          title: t('tabs.quran'),
           tabBarIcon: ({ color, size }) => (
             <TabIcon name="book-outline" color={color} size={size} />
           ),
@@ -77,7 +79,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="prayer"
         options={{
-          title: 'Prayer',
+          title: t('tabs.prayer'),
           tabBarIcon: ({ color, size }) => (
             <MinaretIcon color={color} size={size} strokeWidth={1.6} />
           ),
@@ -86,7 +88,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dua"
         options={{
-          title: 'Dua',
+          title: t('tabs.dua'),
           tabBarIcon: ({ color, size }) => (
             <PrayerBeadsIcon color={color} size={size} />
           ),
@@ -95,7 +97,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: 'More',
+          title: t('tabs.more'),
           tabBarIcon: ({ color, size }) => (
             <TabIcon name="grid-outline" color={color} size={size} />
           ),

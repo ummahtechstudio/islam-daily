@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { getSurahMeta } from '../../constants/surahMeta';
 import {
@@ -54,10 +55,13 @@ function getJuzFromPage(page: number): number {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function SurahHeader({ surahNumber }: { surahNumber: number }) {
+  const { t } = useTranslation();
   const meta = getSurahMeta(surahNumber);
   if (!meta) return null;
   const place =
-    meta.revelation_place === 'makkah' ? 'MAKKIYYAH' : 'MADANIYYAH';
+    meta.revelation_place === 'makkah'
+      ? t('quran.mushaf.makkiyyah')
+      : t('quran.mushaf.madaniyyah');
   return (
     <View style={surahHeaderStyles.wrap}>
       <View style={surahHeaderStyles.banner}>
@@ -67,7 +71,7 @@ function SurahHeader({ surahNumber }: { surahNumber: number }) {
           سُورَةُ {meta.name_arabic}
         </Text>
         <Text style={surahHeaderStyles.meta}>
-          {meta.ayah_count} AYAHS · {place}
+          {t('quran.mushaf.ayahsCount', { count: meta.ayah_count })} · {place}
         </Text>
       </View>
     </View>
@@ -161,16 +165,17 @@ function PageFooter({
   juzNumber: number;
   surahName: string;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={footerStyles.wrap}>
       <View style={footerStyles.divider} />
       <View style={footerStyles.row}>
         <Text style={footerStyles.side} numberOfLines={1}>
-          Juz {juzNumber}
+          {t('quran.mushaf.juz', { n: juzNumber })}
         </Text>
         <View style={footerStyles.pill}>
           <Text style={footerStyles.pillText}>
-            Page {pageNumber} / {TOTAL_PAGES}
+            {t('quran.mushaf.page', { n: pageNumber, total: TOTAL_PAGES })}
           </Text>
         </View>
         <Text
@@ -227,6 +232,7 @@ export default function MushafPage({
   pageNumber,
   onAyahLongPress,
 }: MushafPageProps) {
+  const { t } = useTranslation();
   const [ayahs, setAyahs] = useState<MushafAyah[]>(
     () => pageCache.get(pageNumber) ?? [],
   );
@@ -284,20 +290,20 @@ export default function MushafPage({
                   color={MUSHAF_COLORS.borderOuter}
                 />
                 <Text style={styles.statusText}>
-                  Loading page {pageNumber}…
+                  {t('quran.mushaf.loadingPage', { n: pageNumber })}
                 </Text>
               </PageStatus>
             ) : error ? (
               <PageStatus>
                 <Text style={styles.statusText}>
-                  Could not load page {pageNumber}
+                  {t('quran.mushaf.couldNotLoadPage', { n: pageNumber })}
                 </Text>
                 <Text style={styles.statusSub}>{error}</Text>
               </PageStatus>
             ) : ayahs.length === 0 ? (
               <PageStatus>
                 <Text style={styles.statusText}>
-                  No ayahs on page {pageNumber}
+                  {t('quran.mushaf.noAyahsOnPage', { n: pageNumber })}
                 </Text>
               </PageStatus>
             ) : (

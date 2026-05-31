@@ -16,6 +16,7 @@ import * as Location from 'expo-location';
 import Svg, { Circle, Line, Polygon, Text as SvgText } from 'react-native-svg';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useLocation } from '../src/hooks/useLocation';
@@ -50,6 +51,7 @@ function greatCircleBearing(lat1: number, lng1: number, lat2: number, lng2: numb
 }
 
 export default function QiblaScreen() {
+  const { t } = useTranslation();
   useEffect(() => { trackScreen('Qibla'); }, []);
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -219,10 +221,10 @@ export default function QiblaScreen() {
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
         <Text style={styles.permIcon}>📍</Text>
         <Text style={[styles.permTitle, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
-          Location Required
+          {t('qibla.locationRequired.title')}
         </Text>
         <Text style={[styles.permMsg, { color: isDark ? Colors.dark.textSecondary : Colors.light.textSecondary }]}>
-          Location required for Qibla direction.
+          {t('qibla.locationRequired.message')}
         </Text>
       </View>
     );
@@ -231,7 +233,7 @@ export default function QiblaScreen() {
   if (locLoading || qiblaAngle === null) {
     return (
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
-        <LoadingSpinner message="Finding Qibla direction..." dark={isDark} />
+        <LoadingSpinner message={t('qibla.loading')} dark={isDark} />
       </View>
     );
   }
@@ -241,10 +243,10 @@ export default function QiblaScreen() {
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
         <Text style={styles.permIcon}>🧭</Text>
         <Text style={[styles.permTitle, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
-          Compass Access Needed
+          {t('qibla.compassNeeded.title')}
         </Text>
         <TouchableOpacity style={styles.startBtn} onPress={requestOrientationPermission}>
-          <Text style={styles.startBtnText}>Start AR Qibla</Text>
+          <Text style={styles.startBtnText}>{t('qibla.compassNeeded.startButton')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -256,16 +258,16 @@ export default function QiblaScreen() {
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
         <Text style={styles.permIcon}>🧭</Text>
         <Text style={[styles.permTitle, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
-          Your device doesn&apos;t have a compass
+          {t('qibla.noCompass.title')}
         </Text>
         <Text style={[styles.permMsg, { color: isDark ? Colors.dark.textSecondary : Colors.light.textSecondary }]}>
-          Qibla bearing from your location:
+          {t('qibla.noCompass.bearingMessage')}
         </Text>
         <Text style={[styles.bearingValue, { color: Colors.primary }]}>
-          {qiblaAngle.toFixed(1)}° from North
+          {t('qibla.noCompass.bearingValue', { degrees: qiblaAngle.toFixed(1) })}
         </Text>
         <Text style={[styles.permMsg, { color: isDark ? Colors.dark.textSecondary : Colors.light.textSecondary, marginTop: 8 }]}>
-          Use a physical compass and turn this many degrees clockwise from North.
+          {t('qibla.noCompass.physicalCompass')}
         </Text>
       </View>
     );
@@ -323,11 +325,11 @@ export default function QiblaScreen() {
 
       <SafeAreaView style={styles.overlay} edges={['top', 'bottom']}>
         <View style={styles.header}>
-          <Text style={styles.title}>Qibla Direction</Text>
+          <Text style={styles.title}>{t('qibla.title')}</Text>
           <Text style={styles.sub}>
             {cameraGranted
-              ? 'Rotate your phone until the line and Kaaba point straight up.'
-              : 'Enable camera for AR Qibla view.'}
+              ? t('qibla.sub.withCamera')
+              : t('qibla.sub.withoutCamera')}
           </Text>
           {!cameraGranted && (
             <TouchableOpacity
@@ -336,7 +338,7 @@ export default function QiblaScreen() {
               activeOpacity={0.85}
             >
               <Text style={styles.cameraCtaText}>
-                {cameraDeniedPermanently ? 'Open Settings' : 'Enable Camera'}
+                {cameraDeniedPermanently ? t('qibla.camera.openSettings') : t('qibla.camera.enable')}
               </Text>
             </TouchableOpacity>
           )}
@@ -345,7 +347,7 @@ export default function QiblaScreen() {
         {/* Aligned banner */}
         {isAligned && (
           <View style={[styles.alignBanner, { backgroundColor: Colors.success }]}>
-            <Text style={styles.alignText}>✓ Facing Qibla</Text>
+            <Text style={styles.alignText}>{t('qibla.aligned')}</Text>
           </View>
         )}
 
@@ -430,13 +432,13 @@ export default function QiblaScreen() {
 
         <View style={styles.infoRow}>
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Qibla</Text>
+            <Text style={styles.infoLabel}>{t('qibla.info.qiblaLabel')}</Text>
             <Text style={[styles.infoValue, { color: accentColor }]}>
               {qiblaAngle.toFixed(1)}°
             </Text>
           </View>
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Heading</Text>
+            <Text style={styles.infoLabel}>{t('qibla.info.headingLabel')}</Text>
             <Text style={styles.infoValue}>{compassHeading.toFixed(0)}°</Text>
           </View>
         </View>

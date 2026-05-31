@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -31,19 +32,13 @@ const GOLD = '#EF9F27';
 
 type FilterKey = 'all' | BookmarkType;
 
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'quran', label: 'Quran' },
-  { key: 'hadith', label: 'Hadith' },
-  { key: 'dua', label: 'Duas' },
-  { key: 'dhikr', label: 'Dhikr' },
-];
+const FILTER_KEYS: FilterKey[] = ['all', 'quran', 'hadith', 'dua', 'dhikr'];
 
-const TYPE_META: Record<BookmarkType, { label: string; color: string }> = {
-  quran: { label: 'QURAN', color: '#2563EB' },
-  hadith: { label: 'HADITH', color: '#16A34A' },
-  dua: { label: 'DUA', color: Colors.primary },
-  dhikr: { label: 'DHIKR', color: '#8B5CF6' },
+const TYPE_META: Record<BookmarkType, { color: string }> = {
+  quran: { color: '#2563EB' },
+  hadith: { color: '#16A34A' },
+  dua: { color: Colors.primary },
+  dhikr: { color: '#8B5CF6' },
 };
 
 const showToast = (message: string) => {
@@ -66,6 +61,7 @@ const formatDate = (ts: number): string => {
 };
 
 export default function BookmarksScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -94,7 +90,7 @@ export default function BookmarksScreen() {
 
   const onRemove = async (item: Bookmark) => {
     await removeBookmark(item.type, item.id);
-    showToast('Removed from bookmarks');
+    showToast(t('bookmarks.toast.removed'));
     reload();
   };
 
@@ -110,16 +106,16 @@ export default function BookmarksScreen() {
   const onClearAll = () => {
     if (bookmarks.length === 0) return;
     Alert.alert(
-      'Clear All Bookmarks',
-      'Are you sure you want to remove all bookmarks? This cannot be undone.',
+      t('bookmarks.alerts.clearAll.title'),
+      t('bookmarks.alerts.clearAll.message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Clear All',
+          text: t('bookmarks.alerts.clearAll.confirm'),
           style: 'destructive',
           onPress: async () => {
             await clearAllBookmarks();
-            showToast('All bookmarks cleared');
+            showToast(t('bookmarks.toast.cleared'));
             reload();
           },
         },
@@ -133,10 +129,10 @@ export default function BookmarksScreen() {
       <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
         <View style={styles.cardHeader}>
           <View style={[styles.typeBadge, { backgroundColor: meta.color + '22' }]}>
-            <Text style={[styles.typeBadgeText, { color: meta.color }]}>{meta.label}</Text>
+            <Text style={[styles.typeBadgeText, { color: meta.color }]}>{t(`bookmarks.typeBadge.${item.type}`)}</Text>
           </View>
           <Text style={[styles.savedDate, { color: theme.textMuted }]} numberOfLines={1}>
-            Saved on {formatDate(item.savedAt)}
+            {t('bookmarks.savedOn', { date: formatDate(item.savedAt) })}
           </Text>
         </View>
 
@@ -183,14 +179,14 @@ export default function BookmarksScreen() {
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>My Bookmarks</Text>
+          <Text style={styles.headerTitle}>{t('bookmarks.header.title')}</Text>
           <Text style={styles.headerSub}>
-            {bookmarks.length} {bookmarks.length === 1 ? 'item' : 'items'} saved
+            {t(bookmarks.length === 1 ? 'bookmarks.header.itemCount_one' : 'bookmarks.header.itemCount_other', { count: bookmarks.length })}
           </Text>
         </View>
         {bookmarks.length > 0 ? (
           <TouchableOpacity onPress={onClearAll} hitSlop={8}>
-            <Text style={styles.clearAll}>Clear All</Text>
+            <Text style={styles.clearAll}>{t('bookmarks.clearAll')}</Text>
           </TouchableOpacity>
         ) : null}
       </View>
@@ -200,14 +196,14 @@ export default function BookmarksScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterRow}
       >
-        {FILTERS.map((f) => {
-          const active = filter === f.key;
+        {FILTER_KEYS.map((key) => {
+          const active = filter === key;
           const count =
-            f.key === 'all' ? bookmarks.length : bookmarks.filter((b) => b.type === f.key).length;
+            key === 'all' ? bookmarks.length : bookmarks.filter((b) => b.type === key).length;
           return (
             <TouchableOpacity
-              key={f.key}
-              onPress={() => setFilter(f.key)}
+              key={key}
+              onPress={() => setFilter(key)}
               style={[
                 styles.filterPill,
                 { borderColor: theme.border, backgroundColor: theme.card },
@@ -221,7 +217,7 @@ export default function BookmarksScreen() {
                   { color: active ? '#fff' : theme.text },
                 ]}
               >
-                {f.label}
+                {t(`bookmarks.filters.${key}`)}
               </Text>
               <View
                 style={[
@@ -249,12 +245,12 @@ export default function BookmarksScreen() {
         <View style={styles.empty}>
           <Ionicons name="bookmark-outline" size={56} color={theme.textMuted} />
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
-            {bookmarks.length === 0 ? 'No bookmarks yet' : 'Nothing here yet'}
+            {bookmarks.length === 0 ? t('bookmarks.empty.noBookmarks.title') : t('bookmarks.empty.noneInFilter.title')}
           </Text>
           <Text style={[styles.emptySub, { color: theme.textMuted }]}>
             {bookmarks.length === 0
-              ? 'Tap the bookmark icon on any hadith or dua to save it here.'
-              : `You haven't saved any ${filter} items yet.`}
+              ? t('bookmarks.empty.noBookmarks.sub')
+              : t('bookmarks.empty.noneInFilter.sub', { filter })}
           </Text>
         </View>
       ) : (

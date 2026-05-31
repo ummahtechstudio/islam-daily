@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../../constants/colors';
 import { spacing, radius } from '../../constants/spacing';
@@ -102,6 +103,7 @@ export interface MomentSubtabProps {
 }
 
 export function MomentSubtab({ theme }: MomentSubtabProps) {
+  const { t } = useTranslation();
   const [hisnulMuslim, setHisnulMuslim] = useState<DuaCategory[]>(() => getBundledDuas());
   const [language, setLanguage] = useState<TranslationLanguage>('urdu');
 
@@ -128,7 +130,7 @@ export function MomentSubtab({ theme }: MomentSubtabProps) {
     return (
       <View style={styles.empty}>
         <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-          Loading dua of the moment…
+          {t('dua.moment.loading')}
         </Text>
       </View>
     );
@@ -147,7 +149,7 @@ export function MomentSubtab({ theme }: MomentSubtabProps) {
           {icon ? (
             <CategoryIcon icon={icon} color={palette.goldSoft} size={14} />
           ) : null}
-          <Text style={styles.badgeText}>Dua of the Moment</Text>
+          <Text style={styles.badgeText}>{t('dua.moment.badge')}</Text>
         </View>
         <Text style={[styles.reason, { color: theme.textMuted }]}>{moment.reason}</Text>
         <Text style={[styles.categoryTitle, { color: theme.textSecondary }]}>
@@ -180,7 +182,7 @@ export function MomentSubtab({ theme }: MomentSubtabProps) {
         </Text>
 
         <View style={styles.referenceContainer}>
-          <Text style={styles.referenceLabel}>Reference:</Text>
+          <Text style={styles.referenceLabel}>{t('dua.moment.reference')}</Text>
           <Text style={styles.referenceText}>
             {moment.dua.reference || 'Hisn al-Muslim'}
           </Text>

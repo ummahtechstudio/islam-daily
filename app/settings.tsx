@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -40,47 +41,47 @@ type ThemeOption = 'dark' | 'light' | 'auto';
 type FontSize = 'small' | 'medium' | 'large';
 type Madhab = 'standard' | 'hanafi';
 
-const THEME_OPTIONS: { value: ThemeOption; label: string; comingSoon: boolean }[] = [
-  { value: 'dark', label: 'Dark', comingSoon: false },
-  { value: 'light', label: 'Light', comingSoon: true },
-  { value: 'auto', label: 'Auto', comingSoon: true },
+const THEME_OPTIONS: { value: ThemeOption; comingSoon: boolean }[] = [
+  { value: 'dark', comingSoon: false },
+  { value: 'light', comingSoon: true },
+  { value: 'auto', comingSoon: true },
 ];
 
-const FONT_SIZE_OPTIONS: { value: FontSize; label: string }[] = [
-  { value: 'small', label: 'Small' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'large', label: 'Large' },
+const FONT_SIZE_OPTIONS: { value: FontSize }[] = [
+  { value: 'small' },
+  { value: 'medium' },
+  { value: 'large' },
 ];
 
-const CALC_METHOD_OPTIONS: { value: string; label: string }[] = [
-  { value: 'MuslimWorldLeague', label: 'Muslim World League' },
-  { value: 'ISNA', label: 'ISNA (North America)' },
-  { value: 'EgyptianGeneralAuthority', label: 'Egyptian General Authority' },
-  { value: 'UmmAlQura', label: 'Umm Al-Qura (Makkah)' },
-  { value: 'Karachi', label: 'University of Karachi' },
-  { value: 'Kuwait', label: 'Kuwait' },
-  { value: 'Qatar', label: 'Qatar' },
-  { value: 'Singapore', label: 'Singapore' },
-  { value: 'Tehran', label: 'Tehran' },
-  { value: 'Dubai', label: 'Dubai' },
+const CALC_METHOD_OPTIONS: { value: string }[] = [
+  { value: 'MuslimWorldLeague' },
+  { value: 'ISNA' },
+  { value: 'EgyptianGeneralAuthority' },
+  { value: 'UmmAlQura' },
+  { value: 'Karachi' },
+  { value: 'Kuwait' },
+  { value: 'Qatar' },
+  { value: 'Singapore' },
+  { value: 'Tehran' },
+  { value: 'Dubai' },
 ];
 
-const MADHAB_OPTIONS: { value: Madhab; label: string }[] = [
-  { value: 'standard', label: "Standard (Shafi'i, Maliki, Hanbali)" },
-  { value: 'hanafi', label: 'Hanafi' },
+const MADHAB_OPTIONS: { value: Madhab }[] = [
+  { value: 'standard' },
+  { value: 'hanafi' },
 ];
 
 const HIJRI_OFFSETS: number[] = [-2, -1, 0, 1, 2];
 
-const TRANSLATION_OPTIONS: { value: string; label: string }[] = [
-  { value: 'sahih_international', label: 'Saheeh International' },
-  { value: 'mohsin_khan', label: 'Mohsin Khan (Hilali-Khan)' },
-  { value: 'pickthall', label: 'Pickthall' },
-  { value: 'yusuf_ali', label: 'Yusuf Ali' },
+const TRANSLATION_OPTIONS: { value: string }[] = [
+  { value: 'sahih_international' },
+  { value: 'mohsin_khan' },
+  { value: 'pickthall' },
+  { value: 'yusuf_ali' },
 ];
 
-const RECITER_OPTIONS: { value: string; label: string }[] = [
-  { value: 'alafasy', label: 'Mishary Rashid Alafasy' },
+const RECITER_OPTIONS: { value: string }[] = [
+  { value: 'alafasy' },
 ];
 
 const HADITH_TIME_OPTIONS: string[] = [
@@ -95,6 +96,7 @@ const TERMS_URL = 'https://ummahtechstudio.github.io/islam-daily/terms.html';
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SettingsScreen() {
+  const { t } = useTranslation();
   useEffect(() => { trackScreen('Settings'); }, []);
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -208,8 +210,8 @@ export default function SettingsScreen() {
     await AsyncStorage.setItem('@privacy_consent', value ? 'granted' : 'denied');
     if (!value) {
       Alert.alert(
-        'Analytics disabled',
-        'Anonymous location data will no longer be collected. This takes effect on next app launch.',
+        t('settings.alerts.analyticsDisabled.title'),
+        t('settings.alerts.analyticsDisabled.message'),
       );
     }
   };
@@ -223,7 +225,7 @@ export default function SettingsScreen() {
 
   const onSelectTheme = async (value: ThemeOption) => {
     if (value !== 'dark') {
-      Alert.alert('Coming Soon', 'Light and Auto themes will be available in a future update.');
+      Alert.alert(t('common.comingSoon'), t('settings.alerts.comingSoon.message'));
       return;
     }
     setTheme(value);
@@ -304,12 +306,12 @@ export default function SettingsScreen() {
 
   const onClearCache = () => {
     Alert.alert(
-      'Clear Cache?',
-      'This will remove cached prayer times, Quran data, and hadith data. Your bookmarks and settings will be kept.',
+      t('settings.alerts.clearCache.title'),
+      t('settings.alerts.clearCache.message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Clear',
+          text: t('common.clear'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -317,9 +319,12 @@ export default function SettingsScreen() {
               const cacheKeys = keys.filter((k) => k.startsWith('cache_'));
               if (cacheKeys.length > 0) await AsyncStorage.multiRemove(cacheKeys);
               await computeCacheSize();
-              Alert.alert('Cache Cleared', 'Cached data has been removed.');
+              Alert.alert(
+                t('settings.alerts.clearCache.successTitle'),
+                t('settings.alerts.clearCache.successMessage'),
+              );
             } catch {
-              Alert.alert('Error', 'Could not clear cache.');
+              Alert.alert(t('common.error'), t('settings.alerts.clearCache.errorMessage'));
             }
           },
         },
@@ -329,12 +334,12 @@ export default function SettingsScreen() {
 
   const onResetSettings = () => {
     Alert.alert(
-      'Reset All Settings?',
-      'This will restore all preferences to their defaults. Your bookmarks will be kept.',
+      t('settings.alerts.resetSettings.title'),
+      t('settings.alerts.resetSettings.message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Reset',
+          text: t('common.reset'),
           style: 'destructive',
           onPress: async () => {
             await resetAllSettings();
@@ -353,7 +358,10 @@ export default function SettingsScreen() {
             setDailyHadithTime('08:00');
             setFridayReminder(true);
             setTranslationLang('urdu');
-            Alert.alert('Settings Reset', 'All preferences have been restored to defaults.');
+            Alert.alert(
+              t('settings.alerts.resetSettings.successTitle'),
+              t('settings.alerts.resetSettings.successMessage'),
+            );
           },
         },
       ],
@@ -385,7 +393,7 @@ export default function SettingsScreen() {
 
   const ComingSoonBadge = () => (
     <View style={[styles.badge, { backgroundColor: themeColors.surface, borderColor: themeColors.border }]}>
-      <Text style={[styles.badgeText, { color: themeColors.textMuted }]}>Coming Soon</Text>
+      <Text style={[styles.badgeText, { color: themeColors.textMuted }]}>{t('common.comingSoon')}</Text>
     </View>
   );
 
@@ -396,7 +404,7 @@ export default function SettingsScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
 
         {/* ── TRANSLATION LANGUAGE ──────────────────────────────────────── */}
-        <SectionLabel>ترجمہ کی زبان / Translation Language</SectionLabel>
+        <SectionLabel>{t('settings.sections.translationLanguage')}</SectionLabel>
         <SectionCard>
           <View style={[styles.row, styles.rowColumn]}>
             <View style={styles.radioColumn}>
@@ -408,7 +416,7 @@ export default function SettingsScreen() {
                 <View style={[styles.radioOuter, { borderColor: translationLang === 'urdu' ? Colors.primary : themeColors.border }]}>
                   {translationLang === 'urdu' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
                 </View>
-                <Text style={[styles.radioLabel, { color: themeColors.text }]}>🇵🇰 اردو (Urdu)</Text>
+                <Text style={[styles.radioLabel, { color: themeColors.text }]}>{t('settings.translationLang.urduOption')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioRow}
@@ -418,17 +426,17 @@ export default function SettingsScreen() {
                 <View style={[styles.radioOuter, { borderColor: translationLang === 'english' ? Colors.primary : themeColors.border }]}>
                   {translationLang === 'english' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
                 </View>
-                <Text style={[styles.radioLabel, { color: themeColors.text }]}>🇬🇧 English</Text>
+                <Text style={[styles.radioLabel, { color: themeColors.text }]}>{t('settings.translationLang.englishOption')}</Text>
               </TouchableOpacity>
             </View>
             <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
-              Note: Arabic is always shown. This setting affects English/Urdu translations of duas, dhikr, and hadith.
+              {t('settings.translationLang.explainer')}
             </Text>
           </View>
         </SectionCard>
 
         {/* ── HOME SCREEN ────────────────────────────────────────────────── */}
-        <SectionLabel>Home Screen</SectionLabel>
+        <SectionLabel>{t('settings.sections.homeScreen')}</SectionLabel>
         <SectionCard>
           <TouchableOpacity
             style={styles.row}
@@ -439,9 +447,9 @@ export default function SettingsScreen() {
               <Ionicons name="grid" size={18} color={Colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Customize Home Screen</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.homeScreen.customize')}</Text>
               <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>
-                Choose which tiles appear on your home
+                {t('settings.homeScreen.customizeSub')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={themeColors.textMuted} />
@@ -454,7 +462,7 @@ export default function SettingsScreen() {
             launch. Theme persistence + Colors tokens + the store's
             colorScheme state are intentionally kept so v1.1 can wire real
             Light + Auto support without rebuilding the foundation. */}
-        <SectionLabel>Appearance</SectionLabel>
+        <SectionLabel>{t('settings.sections.appearance')}</SectionLabel>
         <SectionCard>
           {/* Arabic Font Size slider */}
           <View style={[styles.row, styles.rowColumn]}>
@@ -462,7 +470,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
                 <Ionicons name="text" size={18} color="#F59E0B" />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Arabic Font Size</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.appearance.arabicFontSize')}</Text>
             </View>
             <View style={styles.segmentRow}>
               {FONT_SIZE_OPTIONS.map((opt) => {
@@ -480,7 +488,9 @@ export default function SettingsScreen() {
                     onPress={() => onSelectArabicFontSize(opt.value)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>{opt.label}</Text>
+                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>
+                      {t(`settings.fontSize.options.${opt.value}`)}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
@@ -495,7 +505,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: '#3B82F620' }]}>
                 <Ionicons name="text-outline" size={18} color="#3B82F6" />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>English Font Size</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.appearance.englishFontSize')}</Text>
             </View>
             <View style={styles.segmentRow}>
               {FONT_SIZE_OPTIONS.map((opt) => {
@@ -513,7 +523,9 @@ export default function SettingsScreen() {
                     onPress={() => onSelectEnglishFontSize(opt.value)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>{opt.label}</Text>
+                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>
+                      {t(`settings.fontSize.options.${opt.value}`)}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
@@ -522,7 +534,7 @@ export default function SettingsScreen() {
         </SectionCard>
 
         {/* ── CONTENT LANGUAGE (existing) ────────────────────────────────── */}
-        <SectionLabel>Content Language</SectionLabel>
+        <SectionLabel>{t('settings.sections.contentLanguage')}</SectionLabel>
         <SectionCard>
           {LANGUAGE_OPTIONS.map((opt, idx) => (
             <React.Fragment key={opt.value}>
@@ -535,7 +547,9 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.rowLabel, { color: themeColors.text }]}>{opt.label}</Text>
+                  <Text style={[styles.rowLabel, { color: themeColors.text }]}>
+                    {t(`settings.contentLanguage.options.${opt.value}`)}
+                  </Text>
                   {opt.native !== opt.label && (
                     <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{opt.native}</Text>
                   )}
@@ -550,7 +564,7 @@ export default function SettingsScreen() {
         </SectionCard>
 
         {/* ── PRAYER TIMES ───────────────────────────────────────────────── */}
-        <SectionLabel>Prayer Times</SectionLabel>
+        <SectionLabel>{t('settings.sections.prayerTimes')}</SectionLabel>
         <SectionCard>
           {/* Calculation method (new settings_* picker) */}
           <View style={[styles.row, styles.rowColumn]}>
@@ -558,7 +572,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
                 <Ionicons name="compass" size={18} color={Colors.primary} />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Calculation Method</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.calcMethod')}</Text>
             </View>
             <View style={styles.pickerColumn}>
               {CALC_METHOD_OPTIONS.map((opt) => {
@@ -576,7 +590,9 @@ export default function SettingsScreen() {
                     onPress={() => onSelectCalcMethod(opt.value)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>{opt.label}</Text>
+                    <Text style={[styles.pickerText, { color: themeColors.text }]}>
+                      {t(`settings.calcMethod.options.${opt.value}`)}
+                    </Text>
                     {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
                   </TouchableOpacity>
                 );
@@ -592,7 +608,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: '#10B98120' }]}>
                 <Ionicons name="book" size={18} color="#10B981" />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Madhab for Asr</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.madhab')}</Text>
             </View>
             <View style={styles.radioColumn}>
               {MADHAB_OPTIONS.map((opt) => (
@@ -605,12 +621,14 @@ export default function SettingsScreen() {
                   <View style={[styles.radioOuter, { borderColor: madhab === opt.value ? Colors.primary : themeColors.border }]}>
                     {madhab === opt.value && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
                   </View>
-                  <Text style={[styles.radioLabel, { color: themeColors.text }]}>{opt.label}</Text>
+                  <Text style={[styles.radioLabel, { color: themeColors.text }]}>
+                    {t(`settings.madhab.options.${opt.value}`)}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
             <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
-              Hanafi madhab uses a later Asr time
+              {t('settings.prayerTimes.madhabExplainer')}
             </Text>
           </View>
 
@@ -622,7 +640,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: '#EAB30820' }]}>
                 <Ionicons name="calendar" size={18} color="#EAB308" />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Hijri Date Offset</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.hijriOffset')}</Text>
             </View>
             <View style={styles.segmentRow}>
               {HIJRI_OFFSETS.map((offset) => {
@@ -647,7 +665,7 @@ export default function SettingsScreen() {
               })}
             </View>
             <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
-              Adjust if your country sees the moon differently
+              {t('settings.prayerTimes.hijriExplainer')}
             </Text>
           </View>
 
@@ -659,7 +677,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: '#06B6D420' }]}>
                 <Ionicons name="time" size={18} color="#06B6D4" />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Provider Method (Aladhan)</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.providerMethod')}</Text>
             </View>
             <View style={styles.pickerColumn}>
               {CALCULATION_METHODS.map((method) => {
@@ -687,7 +705,7 @@ export default function SettingsScreen() {
         </SectionCard>
 
         {/* ── QURAN ──────────────────────────────────────────────────────── */}
-        <SectionLabel>Quran</SectionLabel>
+        <SectionLabel>{t('settings.sections.quran')}</SectionLabel>
         <SectionCard>
           {/* Translation picker */}
           <View style={[styles.row, styles.rowColumn]}>
@@ -695,7 +713,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
                 <Ionicons name="library" size={18} color={Colors.primary} />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Translation</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.quran.translation')}</Text>
             </View>
             <View style={styles.pickerColumn}>
               {TRANSLATION_OPTIONS.map((opt) => {
@@ -713,13 +731,15 @@ export default function SettingsScreen() {
                     onPress={() => onSelectTranslation(opt.value)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>{opt.label}</Text>
+                    <Text style={[styles.pickerText, { color: themeColors.text }]}>
+                      {t(`settings.translation.options.${opt.value}`)}
+                    </Text>
                     {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
                   </TouchableOpacity>
                 );
               })}
             </View>
-            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>More translations coming soon</Text>
+            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>{t('settings.quran.translationNote')}</Text>
           </View>
 
           <Divider />
@@ -730,8 +750,8 @@ export default function SettingsScreen() {
               <Ionicons name="language" size={18} color="#F59E0B" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Show Transliteration</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Romanized Arabic pronunciation</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.quran.showTransliteration')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.quran.transliterationSub')}</Text>
             </View>
             <Switch
               value={showTransliteration}
@@ -749,7 +769,7 @@ export default function SettingsScreen() {
               <View style={[styles.iconBox, { backgroundColor: '#8B5CF620' }]}>
                 <Ionicons name="musical-notes" size={18} color="#8B5CF6" />
               </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Reciter for Audio</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.quran.reciter')}</Text>
             </View>
             <View style={styles.pickerColumn}>
               {RECITER_OPTIONS.map((opt) => {
@@ -767,7 +787,9 @@ export default function SettingsScreen() {
                     onPress={() => onSelectReciter(opt.value)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>{opt.label}</Text>
+                    <Text style={[styles.pickerText, { color: themeColors.text }]}>
+                      {t(`settings.reciter.options.${opt.value}`)}
+                    </Text>
                     {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
                   </TouchableOpacity>
                 );
@@ -777,7 +799,7 @@ export default function SettingsScreen() {
         </SectionCard>
 
         {/* ── NOTIFICATIONS ──────────────────────────────────────────────── */}
-        <SectionLabel>Notifications</SectionLabel>
+        <SectionLabel>{t('settings.sections.notifications')}</SectionLabel>
         <SectionCard>
           {/* Existing prayer notifications switch */}
           <View style={styles.row}>
@@ -785,8 +807,8 @@ export default function SettingsScreen() {
               <Ionicons name="notifications" size={18} color="#3B82F6" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Prayer Notifications</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Get notified at prayer times</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.prayerNotifications')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.prayerNotificationsSub')}</Text>
             </View>
             <Switch
               value={settings.notificationsEnabled}
@@ -803,8 +825,8 @@ export default function SettingsScreen() {
               <Ionicons name="volume-high" size={18} color={Colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Adhan Notifications</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Play adhan at prayer times</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.adhanNotifications')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.adhanNotificationsSub')}</Text>
             </View>
             <Switch
               value={adhanEnabled}
@@ -821,8 +843,8 @@ export default function SettingsScreen() {
               <Ionicons name="alarm" size={18} color="#F59E0B" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Pre-Adhan Reminder</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>10 minutes before each prayer</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.preAdhan')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.preAdhanSub')}</Text>
             </View>
             <Switch
               value={preAdhan}
@@ -839,8 +861,8 @@ export default function SettingsScreen() {
               <Ionicons name="book" size={18} color="#10B981" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Daily Hadith</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>One hadith every day</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.dailyHadith')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.dailyHadithSub')}</Text>
             </View>
             <Switch
               value={dailyHadith}
@@ -858,14 +880,14 @@ export default function SettingsScreen() {
                   <View style={[styles.iconBox, { backgroundColor: '#06B6D420' }]}>
                     <Ionicons name="time-outline" size={18} color="#06B6D4" />
                   </View>
-                  <Text style={[styles.rowLabel, { color: themeColors.text }]}>Daily Hadith Time</Text>
+                  <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.dailyHadithTime')}</Text>
                 </View>
                 <View style={styles.timeRow}>
-                  {HADITH_TIME_OPTIONS.map((t) => {
-                    const active = dailyHadithTime === t;
+                  {HADITH_TIME_OPTIONS.map((timeOpt) => {
+                    const active = dailyHadithTime === timeOpt;
                     return (
                       <TouchableOpacity
-                        key={t}
+                        key={timeOpt}
                         style={[
                           styles.timeChip,
                           {
@@ -873,10 +895,10 @@ export default function SettingsScreen() {
                             borderColor: active ? Colors.primary : themeColors.border,
                           },
                         ]}
-                        onPress={() => onSelectDailyHadithTime(t)}
+                        onPress={() => onSelectDailyHadithTime(timeOpt)}
                         activeOpacity={0.7}
                       >
-                        <Text style={[styles.timeChipText, { color: active ? '#fff' : themeColors.text }]}>{t}</Text>
+                        <Text style={[styles.timeChipText, { color: active ? '#fff' : themeColors.text }]}>{timeOpt}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -892,8 +914,8 @@ export default function SettingsScreen() {
               <Ionicons name="star" size={18} color="#EAB308" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Friday Reminder</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Reminder to read Surah Al-Kahf</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.fridayReminder')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.fridayReminderSub')}</Text>
             </View>
             <Switch
               value={fridayReminder}
@@ -905,16 +927,16 @@ export default function SettingsScreen() {
         </SectionCard>
 
         {/* ── PRIVACY (existing) ─────────────────────────────────────────── */}
-        <SectionLabel>Privacy</SectionLabel>
+        <SectionLabel>{t('settings.sections.privacy')}</SectionLabel>
         <SectionCard>
           <View style={styles.row}>
             <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
               <Ionicons name="location-outline" size={18} color={Colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Anonymous Analytics</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.privacy.analyticsLabel')}</Text>
               <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>
-                City &amp; country only — no personal data stored
+                {t('settings.privacy.analyticsSub')}
               </Text>
             </View>
             {analyticsEnabled !== null && (
@@ -928,28 +950,28 @@ export default function SettingsScreen() {
           </View>
           <View style={[styles.privacyNote, { backgroundColor: themeColors.surface }]}>
             <Text style={[styles.privacyNoteText, { color: themeColors.textMuted }]}>
-              When enabled, Islam Daily logs your approximate city and country on each app launch to help us
-              understand which regions the app serves. No name, email, device ID, or precise location is
-              ever collected or shared with third parties.
+              {t('settings.privacy.analyticsNote')}
             </Text>
           </View>
         </SectionCard>
 
         {/* ── STORAGE & DATA ─────────────────────────────────────────────── */}
-        <SectionLabel>Storage &amp; Data</SectionLabel>
+        <SectionLabel>{t('settings.sections.storageData')}</SectionLabel>
         <SectionCard>
           <View style={styles.row}>
             <View style={[styles.iconBox, { backgroundColor: '#06B6D420' }]}>
               <Ionicons name="archive" size={18} color="#06B6D4" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Cached Data</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.storage.cachedData')}</Text>
               <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>
                 {cacheSizeKB === null
-                  ? 'Calculating…'
+                  ? t('settings.storage.calculating')
                   : cacheSizeKB === 0
-                  ? 'No cached data'
-                  : `${cacheSizeKB < 1024 ? `${cacheSizeKB} KB` : `${(cacheSizeKB / 1024).toFixed(1)} MB`} cached`}
+                  ? t('settings.storage.noCachedData')
+                  : cacheSizeKB < 1024
+                  ? t('settings.storage.cachedKB', { size: cacheSizeKB })
+                  : t('settings.storage.cachedMB', { size: (cacheSizeKB / 1024).toFixed(1) })}
               </Text>
             </View>
           </View>
@@ -960,7 +982,7 @@ export default function SettingsScreen() {
             <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
               <Ionicons name="trash" size={18} color="#F59E0B" />
             </View>
-            <Text style={[styles.rowLabel, { color: themeColors.text }]}>Clear Cache</Text>
+            <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.storage.clearCache')}</Text>
             <Ionicons name="chevron-forward" size={18} color={themeColors.textMuted} />
           </TouchableOpacity>
 
@@ -970,21 +992,21 @@ export default function SettingsScreen() {
             <View style={[styles.iconBox, { backgroundColor: '#EF444420' }]}>
               <Ionicons name="refresh" size={18} color="#EF4444" />
             </View>
-            <Text style={[styles.rowLabel, { color: themeColors.text }]}>Reset All Settings</Text>
+            <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.storage.resetAllSettings')}</Text>
             <Ionicons name="chevron-forward" size={18} color={themeColors.textMuted} />
           </TouchableOpacity>
         </SectionCard>
 
         {/* ── ABOUT ──────────────────────────────────────────────────────── */}
-        <SectionLabel>About</SectionLabel>
+        <SectionLabel>{t('settings.sections.about')}</SectionLabel>
         <SectionCard>
           <View style={styles.row}>
             <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
               <Ionicons name="information-circle" size={18} color={Colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Islam Daily</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Version {APP_VERSION}</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.about.appName')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.about.version', { version: APP_VERSION })}</Text>
             </View>
           </View>
 
@@ -995,8 +1017,8 @@ export default function SettingsScreen() {
               <Ionicons name="business" size={18} color="#8B5CF6" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Developer</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>Ummah Tech Studio</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.about.developer')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.about.developerName')}</Text>
             </View>
           </View>
 
@@ -1011,7 +1033,7 @@ export default function SettingsScreen() {
               <Ionicons name="mail" size={18} color="#3B82F6" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>Contact</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.about.contact')}</Text>
               <Text style={[styles.rowSub, { color: Colors.primary }]}>{CONTACT_EMAIL}</Text>
             </View>
             <Ionicons name="open-outline" size={18} color={themeColors.textMuted} />
@@ -1023,7 +1045,7 @@ export default function SettingsScreen() {
             <View style={[styles.iconBox, { backgroundColor: '#10B98120' }]}>
               <Ionicons name="shield-checkmark" size={18} color="#10B981" />
             </View>
-            <Text style={[styles.rowLabel, { color: themeColors.text }]}>Privacy Policy</Text>
+            <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.about.privacyPolicy')}</Text>
             <Ionicons name="open-outline" size={18} color={themeColors.textMuted} />
           </TouchableOpacity>
 
@@ -1033,30 +1055,30 @@ export default function SettingsScreen() {
             <View style={[styles.iconBox, { backgroundColor: '#06B6D420' }]}>
               <Ionicons name="document-text" size={18} color="#06B6D4" />
             </View>
-            <Text style={[styles.rowLabel, { color: themeColors.text }]}>Terms of Service</Text>
+            <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.about.termsOfService')}</Text>
             <Ionicons name="open-outline" size={18} color={themeColors.textMuted} />
           </TouchableOpacity>
         </SectionCard>
 
         {/* ── CREDITS ────────────────────────────────────────────────────── */}
-        <SectionLabel>Credits &amp; Data Sources</SectionLabel>
+        <SectionLabel>{t('settings.sections.credits')}</SectionLabel>
         <SectionCard>
           <View style={[styles.creditsBlock, { backgroundColor: themeColors.surface }]}>
             <Text style={[styles.creditsHeader, { color: themeColors.text }]}>
-              We gratefully acknowledge these open data sources:
+              {t('settings.credits.header')}
             </Text>
             <View style={styles.creditsList}>
-              <CreditLine label="Quran" source="Tanzil" colorScheme={themeColors} />
-              <CreditLine label="Hadith" source="A7med3bdulBaset/hadith-json" colorScheme={themeColors} />
-              <CreditLine label="Duas" source="Hisn al-Muslim" colorScheme={themeColors} />
-              <CreditLine label="Prayer Times" source="Aladhan API" colorScheme={themeColors} />
+              <CreditLine labelKey="quran" colorScheme={themeColors} />
+              <CreditLine labelKey="hadith" colorScheme={themeColors} />
+              <CreditLine labelKey="duas" colorScheme={themeColors} />
+              <CreditLine labelKey="prayerTimes" colorScheme={themeColors} />
             </View>
           </View>
         </SectionCard>
 
         <View style={[styles.about, { borderTopColor: themeColors.border }]}>
           <Text style={[styles.aboutText, { color: themeColors.textMuted }]}>
-            Built with care for the Muslim community
+            {t('settings.about.footer')}
           </Text>
         </View>
       </ScrollView>
@@ -1067,18 +1089,21 @@ export default function SettingsScreen() {
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
 function CreditLine({
-  label,
-  source,
+  labelKey,
   colorScheme,
 }: {
-  label: string;
-  source: string;
+  labelKey: 'quran' | 'hadith' | 'duas' | 'prayerTimes';
   colorScheme: typeof Colors.dark;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={styles.creditRow}>
-      <Text style={[styles.creditLabel, { color: colorScheme.textSecondary }]}>{label}</Text>
-      <Text style={[styles.creditSource, { color: colorScheme.text }]}>{source}</Text>
+      <Text style={[styles.creditLabel, { color: colorScheme.textSecondary }]}>
+        {t(`settings.credits.labels.${labelKey}`)}
+      </Text>
+      <Text style={[styles.creditSource, { color: colorScheme.text }]}>
+        {t(`settings.credits.sources.${labelKey}`)}
+      </Text>
     </View>
   );
 }

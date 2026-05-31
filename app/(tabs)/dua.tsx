@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../src/constants/colors';
 import { useStore } from '../../src/store';
@@ -22,15 +23,16 @@ const SUBTAB_KEY = 'dua_section_active_subtab';
 
 type Subtab = 'moment' | 'duas' | 'dhikr' | 'tasbeeh';
 
-const SUBTABS: { id: Subtab; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { id: 'moment',  label: 'Moment',  icon: 'time-outline' },
-  { id: 'duas',    label: 'Duas',    icon: 'book-outline' },
-  { id: 'dhikr',   label: 'Dhikr',   icon: 'sparkles-outline' },
-  { id: 'tasbeeh', label: 'Tasbeeh', icon: 'repeat' },
+const SUBTABS: { id: Subtab; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { id: 'moment',  icon: 'time-outline' },
+  { id: 'duas',    icon: 'book-outline' },
+  { id: 'dhikr',   icon: 'sparkles-outline' },
+  { id: 'tasbeeh', icon: 'repeat' },
 ];
 
 export default function DuaScreen() {
   useEffect(() => { trackScreen('Dua'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -67,9 +69,9 @@ export default function DuaScreen() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]}>
       <View style={[styles.headerBar, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.screenTitle}>Dua & Dhikr</Text>
+        <Text style={styles.screenTitle}>{t('dua.screenTitle')}</Text>
         <View style={styles.subtabRow}>
-          {SUBTABS.map(({ id, label, icon }) => {
+          {SUBTABS.map(({ id, icon }) => {
             const active = subtab === id;
             return (
               <TouchableOpacity
@@ -89,7 +91,7 @@ export default function DuaScreen() {
                     { color: active ? Colors.primary : 'rgba(255,255,255,0.85)' },
                   ]}
                 >
-                  {label}
+                  {t(`dua.tabs.${id}`)}
                 </Text>
               </TouchableOpacity>
             );

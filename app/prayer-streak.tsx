@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -37,14 +38,14 @@ function getLast7Days(): string[] {
   return days;
 }
 
-function dayLabel(dateStr: string): string {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const d = new Date(dateStr);
-  return days[d.getDay()];
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+function dayIndex(dateStr: string): number {
+  return new Date(dateStr).getDay();
 }
 
 export default function PrayerStreakScreen() {
   useEffect(() => { trackScreen('PrayerStreak'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -110,14 +111,14 @@ export default function PrayerStreakScreen() {
         {/* Streak Banner */}
         <View style={[styles.streakBanner, { backgroundColor: Colors.primary }]}>
           <Text style={styles.streakNumber}>{streak}</Text>
-          <Text style={styles.streakLabel}>Day Streak</Text>
-          <Text style={styles.streakSub}>Keep up the consistency!</Text>
+          <Text style={styles.streakLabel}>{t('prayerStreak.streak.label')}</Text>
+          <Text style={styles.streakSub}>{t('prayerStreak.streak.sub')}</Text>
         </View>
 
         {/* Today Progress */}
         <View style={[styles.todayCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <View style={styles.todayHeader}>
-            <Text style={[styles.todayTitle, { color: theme.text }]}>Today's Prayers</Text>
+            <Text style={[styles.todayTitle, { color: theme.text }]}>{t('prayerStreak.today.title')}</Text>
             <Text style={[styles.todayCount, { color: Colors.primary }]}>{todayDone}/5</Text>
           </View>
           <View style={styles.todayPrayers}>
@@ -147,7 +148,7 @@ export default function PrayerStreakScreen() {
         </View>
 
         {/* 7-Day Grid */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Last 7 Days</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('prayerStreak.sections.last7Days')}</Text>
         <View style={[styles.gridCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
           {/* Day headers */}
           <View style={styles.gridRow}>
@@ -155,7 +156,7 @@ export default function PrayerStreakScreen() {
             {last7.map((d) => (
               <View key={d} style={styles.gridCell}>
                 <Text style={[styles.dayLabel, { color: d === today ? Colors.primary : theme.textSecondary }]}>
-                  {dayLabel(d)}
+                  {t(`prayerStreak.days.${DAY_KEYS[dayIndex(d)]}`)}
                 </Text>
                 <Text style={[styles.dayNum, { color: d === today ? Colors.primary : theme.textMuted }]}>
                   {new Date(d).getDate()}
@@ -200,7 +201,7 @@ export default function PrayerStreakScreen() {
         </View>
 
         <Text style={[styles.tip, { color: theme.textMuted }]}>
-          Tip: Tap any cell to mark a prayer as complete or missed. Stay consistent for a longer streak!
+          {t('prayerStreak.tip')}
         </Text>
       </ScrollView>
     </SafeAreaView>

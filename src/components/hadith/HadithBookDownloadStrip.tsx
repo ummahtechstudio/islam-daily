@@ -7,6 +7,7 @@ import {
   Animated,
   Easing,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { HadithDownloadProgress } from '../../services/hadithCache';
 
 const GREEN = '#0F6E56';
@@ -31,6 +32,8 @@ export default function HadithBookDownloadStrip({
   isOnline,
   hasError,
 }: HadithBookDownloadStripProps) {
+  const { t } = useTranslation();
+
   const ratio =
     progress && progress.totalBytes
       ? Math.min(1, progress.receivedBytes / progress.totalBytes)
@@ -58,12 +61,12 @@ export default function HadithBookDownloadStrip({
   let message: string;
   if (inErrorState) {
     message = isOnline
-      ? `Download paused — we'll retry`
-      : `Connection lost — we'll resume when online`;
+      ? t('hadith.download.pausedRetry')
+      : t('hadith.download.connectionLost');
   } else if (progress?.phase === 'parsing') {
-    message = `Preparing ${bookName}…`;
+    message = t('hadith.download.preparing', { name: bookName });
   } else {
-    message = `Downloading ${bookName} for offline reading…`;
+    message = t('hadith.download.downloading', { name: bookName });
   }
 
   const showPercent = !inErrorState && progress != null && progress.phase !== 'done';

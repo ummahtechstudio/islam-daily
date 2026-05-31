@@ -9,6 +9,7 @@ import {
   useColorScheme,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -95,6 +96,7 @@ function saveSettings(s: ZakatSettings) {
 
 export default function ZakatCalculatorScreen() {
   useEffect(() => { trackScreen('ZakatCalculator'); }, []);
+  const { t } = useTranslation();
 
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -235,14 +237,14 @@ export default function ZakatCalculatorScreen() {
       >
         {/* ── Banner ── */}
         <View style={[styles.banner, { backgroundColor: Colors.primary }]}>
-          <Text style={styles.bannerTitle}>Zakat Calculator</Text>
+          <Text style={styles.bannerTitle}>{t('zakat.banner.title')}</Text>
           <Text style={styles.bannerSub}>
-            2.5% on wealth above Nisab held for one lunar year
+            {t('zakat.banner.sub')}
           </Text>
         </View>
 
         {/* ── Currency ── */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Currency</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('zakat.sections.currency')}</Text>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <View style={styles.chipRow}>
             {SUGGESTED_CURRENCIES.map((c) => {
@@ -274,7 +276,7 @@ export default function ZakatCalculatorScreen() {
           </View>
           <View style={[styles.customCurrencyRow, { borderTopColor: theme.border }]}>
             <Text style={[styles.smallLabel, { color: theme.textMuted }]}>
-              Or enter your own
+              {t('zakat.currency.orEnterOwn')}
             </Text>
             <TextInput
               value={currency}
@@ -283,7 +285,7 @@ export default function ZakatCalculatorScreen() {
                 styles.smallInput,
                 { backgroundColor: theme.surface, borderColor: theme.border, color: theme.text },
               ]}
-              placeholder="e.g. CAD"
+              placeholder={t('zakat.currency.placeholder')}
               placeholderTextColor={theme.textMuted}
               autoCapitalize="characters"
               autoCorrect={false}
@@ -292,7 +294,7 @@ export default function ZakatCalculatorScreen() {
         </View>
 
         {/* ── Weight Unit ── */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Weight Unit</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('zakat.sections.weightUnit')}</Text>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <View style={styles.segmentRow}>
             {(['gram', 'tola'] as WeightUnit[]).map((u) => {
@@ -311,25 +313,25 @@ export default function ZakatCalculatorScreen() {
                   activeOpacity={0.75}
                 >
                   <Text style={[styles.segmentText, { color: active ? '#fff' : theme.text }]}>
-                    {u === 'gram' ? 'Gram (g)' : 'Tola'}
+                    {u === 'gram' ? t('zakat.weightUnit.gram') : t('zakat.weightUnit.tola')}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
           <Text style={[styles.helperText, { color: theme.textMuted }]}>
-            1 tola = 11.664 grams. Prices and weights below use your selected unit.
+            {t('zakat.weightUnit.helper')}
           </Text>
         </View>
 
         {/* ── Today's prices ── */}
         <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
-          Today's Prices (per {unitLabel})
+          {t('zakat.sections.todayPrices', { unit: unitLabel })}
         </Text>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <PriceRow
             icon="🥇"
-            label={`Gold (${currencyLabel}/${unitLabel})`}
+            label={t('zakat.prices.gold', { currency: currencyLabel, unit: unitLabel })}
             value={goldPrice}
             onChange={setGoldPrice}
             theme={theme}
@@ -337,7 +339,7 @@ export default function ZakatCalculatorScreen() {
           <View style={[styles.divider, { backgroundColor: theme.border }]} />
           <PriceRow
             icon="🥈"
-            label={`Silver (${currencyLabel}/${unitLabel})`}
+            label={t('zakat.prices.silver', { currency: currencyLabel, unit: unitLabel })}
             value={silverPrice}
             onChange={setSilverPrice}
             theme={theme}
@@ -345,7 +347,7 @@ export default function ZakatCalculatorScreen() {
         </View>
 
         {/* ── Nisab basis ── */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Nisab Threshold</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('zakat.sections.nisabThreshold')}</Text>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <View style={styles.segmentRow}>
             {(['silver', 'gold'] as NisabBasis[]).map((b) => {
@@ -364,25 +366,24 @@ export default function ZakatCalculatorScreen() {
                   activeOpacity={0.75}
                 >
                   <Text style={[styles.segmentText, { color: active ? '#fff' : theme.text }]}>
-                    {b === 'silver' ? 'Silver (recommended)' : 'Gold'}
+                    {b === 'silver' ? t('zakat.nisab.silver') : t('zakat.nisab.gold')}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
           <Text style={[styles.helperText, { color: theme.textMuted }]}>
-            Silver is the lower threshold; using it includes more payers and is the
-            common scholarly preference. You can switch to gold if you prefer.
+            {t('zakat.nisab.helper')}
           </Text>
 
           <View style={[styles.nisabSummary, { backgroundColor: palette.gold + '18', borderColor: palette.gold + '40' }]}>
             <Text style={[styles.nisabSummaryTitle, { color: theme.text }]}>
-              {nisabBasis === 'silver' ? 'Silver Nisab' : 'Gold Nisab'}
+              {nisabBasis === 'silver' ? t('zakat.nisab.silverLabel') : t('zakat.nisab.goldLabel')}
             </Text>
             <Text style={[styles.nisabSummaryAmount, { color: theme.text }]}>
               {nisabReady
                 ? `${currencyLabel} ${formatMoney(calc.nisabValue)}`
-                : `Enter ${nisabBasis} price to compute`}
+                : t('zakat.nisab.enterPricePrompt', { basis: nisabBasis })}
             </Text>
             <Text style={[styles.nisabSummarySub, { color: theme.textMuted }]}>
               {nisabBasis === 'silver'
@@ -393,13 +394,13 @@ export default function ZakatCalculatorScreen() {
         </View>
 
         {/* ── Assets ── */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Your Wealth</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('zakat.sections.yourWealth')}</Text>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <AssetRow
             icon="💵"
             color="#22C55E"
-            label="Cash & Bank Savings"
-            sub={`Total in ${currencyLabel}`}
+            label={t('zakat.assets.cash.label')}
+            sub={t('zakat.assets.cash.sub', { currency: currencyLabel })}
             value={cash}
             onChange={setCash}
             theme={theme}
@@ -409,9 +410,9 @@ export default function ZakatCalculatorScreen() {
           <DualAssetRow
             icon="🥇"
             color="#F59E0B"
-            label="Gold Owned"
-            weightLabel={`Weight (${unitLabel})`}
-            valueLabel={`Or value (${currencyLabel})`}
+            label={t('zakat.assets.gold.label')}
+            weightLabel={t('zakat.assets.gold.weightLabel', { unit: unitLabel })}
+            valueLabel={t('zakat.assets.gold.valueLabel', { currency: currencyLabel })}
             weight={goldWeight}
             value={goldValue}
             onWeightChange={setGoldWeight}
@@ -423,9 +424,9 @@ export default function ZakatCalculatorScreen() {
           <DualAssetRow
             icon="🥈"
             color="#9CA3AF"
-            label="Silver Owned"
-            weightLabel={`Weight (${unitLabel})`}
-            valueLabel={`Or value (${currencyLabel})`}
+            label={t('zakat.assets.silver.label')}
+            weightLabel={t('zakat.assets.silver.weightLabel', { unit: unitLabel })}
+            valueLabel={t('zakat.assets.silver.valueLabel', { currency: currencyLabel })}
             weight={silverWeight}
             value={silverValue}
             onWeightChange={setSilverWeight}
@@ -436,8 +437,8 @@ export default function ZakatCalculatorScreen() {
           <AssetRow
             icon="🏪"
             color="#3B82F6"
-            label="Business Assets"
-            sub={`Inventory / merchandise (${currencyLabel})`}
+            label={t('zakat.assets.business.label')}
+            sub={t('zakat.assets.business.sub', { currency: currencyLabel })}
             value={businessAssets}
             onChange={setBusinessAssets}
             theme={theme}
@@ -445,8 +446,8 @@ export default function ZakatCalculatorScreen() {
           <AssetRow
             icon="🤝"
             color="#8B5CF6"
-            label="Receivables"
-            sub={`Money owed to you, expected (${currencyLabel})`}
+            label={t('zakat.assets.receivables.label')}
+            sub={t('zakat.assets.receivables.sub', { currency: currencyLabel })}
             value={receivables}
             onChange={setReceivables}
             theme={theme}
@@ -455,13 +456,13 @@ export default function ZakatCalculatorScreen() {
         </View>
 
         {/* ── Debts ── */}
-        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>Liabilities</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>{t('zakat.sections.liabilities')}</Text>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <AssetRow
             icon="📉"
             color={Colors.warning}
-            label="Debts Due Now"
-            sub={`Amount you must pay (${currencyLabel})`}
+            label={t('zakat.assets.debts.label')}
+            sub={t('zakat.assets.debts.sub', { currency: currencyLabel })}
             value={debts}
             onChange={setDebts}
             theme={theme}
@@ -480,11 +481,11 @@ export default function ZakatCalculatorScreen() {
           disabled={!canCalculate}
           activeOpacity={0.85}
         >
-          <Text style={styles.calcBtnText}>Calculate Zakat</Text>
+          <Text style={styles.calcBtnText}>{t('zakat.calculate')}</Text>
         </TouchableOpacity>
         {!canCalculate && (
           <Text style={[styles.smallHint, { color: theme.textMuted }]}>
-            Set your currency and the {nisabBasis} price first.
+            {t('zakat.calculateHint', { basis: nisabBasis })}
           </Text>
         )}
 
@@ -500,7 +501,7 @@ export default function ZakatCalculatorScreen() {
             ]}
           >
             <Text style={[styles.resultLabel, { color: theme.textSecondary }]}>
-              Nisab threshold ({nisabBasis})
+              {t('zakat.result.nisabThresholdLabel', { basis: nisabBasis })}
             </Text>
             <Text style={[styles.resultLine, { color: theme.text }]}>
               {currencyLabel} {formatMoney(calc.nisabValue)}
@@ -509,14 +510,17 @@ export default function ZakatCalculatorScreen() {
             <View style={[styles.resultDivider, { backgroundColor: theme.border }]} />
 
             <Text style={[styles.resultLabel, { color: theme.textSecondary }]}>
-              Net zakatable wealth
+              {t('zakat.result.netWealthLabel')}
             </Text>
             <Text style={[styles.resultAmount, { color: theme.text }]}>
               {currencyLabel} {formatMoney(calc.netWealth)}
             </Text>
             <Text style={[styles.resultBreakdown, { color: theme.textMuted }]}>
-              Assets {currencyLabel} {formatMoney(calc.grossAssets)} − Debts {currencyLabel}{' '}
-              {formatMoney(calc.debtsTotal)}
+              {t('zakat.result.breakdown', {
+                currency: currencyLabel,
+                assets: formatMoney(calc.grossAssets),
+                debts: formatMoney(calc.debtsTotal),
+              })}
             </Text>
 
             <View style={[styles.resultDivider, { backgroundColor: theme.border }]} />
@@ -524,10 +528,10 @@ export default function ZakatCalculatorScreen() {
             {calc.aboveNisab ? (
               <>
                 <Text style={[styles.resultStatus, { color: Colors.success }]}>
-                  ✓ Above Nisab — Zakat is obligatory
+                  {t('zakat.result.aboveNisab')}
                 </Text>
                 <Text style={[styles.resultLabel, { color: Colors.primary, marginTop: 8 }]}>
-                  Zakat due (2.5%)
+                  {t('zakat.result.zakatDueLabel')}
                 </Text>
                 <Text style={[styles.zakatAmount, { color: Colors.primary }]}>
                   {currencyLabel} {formatMoney(calc.zakatDue)}
@@ -535,13 +539,13 @@ export default function ZakatCalculatorScreen() {
               </>
             ) : (
               <Text style={[styles.resultStatus, { color: Colors.warning }]}>
-                ℹ Below Nisab — no Zakat due this year
+                {t('zakat.result.belowNisab')}
               </Text>
             )}
 
             <TouchableOpacity onPress={reset} style={styles.resetBtn}>
               <Text style={[styles.resetText, { color: theme.textSecondary }]}>
-                Reset Wealth Entries
+                {t('zakat.result.resetEntries')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -549,9 +553,7 @@ export default function ZakatCalculatorScreen() {
 
         {/* ── Disclaimer ── */}
         <Text style={[styles.disclaimer, { color: theme.textMuted }]}>
-          This calculator is an estimate for guidance only. For complex situations
-          (mixed-purpose assets, partial-year debts, business equity, agricultural
-          produce) please consult a qualified scholar.
+          {t('zakat.disclaimer')}
         </Text>
       </ScrollView>
     </SafeAreaView>

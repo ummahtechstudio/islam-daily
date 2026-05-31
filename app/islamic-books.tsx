@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -56,6 +57,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 function IslamicBooksScreenInner() {
   useEffect(() => { trackScreen('IslamicBooks'); }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -74,8 +76,8 @@ function IslamicBooksScreenInner() {
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-        <Text style={styles.headerTitle}>Islamic Library</Text>
-        <Text style={styles.headerSub}>مكتبة إسلامية</Text>
+        <Text style={styles.headerTitle}>{t('islamicBooks.header.title')}</Text>
+        <Text style={styles.headerSub}>{t('islamicBooks.header.sub')}</Text>
       </View>
 
       <View style={[styles.tabRow, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
@@ -94,7 +96,7 @@ function IslamicBooksScreenInner() {
                 color={active ? Colors.primary : theme.textMuted}
               />
               <Text style={[styles.tabLabel, { color: active ? Colors.primary : theme.textMuted }]}>
-                {tab.label}
+                {t(`islamicBooks.tabs.${tab.key}`)}
               </Text>
             </TouchableOpacity>
           );
@@ -130,15 +132,15 @@ function IslamicBooksScreenInner() {
                       <Text style={[styles.badgeText, { color: catColor }]}>{book.category}</Text>
                     </View>
                     <View style={[styles.badge, { backgroundColor: LANGUAGE_COLORS[book.language] + '20', borderColor: LANGUAGE_COLORS[book.language] + '40' }]}>
-                      <Text style={[styles.badgeText, { color: LANGUAGE_COLORS[book.language] }]}>{LANGUAGE_LABELS[book.language]}</Text>
+                      <Text style={[styles.badgeText, { color: LANGUAGE_COLORS[book.language] }]}>{t(`islamicBooks.badges.languages.${book.language}`)}</Text>
                     </View>
                     {isAvailable ? (
                       <View style={[styles.badge, { backgroundColor: Colors.success + '20', borderColor: Colors.success + '40' }]}>
-                        <Text style={[styles.badgeText, { color: Colors.success }]}>Available</Text>
+                        <Text style={[styles.badgeText, { color: Colors.success }]}>{t('islamicBooks.badges.available')}</Text>
                       </View>
                     ) : (
                       <View style={[styles.badge, { backgroundColor: '#F59E0B20', borderColor: '#F59E0B40' }]}>
-                        <Text style={[styles.badgeText, { color: '#F59E0B' }]}>Coming Soon</Text>
+                        <Text style={[styles.badgeText, { color: '#F59E0B' }]}>{t('common.comingSoon')}</Text>
                       </View>
                     )}
                     <Text style={[styles.sizeText, { color: theme.textMuted }]}>{book.sizeEst}</Text>
@@ -150,7 +152,7 @@ function IslamicBooksScreenInner() {
                 <View style={[styles.comingSoonRow, { backgroundColor: theme.background, borderColor: theme.border }]}>
                   <Ionicons name="time-outline" size={14} color={theme.textMuted} />
                   <Text style={[styles.comingSoonText, { color: theme.textMuted }]}>
-                    Book will be available soon. We are uploading our library.
+                    {t('islamicBooks.comingSoonText')}
                   </Text>
                 </View>
               )}
@@ -159,7 +161,7 @@ function IslamicBooksScreenInner() {
         })}
 
         <Text style={[styles.footer, { color: theme.textMuted }]}>
-          We are uploading our own library. Books will be available soon, insha'Allah.
+          {t('islamicBooks.footer')}
         </Text>
       </ScrollView>
     </SafeAreaView>

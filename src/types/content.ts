@@ -25,6 +25,12 @@ export interface Dua {
   urdu?: string;
   reference: string;
 
+  // Short bilingual labels shown on each dua card so users can scan by
+  // purpose. Authored from each dua's english + reference + category.
+  // Always present in the bundled JSON.
+  title_en?: string;
+  title_ur?: string;
+
   // Phase D.1 — populated from Supabase, absent in bundled JSON.
   // `id` is the integer primary key from public.duas (used by import scripts
   // to bind a CSV row back to its DB row).

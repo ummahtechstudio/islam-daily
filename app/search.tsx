@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { trackScreen } from '../src/services/analytics';
@@ -20,6 +21,7 @@ import { useStore } from '../src/store';
 
 export default function SearchScreen() {
   useEffect(() => { trackScreen('Search'); }, []);
+  const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -84,8 +86,8 @@ export default function SearchScreen() {
           <Ionicons name="chevron-back" size={26} color="#fff" />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Islamic Search</Text>
-          <Text style={styles.headerSub}>Search the Quran by keyword</Text>
+          <Text style={styles.headerTitle}>{t('search.header.title')}</Text>
+          <Text style={styles.headerSub}>{t('search.header.sub')}</Text>
         </View>
       </View>
 
@@ -95,7 +97,7 @@ export default function SearchScreen() {
           <Ionicons name="search" size={18} color={theme.textMuted} />
           <TextInput
             style={[styles.input, { color: theme.text }]}
-            placeholder="e.g. mercy, patience, prayer..."
+            placeholder={t('search.placeholder')}
             placeholderTextColor={theme.textMuted}
             value={query}
             onChangeText={setQuery}
@@ -118,22 +120,22 @@ export default function SearchScreen() {
           disabled={!query.trim()}
           activeOpacity={0.8}
         >
-          <Text style={styles.searchBtnText}>Search</Text>
+          <Text style={styles.searchBtnText}>{t('search.button')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Suggestions */}
       {!searched && (
         <View style={styles.suggestions}>
-          <Text style={[styles.suggestLabel, { color: theme.textSecondary }]}>Popular searches</Text>
+          <Text style={[styles.suggestLabel, { color: theme.textSecondary }]}>{t('search.suggestions.label')}</Text>
           <View style={styles.chips}>
-            {['mercy', 'patience', 'paradise', 'prayer', 'forgiveness', 'knowledge'].map((s) => (
+            {(['mercy', 'patience', 'paradise', 'prayer', 'forgiveness', 'knowledge'] as const).map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[styles.chip, { backgroundColor: theme.card, borderColor: theme.border }]}
                 onPress={() => { setQuery(s); handleSearch(s); }}
               >
-                <Text style={[styles.chipText, { color: theme.text }]}>{s}</Text>
+                <Text style={[styles.chipText, { color: theme.text }]}>{t(`search.chips.${s}`)}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -155,20 +157,20 @@ export default function SearchScreen() {
                 <View style={styles.empty}>
                   <Text style={styles.emptyIcon}>📡</Text>
                   <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-                    Couldn't reach the search service. Check your connection and try again.
+                    {t('search.error.connection')}
                   </Text>
                   <TouchableOpacity
                     style={[styles.chip, { backgroundColor: theme.card, borderColor: theme.border, marginTop: 12 }]}
                     onPress={() => handleSearch()}
                   >
-                    <Text style={[styles.chipText, { color: Colors.primary }]}>Retry</Text>
+                    <Text style={[styles.chipText, { color: Colors.primary }]}>{t('common.retry')}</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <View style={styles.empty}>
                   <Text style={styles.emptyIcon}>🔍</Text>
                   <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-                    No results found for "{query}"
+                    {t('search.empty.noResults', { query })}
                   </Text>
                 </View>
               )

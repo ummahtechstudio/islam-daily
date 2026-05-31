@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import Svg, { Circle } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../../constants/colors';
 import { spacing, radius } from '../../constants/spacing';
@@ -73,6 +74,7 @@ export function TasbeehCounterView({
   onShowList,
   onBack,
 }: TasbeehCounterViewProps) {
+  const { t } = useTranslation();
   const [counters, setCounters] = useState<TasbeehCounter[]>([]);
   const [selectedId, setSelectedIdState] = useState<string>(initialCounterId || 'default-1');
   const [settings, setSettings] = useState<TasbeehSettings | null>(null);
@@ -257,12 +259,12 @@ export function TasbeehCounterView({
   const handleReset = useCallback(() => {
     if (!selected) return;
     Alert.alert(
-      'Reset counter?',
-      `This resets the current count and rounds for ${selected.name}. Lifetime total stays.`,
+      t('tasbeeh.counter.alerts.resetTitle'),
+      t('tasbeeh.counter.alerts.resetMessage', { name: selected.name }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Reset',
+          text: t('common.reset'),
           style: 'destructive',
           onPress: async () => {
             await resetCounter(selected.id);
@@ -275,7 +277,7 @@ export function TasbeehCounterView({
         },
       ],
     );
-  }, [selected]);
+  }, [selected, t]);
 
   const handleTempoTap = useCallback(() => {
     const now = Date.now();
@@ -296,11 +298,11 @@ export function TasbeehCounterView({
 
   const startStopTimer = useCallback(() => {
     if (tapTimes.length < 2) {
-      Alert.alert('Set tempo first', 'Tap "Set Tempo" 3 times in rhythm to set the speed.');
+      Alert.alert(t('tasbeeh.counter.alerts.setTempoTitle'), t('tasbeeh.counter.alerts.setTempoMessage'));
       return;
     }
     setTimerRunning((v) => !v);
-  }, [tapTimes]);
+  }, [tapTimes, t]);
 
   const updateSettingsField = useCallback(
     async (patch: Partial<TasbeehSettings>) => {
@@ -315,7 +317,7 @@ export function TasbeehCounterView({
   if (!selected || !settings) {
     return (
       <View style={styles.loadingBox}>
-        <Text style={{ color: theme.textSecondary }}>Loading…</Text>
+        <Text style={{ color: theme.textSecondary }}>{t('common.loading')}</Text>
       </View>
     );
   }
@@ -380,7 +382,7 @@ export function TasbeehCounterView({
               styles.modeTabText,
               { color: mode === m ? '#fff' : theme.textSecondary },
             ]}>
-              {m === 'touch' ? 'Touch Mode' : 'Timer Mode'}
+              {m === 'touch' ? t('tasbeeh.counter.touchMode') : t('tasbeeh.counter.timerMode')}
             </Text>
           </TouchableOpacity>
         ))}
@@ -433,7 +435,7 @@ export function TasbeehCounterView({
           <View style={styles.ringInner}>
             <Text style={[styles.bigCount, { color: theme.text }]}>{selected.currentCount}</Text>
             <Text style={[styles.targetText, { color: theme.textMuted }]}>
-              {selected.currentCount} / {selected.target}
+              {t('tasbeeh.counter.progress', { current: selected.currentCount, target: selected.target })}
             </Text>
             <Text
               style={[styles.dhikrNameInner, { color: theme.text }]}
@@ -452,7 +454,7 @@ export function TasbeehCounterView({
             <View style={styles.ringMetaRow}>
               <View style={[styles.metaPill, { backgroundColor: Colors.primary + '22' }]}>
                 <Text style={[styles.metaPillText, { color: Colors.primary }]}>
-                  Round {selected.rounds}
+                  {t('tasbeeh.counter.round', { round: selected.rounds })}
                 </Text>
               </View>
               <View style={[styles.metaPill, { backgroundColor: GOLD + '22' }]}>
@@ -465,7 +467,7 @@ export function TasbeehCounterView({
         {showRoundCelebration ? (
           <View style={styles.celebration}>
             <Text style={styles.celebrationText}>
-              ✨ Round {selected.rounds} complete!
+              {t('tasbeeh.counter.roundComplete', { round: selected.rounds })}
             </Text>
           </View>
         ) : null}
@@ -481,7 +483,7 @@ export function TasbeehCounterView({
             >
               <Ionicons name="hand-left-outline" size={14} color="#fff" />
               <Text style={styles.tempoBtnText}>
-                {tapTimes.length === 0 ? 'Tap 3× to set tempo' : `Tap (${tapTimes.length}/3)`}
+                {tapTimes.length === 0 ? t('tasbeeh.counter.timer.tapToSetTempo') : t('tasbeeh.counter.timer.tapProgress', { count: tapTimes.length })}
               </Text>
             </TouchableOpacity>
             <Text style={[styles.tempoInterval, { color: theme.textSecondary }]}>
@@ -503,12 +505,12 @@ export function TasbeehCounterView({
                 color="#fff"
               />
               <Text style={styles.playBtnText}>
-                {timerRunning ? 'Pause' : 'Start Auto'}
+                {timerRunning ? t('tasbeeh.counter.timer.pause') : t('tasbeeh.counter.timer.startAuto')}
               </Text>
             </TouchableOpacity>
             {timerRunning ? (
               <Text style={[styles.countdown, { color: GOLD }]}>
-                Next: {(nextCountdown / 1000).toFixed(1)}s
+                {t('tasbeeh.counter.timer.next', { seconds: (nextCountdown / 1000).toFixed(1) })}
               </Text>
             ) : null}
           </View>
@@ -517,24 +519,24 @@ export function TasbeehCounterView({
       </ScrollView>
 
       <View style={[styles.controls, { backgroundColor: theme.surface, borderTopColor: theme.border }]}>
-        <ControlBtn icon="refresh" label="Reset" theme={theme} onPress={handleReset} />
-        <ControlBtn icon="remove" label="−1" theme={theme} onPress={decrement} />
+        <ControlBtn icon="refresh" label={t('common.reset')} theme={theme} onPress={handleReset} />
+        <ControlBtn icon="remove" label={t('tasbeeh.counter.controls.decrement')} theme={theme} onPress={decrement} />
         <ControlBtn
           icon="add"
-          label="+1"
+          label={t('tasbeeh.counter.controls.increment')}
           theme={theme}
           onPress={increment}
           highlight
         />
         <ControlBtn
           icon="list"
-          label="List"
+          label={t('tasbeeh.counter.controls.list')}
           theme={theme}
           onPress={onShowList}
         />
         <ControlBtn
           icon="settings-outline"
-          label="Settings"
+          label={t('common.settings')}
           theme={theme}
           onPress={() => setShowSettings(true)}
         />
@@ -552,26 +554,26 @@ export function TasbeehCounterView({
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: theme.text }]}>Tasbeeh Settings</Text>
+              <Text style={[styles.modalTitle, { color: theme.text }]}>{t('tasbeeh.counter.settings.title')}</Text>
               <TouchableOpacity onPress={() => setShowSettings(false)} hitSlop={10}>
                 <Ionicons name="close" size={22} color={theme.textSecondary} />
               </TouchableOpacity>
             </View>
 
             <ToggleRow
-              label="Sound feedback"
+              label={t('tasbeeh.counter.settings.soundFeedback')}
               value={settings.soundEnabled}
               theme={theme}
               onToggle={(v) => updateSettingsField({ soundEnabled: v })}
             />
             <ToggleRow
-              label="Vibration"
+              label={t('tasbeeh.counter.settings.vibration')}
               value={settings.vibrationEnabled}
               theme={theme}
               onToggle={(v) => updateSettingsField({ vibrationEnabled: v })}
             />
             <ToggleRow
-              label="Vibrate on round complete"
+              label={t('tasbeeh.counter.settings.vibrateOnRound')}
               value={settings.vibrationOnTarget}
               theme={theme}
               onToggle={(v) => updateSettingsField({ vibrationOnTarget: v })}
@@ -579,13 +581,13 @@ export function TasbeehCounterView({
 
             <View style={styles.lifetimeBox}>
               <Text style={[styles.lifetimeLabel, { color: theme.textMuted }]}>
-                LIFETIME TOTAL
+                {t('tasbeeh.counter.settings.lifetimeTotal')}
               </Text>
               <Text style={[styles.lifetimeNum, { color: GOLD }]}>
                 {selected.totalCount.toLocaleString()}
               </Text>
               <Text style={[styles.lifetimeLabel, { color: theme.textMuted }]}>
-                Total time: {formatTime(selected.totalTime + elapsed)}
+                {t('tasbeeh.counter.settings.totalTime', { time: formatTime(selected.totalTime + elapsed) })}
               </Text>
             </View>
           </Pressable>

@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
@@ -118,6 +119,7 @@ export default function MosqueFinder() {
   useEffect(() => {
     trackScreen('MosqueFinder');
   }, []);
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -159,12 +161,12 @@ export default function MosqueFinder() {
       if (e instanceof OfflineError) {
         setError(OFFLINE_MESSAGE);
       } else {
-        setError('Failed to find mosques. Please try again in a moment.');
+        setError(t('mosqueFinder.errors.fetchFailed'));
       }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchAtCurrentLocation = useCallback(
     async (km: number) => {
@@ -174,7 +176,7 @@ export default function MosqueFinder() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          setError('Location permission denied. Please enable location access.');
+          setError(t('mosqueFinder.errors.locationDenied'));
           setPermissionDenied(true);
           setLoading(false);
           return;
@@ -185,11 +187,11 @@ export default function MosqueFinder() {
         setUserLng(longitude);
         await search(latitude, longitude, km);
       } catch (e) {
-        setError('Failed to get your location.');
+        setError(t('mosqueFinder.errors.locationFailed'));
         setLoading(false);
       }
     },
-    [search],
+    [search, t],
   );
 
   useEffect(() => {
@@ -224,15 +226,19 @@ export default function MosqueFinder() {
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
         <Ionicons name="location" size={24} color="#fff" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Mosque Finder</Text>
+          <Text style={styles.headerTitle}>{t('mosqueFinder.header.title')}</Text>
           <Text style={styles.headerSub} numberOfLines={1}>
             {loading
-              ? 'Finding mosques near you...'
+              ? t('mosqueFinder.header.loading')
               : userLat != null && mosques.length > 0
-              ? `Found ${mosques.length} ${mosques.length === 1 ? 'mosque' : 'mosques'} within ${effectiveRadiusKm}km`
+              ? t('mosqueFinder.header.found', {
+                  count: mosques.length,
+                  mosqueWord: mosques.length === 1 ? 'mosque' : 'mosques',
+                  radius: effectiveRadiusKm,
+                })
               : userLat != null
-              ? `No mosques within ${effectiveRadiusKm}km`
-              : 'Finding your location...'}
+              ? t('mosqueFinder.header.none', { radius: effectiveRadiusKm })
+              : t('mosqueFinder.header.locating')}
           </Text>
         </View>
         <TouchableOpacity onPress={handleRefresh} style={styles.refreshBtn} hitSlop={8}>
@@ -274,7 +280,7 @@ export default function MosqueFinder() {
 
       {autoExpanded ? (
         <Text style={[styles.autoExpandText, { color: theme.textMuted }]}>
-          No mosques within {radiusKm}km — showing within {effectiveRadiusKm}km
+          {t('mosqueFinder.autoExpand', { requested: radiusKm, effective: effectiveRadiusKm })}
         </Text>
       ) : null}
 
@@ -282,7 +288,7 @@ export default function MosqueFinder() {
         <View style={styles.centerBox}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={[styles.loadingText, { color: theme.textSecondary }]}>
-            Finding mosques near you...
+            {t('mosqueFinder.loading')}
           </Text>
         </View>
       ) : error ? (
@@ -294,14 +300,14 @@ export default function MosqueFinder() {
               style={[styles.retryBtn, { backgroundColor: Colors.primary }]}
               onPress={() => Linking.openSettings().catch(() => {})}
             >
-              <Text style={styles.retryText}>Open Settings</Text>
+              <Text style={styles.retryText}>{t('mosqueFinder.openSettings')}</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
               style={[styles.retryBtn, { backgroundColor: Colors.primary }]}
               onPress={handleRefresh}
             >
-              <Text style={styles.retryText}>Try Again</Text>
+              <Text style={styles.retryText}>{t('common.tryAgain')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -309,7 +315,7 @@ export default function MosqueFinder() {
         <View style={styles.centerBox}>
           <Ionicons name="search-outline" size={40} color={theme.textMuted} />
           <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-            No mosques found within {effectiveRadiusKm}km. Try expanding your radius.
+            {t('mosqueFinder.emptySearch', { radius: effectiveRadiusKm })}
           </Text>
         </View>
       ) : (
@@ -332,7 +338,7 @@ export default function MosqueFinder() {
                   </Text>
                 ) : null}
                 <Text style={[styles.distance, { color: Colors.primary }]}>
-                  📍 {item.distance.toFixed(1)} km away
+                  📍 {t('mosqueFinder.distance', { km: item.distance.toFixed(1) })}
                 </Text>
               </View>
               <TouchableOpacity
