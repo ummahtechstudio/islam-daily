@@ -448,6 +448,10 @@
     "actions": {
       "tryAgain": "Try again"
     },
+    "gradings": "Gradings",
+    "translation": {
+      "unavailable": "Urdu translation unavailable"
+    },
     "collections": {
       "hadithsCount": "{{count}} hadiths",
       "selectLabel": "SELECT A COLLECTION"
@@ -1383,7 +1387,7 @@
       },
       "sources": {
         "duas": "Hisn al-Muslim",
-        "hadith": "A7med3bdulBaset/hadith-json",
+        "hadith": "fawazahmed0/hadith-api",
         "prayerTimes": "Aladhan API",
         "quran": "Tanzil"
       }

@@ -44,6 +44,7 @@ import {
   isHadithBookCached,
 } from '../src/services/hadithCache';
 import { migrateInvalidPersistedSettings } from '../src/services/prayerTimesService';
+import { resetHadithBookmarksForV2Once } from '../src/utils/bookmarks';
 import {
   refreshNotificationsIfStale,
   refreshNotificationsOnForeground,
@@ -98,6 +99,11 @@ export default function RootLayout() {
     applyPersistedAppLanguage();
     loadPersistedData();
     migrateInvalidPersistedSettings();
+    // One-time wipe of stale hadith bookmarks for the v2 source switch (the old
+    // idInBook ids no longer map to the new numbering). Other bookmarks kept.
+    resetHadithBookmarksForV2Once().catch((err) =>
+      console.warn('[Layout] hadith bookmark reset failed', err),
+    );
     // Re-arm prayer notifications if last scheduled > 24h ago. Silent on web
     // and when permission has not been granted; the settings UI surfaces state.
     refreshNotificationsIfStale().catch((err) =>

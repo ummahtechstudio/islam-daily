@@ -310,6 +310,10 @@ const ALL_HADITH_BOOKS: HadithCollectionKey[] = [
   'abudawud',
   'ibnmajah',
   'nasai',
+  'malik',
+  'nawawi',
+  'qudsi',
+  'dehlawi',
 ];
 
 export async function downloadHadiths(

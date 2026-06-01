@@ -30,6 +30,10 @@ export const HADITH_COLLECTIONS = [
   { key: 'abudawud', name: 'Sunan Abu Dawud' },
   { key: 'ibnmajah', name: 'Sunan Ibn Majah' },
   { key: 'nasai',    name: "Sunan an-Nasa'i" },
+  { key: 'malik',    name: 'Muwatta Malik' },
+  { key: 'nawawi',   name: 'Forty Hadith of an-Nawawi' },
+  { key: 'qudsi',    name: 'Forty Hadith Qudsi' },
+  { key: 'dehlawi',  name: 'Forty Hadith of Shah Waliullah Dehlawi' },
 ];
 
 export const MAKKAH_COORDS = { latitude: 21.4225, longitude: 39.8262 };

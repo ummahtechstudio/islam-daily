@@ -16,7 +16,10 @@ import {
   type RawCollection,
 } from './hadiths';
 
-const HADITH_CACHE_VERSION = 1;
+// v2: new trilingual schema (arabic/english/urdu + grades[]) from hadiths-v2/.
+// Bumped from 1 → 2 so any cache written under the old A7med3bdulBaset shape
+// (idInBook numbering, English-only) is discarded and re-fetched.
+const HADITH_CACHE_VERSION = 2;
 
 const ALL_BOOK_SLUGS: HadithCollectionKey[] = [
   'bukhari',
@@ -25,6 +28,10 @@ const ALL_BOOK_SLUGS: HadithCollectionKey[] = [
   'abudawud',
   'ibnmajah',
   'nasai',
+  'malik',
+  'nawawi',
+  'qudsi',
+  'dehlawi',
 ];
 
 export type HadithBookCache = {

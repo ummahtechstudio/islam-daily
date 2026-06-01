@@ -50,3 +50,10 @@ scripts/data/
 # The filled-in `content/dua-descriptions.csv` IS committed (source of truth).
 content/dua-descriptions-TEMPLATE.csv
 
+# Hadith data-prep working dirs (~174 MB). The trilingual data is served from
+# R2 (hadiths-v2/); these raw editions + combined build output don't belong in
+# the app repo. See hadith-build/README.md for provenance.
+/hadith-arabic/
+/hadith-urdu/
+/hadith-build/
+

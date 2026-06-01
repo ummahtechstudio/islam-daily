@@ -448,6 +448,10 @@
     "actions": {
       "tryAgain": "دوبارہ کوشش کریں"
     },
+    "gradings": "درجہ بندی",
+    "translation": {
+      "unavailable": "اردو ترجمہ دستیاب نہیں"
+    },
     "collections": {
       "hadithsCount": "{{count}} احادیث",
       "selectLabel": "ایک مجموعہ منتخب کریں"
@@ -1383,7 +1387,7 @@
       },
       "sources": {
         "duas": "حصنُ المسلم",
-        "hadith": "A7med3bdulBaset/hadith-json",
+        "hadith": "fawazahmed0/hadith-api",
         "prayerTimes": "Aladhan API",
         "quran": "Tanzil"
       }

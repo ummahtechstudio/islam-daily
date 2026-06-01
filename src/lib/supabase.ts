@@ -20,6 +20,11 @@ export interface QuranAyah {
   page_indopak?: number;
 }
 
+export interface HadithGrade {
+  name: string;
+  grade: string;
+}
+
 export interface SupabaseHadith {
   id: number;
   collection_key: string;
@@ -31,8 +36,8 @@ export interface SupabaseHadith {
   hadith_number: string;
   arabic: string | null;
   english: string | null;
-  narrator: string | null;
-  grade: string | null;
+  urdu: string | null;
+  grades: HadithGrade[];
 }
 
 export interface SupabaseDua {

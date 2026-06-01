@@ -70,3 +70,33 @@ export const clearAllBookmarks = async (): Promise<void> => {
     await AsyncStorage.removeItem(STORAGE_KEY);
   } catch {}
 };
+
+export const removeBookmarksByType = async (type: BookmarkType): Promise<void> => {
+  try {
+    const all = await getBookmarks();
+    const filtered = all.filter((b) => b.type !== type);
+    if (filtered.length !== all.length) {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    }
+  } catch (e) {
+    console.error('Failed to remove bookmarks by type:', type, e);
+  }
+};
+
+// One-time reset of hadith bookmarks for the v2 source switch. Old hadith
+// bookmark ids keyed on the previous (idInBook) numbering, which no longer
+// matches the new hadithnumber scheme, so they would point at the wrong
+// hadith. Pre-launch, so a clean wipe is fine. Quran/dua/dhikr bookmarks are
+// untouched. Runs once, guarded by a flag.
+const HADITH_BOOKMARK_RESET_KEY = 'migration_hadith_bookmark_reset_v2';
+
+export const resetHadithBookmarksForV2Once = async (): Promise<void> => {
+  try {
+    const done = await AsyncStorage.getItem(HADITH_BOOKMARK_RESET_KEY);
+    if (done === '1') return;
+    await removeBookmarksByType('hadith');
+    await AsyncStorage.setItem(HADITH_BOOKMARK_RESET_KEY, '1');
+  } catch (e) {
+    console.error('Failed to reset hadith bookmarks for v2:', e);
+  }
+};

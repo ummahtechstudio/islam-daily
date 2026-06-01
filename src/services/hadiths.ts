@@ -6,23 +6,31 @@
  * pipeline so the cache layer can call it.
  */
 
-import { SupabaseHadith } from '../lib/supabase';
+import { HadithGrade, SupabaseHadith } from '../lib/supabase';
 import { fetchWithTimeout } from '../utils/network';
 
-// Hadith collections are large (Bukhari ~12 MB). Give them more headroom than
-// the default 15s so slow connections don't abort mid-download.
+// Hadith collections are large (Bukhari ~22 MB trilingual). Give them more
+// headroom than the default 15s so slow connections don't abort mid-download.
 const HADITH_TIMEOUT_MS = 45000;
 
+// v2: aligned trilingual set (Arabic + English + Urdu, shared hadithnumber).
+// The previous `hadiths/` path (A7med3bdulBaset, English-only) is retired.
 export const R2_HADITHS_BASE_URL =
-  'https://pub-3f76e9c4da264c6ba85283d8af8108a0.r2.dev/hadiths';
+  'https://pub-3f76e9c4da264c6ba85283d8af8108a0.r2.dev/hadiths-v2';
 
+// Totals from hadiths-v2/index.json (full record counts incl. fractional
+// sub-narrations and any-language records).
 export const DEFAULT_COLLECTION_COUNTS: Record<string, number> = {
-  bukhari: 7277,
-  muslim: 7563,
-  tirmidhi: 3956,
+  bukhari: 7589,
+  muslim: 7564,
+  tirmidhi: 3998,
   abudawud: 5274,
-  ibnmajah: 4341,
-  nasai: 5767,
+  ibnmajah: 4343,
+  nasai: 5765,
+  malik: 1889,
+  nawawi: 42,
+  qudsi: 40,
+  dehlawi: 40,
 };
 
 export type HadithCollectionKey =
@@ -31,7 +39,11 @@ export type HadithCollectionKey =
   | 'tirmidhi'
   | 'abudawud'
   | 'ibnmajah'
-  | 'nasai';
+  | 'nasai'
+  | 'malik'
+  | 'nawawi'
+  | 'qudsi'
+  | 'dehlawi';
 
 export const COLLECTION_NAMES: Record<HadithCollectionKey, string> = {
   bukhari: 'Sahih Bukhari',
@@ -40,28 +52,30 @@ export const COLLECTION_NAMES: Record<HadithCollectionKey, string> = {
   abudawud: 'Sunan Abu Dawud',
   ibnmajah: 'Sunan Ibn Majah',
   nasai: "Sunan an-Nasa'i",
+  malik: 'Muwatta Malik',
+  nawawi: 'Forty Hadith of an-Nawawi',
+  qudsi: 'Forty Hadith Qudsi',
+  dehlawi: 'Forty Hadith of Shah Waliullah Dehlawi',
 };
 
-interface RawChapter {
-  id: number;
-  bookId?: number;
-  arabic?: string;
-  english?: string;
+interface RawGrade {
+  name?: string;
+  grade?: string;
 }
 
 interface RawHadith {
-  id: number;
-  idInBook?: number;
-  chapterId?: number;
-  bookId?: number;
-  arabic?: string;
-  english?: { narrator?: string; text?: string } | string;
+  hadithnumber?: number | string;
+  arabicnumber?: number | string;
+  reference?: { book?: number | null; hadith?: number | null } | null;
+  section?: string | null;
+  arabic?: string | null;
+  english?: string | null;
+  urdu?: string | null;
+  grades?: RawGrade[];
 }
 
 export interface RawCollection {
-  id?: number;
-  metadata?: { name?: string; arabic?: string; english?: string };
-  chapters?: RawChapter[];
+  metadata?: { name?: string; collection?: string; total?: number };
   hadiths?: RawHadith[];
 }
 
@@ -78,30 +92,35 @@ export function normalize(
   raw: RawCollection,
 ): SupabaseHadith[] {
   const collectionName = COLLECTION_NAMES[collectionKey];
-  const chaptersById = new Map<number, RawChapter>();
-  for (const ch of raw.chapters ?? []) chaptersById.set(ch.id, ch);
 
   const out: SupabaseHadith[] = [];
-  for (const h of raw.hadiths ?? []) {
-    const englishText =
-      typeof h.english === 'string' ? h.english : h.english?.text ?? null;
-    const narrator =
-      typeof h.english === 'string' ? null : h.english?.narrator ?? null;
-    const chapter = h.chapterId != null ? chaptersById.get(h.chapterId) : null;
+  const hadiths = raw.hadiths ?? [];
+  for (let i = 0; i < hadiths.length; i++) {
+    const h = hadiths[i];
+    // hadithnumber may be fractional (sub-narrations, e.g. 631.5) — keep it as
+    // a string so the value is preserved exactly for display and lookup.
+    const hadithNumber = String(h.hadithnumber ?? i + 1);
+    const grades: HadithGrade[] = Array.isArray(h.grades)
+      ? h.grades
+          .filter((g) => g && g.name && g.grade)
+          .map((g) => ({ name: String(g.name), grade: String(g.grade) }))
+      : [];
 
     out.push({
-      id: h.id,
+      // Stable, unique per record within the collection (hadithnumber may
+      // repeat across collections; the array index never collides here).
+      id: i,
       collection_key: collectionKey,
       collection_name: collectionName,
-      book_id: h.bookId ?? null,
+      book_id: h.reference?.book ?? null,
       book_name: null,
-      chapter_id: h.chapterId ?? null,
-      chapter_name: chapter?.english ?? chapter?.arabic ?? null,
-      hadith_number: String(h.idInBook ?? h.id),
+      chapter_id: null,
+      chapter_name: h.section ?? null,
+      hadith_number: hadithNumber,
       arabic: h.arabic ?? null,
-      english: englishText,
-      narrator,
-      grade: null,
+      english: h.english ?? null,
+      urdu: h.urdu ?? null,
+      grades,
     });
   }
   return out;

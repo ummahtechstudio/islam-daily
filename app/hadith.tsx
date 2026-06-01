@@ -10,10 +10,12 @@ import {
   ScrollView,
   TextInput,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useFocusEffect } from 'expo-router';
 
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
@@ -21,7 +23,8 @@ import { spacing, radius } from '../src/constants/spacing';
 import { HADITH_COLLECTIONS } from '../src/constants';
 import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import { trackScreen } from '../src/services/analytics';
-import { SupabaseHadith } from '../src/lib/supabase';
+import { HadithGrade, SupabaseHadith } from '../src/lib/supabase';
+import { getTranslationLanguage, type TranslationLanguage } from '../src/utils/settings';
 import { useStore } from '../src/store';
 import CardActionsRow from '../components/CardActionsRow';
 import { useIsOnline } from '../src/hooks/useIsOnline';
@@ -49,23 +52,58 @@ const COLLECTION_META: Record<string, { color: string; bg: string; icon: string 
   abudawud: { color: '#D97706', bg: '#D9770615', icon: '📒' },
   ibnmajah: { color: '#0D9488', bg: '#0D948815', icon: '📓' },
   nasai:    { color: '#DC4E4E', bg: '#DC4E4E15', icon: '📕' },
+  malik:    { color: '#0F6E56', bg: '#0F6E5615', icon: '📔' },
+  nawawi:   { color: '#9333EA', bg: '#9333EA15', icon: '✨' },
+  qudsi:    { color: '#B45309', bg: '#B4530915', icon: '🕌' },
+  dehlawi:  { color: '#0369A1', bg: '#0369A115', icon: '📜' },
 };
 
-// ─── Grade badge ──────────────────────────────────────────────────────────────
+// ─── Gradings ───────────────────────────────────────────────────────────────
+// The v2 data carries multiple scholarly gradings per hadith (grader + grade).
+// Bukhari/Muslim and the 40-collections carry none — render nothing for those.
 
-function GradeBadge({ grade, theme }: { grade: string; theme: typeof Colors.light }) {
-  if (!grade) return null;
+function gradeColor(grade: string, theme: typeof Colors.light): string {
   const g = grade.toLowerCase();
-  const color = g.includes('sahih') ? Colors.success : g.includes('hasan') ? GOLD : g.includes('da') ? Colors.error : theme.textMuted;
+  // check da'if before sahih: "isnaad da'if" etc. should read as weak
+  if (g.includes('da') && !g.includes('sahih')) return Colors.error;
+  if (g.includes('sahih')) return Colors.success;
+  if (g.includes('hasan')) return GOLD;
+  if (g.includes('da')) return Colors.error;
+  return theme.textMuted;
+}
+
+function Gradings({ grades, label, theme }: { grades: HadithGrade[]; label: string; theme: typeof Colors.light }) {
+  if (!grades || grades.length === 0) return null;
   return (
-    <View style={[gradeStyles.badge, { backgroundColor: color + '22' }]}>
-      <Text style={[gradeStyles.text, { color }]}>{grade}</Text>
+    <View style={gradeStyles.wrap}>
+      <Text style={[gradeStyles.label, { color: palette.textOnCreamMuted }]}>{label}</Text>
+      <View style={gradeStyles.chips}>
+        {grades.map((g, i) => {
+          const color = gradeColor(g.grade, theme);
+          return (
+            <View key={`${g.name}-${i}`} style={[gradeStyles.badge, { backgroundColor: color + '1A' }]}>
+              <Text style={[gradeStyles.grader, { color: palette.textOnCreamSecondary }]}>{g.name}: </Text>
+              <Text style={[gradeStyles.text, { color }]}>{g.grade}</Text>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
 const gradeStyles = StyleSheet.create({
-  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  wrap: { marginTop: spacing.sm, gap: spacing.xs },
+  label: {
+    ...typography.caption,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  grader: { fontSize: 11, fontWeight: '600' },
   text: { fontSize: 11, fontWeight: '700' },
 });
 
@@ -149,6 +187,9 @@ export default function HadithScreen() {
   const [downloadError, setDownloadError] = useState<Error | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionCounts, setCollectionCounts] = useState<Record<string, number>>({});
+  // Which translation to show (English/Urdu). Shared with dua/dhikr via the
+  // same setting — Arabic and gradings are always shown regardless.
+  const [language, setLanguage] = useState<TranslationLanguage>('urdu');
 
   const cancelRef = useRef<{ slug: HadithCollectionKey | null; cancelled: boolean }>({
     slug: null,
@@ -162,6 +203,18 @@ export default function HadithScreen() {
   useEffect(() => {
     setCollectionCounts(getCachedHadithCounts());
   }, []);
+
+  // Re-read the translation language each time the screen gains focus so a
+  // change made in settings (or the dua tabs) is reflected here too.
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      getTranslationLanguage().then((lang) => {
+        if (active) setLanguage(lang);
+      });
+      return () => { active = false; };
+    }, []),
+  );
 
   const startDownload = useCallback(async (key: HadithCollectionKey) => {
     cancelRef.current = { slug: key, cancelled: false };
@@ -244,7 +297,8 @@ export default function HadithScreen() {
   const filteredHadiths = useMemo(() => {
     const trimmed = searchQuery.trim();
     if (!trimmed) return allHadiths;
-    const isNumericQuery = /^\d+$/.test(trimmed);
+    // Allow fractional hadith numbers too (e.g. 631.5 for sub-narrations).
+    const isNumericQuery = /^\d+(\.\d+)?$/.test(trimmed);
     if (isNumericQuery) {
       return allHadiths.filter((h) => h.hadith_number === trimmed);
     }
@@ -252,7 +306,7 @@ export default function HadithScreen() {
     return allHadiths.filter(
       (h) =>
         (h.english ?? '').toLowerCase().includes(q) ||
-        (h.narrator ?? '').toLowerCase().includes(q) ||
+        (h.urdu ?? '').includes(trimmed) ||
         (h.arabic ?? '').includes(trimmed),
     );
   }, [allHadiths, searchQuery]);
@@ -265,6 +319,14 @@ export default function HadithScreen() {
   };
 
   const renderHadith = ({ item }: { item: SupabaseHadith }) => {
+    // Translation shown is driven by the shared language toggle. Arabic is
+    // always shown. When Urdu is selected but absent, show a subtle note and
+    // fall back to English so the block is never blank.
+    const showUrdu = language === 'urdu' && !!item.urdu;
+    const urduMissing = language === 'urdu' && !item.urdu;
+    // Text saved when bookmarking/sharing — match what the user is reading.
+    const displayedTranslation = showUrdu ? item.urdu! : item.english ?? '';
+
     return (
       <ManuscriptCard variant="standard">
         <View style={cardStyles.header}>
@@ -276,7 +338,6 @@ export default function HadithScreen() {
               {item.chapter_name}
             </Text>
           ) : null}
-          <GradeBadge grade={item.grade ?? 'Sahih'} theme={theme} />
         </View>
 
         {/* collName is the proper-noun collection name (e.g. "Sahih Bukhari") — content, not translated */}
@@ -290,13 +351,24 @@ export default function HadithScreen() {
 
         <View style={cardStyles.divider} />
 
-        {item.english ? (
-          <Text style={cardStyles.english}>{item.english}</Text>
-        ) : null}
+        {showUrdu ? (
+          <Text style={cardStyles.urdu} textBreakStrategy="simple">
+            {item.urdu}
+          </Text>
+        ) : (
+          <>
+            {urduMissing ? (
+              <Text style={cardStyles.unavailable}>
+                {t('hadith.translation.unavailable')}
+              </Text>
+            ) : null}
+            {item.english ? (
+              <Text style={cardStyles.english}>{item.english}</Text>
+            ) : null}
+          </>
+        )}
 
-        {item.narrator ? (
-          <Text style={cardStyles.narrator}>— {item.narrator}</Text>
-        ) : null}
+        <Gradings grades={item.grades} label={t('hadith.gradings')} theme={theme} />
 
         <CardActionsRow
           bookmark={{
@@ -304,12 +376,12 @@ export default function HadithScreen() {
             id: `${item.collection_key}-${item.hadith_number}`,
             title: `${collName} #${item.hadith_number}`,
             arabic: item.arabic ?? '',
-            translation: item.english ?? '',
+            translation: displayedTranslation,
             reference: `${collName} ${item.hadith_number}`,
           }}
           shareable={{
             arabic: item.arabic ?? '',
-            translation: item.english ?? '',
+            translation: displayedTranslation,
             reference: `${collName} ${item.hadith_number}`,
             type: 'hadith',
           }}
@@ -438,6 +510,7 @@ export default function HadithScreen() {
             data={visibleHadiths}
             keyExtractor={(item) => `${item.collection_key}-${item.id}`}
             renderItem={renderHadith}
+            extraData={language}
             contentContainerStyle={{ padding: 12, paddingBottom: 20, gap: 12 }}
             onEndReached={loadMore}
             onEndReachedThreshold={0.3}
@@ -570,11 +643,19 @@ const cardStyles = StyleSheet.create({
     fontSize: 14,
     color: palette.textOnCreamSecondary,
   },
-  narrator: {
+  urdu: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    fontSize: 17,
+    lineHeight: 32,
+    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : 'NotoNastaliqUrdu_400Regular',
+    color: palette.textOnCream,
+  },
+  unavailable: {
     ...typography.bodySmall,
     fontSize: 12,
-    fontWeight: '600',
-    marginTop: spacing.sm,
-    color: palette.green,
+    fontStyle: 'italic',
+    marginBottom: spacing.sm,
+    color: palette.textOnCreamMuted,
   },
 });
