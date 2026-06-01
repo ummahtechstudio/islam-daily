@@ -57,3 +57,30 @@ export const setTranslationLanguage = async (lang: TranslationLanguage): Promise
     console.error('Failed to save translation language:', e);
   }
 };
+
+// ─── App (interface) language ────────────────────────────────────────────────
+// Controls which language the whole UI renders in (buttons, labels, menus) via
+// i18next. Independent from the *translation* language above. Default 'en' so a
+// fresh install shows the English interface; the user opts into Urdu.
+
+export type AppLanguage = 'en' | 'ur';
+
+const APP_LANGUAGE_KEY = `${PREFIX}app_language`;
+
+export const getAppLanguage = async (): Promise<AppLanguage> => {
+  try {
+    const v = await AsyncStorage.getItem(APP_LANGUAGE_KEY);
+    if (v === 'en' || v === 'ur') return v;
+    return 'en';
+  } catch {
+    return 'en';
+  }
+};
+
+export const setAppLanguage = async (lang: AppLanguage): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(APP_LANGUAGE_KEY, lang);
+  } catch (e) {
+    console.error('Failed to save app language:', e);
+  }
+};

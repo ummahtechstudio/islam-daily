@@ -17,9 +17,11 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
+import { urduUiStyle } from '../src/constants/fonts';
 import { useStore } from '../src/store';
 import { CALCULATION_METHODS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
+import i18n from '../src/i18n';
 import {
   LANGUAGE_OPTIONS,
   CONTENT_LANGUAGE_KEY,
@@ -33,6 +35,9 @@ import {
   getTranslationLanguage,
   setTranslationLanguage,
   TranslationLanguage,
+  getAppLanguage,
+  setAppLanguage,
+  AppLanguage,
 } from '../src/utils/settings';
 
 // ─── Option lists ─────────────────────────────────────────────────────────────
@@ -96,7 +101,10 @@ const TERMS_URL = 'https://ummahtechstudio.github.io/islam-daily/terms.html';
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function SettingsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
+  // Re-render this screen whenever the UI language changes so the Urdu/English
+  // labels (and the Urdu Nastaliq styling below) update immediately.
+  const isUrduUI = i18nInstance.language === 'ur';
   useEffect(() => { trackScreen('Settings'); }, []);
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -123,6 +131,7 @@ export default function SettingsScreen() {
   const [dailyHadithTime, setDailyHadithTime] = useState<string>('08:00');
   const [fridayReminder, setFridayReminder] = useState<boolean>(true);
   const [translationLang, setTranslationLang] = useState<TranslationLanguage>('urdu');
+  const [appLang, setAppLang] = useState<AppLanguage>('en');
 
   // Storage info
   const [cacheSizeKB, setCacheSizeKB] = useState<number | null>(null);
@@ -143,7 +152,7 @@ export default function SettingsScreen() {
         const [
           themeV, arabicV, englishV, calcV, madhabV, hijriV,
           translationV, transliterationV, reciterV, adhanV, preAdhanV,
-          dailyHadithV, dailyHadithTimeV, fridayV, translationLangV,
+          dailyHadithV, dailyHadithTimeV, fridayV, translationLangV, appLangV,
         ] = await Promise.all([
           getSetting<ThemeOption>('theme', 'dark'),
           getSetting<FontSize>('arabic_font_size', 'medium'),
@@ -160,6 +169,7 @@ export default function SettingsScreen() {
           getSetting<string>('daily_hadith_time', '08:00'),
           getSetting<boolean>('friday_reminder', true),
           getTranslationLanguage(),
+          getAppLanguage(),
         ]);
         setTheme(themeV);
         setArabicFontSize(arabicV);
@@ -176,6 +186,7 @@ export default function SettingsScreen() {
         setDailyHadithTime(dailyHadithTimeV);
         setFridayReminder(fridayV);
         setTranslationLang(translationLangV);
+        setAppLang(appLangV);
       } catch (err) {
         // Hard storage failure — the screen keeps its default initial state
         // and the user can still navigate around. Better than a frozen blank.
@@ -302,6 +313,20 @@ export default function SettingsScreen() {
     await setTranslationLanguage(v);
   };
 
+  // App (interface) language. Coupling rule the owner asked for:
+  //   • Urdu  → also force Translation Language to Urdu ("everything in Urdu").
+  //   • English → leave Translation Language untouched (keeps the default
+  //     English-interface-with-Urdu-translations, and whatever the user chose).
+  const onSelectAppLang = async (v: AppLanguage) => {
+    setAppLang(v);
+    await setAppLanguage(v);
+    await i18n.changeLanguage(v);
+    if (v === 'ur') {
+      setTranslationLang('urdu');
+      await setTranslationLanguage('urdu');
+    }
+  };
+
   // ─── Storage actions ───────────────────────────────────────────────────────
 
   const onClearCache = () => {
@@ -358,6 +383,8 @@ export default function SettingsScreen() {
             setDailyHadithTime('08:00');
             setFridayReminder(true);
             setTranslationLang('urdu');
+            setAppLang('en');
+            i18n.changeLanguage('en');
             Alert.alert(
               t('settings.alerts.resetSettings.successTitle'),
               t('settings.alerts.resetSettings.successMessage'),
@@ -403,6 +430,45 @@ export default function SettingsScreen() {
     <SafeAreaView style={[styles.flex, { backgroundColor: themeColors.background }]} edges={['bottom']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
 
+        {/* ── APP LANGUAGE (interface) ──────────────────────────────────── */}
+        {/* Switches the whole UI via i18next. Choosing Urdu also flips the
+            Translation Language to Urdu (see onSelectAppLang); choosing English
+            leaves the translation choice alone. */}
+        <SectionLabel>{t('settings.sections.appLanguage')}</SectionLabel>
+        <SectionCard>
+          <View style={[styles.row, styles.rowColumn]}>
+            <View style={styles.radioColumn}>
+              <TouchableOpacity
+                style={styles.radioRow}
+                onPress={() => onSelectAppLang('en')}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.radioOuter, { borderColor: appLang === 'en' ? Colors.primary : themeColors.border }]}>
+                  {appLang === 'en' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
+                </View>
+                <Text style={[styles.radioLabel, { color: themeColors.text }, isUrduUI && urduUiStyle(14)]}>
+                  {t('settings.appLang.englishOption')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.radioRow}
+                onPress={() => onSelectAppLang('ur')}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.radioOuter, { borderColor: appLang === 'ur' ? Colors.primary : themeColors.border }]}>
+                  {appLang === 'ur' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
+                </View>
+                <Text style={[styles.radioLabel, { color: themeColors.text }, isUrduUI && urduUiStyle(14)]}>
+                  {t('settings.appLang.urduOption')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.explainer, { color: themeColors.textMuted }, isUrduUI && urduUiStyle(12)]}>
+              {t('settings.appLang.explainer')}
+            </Text>
+          </View>
+        </SectionCard>
+
         {/* ── TRANSLATION LANGUAGE ──────────────────────────────────────── */}
         <SectionLabel>{t('settings.sections.translationLanguage')}</SectionLabel>
         <SectionCard>
@@ -416,7 +482,9 @@ export default function SettingsScreen() {
                 <View style={[styles.radioOuter, { borderColor: translationLang === 'urdu' ? Colors.primary : themeColors.border }]}>
                   {translationLang === 'urdu' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
                 </View>
-                <Text style={[styles.radioLabel, { color: themeColors.text }]}>{t('settings.translationLang.urduOption')}</Text>
+                <Text style={[styles.radioLabel, { color: themeColors.text }, isUrduUI && urduUiStyle(14)]}>
+                  {t('settings.translationLang.urduOption')}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioRow}
@@ -426,10 +494,12 @@ export default function SettingsScreen() {
                 <View style={[styles.radioOuter, { borderColor: translationLang === 'english' ? Colors.primary : themeColors.border }]}>
                   {translationLang === 'english' && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
                 </View>
-                <Text style={[styles.radioLabel, { color: themeColors.text }]}>{t('settings.translationLang.englishOption')}</Text>
+                <Text style={[styles.radioLabel, { color: themeColors.text }, isUrduUI && urduUiStyle(14)]}>
+                  {t('settings.translationLang.englishOption')}
+                </Text>
               </TouchableOpacity>
             </View>
-            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
+            <Text style={[styles.explainer, { color: themeColors.textMuted }, isUrduUI && urduUiStyle(12)]}>
               {t('settings.translationLang.explainer')}
             </Text>
           </View>

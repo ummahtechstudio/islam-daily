@@ -1,1361 +1,1361 @@
 {
   "audioLibrary": {
     "categories": {
-      "bayans": "Bayans / Lectures",
-      "hadith": "Hadith Audio",
-      "kids": "Kids",
-      "nasheed": "Nasheed / Naat",
-      "quran_recitation": "Quran Recitation",
-      "quran_tafseer": "Quran Tafseer",
-      "seerah": "Seerah Audio"
+      "bayans": "بیانات / لیکچرز",
+      "hadith": "حدیث آڈیو",
+      "kids": "بچوں کے لیے",
+      "nasheed": "نشید / نعت",
+      "quran_recitation": "قرآن کی تلاوت",
+      "quran_tafseer": "قرآن کی تفسیر",
+      "seerah": "سیرت آڈیو"
     },
-    "episodes": "{{count}} ep",
+    "episodes": "{{count}} اقساط",
     "header": {
-      "request": "Request",
-      "title": "Audio Library"
+      "request": "درخواست",
+      "title": "آڈیو لائبریری"
     },
     "langTabs": {
-      "all": "All",
-      "arabic": "Arabic عربی",
-      "english": "English",
-      "urdu": "Urdu اردو"
+      "all": "سب",
+      "arabic": "عربی",
+      "english": "انگریزی",
+      "urdu": "اردو"
     },
     "request": {
-      "sub": "Missing a scholar or series? Let us know.",
-      "title": "Request Audio Content"
+      "sub": "کوئی عالم یا سلسلہ موجود نہیں؟ ہمیں بتائیں۔",
+      "title": "آڈیو مواد کی درخواست"
     },
     "search": {
-      "placeholder": "Search by title, scholar, reciter…"
+      "placeholder": "عنوان، عالم یا قاری سے تلاش کریں…"
     },
     "sections": {
-      "browseByCategory": "Browse by Category",
-      "favorites": "Favorites",
-      "noResults": "No results found.",
-      "recentlyPlayed": "Recently Played",
-      "searchResults": "Search Results ({{count}})",
-      "seeAll": "See all {{count}} {{category}}"
+      "browseByCategory": "زمرے کے لحاظ سے دیکھیں",
+      "favorites": "پسندیدہ",
+      "noResults": "کوئی نتیجہ نہیں ملا۔",
+      "recentlyPlayed": "حال ہی میں سنا گیا",
+      "searchResults": "تلاش کے نتائج ({{count}})",
+      "seeAll": "تمام {{count}} {{category}} دیکھیں"
     }
   },
   "bookmarks": {
     "alerts": {
       "clearAll": {
-        "confirm": "Clear All",
-        "message": "Are you sure you want to remove all bookmarks? This cannot be undone.",
-        "title": "Clear All Bookmarks"
+        "confirm": "سب صاف کریں",
+        "message": "کیا آپ واقعی تمام بک مارکس ہٹانا چاہتے ہیں؟ یہ واپس نہیں ہو سکے گا۔",
+        "title": "تمام بک مارکس صاف کریں"
       }
     },
-    "clearAll": "Clear All",
+    "clearAll": "سب صاف کریں",
     "empty": {
       "noBookmarks": {
-        "sub": "Tap the bookmark icon on any hadith or dua to save it here.",
-        "title": "No bookmarks yet"
+        "sub": "کسی بھی حدیث یا دعا پر بک مارک آئیکن دبائیں تاکہ وہ یہاں محفوظ ہو جائے۔",
+        "title": "ابھی کوئی بک مارک نہیں"
       },
       "noneInFilter": {
-        "sub": "You haven't saved any {{filter}} items yet.",
-        "title": "Nothing here yet"
+        "sub": "آپ نے ابھی تک کوئی {{filter}} آئٹم محفوظ نہیں کیا۔",
+        "title": "یہاں ابھی کچھ نہیں"
       }
     },
     "filters": {
-      "all": "All",
-      "dhikr": "Dhikr",
-      "dua": "Duas",
-      "hadith": "Hadith",
-      "quran": "Quran"
+      "all": "سب",
+      "dhikr": "ذکر",
+      "dua": "دعائیں",
+      "hadith": "حدیث",
+      "quran": "قرآن"
     },
     "header": {
-      "itemCount_one": "{{count}} item saved",
-      "itemCount_other": "{{count}} items saved",
-      "title": "My Bookmarks"
+      "itemCount_one": "{{count}} آئٹم محفوظ",
+      "itemCount_other": "{{count}} آئٹمز محفوظ",
+      "title": "میرے بک مارکس"
     },
-    "savedOn": "Saved on {{date}}",
+    "savedOn": "{{date}} کو محفوظ کیا گیا",
     "toast": {
-      "cleared": "All bookmarks cleared",
-      "removed": "Removed from bookmarks"
+      "cleared": "تمام بک مارکس صاف کر دیے گئے",
+      "removed": "بک مارکس سے ہٹا دیا گیا"
     },
     "typeBadge": {
-      "dhikr": "DHIKR",
-      "dua": "DUA",
-      "hadith": "HADITH",
-      "quran": "QURAN"
+      "dhikr": "ذکر",
+      "dua": "دعا",
+      "hadith": "حدیث",
+      "quran": "قرآن"
     }
   },
   "calendar": {
     "events": {
-      "sectionTitle": "Upcoming Islamic Events"
+      "sectionTitle": "آنے والے اسلامی ایام"
     },
     "header": {
-      "title": "Islamic Calendar",
-      "todayHijri": "Today: {{day}} {{monthName}} {{year}} AH"
+      "title": "اسلامی کیلنڈر",
+      "todayHijri": "آج: {{day}} {{monthName}} {{year}} ہجری"
     },
     "months": {
-      "april": "April",
-      "august": "August",
-      "december": "December",
-      "february": "February",
-      "january": "January",
-      "july": "July",
-      "june": "June",
-      "march": "March",
-      "may": "May",
-      "november": "November",
-      "october": "October",
-      "september": "September"
+      "april": "اپریل",
+      "august": "اگست",
+      "december": "دسمبر",
+      "february": "فروری",
+      "january": "جنوری",
+      "july": "جولائی",
+      "june": "جون",
+      "march": "مارچ",
+      "may": "مئی",
+      "november": "نومبر",
+      "october": "اکتوبر",
+      "september": "ستمبر"
     },
     "weekdays": {
-      "fri": "Fri",
-      "mon": "Mon",
-      "sat": "Sat",
-      "sun": "Sun",
-      "thu": "Thu",
-      "tue": "Tue",
-      "wed": "Wed"
+      "fri": "جمعہ",
+      "mon": "پیر",
+      "sat": "ہفتہ",
+      "sun": "اتوار",
+      "thu": "جمعرات",
+      "tue": "منگل",
+      "wed": "بدھ"
     }
   },
   "cityPicker": {
     "empty": {
-      "text": "No cities match your search.\nTry another spelling, or use \"Use my current location\"."
+      "text": "آپ کی تلاش سے کوئی شہر نہیں ملا۔\nکوئی اور ہجے آزمائیں، یا \"میری موجودہ لوکیشن استعمال کریں\" دبائیں۔"
     },
     "header": {
-      "title": "Select City"
+      "title": "شہر منتخب کریں"
     },
-    "searchPlaceholder": "Search city, country or لاہور",
-    "useCurrentLocation": "Use my current location"
+    "searchPlaceholder": "شہر، ملک یا لاہور تلاش کریں",
+    "useCurrentLocation": "میری موجودہ لوکیشن استعمال کریں"
   },
   "common": {
-    "add": "Add",
-    "back": "Back",
-    "cancel": "Cancel",
-    "clear": "Clear",
-    "close": "Close",
-    "comingSoon": "Coming Soon",
-    "confirm": "Confirm",
-    "delete": "Delete",
-    "done": "Done",
-    "edit": "Edit",
-    "error": "Error",
-    "loading": "Loading…",
-    "next": "Next",
-    "no": "No",
-    "ok": "OK",
-    "previous": "Previous",
-    "remove": "Remove",
-    "reset": "Reset",
-    "retry": "Retry",
-    "save": "Save",
-    "search": "Search",
-    "settings": "Settings",
-    "share": "Share",
-    "tryAgain": "Try Again",
-    "yes": "Yes"
+    "add": "شامل کریں",
+    "back": "واپس",
+    "cancel": "منسوخ",
+    "clear": "صاف کریں",
+    "close": "بند کریں",
+    "comingSoon": "جلد آ رہا ہے",
+    "confirm": "تصدیق",
+    "delete": "حذف کریں",
+    "done": "مکمل",
+    "edit": "ترمیم",
+    "error": "خرابی",
+    "loading": "لوڈ ہو رہا ہے…",
+    "next": "اگلا",
+    "no": "نہیں",
+    "ok": "ٹھیک ہے",
+    "previous": "پچھلا",
+    "remove": "ہٹائیں",
+    "reset": "ری سیٹ",
+    "retry": "دوبارہ کوشش",
+    "save": "محفوظ کریں",
+    "search": "تلاش",
+    "settings": "ترتیبات",
+    "share": "شیئر",
+    "tryAgain": "دوبارہ کوشش کریں",
+    "yes": "ہاں"
   },
   "customAdhan": {
     "audioUnavailable": {
-      "message": "This build does not include audio playback support.",
-      "title": "Audio unavailable"
+      "message": "اس بلڈ میں آڈیو چلانے کی سہولت شامل نہیں ہے۔",
+      "title": "آڈیو دستیاب نہیں"
     },
-    "note": "Note: Tap the play button to preview each Adhan sound. Your selection is saved automatically.",
-    "noteNoAudio": "\n\nAudio preview requires expo-av. Run: npx expo install expo-av",
+    "note": "نوٹ: ہر اذان کی آواز سننے کے لیے پلے کا بٹن دبائیں۔ آپ کا انتخاب خودبخود محفوظ ہو جاتا ہے۔",
+    "noteNoAudio": "\n\nآڈیو پیش نظارے کے لیے expo-av درکار ہے۔ چلائیں: npx expo install expo-av",
     "previewError": {
-      "message": "Failed to load audio preview. Check your connection.",
-      "title": "Preview unavailable"
+      "message": "آڈیو پیش نظارہ لوڈ نہیں ہو سکا۔ اپنا کنکشن چیک کریں۔",
+      "title": "پیش نظارہ دستیاب نہیں"
     },
-    "subtitle": "Choose a different Adhan sound for each prayer",
-    "title": "Custom Adhan"
+    "subtitle": "ہر نماز کے لیے الگ اذان کی آواز منتخب کریں",
+    "title": "اپنی پسند کی اذان"
   },
   "customizeHome": {
     "alerts": {
       "reset": {
-        "confirm": "Reset",
-        "message": "This will restore the home screen tiles to their default selection.",
-        "title": "Reset to Default?"
+        "confirm": "ری سیٹ کریں",
+        "message": "اس سے ہوم اسکرین کی ٹائلیں اپنی ڈیفالٹ ترتیب پر واپس آ جائیں گی۔",
+        "title": "ڈیفالٹ پر واپس کریں؟"
       },
       "resetComplete": {
-        "message": "Home tiles restored to default.",
-        "title": "Reset Complete"
+        "message": "ہوم ٹائلیں ڈیفالٹ پر واپس کر دی گئیں۔",
+        "title": "ری سیٹ مکمل"
       }
     },
-    "explainer": "These core features cannot be hidden",
-    "resetBtn": "Reset to Default",
+    "explainer": "یہ بنیادی فیچرز چھپائے نہیں جا سکتے",
+    "resetBtn": "ڈیفالٹ پر واپس کریں",
     "sections": {
-      "alwaysShown": "Always Shown",
-      "optional": "Optional"
+      "alwaysShown": "ہمیشہ دکھائے جائیں",
+      "optional": "اختیاری"
     },
-    "subtitle": "Choose which features appear on your home screen"
+    "subtitle": "منتخب کریں کہ آپ کی ہوم اسکرین پر کون سے فیچرز نظر آئیں"
   },
   "dailyKnowledge": {
     "pills": {
-      "hadith": "Hadith",
-      "nameOfAllah": "Name of Allah",
-      "quranVerse": "Quran Verse",
-      "reflection": "Reflection"
+      "hadith": "حدیث",
+      "nameOfAllah": "اللہ کا نام",
+      "quranVerse": "قرآنی آیت",
+      "reflection": "غور و فکر"
     },
-    "stale": "Updated {{time}}"
+    "stale": "اپڈیٹ ہوا {{time}}"
   },
   "dhikr": {
-    "countWithTasbeeh": "Count this with Tasbeeh →",
+    "countWithTasbeeh": "اسے تسبیح کے ساتھ گنیں ←",
     "loading": {
-      "subtitle": "Please come back in a moment, in shaa Allah.",
-      "title": "Dhikr content is loading"
+      "subtitle": "براہِ کرم تھوڑی دیر بعد دوبارہ آئیں، ان شاء اللہ۔",
+      "title": "ذکر کا مواد لوڈ ہو رہا ہے"
     }
   },
   "downloads": {
     "alerts": {
       "downloadError": {
-        "comingSoon": "This pack is coming soon!",
-        "generic": "Download failed. Check your internet connection and try again.",
-        "needsFileSystem": "This pack requires expo-file-system. Run: npx expo install expo-file-system",
-        "oneOrMore": "One or more packs failed. Check your connection.",
-        "title": "Download Error"
+        "comingSoon": "یہ پیک جلد آ رہا ہے!",
+        "generic": "ڈاؤن لوڈ ناکام۔ اپنا انٹرنیٹ کنکشن چیک کر کے دوبارہ کوشش کریں۔",
+        "needsFileSystem": "اس پیک کے لیے expo-file-system درکار ہے۔ چلائیں: npx expo install expo-file-system",
+        "oneOrMore": "ایک یا زیادہ پیک ناکام ہو گئے۔ اپنا کنکشن چیک کریں۔",
+        "title": "ڈاؤن لوڈ میں خرابی"
       },
       "mobileData": {
-        "continue": "Continue",
-        "message": "Wi-Fi Only is enabled. We cannot verify your connection type. Are you sure you want to continue?",
-        "title": "Mobile Data Warning"
+        "continue": "جاری رکھیں",
+        "message": "صرف Wi-Fi والا آپشن آن ہے۔ ہم آپ کے کنکشن کی قسم کی تصدیق نہیں کر سکتے۔ کیا آپ واقعی جاری رکھنا چاہتے ہیں؟",
+        "title": "موبائل ڈیٹا کی وارننگ"
       },
       "noConnection": {
-        "message": "You appear to be offline. Downloads are unavailable.",
-        "title": "No Connection"
+        "message": "ایسا لگتا ہے کہ آپ آف لائن ہیں۔ ڈاؤن لوڈ دستیاب نہیں۔",
+        "title": "کوئی کنکشن نہیں"
       },
       "notAvailable": {
-        "comingSoon": "This pack is coming in a future update.",
-        "title": "Not Available"
+        "comingSoon": "یہ پیک آنے والے کسی اپڈیٹ میں دستیاب ہوگا۔",
+        "title": "دستیاب نہیں"
       },
       "removePack": {
-        "confirm": "Delete",
-        "message": "Offline data for this pack will be deleted from your device.",
-        "title": "Remove \"{{title}}\"?"
+        "confirm": "حذف کریں",
+        "message": "اس پیک کا آف لائن ڈیٹا آپ کے ڈیوائس سے حذف ہو جائے گا۔",
+        "title": "\"{{title}}\" ہٹائیں؟"
       }
     },
-    "allDone": "All packs downloaded — full offline access!",
-    "downloadAll": "Download All Available Packs",
-    "downloading": "Downloading…",
-    "footer": "Tap the refresh icon to re-download a pack. Tap trash to remove it.\nAudio and book packs require additional packages.",
+    "allDone": "تمام پیک ڈاؤن لوڈ ہو گئے — مکمل آف لائن رسائی!",
+    "downloadAll": "تمام دستیاب پیک ڈاؤن لوڈ کریں",
+    "downloading": "ڈاؤن لوڈ ہو رہا ہے…",
+    "footer": "کسی پیک کو دوبارہ ڈاؤن لوڈ کرنے کے لیے ریفریش کا آئیکن دبائیں۔ ہٹانے کے لیے ڈسٹ بن دبائیں۔\nآڈیو اور کتاب کے پیک کے لیے اضافی پیکجز درکار ہیں۔",
     "offline": {
-      "banner": "You are offline — downloads unavailable"
+      "banner": "آپ آف لائن ہیں — ڈاؤن لوڈ دستیاب نہیں"
     },
     "packs": {
       "adhanSounds": {
-        "subtitle": "8 authentic Adhan recordings",
-        "title": "Adhan Sounds"
+        "subtitle": "8 مستند اذان کی ریکارڈنگز",
+        "title": "اذان کی آوازیں"
       },
       "calendar": {
-        "subtitle": "Hijri dates + events · 12 months ahead",
-        "title": "Islamic Calendar"
+        "subtitle": "ہجری تاریخیں + ایونٹس · 12 ماہ آگے تک",
+        "title": "اسلامی کیلنڈر"
       },
       "duas": {
-        "subtitle": "Hisnul Muslim complete + Supabase duas",
-        "title": "Duas & Dhikr"
+        "subtitle": "مکمل حصنُ المسلم + Supabase کی دعائیں",
+        "title": "دعائیں اور ذکر"
       },
       "hadiths": {
-        "subtitle": "Bukhari · Muslim · Tirmidhi · Abu Dawud · Ibn Majah · Nasai",
-        "title": "Hadith Collections"
+        "subtitle": "بخاری · مسلم · ترمذی · ابو داؤد · ابن ماجہ · نسائی",
+        "title": "حدیث کے مجموعے"
       },
       "islamicBooks": {
-        "subtitle": "Curated Islamic literature library",
-        "title": "Islamic Books"
+        "subtitle": "منتخب اسلامی ادب کی لائبریری",
+        "title": "اسلامی کتب"
       },
       "names99": {
-        "subtitle": "Arabic · transliteration · full meanings",
-        "title": "99 Names of Allah"
+        "subtitle": "عربی · رومن · مکمل معانی",
+        "title": "اللہ کے 99 نام"
       },
       "prayerTimes": {
-        "subtitle": "Pre-cached prayer times for your location",
-        "title": "Prayer Times Cache"
+        "subtitle": "آپ کے مقام کے لیے پہلے سے محفوظ نماز کے اوقات",
+        "title": "نماز کے اوقات کیش"
       },
       "quranAudioAbdulBasit": {
-        "subtitle": "Abdul Basit Abdus Samad · Murattal style",
-        "title": "Quran Audio — Abdul Basit"
+        "subtitle": "عبد الباسط عبد الصمد · مرتل انداز",
+        "title": "قرآن آڈیو — عبد الباسط"
       },
       "quranAudioAlafasy": {
-        "subtitle": "Mishary Alafasy recitation · Full 114 surahs",
-        "title": "Quran Audio — Alafasy"
+        "subtitle": "مشاری العفاسی کی تلاوت · مکمل 114 سورتیں",
+        "title": "قرآن آڈیو — العفاسی"
       },
       "quranText": {
-        "subtitle": "Full Arabic + English · 114 surahs · via Supabase",
-        "title": "Quran Text"
+        "subtitle": "مکمل عربی + انگریزی · 114 سورتیں · Supabase کے ذریعے",
+        "title": "قرآن متن"
       }
     },
-    "sectionLabel": "Content Packs",
+    "sectionLabel": "مواد کے پیک",
     "status": {
-      "downloaded": "Downloaded",
-      "downloading": "Downloading {{pct}}%",
-      "notDownloaded": "Not Downloaded",
-      "unavailable": "Unavailable"
+      "downloaded": "ڈاؤن لوڈ ہو گیا",
+      "downloading": "ڈاؤن لوڈ ہو رہا ہے {{pct}}%",
+      "notDownloaded": "ڈاؤن لوڈ نہیں ہوا",
+      "unavailable": "دستیاب نہیں"
     },
     "storage": {
-      "label": "Storage Used",
-      "packsCount": "of {{total}} packs",
-      "total": "of ~{{total}} MB total"
+      "label": "استعمال شدہ اسٹوریج",
+      "packsCount": "کل {{total}} پیک میں سے",
+      "total": "کل ~{{total}} MB میں سے"
     },
-    "supabaseNote": "Quran, Hadiths, Duas & Names are synced from your Supabase database when available.",
+    "supabaseNote": "قرآن، احادیث، دعائیں اور نام دستیاب ہونے پر آپ کے Supabase ڈیٹابیس سے سنک ہوتے ہیں۔",
     "wifi": {
-      "subOff": "Downloads may use mobile data",
-      "subOn": "Remind me to check connection before downloading",
-      "title": "Wi-Fi Only"
+      "subOff": "ڈاؤن لوڈ میں موبائل ڈیٹا استعمال ہو سکتا ہے",
+      "subOn": "ڈاؤن لوڈ سے پہلے مجھے کنکشن چیک کرنے کی یاد دہانی کرائیں",
+      "title": "صرف Wi-Fi"
     }
   },
   "dua": {
     "duas": {
       "categories": {
-        "distress": "Distress",
-        "dua_parents": "Parents",
-        "eating": "Eating",
-        "evening": "Evening",
-        "forgiveness": "Forgiveness",
-        "friday": "Friday",
-        "knowledge": "Knowledge",
-        "marriage": "Marriage",
-        "morning": "Morning",
-        "mosque": "Mosque",
-        "prayer": "Prayer",
-        "protection": "Protection",
-        "rain": "Patience",
-        "rizq": "Rizq",
-        "sickness": "Sickness",
-        "sleep": "Sleep",
-        "travel": "Travel",
-        "waking": "Waking"
+        "distress": "پریشانی",
+        "dua_parents": "والدین",
+        "eating": "کھانا",
+        "evening": "شام",
+        "forgiveness": "مغفرت",
+        "friday": "جمعہ",
+        "knowledge": "علم",
+        "marriage": "نکاح",
+        "morning": "صبح",
+        "mosque": "مسجد",
+        "prayer": "نماز",
+        "protection": "حفاظت",
+        "rain": "صبر",
+        "rizq": "رزق",
+        "sickness": "بیماری",
+        "sleep": "نیند",
+        "travel": "سفر",
+        "waking": "بیداری"
       },
-      "disclaimer": "ℹ️ Urdu translations are based on authentic Islamic sources. For verification, please refer to printed Hisn al-Muslim Urdu edition.",
+      "disclaimer": "ℹ️ اردو تراجم مستند اسلامی ماخذ پر مبنی ہیں۔ تصدیق کے لیے براہِ کرم حصنُ المسلم کے چھپے ہوئے اردو ایڈیشن سے رجوع کریں۔",
       "empty": {
-        "categorySubtitle": "We're adding more soon InshaAllah",
-        "categoryTitle": "No duas in this category yet",
-        "searchSubtitle": "Try different keywords or clear the search",
-        "searchTitle": "No duas match your search"
+        "categorySubtitle": "ان شاء اللہ جلد مزید شامل کر رہے ہیں",
+        "categoryTitle": "اس زمرے میں ابھی کوئی دعا نہیں",
+        "searchSubtitle": "مختلف الفاظ آزمائیں یا تلاش صاف کریں",
+        "searchTitle": "آپ کی تلاش سے کوئی دعا نہیں ملی"
       },
-      "reference": "Reference:",
+      "reference": "حوالہ:",
       "search": {
-        "placeholder": "Search English, transliteration, or reference (e.g. Bukhari)…"
+        "placeholder": "انگریزی، رومن یا حوالے سے تلاش کریں (مثلاً بخاری)…"
       },
-      "translationUnavailable": "Translation not available",
-      "transliterationUnavailable": "Transliteration not available"
+      "translationUnavailable": "ترجمہ دستیاب نہیں",
+      "transliterationUnavailable": "رومن لکھائی دستیاب نہیں"
     },
     "moment": {
-      "badge": "Dua of the Moment",
-      "loading": "Loading dua of the moment…",
-      "reference": "Reference:"
+      "badge": "اس وقت کی دعا",
+      "loading": "اس وقت کی دعا لوڈ ہو رہی ہے…",
+      "reference": "حوالہ:"
     },
-    "screenTitle": "Dua & Dhikr",
+    "screenTitle": "دعا و ذکر",
     "tabs": {
-      "dhikr": "Dhikr",
-      "duas": "Duas",
-      "moment": "Moment",
-      "tasbeeh": "Tasbeeh"
+      "dhikr": "ذکر",
+      "duas": "دعائیں",
+      "moment": "موقع",
+      "tasbeeh": "تسبیح"
     }
   },
   "errors": {
     "generic": {
-      "retryBtn": "Try Again"
+      "retryBtn": "دوبارہ کوشش کریں"
     }
   },
   "feedback": {
     "alerts": {
       "offline": {
-        "message": "Submitting feedback needs an internet connection. Connect and try again.",
-        "title": "You appear to be offline"
+        "message": "فیڈ بیک بھیجنے کے لیے انٹرنیٹ کنکشن درکار ہے۔ کنیکٹ ہو کر دوبارہ کوشش کریں۔",
+        "title": "لگتا ہے آپ آف لائن ہیں"
       },
       "permissionNeeded": {
-        "message": "Please allow photo library access to attach a screenshot.",
-        "title": "Permission needed"
+        "message": "اسکرین شاٹ منسلک کرنے کے لیے براہِ کرم فوٹو لائبریری تک رسائی کی اجازت دیں۔",
+        "title": "اجازت درکار ہے"
       },
       "pickerError": {
-        "title": "Could not open picker"
+        "title": "پکر نہیں کھل سکا"
       },
       "screenshotFailed": {
-        "message": "Submit feedback without the screenshot?",
-        "submitAnyway": "Submit anyway",
-        "title": "Screenshot upload failed"
+        "message": "اسکرین شاٹ کے بغیر فیڈ بیک بھیج دیں؟",
+        "submitAnyway": "پھر بھی بھیجیں",
+        "title": "اسکرین شاٹ اپ لوڈ نہیں ہو سکا"
       },
       "submitFailed": {
-        "title": "Submit Failed"
+        "title": "بھیجنے میں ناکامی"
       },
       "success": {
-        "message": "Your feedback has been received.",
-        "title": "JazakAllah Khair!"
+        "message": "آپ کا فیڈ بیک موصول ہو گیا ہے۔",
+        "title": "جزاک اللہ خیر!"
       },
       "tooShort": {
-        "message": "Please write at least 10 characters.",
-        "title": "Message Too Short"
+        "message": "براہِ کرم کم از کم 10 حروف لکھیں۔",
+        "title": "پیغام بہت مختصر ہے"
       }
     },
     "categories": {
-      "Bug": "Bug",
-      "ContentIssue": "Content Issue",
-      "Other": "Other",
-      "Suggestion": "Suggestion"
+      "Bug": "بگ/خرابی",
+      "ContentIssue": "مواد کا مسئلہ",
+      "Other": "دیگر",
+      "Suggestion": "تجویز"
     },
     "charCount": {
-      "remaining": "({{n}} more needed)"
+      "remaining": "(مزید {{n}} درکار ہیں)"
     },
-    "deviceNote": "Your app version, OS, and device model will be included automatically.",
-    "errorNote": "Submission failed. Please check your connection and try again.",
+    "deviceNote": "آپ کا ایپ ورژن، آپریٹنگ سسٹم اور ڈیوائس ماڈل خود بخود شامل کر دیا جائے گا۔",
+    "errorNote": "بھیجنے میں ناکامی ہوئی۔ براہِ کرم اپنا کنکشن چیک کر کے دوبارہ کوشش کریں۔",
     "header": {
-      "sub": "Help us improve Islam Daily",
-      "title": "Share Feedback"
+      "sub": "Islam Daily کو بہتر بنانے میں ہماری مدد کریں",
+      "title": "فیڈ بیک شیئر کریں"
     },
     "labels": {
-      "category": "CATEGORY",
-      "email": "EMAIL (OPTIONAL)",
-      "message": "MESSAGE *",
-      "name": "YOUR NAME (OPTIONAL)",
-      "rating": "RATING (OPTIONAL)",
-      "screenshot": "SCREENSHOT (OPTIONAL)"
+      "category": "زمرہ",
+      "email": "ای میل (اختیاری)",
+      "message": "پیغام *",
+      "name": "آپ کا نام (اختیاری)",
+      "rating": "ریٹنگ (اختیاری)",
+      "screenshot": "اسکرین شاٹ (اختیاری)"
     },
     "placeholders": {
-      "email": "So we can follow up",
-      "message": "Share your thoughts, suggestions, or issues... (min 10 characters)",
-      "name": "Anonymous"
+      "email": "تاکہ ہم رابطہ کر سکیں",
+      "message": "اپنے خیالات، تجاویز یا مسائل لکھیں… (کم از کم 10 حروف)",
+      "name": "گمنام"
     },
     "screenshot": {
-      "attach": "Attach screenshot",
-      "attached": "Image attached"
+      "attach": "اسکرین شاٹ منسلک کریں",
+      "attached": "تصویر منسلک ہو گئی"
     },
-    "submit": "Submit Feedback",
+    "submit": "فیڈ بیک بھیجیں",
     "success": {
-      "goBack": "Go Back",
-      "text": "Your feedback has been submitted. We read every message.",
-      "title": "JazakAllah Khair!"
+      "goBack": "واپس جائیں",
+      "text": "آپ کا فیڈ بیک بھیج دیا گیا ہے۔ ہم ہر پیغام پڑھتے ہیں۔",
+      "title": "جزاک اللہ خیر!"
     }
   },
   "hadith": {
     "actions": {
-      "tryAgain": "Try again"
+      "tryAgain": "دوبارہ کوشش کریں"
     },
     "collections": {
-      "hadithsCount": "{{count}} hadiths",
-      "selectLabel": "SELECT A COLLECTION"
+      "hadithsCount": "{{count}} احادیث",
+      "selectLabel": "ایک مجموعہ منتخب کریں"
     },
     "download": {
-      "connectionLost": "Connection lost — we'll resume when online",
-      "downloading": "Downloading {{name}} for offline reading…",
-      "pausedRetry": "Download paused — we'll retry",
-      "preparing": "Preparing {{name}}…"
+      "connectionLost": "کنکشن منقطع ہو گیا — انٹرنیٹ آتے ہی دوبارہ شروع کر دیں گے",
+      "downloading": "آف لائن مطالعے کے لیے {{name}} ڈاؤن لوڈ ہو رہی ہے…",
+      "pausedRetry": "ڈاؤن لوڈ رک گیا — ہم دوبارہ کوشش کریں گے",
+      "preparing": "{{name}} تیار کی جا رہی ہے…"
     },
     "empty": {
-      "noResults": "No hadiths found.",
-      "notDownloaded": "{{name}} not yet downloaded",
-      "notDownloadedBody": "Connect to the internet once and {{name}} will be available offline forever.",
-      "preparing": "Preparing {{name}}…",
-      "preparingBody": "First load only — cached forever after this."
+      "noResults": "کوئی حدیث نہیں ملی۔",
+      "notDownloaded": "{{name}} ابھی ڈاؤن لوڈ نہیں ہوئی",
+      "notDownloadedBody": "ایک بار انٹرنیٹ سے جُڑ جائیں، پھر {{name}} ہمیشہ کے لیے آف لائن دستیاب ہو جائے گی۔",
+      "preparing": "{{name}} تیار کی جا رہی ہے…",
+      "preparingBody": "صرف پہلی بار — اس کے بعد ہمیشہ کے لیے محفوظ رہے گی۔"
     },
     "header": {
-      "subtitle": "Authentic narrations of the Prophet  ﷺ",
-      "title": "Hadith Collections"
+      "subtitle": "نبی ﷺ کی مستند احادیث",
+      "title": "حدیث کے مجموعے"
     },
     "search": {
-      "hadithsCount": "{{count}} hadiths",
-      "hint": "Type a hadith number (e.g. 35) for exact match, or text to search content",
-      "placeholder": "Search by number or keyword...",
-      "resultsCount": "{{count}} results"
+      "hadithsCount": "{{count}} احادیث",
+      "hint": "بالکل درست نتیجے کے لیے حدیث نمبر لکھیں (مثلاً 35)، یا مواد تلاش کرنے کے لیے متن لکھیں",
+      "placeholder": "نمبر یا کلیدی لفظ سے تلاش کریں...",
+      "resultsCount": "{{count}} نتائج"
     }
   },
   "halalFinder": {
-    "autoExpand": "No restaurants within {{requested}}km — showing within {{effective}}km",
-    "directions": "Go",
+    "autoExpand": "{{requested}}km کے اندر کوئی ریسٹورنٹ نہیں — {{effective}}km کے اندر دکھائے جا رہے ہیں",
+    "directions": "چلیں",
     "distance": {
-      "km": "{{km}} km away",
-      "meters": "{{m}} m away"
+      "km": "{{km}} km دور",
+      "meters": "{{m}} m دور"
     },
-    "empty": "No halal restaurants found within {{radius}}km. Try expanding your radius.",
+    "empty": "{{radius}}km کے اندر کوئی حلال ریسٹورنٹ نہیں ملا۔ اپنا دائرہ بڑھا کر دیکھیں۔",
     "errors": {
-      "fetchFailed": "Failed to find restaurants. Please try again in a moment.",
-      "locationDenied": "Location permission denied. Please enable location access in Settings.",
-      "locationFailed": "Failed to get your location."
+      "fetchFailed": "ریسٹورنٹس تلاش کرنے میں ناکامی۔ براہِ کرم تھوڑی دیر بعد دوبارہ کوشش کریں۔",
+      "locationDenied": "لوکیشن کی اجازت نہیں دی گئی۔ براہِ کرم سیٹنگز میں لوکیشن تک رسائی فعال کریں۔",
+      "locationFailed": "آپ کی لوکیشن حاصل کرنے میں ناکامی۔"
     },
     "halalCert": {
-      "byName": "Halal (by name)",
-      "certified": "Halal certified",
-      "cuisine": "Halal cuisine"
+      "byName": "حلال (نام کے لحاظ سے)",
+      "certified": "حلال سرٹیفائیڈ",
+      "cuisine": "حلال کھانے"
     },
     "header": {
-      "found": "Found {{count}} {{restaurantWord}} within {{radius}}km",
-      "loading": "Finding halal restaurants near you...",
-      "locating": "Finding your location...",
-      "none": "No restaurants within {{radius}}km",
-      "title": "Halal Restaurants"
+      "found": "{{radius}}km کے اندر {{count}} {{restaurantWord}} ملے",
+      "loading": "آپ کے قریب حلال ریسٹورنٹس تلاش کیے جا رہے ہیں…",
+      "locating": "آپ کی لوکیشن تلاش کی جا رہی ہے…",
+      "none": "{{radius}}km کے اندر کوئی ریسٹورنٹ نہیں",
+      "title": "حلال ریسٹورنٹس"
     },
-    "loading": "Finding halal restaurants nearby...",
-    "openSettings": "Open Settings"
+    "loading": "قریبی حلال ریسٹورنٹس تلاش کیے جا رہے ہیں…",
+    "openSettings": "سیٹنگز کھولیں"
   },
   "hifz": {
-    "error": "Could not load the surah list. Check your connection and try again.",
-    "loading": "Loading surahs...",
+    "error": "سورتوں کی فہرست لوڈ نہیں ہو سکی۔ اپنا کنکشن چیک کر کے دوبارہ کوشش کریں۔",
+    "loading": "سورتیں لوڈ ہو رہی ہیں...",
     "progress": {
-      "stats": "{{memorized}} / {{total}} Surahs Memorized",
-      "title": "Hifz Progress"
+      "stats": "{{memorized}} / {{total}} سورتیں حفظ مکمل",
+      "title": "حفظ کی پیش رفت"
     },
     "surah": {
-      "verses": "{{count}} verses"
+      "verses": "{{count}} آیات"
     }
   },
   "home": {
     "footer": {
-      "tagline": "Built with love for the Ummah",
+      "tagline": "امت کے لیے محبت سے بنایا گیا",
       "version": "Islam Daily v1.0.0"
     },
     "greeting": {
-      "salam": "Assalamu Alaikum"
+      "salam": "السلام علیکم"
     },
     "moreSections": {
-      "calculators": "Calculators",
-      "islamicKnowledge": "Islamic Knowledge",
+      "calculators": "کیلکولیٹرز",
+      "islamicKnowledge": "اسلامی معلومات",
       "items": {
         "calendar": {
-          "label": "Islamic Calendar",
-          "sub": "Hijri dates"
+          "label": "اسلامی کیلنڈر",
+          "sub": "ہجری تاریخیں"
         },
         "feedback": {
-          "label": "Feedback",
-          "sub": "Share thoughts"
+          "label": "فیڈبیک",
+          "sub": "اپنی رائے دیں"
         },
         "hadith": {
-          "label": "Hadith",
-          "sub": "6 collections"
+          "label": "حدیث",
+          "sub": "6 مجموعے"
         },
         "halal-finder": {
-          "label": "Halal Finder",
-          "sub": "Halal restaurants"
+          "label": "حلال فائنڈر",
+          "sub": "حلال ریستوران"
         },
         "hifz-tracker": {
-          "label": "Hifz Tracker",
-          "sub": "Track memorization"
+          "label": "حفظ ٹریکر",
+          "sub": "حفظ کا ریکارڈ"
         },
         "islamic-books": {
-          "label": "Islamic Books",
-          "sub": "Free PDFs"
+          "label": "اسلامی کتب",
+          "sub": "مفت PDFs"
         },
         "mosque-finder": {
-          "label": "Mosque Finder",
-          "sub": "Near you"
+          "label": "مسجد فائنڈر",
+          "sub": "آپ کے قریب"
         },
         "names": {
-          "label": "99 Names of Allah",
-          "sub": "Asmaul Husna"
+          "label": "اللہ کے 99 نام",
+          "sub": "اسماءُ الحسنیٰ"
         },
         "ramadan": {
-          "label": "Ramadan Mode",
-          "sub": "Sehri & Iftar"
+          "label": "رمضان موڈ",
+          "sub": "سحری و افطار"
         },
         "zakat-calculator": {
-          "label": "Zakat Calculator",
-          "sub": "Calculate zakat"
+          "label": "زکوٰۃ کیلکولیٹر",
+          "sub": "زکوٰۃ کا حساب"
         }
       },
-      "personal": "Personal",
-      "tools": "Tools"
+      "personal": "ذاتی",
+      "tools": "ٹولز"
     },
     "prayerNext": {
-      "label": "NEXT PRAYER"
+      "label": "اگلی نماز"
     },
     "quick": {
       "dua": {
-        "label": "Duas",
-        "sub": "Hisnul Muslim"
+        "label": "دعائیں",
+        "sub": "حصنُ المسلم"
       },
       "prayer-times": {
-        "label": "Prayer Times",
-        "sub": "All 5 prayers"
+        "label": "نماز کے اوقات",
+        "sub": "پانچوں نمازیں"
       },
-      "prayerNextSub": "Next: {{name}} {{time}}",
+      "prayerNextSub": "اگلی: {{name}} {{time}}",
       "qibla": {
-        "label": "Qibla",
-        "sub": "Find direction"
+        "label": "قبلہ",
+        "sub": "سمت معلوم کریں"
       },
       "quran": {
-        "label": "Quran",
-        "sub": "Read & Listen"
+        "label": "قرآن",
+        "sub": "پڑھیں و سنیں"
       }
     },
     "ramadan": {
-      "banner": "🌙 Ramadan Mubarak",
-      "iftar": "Iftar: {{time}}",
-      "sehri": "Sehri: {{time}}"
+      "banner": "🌙 رمضان مبارک",
+      "iftar": "افطار: {{time}}",
+      "sehri": "سحری: {{time}}"
     },
     "sections": {
-      "moreFeatures": "More Features",
-      "quickAccess": "Quick Access"
+      "moreFeatures": "مزید فیچرز",
+      "quickAccess": "فوری رسائی"
     },
     "tiles": {
-      "calendar": "Islamic Calendar",
-      "dua": "Duas",
-      "feedback": "Feedback",
-      "hadith": "Hadith",
-      "halal-finder": "Halal Finder",
-      "hifz-tracker": "Hifz Tracker",
-      "islamic-books": "Islamic Books",
-      "mosque-finder": "Mosque Finder",
-      "names": "99 Names of Allah",
-      "prayer-streak": "Prayer Streak",
-      "prayer-times": "Prayer Times",
-      "qibla": "Qibla",
-      "quran": "Quran",
-      "ramadan": "Ramadan Mode",
-      "zakat-calculator": "Zakat Calculator"
+      "calendar": "اسلامی کیلنڈر",
+      "dua": "دعائیں",
+      "feedback": "فیڈبیک",
+      "hadith": "حدیث",
+      "halal-finder": "حلال فائنڈر",
+      "hifz-tracker": "حفظ ٹریکر",
+      "islamic-books": "اسلامی کتب",
+      "mosque-finder": "مسجد فائنڈر",
+      "names": "اللہ کے 99 نام",
+      "prayer-streak": "نماز اسٹریک",
+      "prayer-times": "نماز کے اوقات",
+      "qibla": "قبلہ",
+      "quran": "قرآن",
+      "ramadan": "رمضان موڈ",
+      "zakat-calculator": "زکوٰۃ کیلکولیٹر"
     },
     "verseOfDay": {
-      "badge": "Verse of the Day",
-      "continue": "Continue Reading →",
-      "error": "Couldn't load today's verse. Tap to retry.",
-      "loading": "Loading verse...",
-      "title": "Verse of the Day"
+      "badge": "آج کی آیت",
+      "continue": "پڑھنا جاری رکھیں →",
+      "error": "آج کی آیت لوڈ نہیں ہو سکی۔ دوبارہ کوشش کے لیے ٹیپ کریں۔",
+      "loading": "آیت لوڈ ہو رہی ہے...",
+      "title": "آج کی آیت"
     }
   },
   "islamicBooks": {
     "badges": {
-      "available": "Available",
-      "comingSoon": "Coming Soon",
+      "available": "دستیاب",
+      "comingSoon": "جلد آ رہا ہے",
       "languages": {
-        "arabic": "Arabic",
-        "english": "English",
-        "urdu": "Urdu"
+        "arabic": "عربی",
+        "english": "انگریزی",
+        "urdu": "اردو"
       }
     },
-    "comingSoonText": "Book will be available soon. We are uploading our library.",
-    "footer": "We are uploading our own library. Books will be available soon, insha'Allah.",
+    "comingSoonText": "کتاب جلد دستیاب ہوگی۔ ہم اپنی لائبریری اپ لوڈ کر رہے ہیں۔",
+    "footer": "ہم اپنی لائبریری اپ لوڈ کر رہے ہیں۔ ان شاء اللہ کتابیں جلد دستیاب ہوں گی۔",
     "header": {
       "sub": "مكتبة إسلامية",
-      "title": "Islamic Library"
+      "title": "اسلامی لائبریری"
     },
     "tabs": {
-      "arabic": "Arabic",
-      "english": "English",
-      "urdu": "Urdu"
+      "arabic": "عربی",
+      "english": "انگریزی",
+      "urdu": "اردو"
     }
   },
   "language": {
-    "defaultName": "Urdu — Jalandhri",
+    "defaultName": "اردو — جالندھری",
     "header": {
-      "selected": "Selected: {{name}}",
-      "title": "Translation Language"
+      "selected": "منتخب شدہ: {{name}}",
+      "title": "ترجمہ کی زبان"
     },
-    "listHeader": "Choose a translation for the Quran reader. This applies across the app."
+    "listHeader": "قرآن ریڈر کے لیے ایک ترجمہ منتخب کریں۔ یہ پوری ایپ پر لاگو ہوگا۔"
   },
   "more": {
     "about": {
-      "tagline": "Built with care for the Muslim community",
+      "tagline": "مسلم کمیونٹی کے لیے محبت سے بنایا گیا",
       "version": "Islam Daily v1.0.0"
     },
     "bookmark": {
-      "saved": "{{count}} saved"
+      "saved": "{{count}} محفوظ"
     },
     "header": {
-      "sub": "Features & Settings",
-      "title": "More"
+      "sub": "فیچرز اور ترتیبات",
+      "title": "مزید"
     },
     "items": {
       "audioBooks": {
-        "label": "Audio Books",
-        "sub": "Lectures, Quran & Naats"
+        "label": "آڈیو کتب",
+        "sub": "بیانات، قرآن اور نعتیں"
       },
       "customAdhan": {
-        "label": "Custom Adhan",
-        "sub": "Choose Adhan per prayer"
+        "label": "اپنی پسند کی اذان",
+        "sub": "ہر نماز کے لیے اذان منتخب کریں"
       },
       "downloads": {
-        "label": "Downloads",
-        "sub": "Save content offline"
+        "label": "ڈاؤن لوڈز",
+        "sub": "مواد آف لائن محفوظ کریں"
       },
       "feedback": {
-        "label": "Feedback",
-        "sub": "Help us improve the app"
+        "label": "فیڈبیک",
+        "sub": "ایپ بہتر بنانے میں مدد کریں"
       },
       "hadithBrowser": {
-        "label": "Hadith Browser",
-        "sub": "6 major collections"
+        "label": "حدیث براؤزر",
+        "sub": "6 بڑے مجموعے"
       },
       "halalFinder": {
-        "label": "Halal Finder",
-        "sub": "Halal restaurants near you"
+        "label": "حلال فائنڈر",
+        "sub": "آپ کے قریب حلال ریستوران"
       },
       "hifzTracker": {
-        "label": "Hifz Tracker",
-        "sub": "Track your Quran memorization progress"
+        "label": "حفظ ٹریکر",
+        "sub": "قرآن کے حفظ کا ریکارڈ رکھیں"
       },
       "islamicBooks": {
-        "label": "Islamic Books",
-        "sub": "Free classic texts"
+        "label": "اسلامی کتب",
+        "sub": "مفت کلاسک کتب"
       },
       "islamicCalendar": {
-        "label": "Islamic Calendar",
-        "sub": "Hijri & Gregorian dates"
+        "label": "اسلامی کیلنڈر",
+        "sub": "ہجری اور عیسوی تاریخیں"
       },
       "mosqueFinder": {
-        "label": "Mosque Finder",
-        "sub": "Find mosques near you"
+        "label": "مسجد فائنڈر",
+        "sub": "اپنے قریب مساجد تلاش کریں"
       },
       "myBookmarks": {
-        "label": "My Bookmarks",
-        "sub": "Saved hadith, duas & dhikr"
+        "label": "میرے بک مارکس",
+        "sub": "محفوظ احادیث، دعائیں اور ذکر"
       },
       "names99": {
-        "label": "99 Names",
-        "sub": "Asma ul-Husna"
+        "label": "99 نام",
+        "sub": "اسماءُ الحسنیٰ"
       },
       "prayerTimes": {
-        "label": "Prayer Times",
-        "sub": "All 5 daily prayers"
+        "label": "نماز کے اوقات",
+        "sub": "پانچوں روزانہ نمازیں"
       },
       "qibla": {
-        "label": "Qibla Finder",
-        "sub": "Live compass to Makkah"
+        "label": "قبلہ فائنڈر",
+        "sub": "مکہ کی سمت لائیو کمپاس"
       },
       "ramadanMode": {
-        "label": "Ramadan Mode",
-        "sub": "Sehri, Iftar & timetable"
+        "label": "رمضان موڈ",
+        "sub": "سحری، افطار اور ٹائم ٹیبل"
       },
       "settings": {
-        "label": "Settings",
-        "sub": "Theme, font, preferences"
+        "label": "ترتیبات",
+        "sub": "تھیم، فونٹ، ترجیحات"
       },
       "translation": {
-        "label": "Translation",
-        "sub": "Quran translation language"
+        "label": "ترجمہ",
+        "sub": "قرآن کے ترجمے کی زبان"
       },
       "zakatCalculator": {
-        "label": "Zakat Calculator",
-        "sub": "Calculate your Zakat"
+        "label": "زکوٰۃ کیلکولیٹر",
+        "sub": "اپنی زکوٰۃ کا حساب لگائیں"
       }
     },
     "quote": {
-      "badge": "✨ Hadith of Wisdom"
+      "badge": "✨ حدیثِ حکمت"
     },
     "search": {
-      "label": "Search",
-      "sub": "Search the Quran by keyword"
+      "label": "تلاش",
+      "sub": "کلیدی لفظ سے قرآن میں تلاش کریں"
     },
     "sections": {
-      "islamicKnowledge": "Islamic Knowledge",
-      "prayerLocation": "Prayer & Location",
-      "quranMemorization": "Quran Memorization",
-      "settingsMore": "Settings & More",
-      "toolsCalculators": "Tools & Calculators"
+      "islamicKnowledge": "اسلامی معلومات",
+      "prayerLocation": "نماز اور مقام",
+      "quranMemorization": "قرآن کا حفظ",
+      "settingsMore": "ترتیبات اور مزید",
+      "toolsCalculators": "ٹولز اور کیلکولیٹرز"
     },
-    "soon": "SOON",
+    "soon": "جلد آرہا ہے",
     "tasbeeh": {
-      "label": "Tasbeeh Counter",
-      "sub": "Count your dhikr with timer"
+      "label": "تسبیح کاؤنٹر",
+      "sub": "ٹائمر کے ساتھ اپنا ذکر گنیں"
     }
   },
   "mosqueFinder": {
-    "autoExpand": "No mosques within {{requested}}km — showing within {{effective}}km",
-    "distance": "{{km}} km away",
+    "autoExpand": "{{requested}}km کے اندر کوئی مسجد نہیں — {{effective}}km کے اندر دکھائی جا رہی ہیں",
+    "distance": "{{km}} km دور",
     "empty": {
-      "body": "Connect to the internet to discover masjids around you with directions, prayer times, and reviews.",
-      "note": "Mosque locations need real-time data and can't be saved offline.",
-      "retryOffline": "Waiting for connection…",
-      "retryOnline": "Retry",
-      "title": "Find Mosques Nearby"
+      "body": "انٹرنیٹ سے جڑیں تاکہ اپنے قریب کی مساجد، ان کے راستے، نماز کے اوقات اور ریویوز دیکھ سکیں۔",
+      "note": "مساجد کے مقامات کے لیے لائیو ڈیٹا درکار ہے، اس لیے انہیں آف لائن محفوظ نہیں کیا جا سکتا۔",
+      "retryOffline": "کنکشن کا انتظار ہے…",
+      "retryOnline": "دوبارہ کوشش کریں",
+      "title": "قریبی مساجد تلاش کریں"
     },
-    "emptySearch": "No mosques found within {{radius}}km. Try expanding your radius.",
+    "emptySearch": "{{radius}}km کے اندر کوئی مسجد نہیں ملی۔ اپنا دائرہ بڑھا کر دیکھیں۔",
     "errors": {
-      "fetchFailed": "Failed to find mosques. Please try again in a moment.",
-      "locationDenied": "Location permission denied. Please enable location access.",
-      "locationFailed": "Failed to get your location."
+      "fetchFailed": "مساجد تلاش کرنے میں ناکامی۔ براہِ کرم تھوڑی دیر بعد دوبارہ کوشش کریں۔",
+      "locationDenied": "لوکیشن کی اجازت نہیں دی گئی۔ براہِ کرم لوکیشن تک رسائی فعال کریں۔",
+      "locationFailed": "آپ کی لوکیشن حاصل کرنے میں ناکامی۔"
     },
     "header": {
-      "found": "Found {{count}} {{mosqueWord}} within {{radius}}km",
-      "loading": "Finding mosques near you...",
-      "locating": "Finding your location...",
-      "none": "No mosques within {{radius}}km",
-      "sub": "Discover masjids near you",
-      "title": "Mosque Finder"
+      "found": "{{radius}}km کے اندر {{count}} {{mosqueWord}} ملیں",
+      "loading": "آپ کے قریب مساجد تلاش کی جا رہی ہیں…",
+      "locating": "آپ کی لوکیشن تلاش کی جا رہی ہے…",
+      "none": "{{radius}}km کے اندر کوئی مسجد نہیں",
+      "sub": "اپنے قریب کی مساجد دریافت کریں",
+      "title": "مسجد فائنڈر"
     },
-    "loading": "Finding mosques near you...",
-    "openSettings": "Open Settings"
+    "loading": "آپ کے قریب مساجد تلاش کی جا رہی ہیں…",
+    "openSettings": "سیٹنگز کھولیں"
   },
   "names": {
     "detail": {
       "counter": "{{id}} / 99",
-      "greatestName": "✦ The Greatest Name",
-      "meaningLabel": "Meaning"
+      "greatestName": "✦ اسمِ اعظم",
+      "meaningLabel": "معنی"
     },
     "header": {
-      "title": "99 Names of Allah"
+      "title": "اللہ کے 99 نام"
     }
   },
   "nav": {
     "titles": {
-      "audioLibrary": "Audio Library — آڈیو لائبریری",
-      "calendar": "Islamic Calendar",
-      "customAdhan": "Custom Adhan",
-      "customizeHome": "Customize Home Screen",
-      "downloads": "Offline Downloads",
-      "hadith": "Hadith Browser",
-      "halalFinder": "Halal Restaurant Finder",
-      "hifzTracker": "Hifz Tracker",
-      "islamicBooks": "Islamic Library",
-      "language": "Translation Language",
-      "mosqueFinder": "Mosque Finder",
-      "names": "99 Names of Allah",
-      "prayerStreak": "Prayer Streak",
-      "qibla": "Qibla Finder",
-      "quranReader": "Quran Reader",
-      "ramadan": "Ramadan",
-      "settings": "Settings",
-      "zakatCalculator": "Zakat Calculator"
+      "audioLibrary": "آڈیو لائبریری",
+      "calendar": "اسلامی کیلنڈر",
+      "customAdhan": "اپنی پسند کی اذان",
+      "customizeHome": "ہوم اسکرین ترتیب دیں",
+      "downloads": "آف لائن ڈاؤن لوڈز",
+      "hadith": "حدیث براؤزر",
+      "halalFinder": "حلال ریسٹورنٹ تلاش کریں",
+      "hifzTracker": "حفظ ٹریکر",
+      "islamicBooks": "اسلامی لائبریری",
+      "language": "ترجمہ کی زبان",
+      "mosqueFinder": "مسجد تلاش کریں",
+      "names": "اللہ کے 99 نام",
+      "prayerStreak": "نماز کا تسلسل",
+      "qibla": "قبلہ کی سمت",
+      "quranReader": "قرآن ریڈر",
+      "ramadan": "رمضان",
+      "settings": "ترتیبات",
+      "zakatCalculator": "زکوٰۃ کیلکولیٹر"
     }
   },
   "notifications": {
-    "aboutCard": "Notifications fire at exact prayer time, computed locally from your selected method and city.",
+    "aboutCard": "نوٹیفکیشن عین نماز کے وقت پر آتی ہیں، جو آپ کے منتخب کردہ طریقے اور شہر کے مطابق آپ کے ڈیوائس پر مقامی طور پر شمار کی جاتی ہیں۔",
     "alerts": {
-      "disabledMessage": "Permissions were denied previously. You can enable them in your device settings.",
-      "disabledTitle": "Notifications disabled",
-      "openSettings": "Open Settings",
-      "permRequiredMessage": "Allow notifications first to send a test.",
-      "permRequiredTitle": "Permission required",
-      "testSentMessage": "{{prayer}} test notification will arrive in a moment.",
-      "testSentTitle": "Test sent",
-      "webOnlyMessage": "Test notifications fire only on a real device or development build, not in the web preview.",
-      "webOnlyTitle": "Test on device"
+      "disabledMessage": "اجازت پہلے مسترد کر دی گئی تھی۔ آپ اسے اپنے ڈیوائس کی سیٹنگز میں آن کر سکتے ہیں۔",
+      "disabledTitle": "نوٹیفکیشن بند ہیں",
+      "openSettings": "سیٹنگز کھولیں",
+      "permRequiredMessage": "ٹیسٹ بھیجنے کے لیے پہلے نوٹیفکیشن کی اجازت دیں۔",
+      "permRequiredTitle": "اجازت درکار ہے",
+      "testSentMessage": "{{prayer}} کی ٹیسٹ نوٹیفکیشن تھوڑی دیر میں آ جائے گی۔",
+      "testSentTitle": "ٹیسٹ بھیج دیا گیا",
+      "webOnlyMessage": "ٹیسٹ نوٹیفکیشن صرف اصل ڈیوائس یا ڈیولپمنٹ بلڈ پر آتی ہیں، ویب پیش نظارے میں نہیں۔",
+      "webOnlyTitle": "ڈیوائس پر ٹیسٹ کریں"
     },
     "explainerModal": {
-      "allowBtn": "Allow notifications",
-      "body": "We'll notify you at each prayer time with your chosen sound — adhan, silent, or system tone. You can customize each prayer individually.",
-      "title": "Allow Islam Daily to send prayer notifications?"
+      "allowBtn": "نوٹیفکیشن کی اجازت دیں",
+      "body": "ہم ہر نماز کے وقت آپ کو آپ کی منتخب کردہ آواز کے ساتھ اطلاع دیں گے — اذان، خاموش، یا سسٹم ٹون۔ آپ ہر نماز کو الگ الگ اپنی پسند کے مطابق سیٹ کر سکتے ہیں۔",
+      "title": "Islam Daily کو نماز کی نوٹیفکیشن بھیجنے کی اجازت دیں؟"
     },
     "master": {
-      "label": "Enable prayer notifications",
-      "sub": "Master switch — turn off to silence all five prayers"
+      "label": "نماز کی نوٹیفکیشن آن کریں",
+      "sub": "مین سوئچ — اسے بند کرنے سے پانچوں نمازوں کی اطلاع خاموش ہو جائے گی"
     },
     "permission": {
-      "denied": "Permissions denied. Tap to open settings.",
-      "granted": "Permissions granted",
-      "undetermined": "Tap \"Enable prayer notifications\" to grant permission."
+      "denied": "اجازت مسترد کر دی گئی۔ سیٹنگز کھولنے کے لیے دبائیں۔",
+      "granted": "اجازت دے دی گئی",
+      "undetermined": "اجازت دینے کے لیے \"نماز کی نوٹیفکیشن آن کریں\" دبائیں۔"
     },
     "prayerNotif": {
       "body": "{{arabic}} · {{time}}{{cityPart}}"
     },
     "prayerRow": {
-      "today": "Today · {{time}}"
+      "today": "آج · {{time}}"
     },
     "sections": {
       "prayers": {
-        "subtitle": "Adhan reminders for the five daily prayers",
-        "title": "Notifications"
+        "subtitle": "پانچوں روزانہ نمازوں کے لیے اذان کی یاد دہانیاں",
+        "title": "نوٹیفکیشن"
       },
       "sunnah": {
-        "subtitle": "Optional voluntary reminders — separate from the five daily prayers",
-        "title": "Sunnah Reminders"
+        "subtitle": "اختیاری نفلی یاد دہانیاں — پانچوں روزانہ نمازوں سے الگ",
+        "title": "سنت کی یاد دہانیاں"
       }
     },
     "sound": {
       "options": {
-        "adhan": "Adhan",
-        "silent": "Silent",
-        "system": "System"
+        "adhan": "اذان",
+        "silent": "خاموش",
+        "system": "سسٹم"
       }
     },
     "tahajjud": {
-      "aboutCard": "Off by default. When on, the reminder time is recomputed from your prayer settings each day, so it always matches your Maghrib and Fajr.",
-      "name": "Tahajjud reminder",
-      "sub": "Fires once at the start of the last third of the night (Maghrib → Fajr)"
+      "aboutCard": "ڈیفالٹ طور پر بند ہے۔ آن ہونے پر، یاد دہانی کا وقت ہر روز آپ کی نماز کی سیٹنگز کے مطابق دوبارہ شمار ہوتا ہے، تاکہ یہ ہمیشہ آپ کے مغرب اور فجر کے مطابق رہے۔",
+      "name": "تہجد کی یاد دہانی",
+      "sub": "رات کے آخری تہائی حصے کے شروع میں ایک بار آتی ہے (مغرب → فجر)"
     },
     "tahajjudModal": {
-      "allowBtn": "Allow notifications",
-      "body": "We'll send one quiet reminder at the start of the last third of the night, with a verse to encourage night prayer. You can turn it off anytime.",
-      "title": "Allow Tahajjud reminders?"
+      "allowBtn": "نوٹیفکیشن کی اجازت دیں",
+      "body": "ہم رات کے آخری تہائی حصے کے شروع میں ایک خاموش یاد دہانی بھیجیں گے، جس میں رات کی نماز کی ترغیب دینے والی ایک آیت ہوگی۔ آپ اسے کسی بھی وقت بند کر سکتے ہیں۔",
+      "title": "تہجد کی یاد دہانیوں کی اجازت دیں؟"
     },
     "tahajjudNotif": {
-      "body": "\"And rise at night and pray, as an extra offering — that your Lord may raise you to a praiseworthy station.\" (Quran 17:79)",
-      "title": "Tahajjud — The Last Third of the Night"
+      "body": "\"اور رات کے کچھ حصے میں تہجد پڑھیں، یہ آپ کے لیے زائد (نفل) ہے — قریب ہے کہ آپ کا رب آپ کو مقامِ محمود پر فائز فرما دے۔\" (Quran 17:79)",
+      "title": "تہجد — رات کا آخری تہائی حصہ"
     },
-    "testBtn": "Test notification",
+    "testBtn": "ٹیسٹ نوٹیفکیشن",
     "testNotif": {
-      "body": "{{arabic}} · test notification",
-      "title": "{{prayer}} · Test"
+      "body": "{{arabic}} · ٹیسٹ نوٹیفکیشن",
+      "title": "{{prayer}} · ٹیسٹ"
     },
     "testPickerModal": {
-      "body": "The test fires immediately using that prayer's sound.",
-      "title": "Send test for which prayer?"
+      "body": "ٹیسٹ فوراً اسی نماز کی آواز کے ساتھ آتا ہے۔",
+      "title": "کس نماز کے لیے ٹیسٹ بھیجیں؟"
     }
   },
   "player": {
-    "episodes": "{{current}} / {{total}} episodes"
+    "episodes": "{{current}} / {{total}} اقساط"
   },
   "prayer": {
     "fallback": {
-      "notice": "Showing prayer times for Karachi. Tap to change."
+      "notice": "کراچی کے لیے نماز کے اوقات دکھائے جا رہے ہیں۔ تبدیل کرنے کے لیے ٹیپ کریں۔"
     },
     "header": {
-      "title": "Prayer Times"
+      "title": "نماز کے اوقات"
     },
     "madhab": {
-      "hanafi": "Hanafi",
-      "shafi": "Shafi"
+      "hanafi": "حنفی",
+      "shafi": "شافعی"
     },
     "methods": {
-      "Dubai": "Dubai",
-      "Egyptian": "Egyptian",
-      "Karachi": "Karachi",
-      "MoonsightingCommittee": "Moonsighting",
-      "MuslimWorldLeague": "Muslim World League",
-      "NorthAmerica": "North America",
-      "Singapore": "Singapore",
-      "Tehran": "Tehran",
-      "Turkey": "Turkey",
-      "UmmAlQura": "Umm al-Qura"
+      "Dubai": "دبئی",
+      "Egyptian": "مصری",
+      "Karachi": "کراچی",
+      "MoonsightingCommittee": "مون سائٹنگ",
+      "MuslimWorldLeague": "رابطہ عالمِ اسلامی",
+      "NorthAmerica": "شمالی امریکہ",
+      "Singapore": "سنگاپور",
+      "Tehran": "تہران",
+      "Turkey": "ترکی",
+      "UmmAlQura": "اُم القریٰ"
     },
     "next": {
-      "label": "NEXT PRAYER"
+      "label": "اگلی نماز"
     },
     "sunnah": {
-      "header": "Sunnah Times",
-      "lastThird": "Last Third of Night",
-      "middleOfNight": "Middle of Night"
+      "header": "سنت کے اوقات",
+      "lastThird": "رات کا آخری تہائی حصہ",
+      "middleOfNight": "نصف شب"
     },
-    "todaysPrayers": "Today's Prayers"
+    "todaysPrayers": "آج کی نمازیں"
   },
   "prayerCard": {
-    "nextLabel": "NEXT"
+    "nextLabel": "اگلی"
   },
   "prayerSettings": {
     "about": {
-      "text": "Prayer times are calculated locally on your device using the {{method}} method. They are based on your geographic location and update automatically each day."
+      "text": "نماز کے اوقات آپ کے ڈیوائس پر مقامی طور پر {{method}} طریقے سے شمار کیے جاتے ہیں۔ یہ آپ کے جغرافیائی محلِ وقوع پر مبنی ہوتے ہیں اور ہر روز خودکار طور پر اپ ڈیٹ ہو جاتے ہیں۔"
     },
     "header": {
-      "title": "Prayer Settings"
+      "title": "نماز کی ترتیبات"
     },
     "highLat": {
       "options": {
         "middleOfTheNight": {
-          "label": "Middle of the night",
-          "sub": "Recommended"
+          "label": "نصف شب",
+          "sub": "تجویز کردہ"
         },
         "seventhOfTheNight": {
-          "label": "Seventh of the night",
-          "sub": "Stricter alternative"
+          "label": "رات کا ساتواں حصہ",
+          "sub": "زیادہ محتاط متبادل"
         },
         "twilightAngle": {
-          "label": "Twilight angle",
-          "sub": "Method-specific angle"
+          "label": "شفق کا زاویہ",
+          "sub": "طریقے کے مطابق زاویہ"
         }
       },
-      "sectionSubtitle": "How to calculate Fajr/Isha during long days",
-      "sectionTitle": "High latitude rule"
+      "sectionSubtitle": "لمبے دنوں میں فجر/عشاء کا حساب کیسے لگایا جائے",
+      "sectionTitle": "بلند عرض البلد کا اصول"
     },
     "location": {
-      "changeCity": "Change city",
-      "sectionSubtitle": "Where prayer times are calculated for",
-      "sectionTitle": "Location",
+      "changeCity": "شہر تبدیل کریں",
+      "sectionSubtitle": "نماز کے اوقات جس مقام کے لیے شمار کیے جاتے ہیں",
+      "sectionTitle": "مقام",
       "sources": {
-        "cached": "Saved",
-        "default": "Default",
+        "cached": "محفوظ شدہ",
+        "default": "طے شدہ",
         "gps": "GPS",
-        "manual": "Manual"
+        "manual": "دستی"
       },
-      "useGps": "Use GPS"
+      "useGps": "GPS استعمال کریں"
     },
     "madhab": {
       "hanafi": {
-        "label": "Hanafi",
-        "sub": "Asr begins when shadow = 2× height"
+        "label": "حنفی",
+        "sub": "عصر تب شروع ہوتی ہے جب سایہ = قد کا 2 گنا ہو"
       },
       "preview": {
-        "asrAt": "Asr at {{time}}",
-        "hanafi": "Hanafi",
-        "standard": "Standard",
-        "today": "Today: "
+        "asrAt": "عصر {{time}} پر",
+        "hanafi": "حنفی",
+        "standard": "معیاری",
+        "today": "آج: "
       },
-      "sectionSubtitle": "When Asr begins",
-      "sectionTitle": "Asr (Madhab)",
+      "sectionSubtitle": "عصر کب شروع ہوتی ہے",
+      "sectionTitle": "عصر (مسلک)",
       "shafi": {
-        "label": "Standard (Shafi'i, Maliki, Hanbali)",
-        "sub": "Asr begins when shadow = 1× height"
+        "label": "معیاری (شافعی، مالکی، حنبلی)",
+        "sub": "عصر تب شروع ہوتی ہے جب سایہ = قد کے برابر ہو"
       }
     },
     "method": {
-      "autoDetected": "Auto-detected from your location: ",
+      "autoDetected": "آپ کے مقام سے خودکار طور پر معلوم کیا گیا: ",
       "options": {
         "Dubai": {
-          "label": "Dubai (UAE General Authority)",
-          "region": "UAE"
+          "label": "دبئی (UAE جنرل اتھارٹی)",
+          "region": "متحدہ عرب امارات"
         },
         "Egyptian": {
-          "label": "Egyptian (General Authority of Survey)",
-          "region": "Egypt"
+          "label": "مصری (جنرل اتھارٹی آف سروے)",
+          "region": "مصر"
         },
         "Karachi": {
-          "label": "Karachi (University of Islamic Sciences)",
-          "region": "Pakistan / India / Bangladesh"
+          "label": "کراچی (جامعہ علومِ اسلامیہ)",
+          "region": "پاکستان / بھارت / بنگلہ دیش"
         },
         "MoonsightingCommittee": {
-          "label": "Moonsighting Committee",
-          "region": "North America (alt)"
+          "label": "مون سائٹنگ کمیٹی",
+          "region": "شمالی امریکہ (متبادل)"
         },
         "MuslimWorldLeague": {
-          "label": "Muslim World League",
-          "region": "Europe / global default"
+          "label": "رابطہ عالمِ اسلامی",
+          "region": "یورپ / عالمی طے شدہ"
         },
         "NorthAmerica": {
-          "label": "North America (ISNA)",
-          "region": "USA / Canada"
+          "label": "شمالی امریکہ (ISNA)",
+          "region": "امریکہ / کینیڈا"
         },
         "Singapore": {
-          "label": "Singapore (MUIS)",
-          "region": "Singapore / Malaysia"
+          "label": "سنگاپور (MUIS)",
+          "region": "سنگاپور / ملائیشیا"
         },
         "Tehran": {
-          "label": "Tehran",
-          "region": "Iran"
+          "label": "تہران",
+          "region": "ایران"
         },
         "Turkey": {
-          "label": "Turkey (Diyanet İşleri Başkanlığı)",
-          "region": "Turkey"
+          "label": "ترکی (Diyanet İşleri Başkanlığı)",
+          "region": "ترکی"
         },
         "UmmAlQura": {
-          "label": "Umm Al-Qura (Makkah)",
-          "region": "Saudi Arabia"
+          "label": "اُم القریٰ (مکہ)",
+          "region": "سعودی عرب"
         }
       },
-      "resetToAuto": "Reset to auto",
-      "sectionSubtitle": "Which prayer time method to use",
-      "sectionTitle": "Calculation Method"
+      "resetToAuto": "خودکار پر بحال کریں",
+      "sectionSubtitle": "نماز کے اوقات کے لیے کون سا طریقہ استعمال کیا جائے",
+      "sectionTitle": "حساب کا طریقہ"
     },
     "timeFormat": {
       "12h": {
-        "label": "12-hour",
-        "sub": "e.g. 5:42 PM"
+        "label": "12 گھنٹے",
+        "sub": "مثلاً 5:42 PM"
       },
       "24h": {
-        "label": "24-hour",
-        "sub": "e.g. 17:42"
+        "label": "24 گھنٹے",
+        "sub": "مثلاً 17:42"
       },
       "auto": {
-        "label": "Auto",
-        "sub": "Match device locale"
+        "label": "خودکار",
+        "sub": "ڈیوائس کی زبان کے مطابق"
       },
-      "preview": "Today: Fajr at {{time}}",
-      "sectionSubtitle": "How prayer times are displayed",
-      "sectionTitle": "Time format"
+      "preview": "آج: فجر {{time}} پر",
+      "sectionSubtitle": "نماز کے اوقات کیسے دکھائے جائیں",
+      "sectionTitle": "وقت کی ساخت"
     }
   },
   "prayerStreak": {
     "days": {
-      "fri": "Fri",
-      "mon": "Mon",
-      "sat": "Sat",
-      "sun": "Sun",
-      "thu": "Thu",
-      "tue": "Tue",
-      "wed": "Wed"
+      "fri": "جمعہ",
+      "mon": "پیر",
+      "sat": "ہفتہ",
+      "sun": "اتوار",
+      "thu": "جمعرات",
+      "tue": "منگل",
+      "wed": "بدھ"
     },
     "sections": {
-      "last7Days": "Last 7 Days"
+      "last7Days": "پچھلے 7 دن"
     },
     "streak": {
-      "label": "Day Streak",
-      "sub": "Keep up the consistency!"
+      "label": "دنوں کا تسلسل",
+      "sub": "اسی پابندی کو برقرار رکھیں!"
     },
-    "tip": "Tip: Tap any cell to mark a prayer as complete or missed. Stay consistent for a longer streak!",
+    "tip": "مشورہ: کسی نماز کو مکمل یا قضا کے طور پر نشان زد کرنے کے لیے اس خانے پر ٹیپ کریں۔ لمبے تسلسل کے لیے پابندی برقرار رکھیں!",
     "today": {
-      "title": "Today's Prayers"
+      "title": "آج کی نمازیں"
     }
   },
   "prayers": {
     "names": {
-      "asr": "Asr",
-      "dhuhr": "Dhuhr",
-      "fajr": "Fajr",
-      "isha": "Isha",
-      "jumuah": "Jumu'ah",
-      "maghrib": "Maghrib",
-      "sunrise": "Sunrise"
+      "asr": "عصر",
+      "dhuhr": "ظہر",
+      "fajr": "فجر",
+      "isha": "عشاء",
+      "jumuah": "جمعہ",
+      "maghrib": "مغرب",
+      "sunrise": "طلوعِ آفتاب"
     }
   },
   "privacy": {
     "consent": {
-      "accept": "OK, I understand",
-      "body1": "Islam Daily collects <bold>anonymous location data</bold> to understand where our users are and improve the app experience for Muslims worldwide.",
-      "body1After": "to understand where our users are and improve the app experience for Muslims worldwide.",
-      "body1Before": "Islam Daily collects",
-      "body1Highlight": "anonymous location data",
-      "body1Plain": "Islam Daily collects anonymous location data to understand where our users are and improve the app experience for Muslims worldwide.",
-      "body2": "No personal information — no name, email, or device ID — is ever stored or shared.",
+      "accept": "ٹھیک ہے، میں سمجھ گیا",
+      "body1": "Islam Daily <bold>گمنام لوکیشن ڈیٹا</bold> اکٹھا کرتی ہے تاکہ یہ سمجھ سکے کہ ہمارے صارفین کہاں ہیں اور دنیا بھر کے مسلمانوں کے لیے ایپ کے تجربے کو بہتر بنا سکے۔",
+      "body1After": "تاکہ یہ سمجھ سکے کہ ہمارے صارفین کہاں ہیں اور دنیا بھر کے مسلمانوں کے لیے ایپ کے تجربے کو بہتر بنا سکے۔",
+      "body1Before": "Islam Daily اکٹھا کرتی ہے",
+      "body1Highlight": "گمنام لوکیشن ڈیٹا",
+      "body1Plain": "Islam Daily گمنام لوکیشن ڈیٹا اکٹھا کرتی ہے تاکہ یہ سمجھ سکے کہ ہمارے صارفین کہاں ہیں اور دنیا بھر کے مسلمانوں کے لیے ایپ کے تجربے کو بہتر بنا سکے۔",
+      "body2": "کوئی ذاتی معلومات — نہ نام، نہ ای میل، نہ ڈیوائس آئی ڈی — کبھی محفوظ یا شیئر نہیں کی جاتیں۔",
       "bullets": {
-        "location": "Approximate city & country only",
-        "noIdentity": "Not linked to your identity",
-        "noShare": "Never sold or shared with third parties",
-        "optOut": "Can be disabled any time in Settings"
+        "location": "صرف تقریبی شہر اور ملک",
+        "noIdentity": "آپ کی شناخت سے منسلک نہیں",
+        "noShare": "کبھی فروخت یا کسی تیسرے فریق کے ساتھ شیئر نہیں کیا جاتا",
+        "optOut": "کسی بھی وقت سیٹنگز میں بند کیا جا سکتا ہے"
       },
-      "learnMore": "Learn More",
-      "noThanks": "No thanks",
-      "title": "A quick note on privacy"
+      "learnMore": "مزید جانیں",
+      "noThanks": "نہیں شکریہ",
+      "title": "پرائیویسی کے بارے میں ایک مختصر بات"
     },
     "detail": {
-      "footer": "Data is stored in Supabase (EU region) and is only accessible to the Islam Daily development team. You can opt out at any time from Settings → Privacy.",
+      "footer": "ڈیٹا Supabase (یورپی ریجن) میں محفوظ ہوتا ہے اور صرف Islam Daily کی ڈیولپمنٹ ٹیم اس تک رسائی رکھتی ہے۔ آپ کسی بھی وقت سیٹنگز → پرائیویسی سے آپٹ آؤٹ کر سکتے ہیں۔",
       "items": {
         "appVersion": {
-          "desc": "So we know which build a session came from.",
-          "heading": "App version"
+          "desc": "تاکہ ہمیں معلوم ہو کہ کوئی سیشن کس بلڈ سے آیا ہے۔",
+          "heading": "ایپ ورژن"
         },
         "cityCountry": {
-          "desc": "Derived from GPS coordinates via on-device reverse geocoding. Only the text (e.g. \"London, GB\") is stored — raw coordinates are stored rounded to 4 decimal places (~11 m precision).",
-          "heading": "City & country"
+          "desc": "GPS کوآرڈینیٹس سے ڈیوائس پر ریورس جیو کوڈنگ کے ذریعے اخذ کیا جاتا ہے۔ صرف متن (مثلاً \"London, GB\") محفوظ ہوتا ہے — خام کوآرڈینیٹس 4 decimal places (~11 m precision) تک گول کر کے محفوظ ہوتے ہیں۔",
+          "heading": "شہر اور ملک"
         },
         "platformDevice": {
-          "desc": "Android or iOS, OS version, and device model (e.g. \"Pixel 7\"). No device ID or advertising ID.",
-          "heading": "Platform & device"
+          "desc": "اینڈرائیڈ یا iOS، OS ورژن اور ڈیوائس ماڈل (مثلاً \"Pixel 7\")۔ کوئی ڈیوائس آئی ڈی یا ایڈورٹائزنگ آئی ڈی نہیں۔",
+          "heading": "پلیٹ فارم اور ڈیوائس"
         },
         "sessionTimestamp": {
-          "desc": "The UTC time the app was opened.",
-          "heading": "Session timestamp"
+          "desc": "وہ UTC وقت جب ایپ کھولی گئی۔",
+          "heading": "سیشن ٹائم اسٹیمپ"
         }
       },
-      "title": "What we collect"
+      "title": "ہم کیا اکٹھا کرتے ہیں"
     },
     "header": "Islam Daily"
   },
   "qibla": {
-    "aligned": "✓ Facing Qibla",
+    "aligned": "✓ قبلہ رخ",
     "calibrate": {
-      "instructions": "Rotate your phone until the line and Kaaba point straight up."
+      "instructions": "اپنا فون اس وقت تک گھمائیں جب تک لکیر اور کعبہ بالکل سیدھے اوپر کی طرف نہ ہو جائیں۔"
     },
     "camera": {
-      "enable": "Enable Camera",
-      "openSettings": "Open Settings"
+      "enable": "کیمرہ فعال کریں",
+      "openSettings": "ترتیبات کھولیں"
     },
     "compassNeeded": {
-      "startButton": "Start AR Qibla",
-      "title": "Compass Access Needed"
+      "startButton": "AR قبلہ شروع کریں",
+      "title": "کمپاس تک رسائی درکار ہے"
     },
     "info": {
-      "headingLabel": "Heading",
-      "qiblaLabel": "Qibla"
+      "headingLabel": "رخ",
+      "qiblaLabel": "قبلہ"
     },
-    "loading": "Finding Qibla direction...",
+    "loading": "قبلہ کی سمت تلاش کی جا رہی ہے...",
     "locationRequired": {
-      "message": "Location required for Qibla direction.",
-      "title": "Location Required"
+      "message": "قبلہ کی سمت کے لیے مقام درکار ہے۔",
+      "title": "مقام درکار ہے"
     },
     "noCompass": {
-      "bearingMessage": "Qibla bearing from your location:",
-      "bearingValue": "{{degrees}}° from North",
-      "physicalCompass": "Use a physical compass and turn this many degrees clockwise from North.",
-      "title": "Your device doesn't have a compass"
+      "bearingMessage": "آپ کے مقام سے قبلہ کا رخ:",
+      "bearingValue": "شمال سے {{degrees}}°",
+      "physicalCompass": "ایک حقیقی کمپاس استعمال کریں اور شمال سے اتنے درجے گھڑی کی سمت میں مڑیں۔",
+      "title": "آپ کے ڈیوائس میں کمپاس موجود نہیں ہے"
     },
     "sub": {
-      "withCamera": "Rotate your phone until the line and Kaaba point straight up.",
-      "withoutCamera": "Enable camera for AR Qibla view."
+      "withCamera": "اپنا فون اس وقت تک گھمائیں جب تک لکیر اور کعبہ بالکل سیدھے اوپر کی طرف نہ ہو جائیں۔",
+      "withoutCamera": "AR قبلہ منظر کے لیے کیمرہ فعال کریں۔"
     },
-    "title": "Qibla Direction"
+    "title": "قبلہ کی سمت"
   },
   "quran": {
     "header": {
-      "title": "The Holy Quran"
+      "title": "قرآنِ کریم"
     },
     "jumpModal": {
-      "close": "Close",
-      "go": "Go",
-      "pageLabel": "Page (1–{{total}})",
-      "pagePlaceholder": "e.g. 50",
-      "surahLabel": "Surah",
-      "surahMeta": "{{count}} ayahs · Page {{page}}",
-      "surahSearchPlaceholder": "Search surah by name or number",
-      "title": "Jump to"
+      "close": "بند کریں",
+      "go": "جائیں",
+      "pageLabel": "صفحہ (1–{{total}})",
+      "pagePlaceholder": "مثلاً 50",
+      "surahLabel": "سورہ",
+      "surahMeta": "{{count}} آیات · صفحہ {{page}}",
+      "surahSearchPlaceholder": "سورہ نام یا نمبر سے تلاش کریں",
+      "title": "یہاں جائیں"
     },
     "juz": {
-      "pageLabel": "Page",
-      "starts": "Starts: Surah {{surah}}, Ayah {{ayah}}"
+      "pageLabel": "صفحہ",
+      "starts": "آغاز: سورہ {{surah}}، آیت {{ayah}}"
     },
     "listen": {
-      "noAyahs": "No ayahs available for this surah.",
-      "reciterLabel": "Reciter",
-      "surahLabel": "Surah"
+      "noAyahs": "اس سورہ کے لیے کوئی آیت دستیاب نہیں۔",
+      "reciterLabel": "قاری",
+      "surahLabel": "سورہ"
     },
     "miniPlayer": {
-      "surahFallback": "Surah {{n}}"
+      "surahFallback": "سورہ {{n}}"
     },
     "mushaf": {
-      "ayahsCount": "{{count}} AYAHS",
-      "couldNotLoadPage": "Could not load page {{n}}",
-      "juz": "Juz {{n}}",
-      "loadingPage": "Loading page {{n}}…",
-      "madaniyyah": "MADANIYYAH",
-      "makkiyyah": "MAKKIYYAH",
-      "noAyahsOnPage": "No ayahs on page {{n}}",
-      "page": "Page {{n}} / {{total}}",
-      "pageJuz": "Page {{n}} / {{total}} · Juz {{juz}}"
+      "ayahsCount": "{{count}} آیات",
+      "couldNotLoadPage": "صفحہ {{n}} لوڈ نہیں ہو سکا",
+      "juz": "پارہ {{n}}",
+      "loadingPage": "صفحہ {{n}} لوڈ ہو رہا ہے…",
+      "madaniyyah": "مدنی",
+      "makkiyyah": "مکی",
+      "noAyahsOnPage": "صفحہ {{n}} پر کوئی آیت نہیں",
+      "page": "صفحہ {{n}} / {{total}}",
+      "pageJuz": "صفحہ {{n}} / {{total}} · پارہ {{juz}}"
     },
     "reader": {
-      "audioUnavailableBody": "This build does not include audio playback support.",
-      "audioUnavailableTitle": "Audio unavailable",
-      "bookmarkSurah": "Bookmark this Surah",
-      "bookmarked": "Bookmarked",
-      "error": "Failed to load surah",
-      "fontSize": "Font Size",
-      "loading": "Loading surah...",
-      "modeRecite": "🔊 Recite",
-      "modeStudy": "📖 Study",
-      "playbackFailedBody": "Could not load audio. Check your connection.",
-      "playbackFailedTitle": "Playback failed",
-      "switchToStudy": "Switch to Study Mode",
-      "verses": "{{count}} Verses"
+      "audioUnavailableBody": "اس بلڈ میں آڈیو چلانے کی سہولت موجود نہیں ہے۔",
+      "audioUnavailableTitle": "آڈیو دستیاب نہیں",
+      "bookmarkSurah": "اس سورہ کو بک مارک کریں",
+      "bookmarked": "بک مارک ہو گیا",
+      "error": "سورہ لوڈ نہیں ہو سکی",
+      "fontSize": "فونٹ سائز",
+      "loading": "سورہ لوڈ ہو رہی ہے...",
+      "modeRecite": "🔊 تلاوت",
+      "modeStudy": "📖 مطالعہ",
+      "playbackFailedBody": "آڈیو لوڈ نہیں ہو سکی۔ اپنا کنکشن چیک کریں۔",
+      "playbackFailedTitle": "پلے بیک ناکام",
+      "switchToStudy": "مطالعہ موڈ پر جائیں",
+      "verses": "{{count}} آیات"
     },
     "reciteSettings": {
-      "title": "Recite Settings"
+      "title": "تلاوت کی ترتیبات"
     },
     "reciteTab": {
-      "decreaseSize": "Decrease text size",
-      "floatingIndicator": "Page {{page}} / {{total}} · Juz {{juz}}",
-      "increaseSize": "Increase text size",
-      "jumpToPageOrSurah": "Jump to page or surah",
-      "textSize": "Text size"
+      "decreaseSize": "متن کا سائز کم کریں",
+      "floatingIndicator": "صفحہ {{page}} / {{total}} · پارہ {{juz}}",
+      "increaseSize": "متن کا سائز بڑھائیں",
+      "jumpToPageOrSurah": "صفحے یا سورہ پر جائیں",
+      "textSize": "متن کا سائز"
     },
     "reciterPicker": {
-      "title": "Select Reciter"
+      "title": "قاری منتخب کریں"
     },
     "resume": {
-      "continueReading": "Continue reading",
-      "dismiss": "Dismiss resume banner",
-      "fromAyah": "Continue from {{name}}, Ayah {{ayah}}",
-      "fromPage": "Continue from Page {{page}} · Juz {{juz}}"
+      "continueReading": "پڑھنا جاری رکھیں",
+      "dismiss": "ریزیوم بینر ہٹائیں",
+      "fromAyah": "{{name}}، آیت {{ayah}} سے جاری رکھیں",
+      "fromPage": "صفحہ {{page}} · پارہ {{juz}} سے جاری رکھیں"
     },
     "surahList": {
-      "continueBadge": "Continue",
-      "loading": "Loading Quran...",
-      "searchPlaceholder": "Search surah by name or number...",
-      "tabJuz": "Juz / Para (30)",
-      "tabSurahs": "Surah (114)",
-      "versesCount": "· {{count}} verses"
+      "continueBadge": "جاری رکھیں",
+      "loading": "قرآن لوڈ ہو رہا ہے...",
+      "searchPlaceholder": "سورہ نام یا نمبر سے تلاش کریں...",
+      "tabJuz": "پارہ (30)",
+      "tabSurahs": "سورہ (114)",
+      "versesCount": "· {{count}} آیات"
     },
     "tabs": {
-      "listen": "Listen",
-      "recite": "Recite",
-      "translation": "Translation"
+      "listen": "سنیں",
+      "recite": "تلاوت",
+      "translation": "ترجمہ"
     },
     "tajweed": {
-      "ghunna": "■ Ghunna",
-      "ikhfa": "■ Ikhfa",
-      "madd": "■ Madd",
-      "qalqala": "■ Qalqala",
-      "tapForMeaning": "Tap word for meaning"
+      "ghunna": "■ غنہ",
+      "ikhfa": "■ اخفا",
+      "madd": "■ مدّ",
+      "qalqala": "■ قلقلہ",
+      "tapForMeaning": "معنی کے لیے لفظ پر ٹیپ کریں"
     },
     "wordPopup": {
-      "transliteration": "Transliteration"
+      "transliteration": "نقلِ حروف"
     }
   },
   "ramadan": {
-    "error": "Failed to load Ramadan data. Please check your connection.",
+    "error": "رمضان کا ڈیٹا لوڈ نہیں ہو سکا۔ براہِ کرم اپنا انٹرنیٹ کنکشن چیک کریں۔",
     "header": {
-      "hijriDay": "Hijri Day {{day}} · Month {{month}}",
-      "title": "Ramadan Mubarak"
+      "hijriDay": "ہجری تاریخ {{day}} · مہینہ {{month}}",
+      "title": "رمضان مبارک"
     },
-    "loading": "Loading Ramadan timetable...",
+    "loading": "رمضان کا ٹائم ٹیبل لوڈ ہو رہا ہے...",
     "notice": {
-      "notStarted": "Ramadan has not started yet. This screen will show live countdowns and the timetable during Ramadan."
+      "notStarted": "رمضان ابھی شروع نہیں ہوا۔ رمضان کے دوران یہ اسکرین لائیو کاؤنٹ ڈاؤن اور ٹائم ٹیبل دکھائے گی۔"
     },
     "timetable": {
-      "colDate": "Date",
-      "colDay": "Day",
-      "colIftar": "Iftar",
-      "colSehri": "Sehri",
-      "sectionLabel": "Full Ramadan Timetable — 1446 AH"
+      "colDate": "تاریخ",
+      "colDay": "دن",
+      "colIftar": "افطار",
+      "colSehri": "سحری",
+      "sectionLabel": "مکمل رمضان ٹائم ٹیبل — 1446 ہجری"
     },
     "timings": {
-      "iftarLabel": "Iftar (Maghrib)",
-      "sehriLabel": "Sehri (Fajr)"
+      "iftarLabel": "افطار (مغرب)",
+      "sehriLabel": "سحری (فجر)"
     }
   },
   "search": {
-    "button": "Search",
+    "button": "تلاش",
     "chips": {
-      "forgiveness": "forgiveness",
-      "knowledge": "knowledge",
-      "mercy": "mercy",
-      "paradise": "paradise",
-      "patience": "patience",
-      "prayer": "prayer"
+      "forgiveness": "مغفرت",
+      "knowledge": "علم",
+      "mercy": "رحمت",
+      "paradise": "جنت",
+      "patience": "صبر",
+      "prayer": "نماز"
     },
     "empty": {
-      "noResults": "No results found for \"{{query}}\""
+      "noResults": "\"{{query}}\" کے لیے کوئی نتیجہ نہیں ملا"
     },
     "error": {
-      "connection": "Couldn't reach the search service. Check your connection and try again."
+      "connection": "تلاش کی سروس تک رسائی نہیں ہو سکی۔ اپنا کنکشن چیک کر کے دوبارہ کوشش کریں۔"
     },
     "header": {
-      "sub": "Search the Quran by keyword",
-      "title": "Islamic Search"
+      "sub": "قرآن کو کسی لفظ سے تلاش کریں",
+      "title": "اسلامی تلاش"
     },
-    "placeholder": "e.g. mercy, patience, prayer...",
+    "placeholder": "مثلاً رحمت، صبر، نماز…",
     "suggestions": {
-      "label": "Popular searches"
+      "label": "مقبول تلاشیں"
     }
   },
   "section": {
-    "seeAll": "See All"
+    "seeAll": "سب دیکھیں"
   },
   "settings": {
     "about": {
       "appName": "Islam Daily",
-      "contact": "Contact",
-      "developer": "Developer",
+      "contact": "رابطہ",
+      "developer": "ڈویلپر",
       "developerName": "Ummah Tech Studio",
-      "footer": "Built with care for the Muslim community",
-      "privacyPolicy": "Privacy Policy",
-      "termsOfService": "Terms of Service",
-      "version": "Version {{version}}"
+      "footer": "مسلم کمیونٹی کے لیے محبت اور خلوص سے بنایا گیا",
+      "privacyPolicy": "پرائیویسی پالیسی",
+      "termsOfService": "سروس کی شرائط",
+      "version": "ورژن {{version}}"
     },
     "alerts": {
       "analyticsDisabled": {
-        "message": "Anonymous location data will no longer be collected. This takes effect on next app launch.",
-        "title": "Analytics disabled"
+        "message": "اب آپ کی تخمینی لوکیشن کا کوئی ڈیٹا جمع نہیں کیا جائے گا۔ یہ تبدیلی ایپ کو اگلی بار کھولنے پر لاگو ہوگی۔",
+        "title": "اینالیٹکس بند کر دیا گیا"
       },
       "clearCache": {
-        "errorMessage": "Could not clear cache.",
-        "message": "This will remove cached prayer times, Quran data, and hadith data. Your bookmarks and settings will be kept.",
-        "successMessage": "Cached data has been removed.",
-        "successTitle": "Cache Cleared",
-        "title": "Clear Cache?"
+        "errorMessage": "کیشے صاف نہیں ہو سکا۔",
+        "message": "اس سے کیشے میں محفوظ نماز کے اوقات، قرآن اور حدیث کا ڈیٹا ہٹ جائے گا۔ آپ کے بک مارکس اور سیٹنگز محفوظ رہیں گی۔",
+        "successMessage": "کیشے کا ڈیٹا ہٹا دیا گیا ہے۔",
+        "successTitle": "کیشے صاف ہو گیا",
+        "title": "کیشے صاف کریں؟"
       },
       "comingSoon": {
-        "message": "Light and Auto themes will be available in a future update."
+        "message": "لائٹ اور آٹو تھیمز کسی آئندہ اپڈیٹ میں دستیاب ہوں گی۔"
       },
       "resetSettings": {
-        "message": "This will restore all preferences to their defaults. Your bookmarks will be kept.",
-        "successMessage": "All preferences have been restored to defaults.",
-        "successTitle": "Settings Reset",
-        "title": "Reset All Settings?"
+        "message": "اس سے تمام ترجیحات دوبارہ ڈیفالٹ پر آ جائیں گی۔ آپ کے بک مارکس محفوظ رہیں گے۔",
+        "successMessage": "تمام ترجیحات دوبارہ ڈیفالٹ پر بحال کر دی گئی ہیں۔",
+        "successTitle": "سیٹنگز ری سیٹ ہو گئیں",
+        "title": "تمام سیٹنگز ری سیٹ کریں؟"
       }
     },
     "appearance": {
-      "arabicFontSize": "Arabic Font Size",
-      "englishFontSize": "English Font Size"
+      "arabicFontSize": "عربی فونٹ کا سائز",
+      "englishFontSize": "انگریزی فونٹ کا سائز"
     },
     "calcMethod": {
       "options": {
-        "Dubai": "Dubai",
-        "EgyptianGeneralAuthority": "Egyptian General Authority",
-        "ISNA": "ISNA (North America)",
-        "Karachi": "University of Karachi",
-        "Kuwait": "Kuwait",
-        "MuslimWorldLeague": "Muslim World League",
-        "Qatar": "Qatar",
-        "Singapore": "Singapore",
-        "Tehran": "Tehran",
-        "UmmAlQura": "Umm Al-Qura (Makkah)"
+        "Dubai": "دبئی",
+        "EgyptianGeneralAuthority": "مصری جنرل اتھارٹی",
+        "ISNA": "ISNA (شمالی امریکہ)",
+        "Karachi": "جامعہ کراچی",
+        "Kuwait": "کویت",
+        "MuslimWorldLeague": "رابطہ عالمِ اسلامی",
+        "Qatar": "قطر",
+        "Singapore": "سنگاپور",
+        "Tehran": "تہران",
+        "UmmAlQura": "ام القریٰ (مکہ)"
       }
     },
     "contentLanguage": {
       "options": {
-        "ar": "Arabic",
-        "auto": "Auto",
-        "bn": "Bangla",
-        "en": "English",
-        "hi": "Hindi",
-        "tr": "Turkish",
-        "ur": "Urdu"
+        "ar": "عربی",
+        "auto": "آٹو",
+        "bn": "بنگالی",
+        "en": "انگریزی",
+        "hi": "ہندی",
+        "tr": "ترکی",
+        "ur": "اردو"
       }
     },
     "credits": {
-      "header": "We gratefully acknowledge these open data sources:",
+      "header": "ہم ان کھلے ڈیٹا ذرائع کے شکر گزار ہیں:",
       "labels": {
-        "duas": "Duas",
-        "hadith": "Hadith",
-        "prayerTimes": "Prayer Times",
-        "quran": "Quran"
+        "duas": "دعائیں",
+        "hadith": "حدیث",
+        "prayerTimes": "نماز کے اوقات",
+        "quran": "قرآن"
       },
       "sources": {
-        "duas": "Hisn al-Muslim",
+        "duas": "حصنُ المسلم",
         "hadith": "A7med3bdulBaset/hadith-json",
         "prayerTimes": "Aladhan API",
         "quran": "Tanzil"
@@ -1363,188 +1363,194 @@
     },
     "fontSize": {
       "options": {
-        "large": "Large",
-        "medium": "Medium",
-        "small": "Small"
+        "large": "بڑا",
+        "medium": "درمیانہ",
+        "small": "چھوٹا"
       }
     },
     "homeScreen": {
-      "customize": "Customize Home Screen",
-      "customizeSub": "Choose which tiles appear on your home"
+      "customize": "ہوم اسکرین کو اپنی مرضی سے ترتیب دیں",
+      "customizeSub": "منتخب کریں کہ ہوم پر کون سے ٹائلز نظر آئیں"
     },
     "madhab": {
       "options": {
-        "hanafi": "Hanafi",
-        "standard": "Standard (Shafi'i, Maliki, Hanbali)"
+        "hanafi": "حنفی",
+        "standard": "اسٹینڈرڈ (شافعی، مالکی، حنبلی)"
       }
     },
     "notifSection": {
-      "adhanNotifications": "Adhan Notifications",
-      "adhanNotificationsSub": "Play adhan at prayer times",
-      "dailyHadith": "Daily Hadith",
-      "dailyHadithSub": "One hadith every day",
-      "dailyHadithTime": "Daily Hadith Time",
-      "fridayReminder": "Friday Reminder",
-      "fridayReminderSub": "Reminder to read Surah Al-Kahf",
-      "prayerNotifications": "Prayer Notifications",
-      "prayerNotificationsSub": "Get notified at prayer times",
-      "preAdhan": "Pre-Adhan Reminder",
-      "preAdhanSub": "10 minutes before each prayer"
+      "adhanNotifications": "اذان کی اطلاعات",
+      "adhanNotificationsSub": "نماز کے اوقات پر اذان چلائیں",
+      "dailyHadith": "روزانہ کی حدیث",
+      "dailyHadithSub": "ہر روز ایک حدیث",
+      "dailyHadithTime": "روزانہ کی حدیث کا وقت",
+      "fridayReminder": "جمعہ کی یاد دہانی",
+      "fridayReminderSub": "سورہ الکہف پڑھنے کی یاد دہانی",
+      "prayerNotifications": "نماز کی اطلاعات",
+      "prayerNotificationsSub": "نماز کے اوقات پر اطلاع پائیں",
+      "preAdhan": "اذان سے پہلے یاد دہانی",
+      "preAdhanSub": "ہر نماز سے 10 منٹ پہلے"
     },
     "prayerTimes": {
-      "calcMethod": "Calculation Method",
-      "hijriExplainer": "Adjust if your country sees the moon differently",
-      "hijriOffset": "Hijri Date Offset",
-      "madhab": "Madhab for Asr",
-      "madhabExplainer": "Hanafi madhab uses a later Asr time",
-      "providerMethod": "Provider Method (Aladhan)"
+      "calcMethod": "حساب کا طریقہ",
+      "hijriExplainer": "اگر آپ کے ملک میں چاند کسی اور دن نظر آتا ہے تو ایڈجسٹ کریں",
+      "hijriOffset": "ہجری تاریخ کا فرق",
+      "madhab": "عصر کے لیے مسلک",
+      "madhabExplainer": "حنفی مسلک میں عصر کا وقت کچھ دیر بعد ہوتا ہے",
+      "providerMethod": "پرووائیڈر طریقہ (Aladhan)"
     },
     "privacy": {
-      "analyticsLabel": "Anonymous Analytics",
-      "analyticsNote": "When enabled, Islam Daily logs your approximate city and country on each app launch to help us understand which regions the app serves. No name, email, device ID, or precise location is ever collected or shared with third parties.",
-      "analyticsSub": "City & country only — no personal data stored"
+      "analyticsLabel": "گمنام اینالیٹکس",
+      "analyticsNote": "آن ہونے پر، Islam Daily ہر بار ایپ کھلنے پر آپ کے تخمینی شہر اور ملک کو ریکارڈ کرتا ہے تاکہ ہمیں پتا چلے کہ ایپ کن علاقوں میں استعمال ہو رہی ہے۔ آپ کا نام، ای میل، ڈیوائس آئی ڈی یا درست لوکیشن کبھی جمع نہیں کی جاتی اور نہ ہی کسی تیسرے فریق کے ساتھ شیئر کی جاتی ہے۔",
+      "analyticsSub": "صرف شہر اور ملک — کوئی ذاتی معلومات محفوظ نہیں کی جاتیں"
     },
     "quran": {
-      "reciter": "Reciter for Audio",
-      "showTransliteration": "Show Transliteration",
-      "translation": "Translation",
-      "translationNote": "More translations coming soon",
-      "transliterationSub": "Romanized Arabic pronunciation"
+      "reciter": "آڈیو کے لیے قاری",
+      "showTransliteration": "ٹرانسلٹریشن دکھائیں",
+      "translation": "ترجمہ",
+      "translationNote": "مزید تراجم جلد آ رہے ہیں",
+      "transliterationSub": "رومن حروف میں عربی تلفظ"
     },
     "reciter": {
       "options": {
-        "alafasy": "Mishary Rashid Alafasy"
+        "alafasy": "مشاری راشد العفاسی"
       }
     },
     "sections": {
-      "about": "About",
-      "appearance": "Appearance",
-      "contentLanguage": "Content Language",
-      "credits": "Credits & Data Sources",
-      "homeScreen": "Home Screen",
-      "notifications": "Notifications",
-      "prayerTimes": "Prayer Times",
-      "privacy": "Privacy",
-      "quran": "Quran",
-      "storageData": "Storage & Data",
+      "about": "ایپ کے بارے میں",
+      "appLanguage": "ایپ کی زبان",
+      "appearance": "ظاہری شکل",
+      "contentLanguage": "مواد کی زبان",
+      "credits": "کریڈٹس اور ڈیٹا ذرائع",
+      "homeScreen": "ہوم اسکرین",
+      "notifications": "اطلاعات",
+      "prayerTimes": "نماز کے اوقات",
+      "privacy": "پرائیویسی",
+      "quran": "قرآن",
+      "storageData": "اسٹوریج اور ڈیٹا",
       "translationLanguage": "ترجمہ کی زبان / Translation Language"
     },
     "storage": {
-      "cachedData": "Cached Data",
-      "cachedKB": "{{size}} KB cached",
-      "cachedMB": "{{size}} MB cached",
-      "calculating": "Calculating…",
-      "clearCache": "Clear Cache",
-      "noCachedData": "No cached data",
-      "resetAllSettings": "Reset All Settings"
+      "cachedData": "کیشے میں محفوظ ڈیٹا",
+      "cachedKB": "{{size}} KB کیشے میں محفوظ",
+      "cachedMB": "{{size}} MB کیشے میں محفوظ",
+      "calculating": "حساب لگایا جا رہا ہے…",
+      "clearCache": "کیشے صاف کریں",
+      "noCachedData": "کیشے میں کوئی ڈیٹا نہیں",
+      "resetAllSettings": "تمام سیٹنگز ری سیٹ کریں"
     },
     "translation": {
       "options": {
-        "mohsin_khan": "Mohsin Khan (Hilali-Khan)",
+        "mohsin_khan": "محسن خان (ہلالی-خان)",
         "pickthall": "Pickthall",
         "sahih_international": "Saheeh International",
         "yusuf_ali": "Yusuf Ali"
       }
     },
     "translationLang": {
-      "englishOption": "🇬🇧 English",
-      "explainer": "Note: Arabic is always shown. This setting affects English/Urdu translations of duas, dhikr, and hadith.",
+      "englishOption": "🇬🇧 انگریزی",
+      "explainer": "نوٹ: عربی ہمیشہ دکھائی جاتی ہے۔ یہ سیٹنگ دعاؤں، ذکر اور حدیث کے انگریزی/اردو ترجمے پر اثر ڈالتی ہے۔",
+      "urduOption": "🇵🇰 اردو (Urdu)"
+    },
+    "appLang": {
+      "englishOption": "🇬🇧 انگریزی",
+      "explainer": "اس سے پوری ایپ کا انٹرفیس بدل جاتا ہے۔ اردو منتخب کرنے پر ترجمہ بھی اردو میں ہو جاتا ہے؛ انگریزی منتخب کرنے پر آپ کا ترجمے کا انتخاب برقرار رہتا ہے۔",
       "urduOption": "🇵🇰 اردو (Urdu)"
     }
   },
   "tabs": {
-    "dua": "Dua",
-    "home": "Home",
-    "more": "More",
-    "prayer": "Prayer",
-    "quran": "Quran"
+    "dua": "دعا",
+    "home": "ہوم",
+    "more": "مزید",
+    "prayer": "نماز",
+    "quran": "قرآن"
   },
   "tasbeeh": {
     "counter": {
       "alerts": {
-        "resetMessage": "This resets the current count and rounds for {{name}}. Lifetime total stays.",
-        "resetTitle": "Reset counter?",
-        "setTempoMessage": "Tap \"Set Tempo\" 3 times in rhythm to set the speed.",
-        "setTempoTitle": "Set tempo first"
+        "resetMessage": "اس سے {{name}} کی موجودہ گنتی اور راؤنڈ صفر ہو جائیں گے۔ تاحیات کل تعداد برقرار رہے گی۔",
+        "resetTitle": "کاؤنٹر ری سیٹ کریں؟",
+        "setTempoMessage": "رفتار مقرر کرنے کے لیے تال میں \"رفتار مقرر کریں\" پر 3 بار ٹیپ کریں۔",
+        "setTempoTitle": "پہلے رفتار مقرر کریں"
       },
       "controls": {
         "decrement": "−1",
         "increment": "+1",
-        "list": "List"
+        "list": "فہرست"
       },
       "progress": "{{current}} / {{target}}",
-      "round": "Round {{round}}",
-      "roundComplete": "✨ Round {{round}} complete!",
+      "round": "راؤنڈ {{round}}",
+      "roundComplete": "✨ راؤنڈ {{round}} مکمل!",
       "settings": {
-        "lifetimeTotal": "LIFETIME TOTAL",
-        "soundFeedback": "Sound feedback",
-        "title": "Tasbeeh Settings",
-        "totalTime": "Total time: {{time}}",
-        "vibrateOnRound": "Vibrate on round complete",
-        "vibration": "Vibration"
+        "lifetimeTotal": "تاحیات کل تعداد",
+        "soundFeedback": "آواز کی فیڈ بیک",
+        "title": "تسبیح کی ترتیبات",
+        "totalTime": "کل وقت: {{time}}",
+        "vibrateOnRound": "راؤنڈ مکمل ہونے پر وائبریشن",
+        "vibration": "وائبریشن"
       },
       "timer": {
-        "next": "Next: {{seconds}}s",
-        "pause": "Pause",
-        "startAuto": "Start Auto",
-        "tapProgress": "Tap ({{count}}/3)",
-        "tapToSetTempo": "Tap 3× to set tempo"
+        "next": "اگلا: {{seconds}} سیکنڈ",
+        "pause": "روکیں",
+        "startAuto": "آٹو شروع کریں",
+        "tapProgress": "ٹیپ ({{count}}/3)",
+        "tapToSetTempo": "رفتار مقرر کرنے کے لیے 3× ٹیپ کریں"
       },
-      "timerMode": "Timer Mode",
-      "touchMode": "Touch Mode"
+      "timerMode": "ٹائمر موڈ",
+      "touchMode": "ٹچ موڈ"
     },
     "edit": {
       "alerts": {
         "arabicRequired": {
-          "message": "Please enter Arabic text for this counter.",
-          "title": "Arabic required"
+          "message": "براہِ کرم اس کاؤنٹر کے لیے عربی متن درج کریں۔",
+          "title": "عربی متن ضروری ہے"
         },
         "deleteCounter": {
-          "message": "This will permanently remove \"{{name}}\" and its progress.",
-          "title": "Delete counter?"
+          "message": "اس سے \"{{name}}\" اور اس کی پیشرفت ہمیشہ کے لیے حذف ہو جائے گی۔",
+          "title": "کاؤنٹر حذف کریں؟"
         },
         "invalidName": {
-          "message": "Name must be 1–50 characters.",
-          "title": "Invalid name"
+          "message": "نام 1 سے 50 حروف کے درمیان ہونا چاہیے۔",
+          "title": "غلط نام"
         },
         "invalidTarget": {
-          "message": "Target must be a number between 1 and 9999.",
-          "title": "Invalid target"
+          "message": "ہدف 1 سے 9999 کے درمیان کوئی عدد ہونا چاہیے۔",
+          "title": "غلط ہدف"
         }
       },
-      "createCounter": "Create Counter",
-      "deleteCounter": "Delete Counter",
+      "createCounter": "کاؤنٹر بنائیں",
+      "deleteCounter": "کاؤنٹر حذف کریں",
       "fields": {
-        "arabic": "Arabic Text",
+        "arabic": "عربی متن",
         "arabicPlaceholder": "سُبْحَانَ اللَّهِ",
-        "name": "Name (English)",
-        "namePlaceholder": "e.g. SubhanAllah",
-        "source": "Source / Reference (optional)",
-        "sourcePlaceholder": "e.g. Bukhari 843",
-        "target": "Target Count",
+        "name": "نام (انگریزی)",
+        "namePlaceholder": "مثلاً SubhanAllah",
+        "source": "ماخذ / حوالہ (اختیاری)",
+        "sourcePlaceholder": "مثلاً بخاری 843",
+        "target": "ہدف کی تعداد",
         "targetPlaceholder": "33"
       },
-      "saveChanges": "Save Changes",
-      "titleEdit": "Edit Counter",
-      "titleNew": "New Counter"
+      "saveChanges": "تبدیلیاں محفوظ کریں",
+      "titleEdit": "کاؤنٹر میں ترمیم کریں",
+      "titleNew": "نیا کاؤنٹر"
     },
     "list": {
       "counter": {
-        "round": "Round {{round}}",
-        "target": "Target: {{target}}",
-        "total": "Total {{total}}"
+        "round": "راؤنڈ {{round}}",
+        "target": "ہدف: {{target}}",
+        "total": "کل {{total}}"
       },
       "empty": {
-        "subtitle": "Tap \"Use\" on a template below to create your first one.",
-        "title": "No saved counters yet"
+        "subtitle": "اپنا پہلا کاؤنٹر بنانے کے لیے نیچے کسی ٹیمپلیٹ پر \"استعمال کریں\" دبائیں۔",
+        "title": "ابھی کوئی محفوظ کاؤنٹر نہیں"
       },
-      "newBtn": "New",
+      "newBtn": "نیا",
       "sections": {
-        "myCounters": "My Counters",
-        "templates": "Templates from Dhikr ({{count}})"
+        "myCounters": "میرے کاؤنٹرز",
+        "templates": "ذکر کے ٹیمپلیٹس ({{count}})"
       },
-      "title": "Counters",
-      "useBtn": "Use"
+      "title": "کاؤنٹرز",
+      "useBtn": "استعمال کریں"
     }
   },
   "welcome": {
@@ -1566,76 +1572,76 @@
   "zakat": {
     "assets": {
       "business": {
-        "label": "Business Assets",
-        "sub": "Inventory / merchandise ({{currency}})"
+        "label": "کاروباری اثاثے",
+        "sub": "اسٹاک / مالِ تجارت ({{currency}})"
       },
       "cash": {
-        "label": "Cash & Bank Savings",
-        "sub": "Total in {{currency}}"
+        "label": "نقدی و بینک بچت",
+        "sub": "{{currency}} میں کل رقم"
       },
       "debts": {
-        "label": "Debts Due Now",
-        "sub": "Amount you must pay ({{currency}})"
+        "label": "ابھی واجب الادا قرض",
+        "sub": "وہ رقم جو آپ کو ادا کرنی ہے ({{currency}})"
       },
       "gold": {
-        "label": "Gold Owned",
-        "valueLabel": "Or value ({{currency}})",
-        "weightLabel": "Weight ({{unit}})"
+        "label": "آپ کے پاس موجود سونا",
+        "valueLabel": "یا قیمت ({{currency}})",
+        "weightLabel": "وزن ({{unit}})"
       },
       "receivables": {
-        "label": "Receivables",
-        "sub": "Money owed to you, expected ({{currency}})"
+        "label": "وصول طلب رقم",
+        "sub": "وہ رقم جو لوگوں کے ذمے ہے اور ملنے کی توقع ہے ({{currency}})"
       },
       "silver": {
-        "label": "Silver Owned",
-        "valueLabel": "Or value ({{currency}})",
-        "weightLabel": "Weight ({{unit}})"
+        "label": "آپ کے پاس موجود چاندی",
+        "valueLabel": "یا قیمت ({{currency}})",
+        "weightLabel": "وزن ({{unit}})"
       }
     },
     "banner": {
-      "sub": "2.5% on wealth above Nisab held for one lunar year",
-      "title": "Zakat Calculator"
+      "sub": "نصاب سے زائد مال پر، جو ایک قمری سال تک پاس رہے، 2.5% زکوٰۃ",
+      "title": "زکوٰۃ کیلکولیٹر"
     },
-    "calculate": "Calculate Zakat",
-    "calculateHint": "Set your currency and the {{basis}} price first.",
+    "calculate": "زکوٰۃ کا حساب لگائیں",
+    "calculateHint": "پہلے اپنی کرنسی اور {{basis}} کی قیمت درج کریں۔",
     "currency": {
-      "orEnterOwn": "Or enter your own",
-      "placeholder": "e.g. CAD"
+      "orEnterOwn": "یا اپنی کرنسی درج کریں",
+      "placeholder": "مثلاً CAD"
     },
-    "disclaimer": "This calculator is an estimate for guidance only. For complex situations (mixed-purpose assets, partial-year debts, business equity, agricultural produce) please consult a qualified scholar.",
+    "disclaimer": "یہ کیلکولیٹر صرف رہنمائی کے لیے ایک تخمینہ ہے۔ پیچیدہ معاملات (مخلوط مقاصد کے اثاثے، سال کے دوران واجب الادا قرض، کاروباری حصہ داری، زرعی پیداوار) کے لیے براہِ کرم کسی مستند عالم سے رجوع کریں۔",
     "nisab": {
-      "enterPricePrompt": "Enter {{basis}} price to compute",
-      "gold": "Gold",
-      "goldLabel": "Gold Nisab",
-      "helper": "Silver is the lower threshold; using it includes more payers and is the common scholarly preference. You can switch to gold if you prefer.",
-      "silver": "Silver (recommended)",
-      "silverLabel": "Silver Nisab"
+      "enterPricePrompt": "حساب کے لیے {{basis}} کی قیمت درج کریں",
+      "gold": "سونا",
+      "goldLabel": "سونے کا نصاب",
+      "helper": "چاندی کم تر حد ہے؛ اسے استعمال کرنے سے زیادہ لوگ زکوٰۃ کے دائرے میں آتے ہیں اور علماء کی عام ترجیح یہی ہے۔ اگر چاہیں تو سونے پر بھی منتقل ہو سکتے ہیں۔",
+      "silver": "چاندی (تجویز کردہ)",
+      "silverLabel": "چاندی کا نصاب"
     },
     "prices": {
-      "gold": "Gold ({{currency}}/{{unit}})",
-      "silver": "Silver ({{currency}}/{{unit}})"
+      "gold": "سونا ({{currency}}/{{unit}})",
+      "silver": "چاندی ({{currency}}/{{unit}})"
     },
     "result": {
-      "aboveNisab": "✓ Above Nisab — Zakat is obligatory",
-      "belowNisab": "ℹ Below Nisab — no Zakat due this year",
-      "breakdown": "Assets {{currency}} {{assets}} − Debts {{currency}} {{debts}}",
-      "netWealthLabel": "Net zakatable wealth",
-      "nisabThresholdLabel": "Nisab threshold ({{basis}})",
-      "resetEntries": "Reset Wealth Entries",
-      "zakatDueLabel": "Zakat due (2.5%)"
+      "aboveNisab": "✓ نصاب سے زیادہ — زکوٰۃ واجب ہے",
+      "belowNisab": "ℹ نصاب سے کم — اس سال زکوٰۃ واجب نہیں",
+      "breakdown": "اثاثے {{currency}} {{assets}} − قرضے {{currency}} {{debts}}",
+      "netWealthLabel": "قابلِ زکوٰۃ خالص مال",
+      "nisabThresholdLabel": "نصاب کی حد ({{basis}})",
+      "resetEntries": "مال کی تفصیلات صاف کریں",
+      "zakatDueLabel": "واجب زکوٰۃ (2.5%)"
     },
     "sections": {
-      "currency": "Currency",
-      "liabilities": "Liabilities",
-      "nisabThreshold": "Nisab Threshold",
-      "todayPrices": "Today's Prices (per {{unit}})",
-      "weightUnit": "Weight Unit",
-      "yourWealth": "Your Wealth"
+      "currency": "کرنسی",
+      "liabilities": "واجبات",
+      "nisabThreshold": "نصاب کی حد",
+      "todayPrices": "آج کی قیمتیں (فی {{unit}})",
+      "weightUnit": "وزن کا یونٹ",
+      "yourWealth": "آپ کا مال"
     },
     "weightUnit": {
-      "gram": "Gram (g)",
-      "helper": "1 tola = 11.664 grams. Prices and weights below use your selected unit.",
-      "tola": "Tola"
+      "gram": "گرام (g)",
+      "helper": "1 تولہ = 11.664 گرام۔ نیچے دی گئی قیمتیں اور وزن آپ کے منتخب کردہ یونٹ کے مطابق ہیں۔",
+      "tola": "تولہ"
     }
   }
 }

@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 // Initialise i18n before any screen renders (the import runs init synchronously).
-import '../src/i18n';
+import { applyPersistedAppLanguage } from '../src/i18n';
 import { useColorScheme, Platform, AppState, type AppStateStatus } from 'react-native';
 import { AudioPlayerProvider } from '../src/context/AudioPlayerContext';
 import { MiniPlayer } from '../src/components/MiniPlayer';
@@ -94,6 +94,8 @@ export default function RootLayout() {
   const analyticsRan = useRef(false);
 
   useEffect(() => {
+    // Apply the saved App Language (English/Urdu) before the rest of startup.
+    applyPersistedAppLanguage();
     loadPersistedData();
     migrateInvalidPersistedSettings();
     // Re-arm prayer notifications if last scheduled > 24h ago. Silent on web

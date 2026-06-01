@@ -1418,6 +1418,7 @@
     },
     "sections": {
       "about": "About",
+      "appLanguage": "App Language",
       "appearance": "Appearance",
       "contentLanguage": "Content Language",
       "credits": "Credits & Data Sources",
@@ -1449,6 +1450,11 @@
     "translationLang": {
       "englishOption": "🇬🇧 English",
       "explainer": "Note: Arabic is always shown. This setting affects English/Urdu translations of duas, dhikr, and hadith.",
+      "urduOption": "🇵🇰 اردو (Urdu)"
+    },
+    "appLang": {
+      "englishOption": "🇬🇧 English",
+      "explainer": "Changes the whole app interface. Choosing Urdu also switches translations to Urdu; choosing English keeps your translation choice.",
       "urduOption": "🇵🇰 اردو (Urdu)"
     }
   },

@@ -16,10 +16,10 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import * as Localization from 'expo-localization';
 
 import en from './locales/en.json';
 import ur from './locales/ur.json';
+import { getAppLanguage } from '../utils/settings';
 
 export const resources = {
   en: { translation: en },
@@ -29,23 +29,15 @@ export const resources = {
 export const SUPPORTED_LANGUAGES = Object.keys(resources);
 export const FALLBACK_LANGUAGE = 'en';
 
-// Detect the device language. We only switch away from English when we actually
-// ship that locale; everything unknown falls back to English. In Phase 1 every
-// locale file holds English text, so detection never changes what's on screen.
-function detectDeviceLanguage(): string {
-  try {
-    const code = Localization.getLocales()?.[0]?.languageCode?.toLowerCase();
-    if (code && SUPPORTED_LANGUAGES.includes(code)) return code;
-  } catch {
-    // expo-localization can throw on some web/SSR contexts — fall through.
-  }
-  return FALLBACK_LANGUAGE;
-}
-
+// The interface starts in English on a fresh install. The user's saved choice
+// (English or Urdu) is applied asynchronously on startup via
+// `applyPersistedAppLanguage()` — see app/_layout.tsx. We don't auto-detect the
+// device locale here: the owner wants English to be the deliberate default,
+// with Urdu opted into from Settings → Language.
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
     resources,
-    lng: detectDeviceLanguage(),
+    lng: FALLBACK_LANGUAGE,
     fallbackLng: FALLBACK_LANGUAGE,
     defaultNS: 'translation',
     // React already escapes values, so i18next must not double-escape.
@@ -55,6 +47,20 @@ if (!i18n.isInitialized) {
     keySeparator: '.',
     nsSeparator: ':',
   });
+}
+
+// Read the persisted App Language and switch the UI to it. Called once on
+// startup. Safe to call before/after first render — react-i18next re-renders
+// consumers when the language changes. Failures fall back to English silently.
+export async function applyPersistedAppLanguage(): Promise<void> {
+  try {
+    const lang = await getAppLanguage();
+    if (lang && i18n.language !== lang) {
+      await i18n.changeLanguage(lang);
+    }
+  } catch {
+    // Keep the English default if storage is unavailable.
+  }
 }
 
 export default i18n;

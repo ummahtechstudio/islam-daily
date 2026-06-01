@@ -45,6 +45,26 @@ export function urduStyle(fontSize: number): {
 
 export const UrduTextStyle = urduStyle(18);
 
+// ─── Urdu UI-label helper ─────────────────────────────────────────────────────
+// Lighter than `urduStyle` — for short interface labels/buttons (not body copy).
+// Applies the Nastaliq face, right-alignment and RTL so the Urdu text itself
+// reads correctly while the surrounding layout stays left-to-right. Pass the
+// label's existing fontSize so the line height scales with it.
+
+export function urduUiStyle(fontSize: number = 15): {
+  fontFamily: string;
+  lineHeight: number;
+  textAlign: 'right';
+  writingDirection: 'rtl';
+} {
+  return {
+    fontFamily: URDU_FONT,
+    lineHeight: Math.round(fontSize * 1.9),
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  };
+}
+
 export const FontSizes = {
   xs: 11,
   sm: 13,
