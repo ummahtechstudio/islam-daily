@@ -671,7 +671,11 @@ export default function HomeScreen() {
         <GreetingCard
           hijriDate={
             prayerData
-              ? `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.en} ${prayerData.date.hijri.year}`
+              ? `${prayerData.date.hijri.day} ${
+                  hijriMonth >= 1 && hijriMonth <= 12
+                    ? t(`calendar.hijriMonths.${hijriMonth}`)
+                    : prayerData.date.hijri.month.en
+                } ${prayerData.date.hijri.year}`
               : null
           }
         />

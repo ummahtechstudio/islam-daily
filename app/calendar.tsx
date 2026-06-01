@@ -18,7 +18,8 @@ import { trackScreen } from '../src/services/analytics';
 // ─── Hijri conversion (Umm al-Qura approximation) ────────────────────────────
 
 function toHijri(date: Date): { day: number; month: number; monthName: string; year: number } {
-  // HIJRI_MONTHS are Islamic month names — content, not translated via i18n keys
+  // English fallback names only — the UI normally renders the localized
+  // calendar.hijriMonths.* keys; this is used if the month index is out of range.
   const HIJRI_MONTHS = [
     'Muharram', 'Safar', "Rabi' al-Awwal", "Rabi' al-Thani",
     'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', "Sha'ban",
@@ -64,20 +65,21 @@ function toHijri(date: Date): { day: number; month: number; monthName: string; y
 
 // ─── Islamic events ───────────────────────────────────────────────────────────
 
-// ISLAMIC_EVENTS names are proper Islamic event names (content) — not extracted to i18n keys.
-// The abbreviated Hijri month names in the eventDate display are also Islamic calendar content.
-const ISLAMIC_EVENTS: { hijriMonth: number; hijriDay: number; name: string; icon: string }[] = [
-  { hijriMonth: 1, hijriDay: 1, name: 'Islamic New Year', icon: '🎊' },
-  { hijriMonth: 1, hijriDay: 10, name: 'Day of Ashura', icon: '🌙' },
-  { hijriMonth: 3, hijriDay: 12, name: "Mawlid an-Nabi (Prophet's Birthday)", icon: '🌟' },
-  { hijriMonth: 7, hijriDay: 27, name: "Isra and Mi'raj", icon: '✨' },
-  { hijriMonth: 8, hijriDay: 15, name: "Laylat al-Bara'at (Night of Forgiveness)", icon: '🙏' },
-  { hijriMonth: 9, hijriDay: 1, name: 'Ramadan Begins', icon: '🌙' },
-  { hijriMonth: 9, hijriDay: 27, name: "Laylat al-Qadr (Night of Power)", icon: '💫' },
-  { hijriMonth: 10, hijriDay: 1, name: 'Eid al-Fitr', icon: '🎉' },
-  { hijriMonth: 12, hijriDay: 8, name: 'Hajj Begins', icon: '🕋' },
-  { hijriMonth: 12, hijriDay: 9, name: 'Day of Arafah', icon: '⛰️' },
-  { hijriMonth: 12, hijriDay: 10, name: 'Eid al-Adha', icon: '🎊' },
+// Event names + the Hijri month names in the eventDate display are Islamic
+// calendar content, but they should follow the UI language — each entry carries
+// an i18n key (calendar.islamicEvents.*) translated at render time.
+const ISLAMIC_EVENTS: { hijriMonth: number; hijriDay: number; key: string; icon: string }[] = [
+  { hijriMonth: 1, hijriDay: 1, key: 'islamicNewYear', icon: '🎊' },
+  { hijriMonth: 1, hijriDay: 10, key: 'ashura', icon: '🌙' },
+  { hijriMonth: 3, hijriDay: 12, key: 'mawlid', icon: '🌟' },
+  { hijriMonth: 7, hijriDay: 27, key: 'israMiraj', icon: '✨' },
+  { hijriMonth: 8, hijriDay: 15, key: 'baraat', icon: '🙏' },
+  { hijriMonth: 9, hijriDay: 1, key: 'ramadanBegins', icon: '🌙' },
+  { hijriMonth: 9, hijriDay: 27, key: 'laylatAlQadr', icon: '💫' },
+  { hijriMonth: 10, hijriDay: 1, key: 'eidAlFitr', icon: '🎉' },
+  { hijriMonth: 12, hijriDay: 8, key: 'hajjBegins', icon: '🕋' },
+  { hijriMonth: 12, hijriDay: 9, key: 'arafah', icon: '⛰️' },
+  { hijriMonth: 12, hijriDay: 10, key: 'eidAlAdha', icon: '🎊' },
 ];
 
 // Stable keys for the weekday and Gregorian month labels (UI strings).
@@ -86,12 +88,6 @@ const MONTH_KEYS = [
   'january', 'february', 'march', 'april', 'may', 'june',
   'july', 'august', 'september', 'october', 'november', 'december',
 ] as const;
-
-// Abbreviated Hijri month names used in event date display — Islamic calendar content.
-const HIJRI_MONTH_ABBR = [
-  'Muharram','Safar',"Rabi' I","Rabi' II","Jumada I","Jumada II",
-  'Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhu al-Qi'dah",'Dhu al-Hijjah',
-];
 
 export default function CalendarScreen() {
   useEffect(() => { trackScreen('Calendar'); }, []);
@@ -135,7 +131,10 @@ export default function CalendarScreen() {
           <Text style={styles.hijriToday}>
             {t('calendar.header.todayHijri', {
               day: todayHijri.day,
-              monthName: todayHijri.monthName,
+              monthName:
+                todayHijri.month >= 1 && todayHijri.month <= 12
+                  ? t(`calendar.hijriMonths.${todayHijri.month}`)
+                  : todayHijri.monthName,
               year: todayHijri.year,
             })}
           </Text>
@@ -228,11 +227,11 @@ export default function CalendarScreen() {
             >
               <Text style={styles.eventIcon}>{event.icon}</Text>
               <View style={styles.eventInfo}>
-                {/* event.name is a proper Islamic event name — content, not translated */}
-                <Text style={[styles.eventName, { color: theme.text }]}>{event.name}</Text>
-                {/* HIJRI_MONTH_ABBR entries are Islamic calendar content — not translated */}
+                <Text style={[styles.eventName, { color: theme.text }]}>
+                  {t(`calendar.islamicEvents.${event.key}`)}
+                </Text>
                 <Text style={[styles.eventDate, { color: Colors.primary }]}>
-                  {event.hijriDay} {HIJRI_MONTH_ABBR[event.hijriMonth - 1]}
+                  {event.hijriDay} {t(`calendar.hijriMonths.${event.hijriMonth}`)}
                 </Text>
               </View>
             </View>

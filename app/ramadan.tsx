@@ -134,7 +134,7 @@ export default function RamadanScreen() {
             <Text style={styles.headerSub}>
               {t('ramadan.header.hijriDay', {
                 day: currentHijriDay,
-                month: isRamadan ? '9 (Ramadan)' : '—',
+                month: isRamadan ? t('calendar.hijriMonths.9') : '—',
               })}
             </Text>
           )}

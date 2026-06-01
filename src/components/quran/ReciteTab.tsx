@@ -29,6 +29,13 @@ import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
 import { useDebouncedPositionWriter } from '../../hooks/useQuranLastPosition';
 
 const ALL_PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1);
+// Uniform per-page height estimate used only for getItemLayout. A Mushaf page
+// renders to roughly one screen, so this lets scrollToIndex compute a far
+// page's offset directly (instant jump) without progressively rendering every
+// page in between. Cells still render at their natural height — getItemLayout
+// only feeds scroll math and off-screen spacer sizing, so manual continuous
+// scrolling is unaffected.
+const ITEM_HEIGHT = Dimensions.get('window').height;
 const FONT_SCALE_KEY = 'quran_font_scale';
 const LAST_PAGE_KEY = 'quran_last_page';
 const FONT_SCALE_MIN = 0.7;
@@ -103,21 +110,14 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     };
   }, []);
 
-  // After hydration, scroll to last page if not page 1. Uses the same
-  // scrollToOffset-then-snap path as jumpToPage so far jumps land instantly.
+  // After hydration, jump straight to the last-read page if not page 1.
+  // getItemLayout makes this an instant, direct jump.
   useEffect(() => {
     if (!hydrated || currentPage <= 1) return;
-    const list = flatListRef.current;
-    if (!list) return;
-    const screenHeight = Dimensions.get('window').height;
-    list.scrollToOffset({
-      offset: (currentPage - 1) * screenHeight,
+    flatListRef.current?.scrollToIndex({
+      index: currentPage - 1,
       animated: false,
     });
-    const t = setTimeout(() => {
-      list.scrollToIndex({ index: currentPage - 1, animated: false });
-    }, 250);
-    return () => clearTimeout(t);
     // Only fire once after first hydration; intentionally no deps on currentPage.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
@@ -185,23 +185,13 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     }, 80);
   }, []);
 
-  // Each Mushaf page renders to roughly screen-height. Using this estimate to
-  // jump via scrollToOffset first avoids onScrollToIndexFailed's intermediate
-  // render that previously made far jumps look like a smooth scroll.
+  // With getItemLayout in place, scrollToIndex computes the target page's
+  // offset directly and lands on it instantly — no animation, no rendering of
+  // the pages in between.
   const jumpToPage = useCallback((page: number) => {
     const clamped = Math.max(1, Math.min(TOTAL_PAGES, page));
-    const list = flatListRef.current;
-    if (!list) return;
     setCurrentPage(clamped);
-    const screenHeight = Dimensions.get('window').height;
-    list.scrollToOffset({
-      offset: (clamped - 1) * screenHeight,
-      animated: false,
-    });
-    // Snap to exact item once it has been measured.
-    setTimeout(() => {
-      list.scrollToIndex({ index: clamped - 1, animated: false });
-    }, 50);
+    flatListRef.current?.scrollToIndex({ index: clamped - 1, animated: false });
   }, []);
 
   useEffect(() => {
@@ -253,6 +243,11 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
         data={ALL_PAGES}
         keyExtractor={(item) => String(item)}
         renderItem={renderPage}
+        getItemLayout={(_, index) => ({
+          length: ITEM_HEIGHT,
+          offset: ITEM_HEIGHT * index,
+          index,
+        })}
         initialNumToRender={2}
         maxToRenderPerBatch={3}
         windowSize={5}
