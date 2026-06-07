@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -7,7 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '../../constants/colors';
 import { spacing, radius } from '../../constants/spacing';
 import { urduStyle } from '../../constants/fonts';
-import { getBundledDuas } from '../../services/content';
+import {
+  getBundledDuas,
+  getCachedOrBundledDuas,
+} from '../../services/content';
 import type { NamazDuaLink } from '../../types/namaz';
 
 export interface DuaLinkGridProps {
@@ -24,11 +27,18 @@ export function DuaLinkGrid({ links, theme }: DuaLinkGridProps) {
   const { t } = useTranslation();
   const router = useRouter();
 
+  // Count from the SAME source the Duas tab renders (cached-or-bundled), so
+  // the card counts always match the list each link lands on.
+  const [duaCategories, setDuaCategories] = useState(() => getBundledDuas());
+  useEffect(() => {
+    setDuaCategories(getCachedOrBundledDuas());
+  }, []);
+
   const countByCategory = useMemo(() => {
     const map = new Map<string, number>();
-    for (const cat of getBundledDuas()) map.set(cat.id, cat.duas.length);
+    for (const cat of duaCategories) map.set(cat.id, cat.duas.length);
     return map;
-  }, []);
+  }, [duaCategories]);
 
   return (
     <View style={styles.grid}>

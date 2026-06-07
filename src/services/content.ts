@@ -63,10 +63,25 @@ export function getBundledDuas(): DuaCategory[] {
   return DUAS_BUNDLED;
 }
 
+// A cached/remote snapshot is only trustworthy if it covers every bundled
+// category with at least one dua. The bundled set is the verified baseline
+// (102 duas / 18 categories); a partial remote table (e.g. the legacy 53-row
+// pilot still in Supabase) would otherwise silently hide whole categories —
+// Marriage, Sickness, Rizq, Friday — from the Duas tab while link cards and
+// counts elsewhere are computed from the full bundled data.
+function coversAllBundledCategories(cats: DuaCategory[]): boolean {
+  const countById = new Map(cats.map((c) => [c.id, c.duas?.length ?? 0]));
+  return DUAS_BUNDLED.every((b) => (countById.get(b.id) ?? 0) > 0);
+}
+
 export function getCachedOrBundledDuas(): DuaCategory[] {
   try {
     const cached = cache.getJSON<DuaCategory[]>(CACHE_KEYS.DUAS);
-    if (cached && cached.length) return cached;
+    // Guard at read time too: devices that already cached a stale partial
+    // snapshot fall back to bundled even before the next refresh runs.
+    if (cached && cached.length && coversAllBundledCategories(cached)) {
+      return cached;
+    }
   } catch { /* storage not ready -> fall through */ }
   return DUAS_BUNDLED;
 }
@@ -119,7 +134,11 @@ export async function refreshDuas(): Promise<void> {
         description_source: row.description_source,
       });
     }
-    cache.setJSON<DuaCategory[]>(CACHE_KEYS.DUAS, Array.from(grouped.values()));
+    const remote = Array.from(grouped.values());
+    // Refuse to cache a snapshot that is sparser than the bundled baseline —
+    // it would downgrade verified content and empty out entire categories.
+    if (!coversAllBundledCategories(remote)) return;
+    cache.setJSON<DuaCategory[]>(CACHE_KEYS.DUAS, remote);
   } catch {
     // bundled content is always available
   }
