@@ -20,6 +20,7 @@ const ALL_HOME_TILES: HomeTile[] = [
 
   // Islamic Knowledge
   { id: 'hadith',         label: 'Hadith',            emoji: '📜', route: '/hadith',         required: true,  defaultEnabled: true },
+  { id: 'namaz',          label: 'Namaz Guide',       emoji: '🕌', route: '/namaz',          required: false, defaultEnabled: true },
   { id: 'names',          label: '99 Names of Allah', emoji: '☪️', route: '/names',          required: false, defaultEnabled: true },
   { id: 'islamic-books',  label: 'Islamic Books',     emoji: '📕', route: '/islamic-books',  required: false, defaultEnabled: true },
 

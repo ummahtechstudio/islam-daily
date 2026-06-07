@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../src/constants/colors';
@@ -44,11 +45,25 @@ export default function DuaScreen() {
   const [hydrated, setHydrated] = useState(false);
   const [tasbeehHandoffId, setTasbeehHandoffId] = useState<string | null>(null);
 
+  // Deep-link support (e.g. from the Namaz module's "Masnoon Duas" links):
+  // /dua?category=waking opens the Duas subtab pre-filtered to that category.
+  const { category: categoryParam } = useLocalSearchParams<{ category?: string }>();
+  const categoryParamRef = useRef(categoryParam);
+  categoryParamRef.current = categoryParam;
+  useEffect(() => {
+    if (categoryParam) setSubtab('duas');
+  }, [categoryParam]);
+
   useEffect(() => {
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(SUBTAB_KEY);
-        if (raw === 'moment' || raw === 'duas' || raw === 'dhikr' || raw === 'tasbeeh') {
+        // A deep-link param wins over the remembered subtab — don't let the
+        // async restore overwrite the 'duas' subtab the param just forced.
+        if (
+          !categoryParamRef.current &&
+          (raw === 'moment' || raw === 'duas' || raw === 'dhikr' || raw === 'tasbeeh')
+        ) {
           setSubtab(raw);
         }
       } catch {}
@@ -103,7 +118,7 @@ export default function DuaScreen() {
         {!hydrated ? null : subtab === 'moment' ? (
           <MomentSubtab theme={theme} />
         ) : subtab === 'duas' ? (
-          <DuasSubtab theme={theme} />
+          <DuasSubtab theme={theme} initialCategory={categoryParam} />
         ) : subtab === 'dhikr' ? (
           <DhikrSubtab theme={theme} onCountWithTasbeeh={handleCountWithTasbeeh} />
         ) : (

@@ -95,6 +95,7 @@ const SECTIONS = [
     color: '#3B82F6',
     items: [
       { icon: '🔖', itemKey: 'myBookmarks',     route: '/bookmarks',     bg: '#EF9F2722' },
+      { icon: '🤲', itemKey: 'namazGuide',      route: '/namaz',         bg: '#0F6E5622' },
       { icon: '📚', itemKey: 'hadithBrowser',   route: '/hadith',        bg: '#3B82F622' },
       { icon: '☪️',  itemKey: 'names99',         route: '/names',         bg: '#8B5CF622' },
       { icon: '📖', itemKey: 'islamicBooks',    route: '/islamic-books', bg: '#22C55E22' },

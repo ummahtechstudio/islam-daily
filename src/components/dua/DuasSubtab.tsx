@@ -75,9 +75,11 @@ function CategoryIcon({
 
 export interface DuasSubtabProps {
   theme: typeof Colors.dark;
+  /** Deep-link target: pre-select this category slug (e.g. from /dua?category=waking). */
+  initialCategory?: string;
 }
 
-export function DuasSubtab({ theme }: DuasSubtabProps) {
+export function DuasSubtab({ theme, initialCategory }: DuasSubtabProps) {
   const { t } = useTranslation();
   const [hisnulMuslim, setHisnulMuslim] = useState<DuaCategory[]>(() => getBundledDuas());
   // Defensive: if the bundle is ever empty (broken JSON, content not yet
@@ -94,6 +96,12 @@ export function DuasSubtab({ theme }: DuasSubtabProps) {
   useEffect(() => {
     setHisnulMuslim(getCachedOrBundledDuas());
   }, []);
+
+  // Honor a deep-link category whenever it (re)arrives — navigating from the
+  // Namaz module's linked-duas grid lands directly on the right category.
+  useEffect(() => {
+    if (initialCategory) setSelectedCategory(initialCategory);
+  }, [initialCategory]);
 
   useEffect(() => { setExpanded(null); }, [selectedCategory]);
   useEffect(() => { setExpanded(null); }, [searchQuery]);

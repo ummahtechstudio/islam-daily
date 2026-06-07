@@ -651,6 +651,201 @@ function validateDhikr() {
   stats[FILE].entries = totalItems;
 }
 
+// ─── CATEGORY A + K: namaz-core.json ─────────────────────────────────────────
+
+function validateNamaz() {
+  const FILE = 'assets/data/namaz-core.json';
+  let data: any;
+  try {
+    data = readJson(FILE);
+  } catch (e: any) {
+    record('ERROR', FILE, 'A', '<root>', 'JSON parse failed', String(e?.message ?? e));
+    return;
+  }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    record('ERROR', FILE, 'A', '<root>', 'Top-level must be an object { version, entries, categories }');
+    return;
+  }
+  if (!Array.isArray(data.entries)) {
+    record('ERROR', FILE, 'A', 'entries', 'entries must be an array');
+    return;
+  }
+  if (!Array.isArray(data.categories)) {
+    record('ERROR', FILE, 'A', 'categories', 'categories must be an array');
+    return;
+  }
+
+  // ── entries[] ──
+  const entryIds = new Set<string>();
+  for (let i = 0; i < data.entries.length; i++) {
+    const e = data.entries[i];
+    const loc = `entries[${i}]`;
+    if (!e || typeof e !== 'object') {
+      record('ERROR', FILE, 'A', loc, 'Entry is not an object');
+      continue;
+    }
+    if (!e.id || typeof e.id !== 'string') {
+      record('ERROR', FILE, 'K', `${loc}.id`, 'Entry id missing or not a string');
+    } else if (entryIds.has(e.id)) {
+      record('ERROR', FILE, 'C', `${loc}.id`, `Duplicate entry id "${e.id}"`);
+    } else {
+      entryIds.add(e.id);
+    }
+    if (!e.title_en) record('ERROR', FILE, 'K', `${loc}.title_en`, 'title_en missing');
+    if (!e.title_ur) record('ERROR', FILE, 'K', `${loc}.title_ur`, 'title_ur missing');
+    if (!e.source) record('ERROR', FILE, 'K', `${loc}.source`, 'source missing');
+    else validateReference(FILE, `${loc}.source`, e.source);
+
+    if (e.kind === 'recitation') {
+      if (!e.arabic) record('ERROR', FILE, 'K', `${loc}.arabic`, 'Recitation missing arabic field');
+      else validateArabic(FILE, `${loc}.arabic`, e.arabic);
+      if (!e.transliteration) record('WARNING', FILE, 'K', `${loc}.transliteration`, 'No transliteration provided');
+      if (!e.translation_en) record('ERROR', FILE, 'K', `${loc}.translation_en`, 'translation_en missing');
+      if (!e.translation_ur) record('ERROR', FILE, 'K', `${loc}.translation_ur`, 'translation_ur missing');
+    } else if (e.kind === 'quran') {
+      // Quranic text must never be hand-typed — coordinates only.
+      if (e.arabic) {
+        record('ERROR', FILE, 'K', `${loc}.arabic`, 'Quran-ref entry must not carry Arabic text (resolved from Tanzil at runtime)');
+      }
+      const surah = e.surah, start = e.ayahStart, end = e.ayahEnd;
+      if (typeof surah !== 'number' || surah < 1 || surah > 114) {
+        record('ERROR', FILE, 'E', `${loc}.surah`, `Surah ${surah} out of range (1–114)`);
+      } else {
+        const max = QURAN_AYAH_COUNTS[surah - 1];
+        if (typeof start !== 'number' || start < 1 || start > max) {
+          record('ERROR', FILE, 'E', `${loc}.ayahStart`, `Ayah ${start} out of range — surah ${surah} has ${max} ayahs`);
+        }
+        if (typeof end !== 'number' || end < 1 || end > max) {
+          record('ERROR', FILE, 'E', `${loc}.ayahEnd`, `Ayah ${end} out of range — surah ${surah} has ${max} ayahs`);
+        }
+        if (typeof start === 'number' && typeof end === 'number' && start > end) {
+          record('ERROR', FILE, 'E', `${loc}`, `ayahStart ${start} > ayahEnd ${end}`);
+        }
+      }
+    } else {
+      record('ERROR', FILE, 'K', `${loc}.kind`, `Unknown entry kind ${JSON.stringify(e.kind)}`);
+    }
+  }
+
+  // ── categories[] ──
+  const catIds = new Set<string>();
+  const checkRecitationIds = (ids: unknown, loc: string) => {
+    if (ids == null) return;
+    if (!Array.isArray(ids)) {
+      record('ERROR', FILE, 'K', loc, 'recitationIds must be an array');
+      return;
+    }
+    for (const id of ids) {
+      if (!entryIds.has(id)) {
+        record('ERROR', FILE, 'K', loc, `recitationIds references unknown entry "${id}"`);
+      }
+    }
+  };
+
+  for (let ci = 0; ci < data.categories.length; ci++) {
+    const cat = data.categories[ci];
+    const catLoc = `categories[${ci}]`;
+    if (!cat || typeof cat !== 'object') {
+      record('ERROR', FILE, 'A', catLoc, 'Category is not an object');
+      continue;
+    }
+    if (!cat.id) record('ERROR', FILE, 'K', `${catLoc}.id`, 'Category id missing');
+    else if (catIds.has(cat.id)) record('ERROR', FILE, 'C', `${catLoc}.id`, `Duplicate category id "${cat.id}"`);
+    else catIds.add(cat.id);
+    if (!cat.title_en) record('ERROR', FILE, 'K', `${catLoc}.title_en`, 'title_en missing');
+    if (!cat.title_ur) record('ERROR', FILE, 'K', `${catLoc}.title_ur`, 'title_ur missing');
+    if (!Array.isArray(cat.items) || cat.items.length === 0) {
+      record('ERROR', FILE, 'K', `${catLoc}.items`, 'Category has no items');
+      continue;
+    }
+
+    for (let ii = 0; ii < cat.items.length; ii++) {
+      const item = cat.items[ii];
+      const loc = `${catLoc}.items[${ii}]`;
+      if (!item || typeof item !== 'object') {
+        record('ERROR', FILE, 'A', loc, 'Item is not an object');
+        continue;
+      }
+      switch (item.kind) {
+        case 'entry':
+          if (!entryIds.has(item.entryId)) {
+            record('ERROR', FILE, 'K', `${loc}.entryId`, `References unknown entry "${item.entryId}"`);
+          }
+          break;
+        case 'sequence': {
+          if (!Array.isArray(item.steps) || item.steps.length === 0) {
+            record('ERROR', FILE, 'K', `${loc}.steps`, 'Sequence has no steps');
+            break;
+          }
+          if (item.source) validateReference(FILE, `${loc}.source`, item.source);
+          const stepIds = new Set<string>();
+          for (let si = 0; si < item.steps.length; si++) {
+            const step = item.steps[si];
+            const sLoc = `${loc}.steps[${si}]`;
+            if (!step?.id) record('ERROR', FILE, 'K', `${sLoc}.id`, 'Step id missing');
+            else if (stepIds.has(step.id)) record('ERROR', FILE, 'C', `${sLoc}.id`, `Duplicate step id "${step.id}"`);
+            else stepIds.add(step.id);
+            if (!step?.title_en) record('ERROR', FILE, 'K', `${sLoc}.title_en`, 'title_en missing');
+            if (!step?.title_ur) record('ERROR', FILE, 'K', `${sLoc}.title_ur`, 'title_ur missing');
+            if (!step?.body_en) record('ERROR', FILE, 'K', `${sLoc}.body_en`, 'body_en missing');
+            if (!step?.body_ur) record('ERROR', FILE, 'K', `${sLoc}.body_ur`, 'body_ur missing');
+            checkRecitationIds(step?.recitationIds, `${sLoc}.recitationIds`);
+          }
+          break;
+        }
+        case 'checklist': {
+          if (!Array.isArray(item.items) || item.items.length === 0) {
+            record('ERROR', FILE, 'K', `${loc}.items`, 'Checklist has no items');
+            break;
+          }
+          if (item.source) validateReference(FILE, `${loc}.source`, item.source);
+          for (let li = 0; li < item.items.length; li++) {
+            const cl = item.items[li];
+            if (!cl?.text_en) record('ERROR', FILE, 'K', `${loc}.items[${li}].text_en`, 'text_en missing');
+            if (!cl?.text_ur) record('ERROR', FILE, 'K', `${loc}.items[${li}].text_ur`, 'text_ur missing');
+          }
+          break;
+        }
+        case 'table': {
+          if (!Array.isArray(item.columns) || !Array.isArray(item.rows)) {
+            record('ERROR', FILE, 'K', loc, 'Table missing columns/rows arrays');
+            break;
+          }
+          for (let ri = 0; ri < item.rows.length; ri++) {
+            const row = item.rows[ri];
+            if (!Array.isArray(row?.cells) || row.cells.length !== item.columns.length) {
+              record(
+                'ERROR',
+                FILE,
+                'K',
+                `${loc}.rows[${ri}].cells`,
+                `Row has ${row?.cells?.length ?? 0} cells, expected ${item.columns.length}`,
+              );
+            }
+          }
+          break;
+        }
+        case 'dua_link':
+          // CATEGORY J: links must target a real duas-core category slug.
+          if (!KNOWN_DUA_CATEGORIES.has(item.duaCategoryId)) {
+            record(
+              'ERROR',
+              FILE,
+              'J',
+              `${loc}.duaCategoryId`,
+              `dua_link targets unknown dua category "${item.duaCategoryId}"`,
+            );
+          }
+          break;
+        default:
+          record('ERROR', FILE, 'K', `${loc}.kind`, `Unknown item kind ${JSON.stringify(item.kind)}`);
+      }
+    }
+  }
+
+  stats[FILE].entries = data.entries.length;
+}
+
 // ─── CATEGORY A + F: names_of_allah.json ─────────────────────────────────────
 
 function validateNamesOfAllah() {
@@ -965,6 +1160,7 @@ function renderMarkdown(reportPath: string) {
   lines.push(`- **H** — Dhikr Structure`);
   lines.push(`- **I** — Encoding Sanity`);
   lines.push(`- **J** — Cross-File Consistency`);
+  lines.push(`- **K** — Namaz Module Structure`);
   lines.push('');
 
   // Issues grouped by file
@@ -1008,6 +1204,7 @@ function renderMarkdown(reportPath: string) {
 function main() {
   validateHisnulMuslim();
   validateDhikr();
+  validateNamaz();
   validateNamesOfAllah();
   validateGenericArray('assets/daily_knowledge.json', ['id', 'category', 'en']);
   validateGenericArray('assets/islamic_tips.json', ['id', 'title', 'tip']);

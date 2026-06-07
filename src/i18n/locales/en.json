@@ -559,6 +559,10 @@
           "label": "Mosque Finder",
           "sub": "Near you"
         },
+        "namaz": {
+          "label": "Namaz Guide",
+          "sub": "How to pray"
+        },
         "names": {
           "label": "99 Names of Allah",
           "sub": "Asmaul Husna"
@@ -718,6 +722,10 @@
         "label": "My Bookmarks",
         "sub": "Saved hadith, duas & dhikr"
       },
+      "namazGuide": {
+        "label": "Namaz Guide",
+        "sub": "Wudu, salah & masnoon duas"
+      },
       "names99": {
         "label": "99 Names",
         "sub": "Asma ul-Husna"
@@ -794,6 +802,41 @@
     "loading": "Finding mosques near you...",
     "openSettings": "Open Settings"
   },
+  "namaz": {
+    "about": {
+      "link": "About this guide",
+      "title": "About this Guide",
+      "compiledBy": "Compiled by Ummah Tech Studio",
+      "methodologyTitle": "Methodology",
+      "methodology": "Quranic passages are taken directly from the app's Tanzil-verified Quran text and are never retyped. Duas and in-salah recitations are compiled from authentic hadith via the Hisn al-Muslim collection, each entry carrying its own source line. The salah method follows standard Hanafi fiqh.",
+      "sourcesTitle": "Sources",
+      "sources": "Quran (Tanzil) · Sahih al-Bukhari · Sahih Muslim · Sunan Abi Dawud · Jami' at-Tirmidhi · Hisn al-Muslim · Hanafi fiqh texts",
+      "disclaimer": "This is a compilation of established Islamic source material organized for the Islam Daily app. It is not a reproduction of any third-party book."
+    },
+    "header": {
+      "title": "Namaz & Masnoon Duas",
+      "brand": "Islam Daily · Ummah Tech Studio"
+    },
+    "categoryCount": "{{count}} sections",
+    "linkedDuas": {
+      "hint": "These open in the Duas section of the app",
+      "count": "{{count}} duas"
+    },
+    "startWalkthrough": "Start step-by-step guide",
+    "step": {
+      "progress": "Step {{current}} of {{total}}",
+      "next": "Next",
+      "prev": "Back",
+      "finish": "Finish"
+    },
+    "steps": "Steps",
+    "repeatBadge": "×{{count}}",
+    "fardBadge": "FARD",
+    "hanafiNote": "Note (Hanafi)",
+    "reference": "Source:",
+    "playAudio": "Play recitation",
+    "stopAudio": "Stop recitation"
+  },
   "names": {
     "detail": {
       "counter": "{{id}} / 99",
@@ -823,7 +866,10 @@
       "quranReader": "Quran Reader",
       "ramadan": "Ramadan",
       "settings": "Settings",
-      "zakatCalculator": "Zakat Calculator"
+      "zakatCalculator": "Zakat Calculator",
+      "namaz": "Namaz Guide",
+      "namazHowToPray": "How to Pray",
+      "namazAbout": "About this Guide"
     }
   },
   "notifications": {

@@ -38,6 +38,7 @@ interface QuranAudioCtx extends State {
   reciters: QuranReciter[];
   setReciter: (id: string) => void;
   playAyah: (surah: number, ayah: number) => Promise<void>;
+  playRange: (surah: number, ayahStart: number, ayahEnd: number) => Promise<void>;
   togglePlay: () => Promise<void>;
   next: () => Promise<void>;
   prev: () => Promise<void>;
@@ -107,6 +108,12 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
     async () => {},
   );
 
+  // Bounded playback (e.g. Al-Fatiha in the Namaz guide): when set,
+  // auto-advance stops after this ayah instead of rolling on through the
+  // rest of the Quran. Direct playAyah calls clear it; startAyah preserves
+  // it so the range survives auto-advance, next/prev, and reciter swaps.
+  const rangeEndRef = useRef<Playing | null>(null);
+
   const onStatus = useCallback((status: AVPlaybackStatus) => {
     if (!status.isLoaded) return;
     // Push isPlaying changes into state so the UI reflects pause/resume
@@ -121,6 +128,13 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
       // or stop at end of Quran (114:6).
       const cur = stateRef.current.current;
       if (!cur) return;
+      const end = rangeEndRef.current;
+      if (end && cur.surah === end.surah && cur.ayah === end.ayah) {
+        // Reached the end of a bounded range — stop instead of advancing.
+        rangeEndRef.current = null;
+        setState((prev) => ({ ...prev, isPlaying: false }));
+        return;
+      }
       const nxt = nextAyah(cur.surah, cur.ayah);
       if (!nxt) {
         // End of Quran — stop cleanly.
@@ -131,7 +145,10 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
     }
   }, []);
 
-  const playAyah = useCallback(
+  // Core load-and-play. Deliberately does NOT touch rangeEndRef — it is the
+  // path auto-advance, next/prev, retry, and reciter swaps go through, all of
+  // which must preserve an active bounded range.
+  const startAyah = useCallback(
     async (surah: number, ayah: number) => {
       // Tear down any previous sound first.
       const prevSound = soundRef.current;
@@ -187,12 +204,32 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
     [onStatus],
   );
 
-  // Update the ref every time playAyah is reconstructed so the status
+  // Update the ref every time startAyah is reconstructed so the status
   // callback (which only sees the first version via its closure) always
   // dispatches the latest implementation.
   useEffect(() => {
-    playAyahRef.current = playAyah;
-  }, [playAyah]);
+    playAyahRef.current = startAyah;
+  }, [startAyah]);
+
+  // Public play: a direct user tap escapes any active bounded range.
+  const playAyah = useCallback(
+    async (surah: number, ayah: number) => {
+      rangeEndRef.current = null;
+      await startAyah(surah, ayah);
+    },
+    [startAyah],
+  );
+
+  // Bounded play: start at ayahStart and stop after ayahEnd (inclusive).
+  // Used by the Namaz guide so Al-Fatiha stops at 1:7 instead of rolling
+  // into Al-Baqarah.
+  const playRange = useCallback(
+    async (surah: number, ayahStart: number, ayahEnd: number) => {
+      rangeEndRef.current = { surah, ayah: ayahEnd };
+      await startAyah(surah, ayahStart);
+    },
+    [startAyah],
+  );
 
   const togglePlay = useCallback(async () => {
     const sound = soundRef.current;
@@ -215,18 +252,19 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
     if (!cur) return;
     const nxt = nextAyah(cur.surah, cur.ayah);
     if (!nxt) return;
-    await playAyah(nxt.surah, nxt.ayah);
-  }, [playAyah]);
+    await startAyah(nxt.surah, nxt.ayah);
+  }, [startAyah]);
 
   const prev = useCallback(async () => {
     const cur = stateRef.current.current;
     if (!cur) return;
     const prv = prevAyah(cur.surah, cur.ayah);
     if (!prv) return;
-    await playAyah(prv.surah, prv.ayah);
-  }, [playAyah]);
+    await startAyah(prv.surah, prv.ayah);
+  }, [startAyah]);
 
   const stop = useCallback(async () => {
+    rangeEndRef.current = null;
     const sound = soundRef.current;
     soundRef.current = null;
     if (sound) {
@@ -249,8 +287,8 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
   const retry = useCallback(async () => {
     const cur = stateRef.current.current;
     if (!cur) return;
-    await playAyah(cur.surah, cur.ayah);
-  }, [playAyah]);
+    await startAyah(cur.surah, cur.ayah);
+  }, [startAyah]);
 
   const setReciter = useCallback(
     (id: string) => {
@@ -261,10 +299,10 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
       // the change is audible immediately.
       const cur = stateRef.current.current;
       if (cur) {
-        void playAyah(cur.surah, cur.ayah);
+        void startAyah(cur.surah, cur.ayah);
       }
     },
-    [playAyah],
+    [startAyah],
   );
 
   const isAyahActive = useCallback((surah: number, ayah: number) => {
@@ -278,6 +316,7 @@ export function QuranAudioProvider({ children }: { children: React.ReactNode }) 
     reciters: RECITERS,
     setReciter,
     playAyah,
+    playRange,
     togglePlay,
     next,
     prev,

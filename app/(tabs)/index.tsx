@@ -421,6 +421,7 @@ const MORE_SECTIONS: MoreSection[] = [
     color: '#2563EB',
     items: [
       { id: 'hadith',        icon: 'document-text-outline', label: 'Hadith',           sub: '6 collections',    route: '/hadith' },
+      { id: 'namaz',         icon: 'compass-outline', label: 'Namaz Guide',       sub: 'How to pray',      route: '/namaz' },
       { id: 'names',         icon: 'star-outline',  label: '99 Names of Allah', sub: 'Asmaul Husna',     route: '/names' },
       { id: 'islamic-books', icon: 'book-outline', label: 'Islamic Books',     sub: 'Free PDFs',        route: '/islamic-books' },
     ],

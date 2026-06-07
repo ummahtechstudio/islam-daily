@@ -1,0 +1,1291 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "kind": "recitation",
+      "id": "wudu_bismillah",
+      "title_en": "Before starting wudu",
+      "title_ur": "وضو شروع کرنے سے پہلے",
+      "arabic": "بِسْمِ اللَّهِ",
+      "transliteration": "Bismillah",
+      "translation_en": "In the name of Allah.",
+      "translation_ur": "اللہ کے نام سے۔",
+      "source": "Abu Dawud 101",
+      "note_en": "Saying Bismillah at the start of wudu is an emphasized sunnah.",
+      "note_ur": "وضو کے آغاز میں بسم اللہ کہنا سنتِ مؤکدہ ہے۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "wudu_after_shahadah",
+      "title_en": "After completing wudu (shahadah)",
+      "title_ur": "وضو مکمل کرنے کے بعد (شہادت)",
+      "arabic": "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+      "transliteration": "Ash-hadu an la ilaha illallahu wahdahu la shareeka lah, wa ash-hadu anna Muhammadan 'abduhu wa rasooluh",
+      "translation_en": "I bear witness that none has the right to be worshipped except Allah, alone without partner, and I bear witness that Muhammad is His slave and Messenger.",
+      "translation_ur": "میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، اور میں گواہی دیتا ہوں کہ محمد ﷺ اس کے بندے اور رسول ہیں۔",
+      "source": "Sahih Muslim 234",
+      "note_en": "Whoever says this after wudu, the eight gates of Paradise are opened for him.",
+      "note_ur": "جو شخص وضو کے بعد یہ کہے اس کے لیے جنت کے آٹھوں دروازے کھول دیے جاتے ہیں۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "wudu_after_tawwabin",
+      "title_en": "After completing wudu (dua)",
+      "title_ur": "وضو مکمل کرنے کے بعد (دعا)",
+      "arabic": "اللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ",
+      "transliteration": "Allahummaj-'alni minat-tawwabeena waj-'alni minal-mutatahhireen",
+      "translation_en": "O Allah, make me among those who turn to You in repentance, and make me among those who purify themselves.",
+      "translation_ur": "اے اللہ! مجھے بہت توبہ کرنے والوں میں سے بنا اور مجھے خوب پاکیزگی اختیار کرنے والوں میں سے بنا۔",
+      "source": "Jami' at-Tirmidhi 55"
+    },
+    {
+      "kind": "recitation",
+      "id": "adhan_text",
+      "title_en": "The Adhan (call to prayer)",
+      "title_ur": "اذان",
+      "arabic": "اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ\nأَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ\nأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، أَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ\nحَيَّ عَلَى الصَّلَاةِ، حَيَّ عَلَى الصَّلَاةِ\nحَيَّ عَلَى الْفَلَاحِ، حَيَّ عَلَى الْفَلَاحِ\nاللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ\nلَا إِلَهَ إِلَّا اللَّهُ",
+      "transliteration": "Allahu Akbar, Allahu Akbar (×2) · Ash-hadu an la ilaha illallah (×2) · Ash-hadu anna Muhammadar-rasoolullah (×2) · Hayya 'alas-salah (×2) · Hayya 'alal-falah (×2) · Allahu Akbar, Allahu Akbar · La ilaha illallah",
+      "translation_en": "Allah is the Greatest (×4). I bear witness that none has the right to be worshipped except Allah (×2). I bear witness that Muhammad is the Messenger of Allah (×2). Come to prayer (×2). Come to success (×2). Allah is the Greatest (×2). None has the right to be worshipped except Allah.",
+      "translation_ur": "اللہ سب سے بڑا ہے (۴ بار)۔ میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں (۲ بار)۔ میں گواہی دیتا ہوں کہ محمد ﷺ اللہ کے رسول ہیں (۲ بار)۔ نماز کی طرف آؤ (۲ بار)۔ کامیابی کی طرف آؤ (۲ بار)۔ اللہ سب سے بڑا ہے (۲ بار)۔ اللہ کے سوا کوئی معبود نہیں۔",
+      "source": "Abu Dawud 499",
+      "note_en": "In the Fajr adhan, after 'Hayya 'alal-falah' the mu'adhdhin adds: As-salatu khayrum-minan-nawm (Prayer is better than sleep) — twice.",
+      "note_ur": "فجر کی اذان میں «حَيَّ عَلَى الْفَلَاحِ» کے بعد مؤذن دو بار «الصَّلَاةُ خَيْرٌ مِنَ النَّوْمِ» (نماز نیند سے بہتر ہے) کہتا ہے۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "adhan_response_hawqala",
+      "title_en": "Responding to the Adhan",
+      "title_ur": "اذان کا جواب",
+      "arabic": "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+      "transliteration": "La hawla wa la quwwata illa billah",
+      "translation_en": "There is no power and no strength except with Allah.",
+      "translation_ur": "گناہ سے بچنے کی طاقت اور نیکی کرنے کی قوت صرف اللہ ہی کی توفیق سے ہے۔",
+      "source": "Sahih Muslim 385",
+      "note_en": "Repeat each phrase of the adhan after the mu'adhdhin, except after 'Hayya 'alas-salah' and 'Hayya 'alal-falah', where this is said instead.",
+      "note_ur": "مؤذن کے ہر کلمے کا جواب وہی کلمہ دہرا کر دیں، سوائے «حَيَّ عَلَى الصَّلَاةِ» اور «حَيَّ عَلَى الْفَلَاحِ» کے، جن کے جواب میں یہ کلمات کہے جائیں۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "dua_after_adhan",
+      "title_en": "Dua after the Adhan",
+      "title_ur": "اذان کے بعد کی دعا",
+      "arabic": "اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ، وَالصَّلَاةِ الْقَائِمَةِ، آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ، وَابْعَثْهُ مَقَامًا مَحْمُودًا الَّذِي وَعَدْتَهُ",
+      "transliteration": "Allahumma rabba hadhihid-da'watit-tammah, was-salatil-qa'imah, ati Muhammadanil-waseelata wal-fadeelah, wab'ath-hu maqamam-mahmoodanil-ladhee wa'adtah",
+      "translation_en": "O Allah, Lord of this perfect call and the established prayer, grant Muhammad the wasilah and excellence, and raise him to the praised station You have promised him.",
+      "translation_ur": "اے اللہ! اس کامل پکار اور قائم ہونے والی نماز کے رب! محمد ﷺ کو وسیلہ اور فضیلت عطا فرما اور انہیں مقامِ محمود پر فائز فرما جس کا تو نے ان سے وعدہ کیا ہے۔",
+      "source": "Sahih al-Bukhari 614",
+      "note_en": "Whoever says this after the adhan, the intercession of the Prophet ﷺ becomes due for him.",
+      "note_ur": "جو شخص اذان کے بعد یہ دعا پڑھے اس کے لیے نبی کریم ﷺ کی شفاعت واجب ہو جاتی ہے۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "iqamah_text",
+      "title_en": "The Iqamah",
+      "title_ur": "اقامت (تکبیر)",
+      "arabic": "اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ\nأَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ\nأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ، أَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللَّهِ\nحَيَّ عَلَى الصَّلَاةِ، حَيَّ عَلَى الصَّلَاةِ\nحَيَّ عَلَى الْفَلَاحِ، حَيَّ عَلَى الْفَلَاحِ\nقَدْ قَامَتِ الصَّلَاةُ، قَدْ قَامَتِ الصَّلَاةُ\nاللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ\nلَا إِلَهَ إِلَّا اللَّهُ",
+      "transliteration": "Like the adhan, with the addition after 'Hayya 'alal-falah': Qad qamatis-salah, qad qamatis-salah (The prayer has begun)",
+      "translation_en": "The same words as the adhan, with 'Qad qamatis-salah' (The prayer has begun) said twice after 'Hayya 'alal-falah'.",
+      "translation_ur": "اذان ہی کے کلمات، البتہ «حَيَّ عَلَى الْفَلَاحِ» کے بعد دو بار «قَدْ قَامَتِ الصَّلَاةُ» (نماز کھڑی ہو گئی) کہا جاتا ہے۔",
+      "source": "Abu Dawud 510",
+      "note_en": "In the Hanafi madhhab the iqamah phrases are said in pairs like the adhan, recited more quickly and in a lower voice.",
+      "note_ur": "حنفی مذہب میں اقامت کے کلمات اذان کی طرح دو دو بار کہے جاتے ہیں، البتہ قدرے تیز اور پست آواز میں۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_takbir",
+      "title_en": "Takbir Tahrimah (opening takbir)",
+      "title_ur": "تکبیرِ تحریمہ",
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "transliteration": "Allahu Akbar",
+      "translation_en": "Allah is the Greatest.",
+      "translation_ur": "اللہ سب سے بڑا ہے۔",
+      "source": "Sahih al-Bukhari 735"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_thana",
+      "title_en": "Thana (opening praise)",
+      "title_ur": "ثنا",
+      "arabic": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ",
+      "transliteration": "Subhanaka Allahumma wa bihamdika, wa tabarakas-muka, wa ta'ala jadduka, wa la ilaha ghayruk",
+      "translation_en": "Glory is to You, O Allah, and praise is Yours. Blessed is Your name, exalted is Your majesty, and there is no god other than You.",
+      "translation_ur": "اے اللہ! تو پاک ہے اپنی حمد کے ساتھ، تیرا نام بابرکت ہے، تیری شان بلند ہے اور تیرے سوا کوئی معبود نہیں۔",
+      "source": "Abu Dawud 775"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_taawwudh",
+      "title_en": "Ta'awwudh (seeking refuge)",
+      "title_ur": "تعوذ",
+      "arabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "transliteration": "A'oodhu billahi minash-shaytanir-rajeem",
+      "translation_en": "I seek refuge with Allah from Shaytan, the accursed.",
+      "translation_ur": "میں اللہ کی پناہ مانگتا ہوں شیطان مردود سے۔",
+      "source": "Quran 16:98"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_tasmiyah",
+      "title_en": "Tasmiyah (Bismillah)",
+      "title_ur": "تسمیہ",
+      "arabic": "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+      "transliteration": "Bismillahir-Rahmanir-Raheem",
+      "translation_en": "In the name of Allah, the Most Gracious, the Most Merciful.",
+      "translation_ur": "اللہ کے نام سے جو بڑا مہربان نہایت رحم والا ہے۔",
+      "source": "Quran 1:1",
+      "note_en": "In the Hanafi madhhab the ta'awwudh and tasmiyah are recited silently before Al-Fatiha in the first rak'ah; the tasmiyah is repeated silently before Al-Fatiha in every rak'ah.",
+      "note_ur": "حنفی مذہب میں تعوذ اور تسمیہ پہلی رکعت میں سورہ فاتحہ سے پہلے آہستہ پڑھے جاتے ہیں؛ ہر رکعت میں فاتحہ سے پہلے تسمیہ آہستہ پڑھنا مستحب ہے۔"
+    },
+    {
+      "kind": "quran",
+      "id": "salah_fatiha",
+      "title_en": "Surah Al-Fatiha",
+      "title_ur": "سورۃ الفاتحہ",
+      "surah": 1,
+      "ayahStart": 1,
+      "ayahEnd": 7,
+      "source": "Quran 1:1-7",
+      "note_en": "After Al-Fatiha, say 'Ameen' silently (Hanafi). Behind the imam, the follower remains silent and does not recite (Hanafi).",
+      "note_ur": "فاتحہ کے بعد آہستہ آمین کہیں (حنفی)۔ امام کے پیچھے مقتدی خاموش رہے، قراءت نہ کرے (حنفی)۔"
+    },
+    {
+      "kind": "quran",
+      "id": "surah_ikhlas",
+      "title_en": "Surah Al-Ikhlas",
+      "title_ur": "سورۃ الاخلاص",
+      "surah": 112,
+      "ayahStart": 1,
+      "ayahEnd": 4,
+      "source": "Quran 112:1-4"
+    },
+    {
+      "kind": "quran",
+      "id": "surah_falaq",
+      "title_en": "Surah Al-Falaq",
+      "title_ur": "سورۃ الفلق",
+      "surah": 113,
+      "ayahStart": 1,
+      "ayahEnd": 5,
+      "source": "Quran 113:1-5"
+    },
+    {
+      "kind": "quran",
+      "id": "surah_nas",
+      "title_en": "Surah An-Nas",
+      "title_ur": "سورۃ الناس",
+      "surah": 114,
+      "ayahStart": 1,
+      "ayahEnd": 6,
+      "source": "Quran 114:1-6"
+    },
+    {
+      "kind": "quran",
+      "id": "surah_kawthar",
+      "title_en": "Surah Al-Kawthar",
+      "title_ur": "سورۃ الکوثر",
+      "surah": 108,
+      "ayahStart": 1,
+      "ayahEnd": 3,
+      "source": "Quran 108:1-3"
+    },
+    {
+      "kind": "quran",
+      "id": "ayat_kursi",
+      "title_en": "Ayat al-Kursi",
+      "title_ur": "آیت الکرسی",
+      "surah": 2,
+      "ayahStart": 255,
+      "ayahEnd": 255,
+      "source": "Quran 2:255",
+      "note_en": "Whoever recites Ayat al-Kursi after every obligatory prayer, nothing prevents him from entering Paradise except death. (An-Nasa'i, Al-Kubra 9928)",
+      "note_ur": "جو شخص ہر فرض نماز کے بعد آیت الکرسی پڑھے، اسے جنت میں داخل ہونے سے سوائے موت کے کوئی چیز نہیں روکتی۔ (نسائی کبریٰ ۹۹۲۸)"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_ruku_tasbih",
+      "title_en": "Tasbih of Ruku",
+      "title_ur": "رکوع کی تسبیح",
+      "arabic": "سُبْحَانَ رَبِّيَ الْعَظِيمِ",
+      "transliteration": "Subhana Rabbiyal-'Adheem",
+      "translation_en": "Glory is to my Lord, the Magnificent.",
+      "translation_ur": "پاک ہے میرا رب جو عظمت والا ہے۔",
+      "source": "Abu Dawud 871",
+      "repeat": 3
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_tasmi",
+      "title_en": "Tasmi' (rising from ruku)",
+      "title_ur": "تسمیع (رکوع سے اٹھتے ہوئے)",
+      "arabic": "سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ",
+      "transliteration": "Sami'allahu liman hamidah",
+      "translation_en": "Allah hears the one who praises Him.",
+      "translation_ur": "اللہ نے اس کی سن لی جس نے اس کی حمد کی۔",
+      "source": "Sahih al-Bukhari 789"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_tahmid",
+      "title_en": "Tahmid (standing after ruku)",
+      "title_ur": "تحمید (قومہ میں)",
+      "arabic": "رَبَّنَا لَكَ الْحَمْدُ",
+      "transliteration": "Rabbana lakal-hamd",
+      "translation_en": "Our Lord, to You is all praise.",
+      "translation_ur": "اے ہمارے رب! تمام تعریف تیرے ہی لیے ہے۔",
+      "source": "Sahih al-Bukhari 789",
+      "note_en": "The imam says the tasmi'; the follower says the tahmid. Praying alone, say both.",
+      "note_ur": "امام تسمیع کہتا ہے اور مقتدی تحمید؛ اکیلے نماز پڑھنے والا دونوں کہے۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_sujood_tasbih",
+      "title_en": "Tasbih of Sujood",
+      "title_ur": "سجدے کی تسبیح",
+      "arabic": "سُبْحَانَ رَبِّيَ الْأَعْلَى",
+      "transliteration": "Subhana Rabbiyal-A'la",
+      "translation_en": "Glory is to my Lord, the Most High.",
+      "translation_ur": "پاک ہے میرا رب جو سب سے بلند ہے۔",
+      "source": "Abu Dawud 871",
+      "repeat": 3
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_bayna_sajdatayn",
+      "title_en": "Between the two sujoods",
+      "title_ur": "دونوں سجدوں کے درمیان",
+      "arabic": "اللَّهُمَّ اغْفِرْ لِي وَارْحَمْنِي وَاهْدِنِي وَعَافِنِي وَارْزُقْنِي",
+      "transliteration": "Allahummagh-fir lee, war-hamnee, wah-dinee, wa 'afinee, war-zuqnee",
+      "translation_en": "O Allah, forgive me, have mercy on me, guide me, grant me well-being, and provide for me.",
+      "translation_ur": "اے اللہ! مجھے بخش دے، مجھ پر رحم فرما، مجھے ہدایت دے، مجھے عافیت دے اور مجھے رزق عطا فرما۔",
+      "source": "Abu Dawud 850",
+      "note_en": "Reciting this dua in the sitting between the two sujoods is recommended; in the Hanafi madhhab a brief pause is required.",
+      "note_ur": "دونوں سجدوں کے درمیان یہ دعا پڑھنا مستحب ہے؛ حنفی مذہب میں اطمینان سے بیٹھنا ضروری ہے۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_tashahhud",
+      "title_en": "Tashahhud (At-Tahiyyat)",
+      "title_ur": "تشہد (التحیات)",
+      "arabic": "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ",
+      "transliteration": "At-tahiyyatu lillahi was-salawatu wat-tayyibat, as-salamu 'alayka ayyuhan-nabiyyu wa rahmatullahi wa barakatuh, as-salamu 'alayna wa 'ala 'ibadillahis-saliheen, ash-hadu an la ilaha illallahu wa ash-hadu anna Muhammadan 'abduhu wa rasooluh",
+      "translation_en": "All greetings, prayers, and pure words are for Allah. Peace be upon you, O Prophet, and the mercy of Allah and His blessings. Peace be upon us and upon the righteous slaves of Allah. I bear witness that none has the right to be worshipped except Allah, and I bear witness that Muhammad is His slave and Messenger.",
+      "translation_ur": "تمام قولی، فعلی اور مالی عبادتیں اللہ ہی کے لیے ہیں۔ اے نبی! آپ پر سلام ہو اور اللہ کی رحمت اور اس کی برکتیں۔ ہم پر اور اللہ کے نیک بندوں پر سلام ہو۔ میں گواہی دیتا ہوں کہ اللہ کے سوا کوئی معبود نہیں اور میں گواہی دیتا ہوں کہ محمد ﷺ اس کے بندے اور رسول ہیں۔",
+      "source": "Sahih al-Bukhari 6265",
+      "note_en": "This is the tashahhud of Ibn Mas'ud (RA), preferred in the Hanafi madhhab. At 'ash-hadu an la ilaha', raise the index finger; lower it at 'illallah'.",
+      "note_ur": "یہ حضرت عبداللہ بن مسعودؓ کا تشہد ہے جو حنفی مذہب میں مختار ہے۔ «أَشْهَدُ أَنْ لَا إِلَهَ» پر شہادت کی انگلی اٹھائیں اور «إِلَّا اللَّهُ» پر گرا دیں۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_durood_ibrahim",
+      "title_en": "Durood Ibrahim",
+      "title_ur": "درود ابراہیمی",
+      "arabic": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ، اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ",
+      "transliteration": "Allahumma salli 'ala Muhammadin wa 'ala ali Muhammad, kama sallayta 'ala Ibraheema wa 'ala ali Ibraheem, innaka Hameedum-Majeed. Allahumma barik 'ala Muhammadin wa 'ala ali Muhammad, kama barakta 'ala Ibraheema wa 'ala ali Ibraheem, innaka Hameedum-Majeed",
+      "translation_en": "O Allah, send Your mercy upon Muhammad and upon the family of Muhammad, as You sent mercy upon Ibrahim and the family of Ibrahim; You are indeed Praiseworthy, Glorious. O Allah, bless Muhammad and the family of Muhammad, as You blessed Ibrahim and the family of Ibrahim; You are indeed Praiseworthy, Glorious.",
+      "translation_ur": "اے اللہ! محمد ﷺ پر اور آلِ محمد پر رحمت نازل فرما جیسے تو نے ابراہیمؑ پر اور آلِ ابراہیم پر رحمت نازل فرمائی، بے شک تو لائقِ حمد، بزرگی والا ہے۔ اے اللہ! محمد ﷺ پر اور آلِ محمد پر برکت نازل فرما جیسے تو نے ابراہیمؑ پر اور آلِ ابراہیم پر برکت نازل فرمائی، بے شک تو لائقِ حمد، بزرگی والا ہے۔",
+      "source": "Sahih al-Bukhari 3370"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_dua_zalamtu",
+      "title_en": "Dua before salam (forgiveness)",
+      "title_ur": "سلام سے پہلے کی دعا (مغفرت)",
+      "arabic": "اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي ظُلْمًا كَثِيرًا، وَلَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ، فَاغْفِرْ لِي مَغْفِرَةً مِنْ عِنْدِكَ، وَارْحَمْنِي، إِنَّكَ أَنْتَ الْغَفُورُ الرَّحِيمُ",
+      "transliteration": "Allahumma innee zalamtu nafsee zulman katheera, wa la yaghfirudh-dhunooba illa ant, faghfir lee maghfiratam-min 'indik, war-hamnee, innaka antal-Ghafoorur-Raheem",
+      "translation_en": "O Allah, I have wronged myself greatly, and none forgives sins except You. So grant me forgiveness from Yourself and have mercy on me; You are indeed the Most Forgiving, the Most Merciful.",
+      "translation_ur": "اے اللہ! میں نے اپنی جان پر بہت ظلم کیا اور گناہوں کو تیرے سوا کوئی نہیں بخشتا، پس اپنی طرف سے مجھے بخش دے اور مجھ پر رحم فرما، بے شک تو ہی بخشنے والا مہربان ہے۔",
+      "source": "Sahih al-Bukhari 834"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_dua_adhab",
+      "title_en": "Dua before salam (protection)",
+      "title_ur": "سلام سے پہلے کی دعا (پناہ)",
+      "arabic": "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، وَمِنْ عَذَابِ جَهَنَّمَ، وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ، وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ",
+      "transliteration": "Allahumma innee a'oodhu bika min 'adhabil-qabr, wa min 'adhabi jahannam, wa min fitnatil-mahya wal-mamat, wa min sharri fitnatil-maseehid-dajjal",
+      "translation_en": "O Allah, I seek refuge in You from the punishment of the grave, from the punishment of Hellfire, from the trials of life and death, and from the evil of the trial of the false messiah (Dajjal).",
+      "translation_ur": "اے اللہ! میں قبر کے عذاب سے، جہنم کے عذاب سے، زندگی اور موت کے فتنوں سے اور مسیح دجال کے فتنے کے شر سے تیری پناہ مانگتا ہوں۔",
+      "source": "Sahih Muslim 588"
+    },
+    {
+      "kind": "recitation",
+      "id": "salah_salam",
+      "title_en": "Salam (ending the prayer)",
+      "title_ur": "سلام",
+      "arabic": "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ",
+      "transliteration": "As-salamu 'alaykum wa rahmatullah",
+      "translation_en": "Peace be upon you, and the mercy of Allah.",
+      "translation_ur": "تم پر سلامتی ہو اور اللہ کی رحمت۔",
+      "source": "Abu Dawud 996",
+      "note_en": "Turn the face to the right saying it, then to the left saying it again.",
+      "note_ur": "پہلے دائیں جانب منہ پھیر کر کہیں، پھر بائیں جانب پھیر کر دوبارہ کہیں۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "after_salah_istighfar",
+      "title_en": "Istighfar after salah",
+      "title_ur": "نماز کے بعد استغفار",
+      "arabic": "أَسْتَغْفِرُ اللَّهَ (ثَلَاثًا) اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+      "transliteration": "Astaghfirullah (×3). Allahumma antas-salam, wa minkas-salam, tabarakta ya dhal-jalali wal-ikram",
+      "translation_en": "I seek the forgiveness of Allah (three times). O Allah, You are Peace and from You is peace. Blessed are You, O Possessor of majesty and honor.",
+      "translation_ur": "میں اللہ سے بخشش مانگتا ہوں (تین بار)۔ اے اللہ! تو ہی سلام ہے اور تجھی سے سلامتی ہے، تو بابرکت ہے اے جلال اور بزرگی والے!",
+      "source": "Sahih Muslim 591",
+      "repeat": 3
+    },
+    {
+      "kind": "recitation",
+      "id": "after_salah_tasbihat",
+      "title_en": "Tasbihat after salah",
+      "title_ur": "نماز کے بعد کی تسبیحات",
+      "arabic": "سُبْحَانَ اللَّهِ (٣٣) الْحَمْدُ لِلَّهِ (٣٣) اللَّهُ أَكْبَرُ (٣٤)",
+      "transliteration": "SubhanAllah (×33), Alhamdulillah (×33), Allahu Akbar (×34)",
+      "translation_en": "Glory is to Allah (33 times), all praise is for Allah (33 times), Allah is the Greatest (34 times).",
+      "translation_ur": "اللہ پاک ہے (۳۳ بار)، تمام تعریفیں اللہ کے لیے ہیں (۳۳ بار)، اللہ سب سے بڑا ہے (۳۴ بار)۔",
+      "source": "Sahih Muslim 596",
+      "note_en": "Whoever says these after every prayer, his sins are forgiven even if they are like the foam of the sea (in the narration completing 100 with La ilaha illallahu wahdahu...).",
+      "note_ur": "جو شخص ہر نماز کے بعد یہ کلمات کہے اس کے گناہ معاف کر دیے جاتے ہیں اگرچہ سمندر کی جھاگ کے برابر ہوں (روایت میں سو کی تکمیل «لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ...» سے ہے)۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "dua_qunoot",
+      "title_en": "Dua Qunoot (Witr)",
+      "title_ur": "دعائے قنوت (وتر)",
+      "arabic": "اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ، وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ، وَنُثْنِي عَلَيْكَ الْخَيْرَ، وَنَشْكُرُكَ وَلَا نَكْفُرُكَ، وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ، اللَّهُمَّ إِيَّاكَ نَعْبُدُ، وَلَكَ نُصَلِّي وَنَسْجُدُ، وَإِلَيْكَ نَسْعَى وَنَحْفِدُ، نَرْجُو رَحْمَتَكَ، وَنَخْشَى عَذَابَكَ، إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحِقٌ",
+      "transliteration": "Allahumma inna nasta'eenuka wa nastaghfiruk, wa nu'minu bika wa natawakkalu 'alayk, wa nuthnee 'alaykal-khayr, wa nashkuruka wa la nakfuruk, wa nakhla'u wa natruku man yafjuruk. Allahumma iyyaka na'bud, wa laka nusallee wa nasjud, wa ilayka nas'a wa nahfid, narjoo rahmataka, wa nakhsha 'adhabak, inna 'adhabaka bil-kuffari mulhiq",
+      "translation_en": "O Allah, we seek Your help and Your forgiveness. We believe in You, place our trust in You, and praise You with every good. We thank You and are not ungrateful to You, and we abandon and forsake whoever disobeys You. O Allah, You alone we worship; to You we pray and prostrate; toward You we hasten and serve. We hope for Your mercy and fear Your punishment; surely Your punishment will overtake the disbelievers.",
+      "translation_ur": "اے اللہ! ہم تجھی سے مدد مانگتے ہیں اور تجھی سے بخشش طلب کرتے ہیں، تجھ پر ایمان رکھتے ہیں اور تجھی پر بھروسا کرتے ہیں، اور تیری بہترین تعریف کرتے ہیں۔ ہم تیرا شکر ادا کرتے ہیں، ناشکری نہیں کرتے، اور جو تیری نافرمانی کرے اسے چھوڑتے اور اس سے الگ ہوتے ہیں۔ اے اللہ! ہم تیری ہی عبادت کرتے ہیں، تیرے ہی لیے نماز پڑھتے اور سجدہ کرتے ہیں، تیری ہی طرف دوڑتے اور حاضر ہوتے ہیں۔ ہم تیری رحمت کے امیدوار ہیں اور تیرے عذاب سے ڈرتے ہیں؛ بے شک تیرا عذاب کافروں کو پہنچنے والا ہے۔",
+      "source": "Al-Bayhaqi, As-Sunan al-Kubra 2/210; Hisn al-Muslim",
+      "note_en": "Recited silently in the third rak'ah of Witr after the takbir, before ruku (Hanafi).",
+      "note_ur": "وتر کی تیسری رکعت میں تکبیر کے بعد، رکوع سے پہلے آہستہ پڑھی جاتی ہے (حنفی)۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "janazah_thana",
+      "title_en": "Thana of Janazah",
+      "title_ur": "جنازے کی ثنا",
+      "arabic": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَجَلَّ ثَنَاؤُكَ، وَلَا إِلَهَ غَيْرُكَ",
+      "transliteration": "Subhanaka Allahumma wa bihamdika, wa tabarakas-muka, wa ta'ala jadduka, wa jalla thana'uka, wa la ilaha ghayruk",
+      "translation_en": "Glory is to You, O Allah, and praise is Yours. Blessed is Your name, exalted is Your majesty, sublime is Your praise, and there is no god other than You.",
+      "translation_ur": "اے اللہ! تو پاک ہے اپنی حمد کے ساتھ، تیرا نام بابرکت ہے، تیری شان بلند ہے، تیری ثنا عظیم ہے اور تیرے سوا کوئی معبود نہیں۔",
+      "source": "Hanafi fiqh; cf. Abu Dawud 775",
+      "note_en": "In the janazah thana the words 'wa jalla thana'uka' are added (Hanafi).",
+      "note_ur": "جنازے کی ثنا میں «وَجَلَّ ثَنَاؤُكَ» کے الفاظ کا اضافہ کیا جاتا ہے (حنفی)۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "janazah_dua_adult",
+      "title_en": "Dua for the deceased (Janazah)",
+      "title_ur": "میت کے لیے دعا (جنازہ)",
+      "arabic": "اللَّهُمَّ اغْفِرْ لِحَيِّنَا وَمَيِّتِنَا، وَشَاهِدِنَا وَغَائِبِنَا، وَصَغِيرِنَا وَكَبِيرِنَا، وَذَكَرِنَا وَأُنْثَانَا، اللَّهُمَّ مَنْ أَحْيَيْتَهُ مِنَّا فَأَحْيِهِ عَلَى الْإِسْلَامِ، وَمَنْ تَوَفَّيْتَهُ مِنَّا فَتَوَفَّهُ عَلَى الْإِيمَانِ",
+      "transliteration": "Allahummagh-fir lihayyina wa mayyitina, wa shahidina wa gha'ibina, wa sagheerina wa kabeerina, wa dhakarina wa unthana. Allahumma man ahyaytahu minna fa-ahyihi 'alal-Islam, wa man tawaffaytahu minna fatawaffahu 'alal-eeman",
+      "translation_en": "O Allah, forgive our living and our dead, those present and those absent, our young and our old, our males and our females. O Allah, whomever of us You keep alive, keep him alive upon Islam, and whomever of us You take, take him upon faith.",
+      "translation_ur": "اے اللہ! ہمارے زندوں اور مُردوں کو، حاضر اور غائب کو، چھوٹوں اور بڑوں کو، مردوں اور عورتوں کو بخش دے۔ اے اللہ! ہم میں سے جسے تو زندہ رکھے اسے اسلام پر زندہ رکھ اور جسے موت دے اسے ایمان پر موت دے۔",
+      "source": "Jami' at-Tirmidhi 1024",
+      "note_en": "For a child, a separate shorter dua is read asking that the child be a forerunner and reward for the parents.",
+      "note_ur": "نابالغ کے جنازے میں اس کے بجائے مختصر دعا پڑھی جاتی ہے جس میں بچے کو والدین کے لیے اجر اور پیش رو بنانے کی دعا ہوتی ہے۔"
+    },
+    {
+      "kind": "recitation",
+      "id": "sajda_tilawah_dua",
+      "title_en": "Dua of Sajda Tilawah",
+      "title_ur": "سجدہ تلاوت کی دعا",
+      "arabic": "سَجَدَ وَجْهِيَ لِلَّذِي خَلَقَهُ، وَشَقَّ سَمْعَهُ وَبَصَرَهُ، بِحَوْلِهِ وَقُوَّتِهِ، فَتَبَارَكَ اللَّهُ أَحْسَنُ الْخَالِقِينَ",
+      "transliteration": "Sajada wajhiya lilladhee khalaqahu, wa shaqqa sam'ahu wa basarahu, bihawlihi wa quwwatih, fatabarakallahu ahsanul-khaliqeen",
+      "translation_en": "My face has prostrated to the One who created it and brought forth its hearing and sight by His might and power. So blessed is Allah, the best of creators.",
+      "translation_ur": "میرے چہرے نے اس ذات کو سجدہ کیا جس نے اسے پیدا کیا اور اپنی قوت و طاقت سے اس کے کان اور آنکھ بنائے، پس بڑا بابرکت ہے اللہ جو سب سے بہتر پیدا کرنے والا ہے۔",
+      "source": "Jami' at-Tirmidhi 580",
+      "note_en": "The tasbih of sujood (Subhana Rabbiyal-A'la) also suffices in sajda tilawah.",
+      "note_ur": "سجدہ تلاوت میں سجدے کی تسبیح «سُبْحَانَ رَبِّيَ الْأَعْلَى» کہنا بھی کافی ہے۔"
+    }
+  ],
+  "categories": [
+    {
+      "id": "taharah",
+      "icon": "💧",
+      "title_en": "Taharah (Purification)",
+      "title_ur": "طہارت",
+      "items": [
+        {
+          "kind": "sequence",
+          "id": "wudu",
+          "title_en": "Wudu — step by step",
+          "title_ur": "وضو کا طریقہ",
+          "intro_en": "Wudu is the ritual washing required before salah. Four acts are fard (obligatory); the rest are sunnah, completing the way of the Prophet ﷺ.",
+          "intro_ur": "وضو نماز سے پہلے کی لازمی طہارت ہے۔ اس میں چار فرائض ہیں؛ باقی اعمال سنت ہیں جن سے نبی کریم ﷺ کا طریقہ مکمل ہوتا ہے۔",
+          "source": "Hanafi fiqh; Quran 5:6",
+          "steps": [
+            {
+              "id": "wudu_step_01",
+              "title_en": "Intention & Bismillah",
+              "title_ur": "نیت اور بسم اللہ",
+              "body_en": "Make the intention of wudu in your heart and say Bismillah.",
+              "body_ur": "دل میں وضو کی نیت کریں اور بسم اللہ پڑھیں۔",
+              "recitationIds": ["wudu_bismillah"]
+            },
+            {
+              "id": "wudu_step_02",
+              "title_en": "Wash the hands",
+              "title_ur": "ہاتھ دھونا",
+              "body_en": "Wash both hands up to the wrists three times, beginning with the right.",
+              "body_ur": "دونوں ہاتھ کلائیوں تک تین بار دھوئیں، دائیں ہاتھ سے شروع کریں۔"
+            },
+            {
+              "id": "wudu_step_03",
+              "title_en": "Rinse the mouth",
+              "title_ur": "کلی کرنا",
+              "body_en": "Rinse the mouth thoroughly three times. Using the miswak is sunnah.",
+              "body_ur": "تین بار اچھی طرح کلی کریں۔ مسواک کرنا سنت ہے۔"
+            },
+            {
+              "id": "wudu_step_04",
+              "title_en": "Sniff water into the nose",
+              "title_ur": "ناک میں پانی ڈالنا",
+              "body_en": "Sniff water into the nostrils three times and clean the nose with the left hand.",
+              "body_ur": "تین بار ناک میں پانی چڑھائیں اور بائیں ہاتھ سے ناک صاف کریں۔"
+            },
+            {
+              "id": "wudu_step_05",
+              "title_en": "Wash the face",
+              "title_ur": "چہرہ دھونا",
+              "body_en": "Wash the entire face three times — from the hairline to below the chin, and from ear to ear.",
+              "body_ur": "پورا چہرہ تین بار دھوئیں — پیشانی کے بالوں سے ٹھوڑی کے نیچے تک اور ایک کان سے دوسرے کان تک۔",
+              "fard": true
+            },
+            {
+              "id": "wudu_step_06",
+              "title_en": "Wash the arms",
+              "title_ur": "بازو دھونا",
+              "body_en": "Wash the right arm including the elbow three times, then the left arm likewise.",
+              "body_ur": "پہلے دایاں بازو کہنی سمیت تین بار دھوئیں، پھر اسی طرح بایاں بازو۔",
+              "fard": true
+            },
+            {
+              "id": "wudu_step_07",
+              "title_en": "Masah of the head and ears",
+              "title_ur": "سر اور کانوں کا مسح",
+              "body_en": "With wet hands, wipe over the head once, then wipe the inside of the ears with the index fingers and the back of the ears with the thumbs.",
+              "body_ur": "گیلے ہاتھوں سے ایک بار پورے سر کا مسح کریں، پھر شہادت کی انگلیوں سے کانوں کے اندر اور انگوٹھوں سے کانوں کی پشت کا مسح کریں۔",
+              "fard": true,
+              "hanafiNote_en": "Wiping at least a quarter of the head is fard; wiping the whole head once is sunnah.",
+              "hanafiNote_ur": "چوتھائی سر کا مسح فرض ہے؛ پورے سر کا ایک بار مسح سنت ہے۔"
+            },
+            {
+              "id": "wudu_step_08",
+              "title_en": "Wash the feet",
+              "title_ur": "پاؤں دھونا",
+              "body_en": "Wash the right foot including the ankle three times, then the left foot likewise, passing the fingers between the toes.",
+              "body_ur": "پہلے دایاں پاؤں ٹخنے سمیت تین بار دھوئیں، پھر اسی طرح بایاں، اور انگلیوں کا خلال کریں۔",
+              "fard": true
+            },
+            {
+              "id": "wudu_step_09",
+              "title_en": "Dua after wudu",
+              "title_ur": "وضو کے بعد کی دعا",
+              "body_en": "Facing the qiblah, recite the shahadah and the dua of wudu.",
+              "body_ur": "قبلہ رخ ہو کر شہادت اور وضو کی دعا پڑھیں۔",
+              "recitationIds": ["wudu_after_shahadah", "wudu_after_tawwabin"]
+            }
+          ]
+        },
+        {
+          "kind": "checklist",
+          "id": "ghusl_faraid",
+          "title_en": "Obligations (fara'id) of Ghusl",
+          "title_ur": "غسل کے فرائض",
+          "source": "Hanafi fiqh",
+          "items": [
+            {
+              "id": "ghusl_fard_1",
+              "text_en": "Rinsing the mouth thoroughly",
+              "text_ur": "اچھی طرح کلی کرنا"
+            },
+            {
+              "id": "ghusl_fard_2",
+              "text_en": "Rinsing the nose up to the soft bone",
+              "text_ur": "ناک میں نرم ہڈی تک پانی پہنچانا"
+            },
+            {
+              "id": "ghusl_fard_3",
+              "text_en": "Washing the entire body so no spot remains dry",
+              "text_ur": "پورے جسم پر اس طرح پانی بہانا کہ کوئی جگہ خشک نہ رہے"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "ghusl_method",
+          "title_en": "Ghusl — masnoon method",
+          "title_ur": "غسل کا مسنون طریقہ",
+          "source": "Sahih al-Bukhari 248; Hanafi fiqh",
+          "steps": [
+            {
+              "id": "ghusl_step_01",
+              "title_en": "Intention",
+              "title_ur": "نیت",
+              "body_en": "Make the intention of purification in your heart.",
+              "body_ur": "دل میں پاکی حاصل کرنے کی نیت کریں۔"
+            },
+            {
+              "id": "ghusl_step_02",
+              "title_en": "Wash the hands and private parts",
+              "title_ur": "ہاتھ اور شرمگاہ دھونا",
+              "body_en": "Wash both hands, then wash the private parts and remove any impurity from the body.",
+              "body_ur": "دونوں ہاتھ دھوئیں، پھر شرمگاہ دھوئیں اور جسم پر لگی نجاست دور کریں۔"
+            },
+            {
+              "id": "ghusl_step_03",
+              "title_en": "Perform wudu",
+              "title_ur": "وضو کرنا",
+              "body_en": "Perform a complete wudu as for salah.",
+              "body_ur": "نماز جیسا مکمل وضو کریں۔"
+            },
+            {
+              "id": "ghusl_step_04",
+              "title_en": "Pour water over the head",
+              "title_ur": "سر پر پانی ڈالنا",
+              "body_en": "Pour water over the head three times so it reaches the roots of the hair.",
+              "body_ur": "تین بار سر پر پانی ڈالیں کہ بالوں کی جڑوں تک پہنچ جائے۔"
+            },
+            {
+              "id": "ghusl_step_05",
+              "title_en": "Wash the whole body",
+              "title_ur": "پورا جسم دھونا",
+              "body_en": "Pour water over the entire body, beginning with the right side, then the left, rubbing so no spot remains dry.",
+              "body_ur": "پورے جسم پر پانی بہائیں، پہلے دائیں جانب پھر بائیں، اور ملتے جائیں تاکہ کوئی جگہ خشک نہ رہے۔"
+            },
+            {
+              "id": "ghusl_step_06",
+              "title_en": "Wash the feet",
+              "title_ur": "پاؤں دھونا",
+              "body_en": "If standing in pooled water, step aside and wash the feet last.",
+              "body_ur": "اگر پانی جمع ہونے کی جگہ کھڑے ہوں تو الگ ہٹ کر آخر میں پاؤں دھوئیں۔"
+            }
+          ]
+        },
+        {
+          "kind": "checklist",
+          "id": "tayammum_when",
+          "title_en": "When Tayammum is permitted",
+          "title_ur": "تیمم کب جائز ہے",
+          "source": "Quran 4:43; Hanafi fiqh",
+          "items": [
+            {
+              "id": "tayammum_when_1",
+              "text_en": "Water is not available within approximately one mile",
+              "text_ur": "تقریباً ایک میل کے اندر پانی میسر نہ ہو"
+            },
+            {
+              "id": "tayammum_when_2",
+              "text_en": "Illness where using water would cause harm or delay recovery",
+              "text_ur": "ایسی بیماری جس میں پانی کے استعمال سے نقصان یا شفا میں تاخیر کا اندیشہ ہو"
+            },
+            {
+              "id": "tayammum_when_3",
+              "text_en": "Severe cold with no means to heat water, fearing harm",
+              "text_ur": "سخت سردی ہو، پانی گرم کرنے کا کوئی ذریعہ نہ ہو اور نقصان کا خوف ہو"
+            },
+            {
+              "id": "tayammum_when_4",
+              "text_en": "Danger from an enemy or animal in reaching the water",
+              "text_ur": "پانی تک پہنچنے میں دشمن یا درندے کا خطرہ ہو"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "tayammum_method",
+          "title_en": "Tayammum — method",
+          "title_ur": "تیمم کا طریقہ",
+          "source": "Quran 4:43; Hanafi fiqh",
+          "steps": [
+            {
+              "id": "tayammum_step_01",
+              "title_en": "Intention",
+              "title_ur": "نیت",
+              "body_en": "Make the intention to attain purity for salah. In tayammum the intention is fard.",
+              "body_ur": "نماز کے لیے پاکی حاصل کرنے کی نیت کریں۔ تیمم میں نیت فرض ہے۔",
+              "fard": true
+            },
+            {
+              "id": "tayammum_step_02",
+              "title_en": "Strike the earth and wipe the face",
+              "title_ur": "زمین پر ہاتھ مار کر چہرے کا مسح",
+              "body_en": "Strike both palms on clean earth (or anything of the earth's kind, like stone), shake off the excess, and wipe the entire face.",
+              "body_ur": "دونوں ہتھیلیاں پاک مٹی (یا زمین کی جنس کی کسی چیز جیسے پتھر) پر ماریں، جھاڑ کر پورے چہرے کا مسح کریں۔",
+              "fard": true
+            },
+            {
+              "id": "tayammum_step_03",
+              "title_en": "Strike again and wipe the arms",
+              "title_ur": "دوبارہ ہاتھ مار کر بازوؤں کا مسح",
+              "body_en": "Strike the palms on the earth a second time and wipe the right arm including the elbow, then the left.",
+              "body_ur": "دوسری بار ہتھیلیاں زمین پر ماریں اور پہلے دائیں بازو کا کہنی سمیت، پھر بائیں کا مسح کریں۔",
+              "fard": true
+            },
+            {
+              "id": "tayammum_step_04",
+              "title_en": "Tayammum ends when water is found",
+              "title_ur": "پانی ملنے پر تیمم ختم",
+              "body_en": "Tayammum substitutes for wudu and ghusl, but becomes void as soon as usable water becomes available.",
+              "body_ur": "تیمم وضو اور غسل دونوں کا بدل ہے، لیکن قابلِ استعمال پانی ملتے ہی ختم ہو جاتا ہے۔"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "masah_khuffain",
+          "title_en": "Masah on Khuffain (leather socks)",
+          "title_ur": "موزوں پر مسح",
+          "source": "Sahih Muslim 276; Hanafi fiqh",
+          "steps": [
+            {
+              "id": "masah_step_01",
+              "title_en": "Wear after complete wudu",
+              "title_ur": "مکمل وضو کے بعد پہننا",
+              "body_en": "Put on the khuffain while in a state of complete wudu.",
+              "body_ur": "مکمل وضو کی حالت میں موزے پہنیں۔"
+            },
+            {
+              "id": "masah_step_02",
+              "title_en": "How to wipe",
+              "title_ur": "مسح کا طریقہ",
+              "body_en": "In later wudus, instead of washing the feet, wipe the top of each khuff once with wet fingers, from the toes toward the shin.",
+              "body_ur": "بعد کے وضو میں پاؤں دھونے کے بجائے گیلی انگلیوں سے ہر موزے کے اوپر والے حصے پر، انگلیوں سے پنڈلی کی طرف ایک بار مسح کریں۔",
+              "hanafiNote_en": "The wiped area must be at least the width of three fingers.",
+              "hanafiNote_ur": "مسح کم از کم تین انگلیوں کی چوڑائی کے برابر ہونا ضروری ہے۔"
+            },
+            {
+              "id": "masah_step_03",
+              "title_en": "When the period ends",
+              "title_ur": "مدت ختم ہونے پر",
+              "body_en": "When the masah period expires or the khuffain are removed, washing the feet returns to being required in wudu.",
+              "body_ur": "مدتِ مسح ختم ہونے یا موزے اتارنے پر وضو میں پاؤں دھونا دوبارہ لازم ہو جاتا ہے۔"
+            }
+          ]
+        },
+        {
+          "kind": "checklist",
+          "id": "masah_conditions",
+          "title_en": "Conditions for Masah",
+          "title_ur": "مسح کی شرائط",
+          "source": "Hanafi fiqh",
+          "items": [
+            {
+              "id": "masah_cond_1",
+              "text_en": "The khuffain were put on after a complete wudu",
+              "text_ur": "موزے مکمل وضو کی حالت میں پہنے گئے ہوں"
+            },
+            {
+              "id": "masah_cond_2",
+              "text_en": "They cover the ankles and are strong enough to walk in",
+              "text_ur": "ٹخنوں کو ڈھانپتے ہوں اور ان میں چلنا ممکن ہو"
+            },
+            {
+              "id": "masah_cond_3",
+              "text_en": "Duration: 24 hours for a resident, 72 hours for a traveler",
+              "text_ur": "مدت: مقیم کے لیے ایک دن ایک رات (۲۴ گھنٹے)، مسافر کے لیے تین دن تین راتیں (۷۲ گھنٹے)"
+            },
+            {
+              "id": "masah_cond_4",
+              "text_en": "Masah does not lift major impurity — ghusl requires washing the feet",
+              "text_ur": "مسح غسل کی حالتِ جنابت کو دور نہیں کرتا — غسل میں پاؤں دھونا ضروری ہے"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "foundations",
+      "icon": "🕌",
+      "title_en": "Salah Foundations",
+      "title_ur": "نماز کی بنیادیں",
+      "items": [
+        { "kind": "entry", "entryId": "adhan_text" },
+        { "kind": "entry", "entryId": "adhan_response_hawqala" },
+        { "kind": "entry", "entryId": "dua_after_adhan" },
+        { "kind": "entry", "entryId": "iqamah_text" },
+        {
+          "kind": "checklist",
+          "id": "salah_conditions",
+          "title_en": "Conditions of Salah (Shurut)",
+          "title_ur": "نماز کی شرائط",
+          "source": "Hanafi fiqh",
+          "items": [
+            {
+              "id": "shart_1",
+              "text_en": "Purity of the body (from hadath and impurity)",
+              "text_ur": "جسم کا پاک ہونا (بے وضوئی اور نجاست سے)"
+            },
+            {
+              "id": "shart_2",
+              "text_en": "Purity of the clothes",
+              "text_ur": "کپڑوں کا پاک ہونا"
+            },
+            {
+              "id": "shart_3",
+              "text_en": "Purity of the place of prayer",
+              "text_ur": "نماز کی جگہ کا پاک ہونا"
+            },
+            {
+              "id": "shart_4",
+              "text_en": "Covering the awrah (men: navel to knees; women: all except face, hands, feet)",
+              "text_ur": "ستر کا ڈھانپنا (مرد: ناف سے گھٹنوں تک؛ عورت: چہرے، ہاتھوں اور پاؤں کے سوا پورا جسم)"
+            },
+            {
+              "id": "shart_5",
+              "text_en": "The prayer time having entered",
+              "text_ur": "نماز کا وقت داخل ہو چکا ہو"
+            },
+            {
+              "id": "shart_6",
+              "text_en": "Facing the qiblah",
+              "text_ur": "قبلہ رخ ہونا"
+            },
+            {
+              "id": "shart_7",
+              "text_en": "Intention (niyyah) for the specific prayer",
+              "text_ur": "متعین نماز کی نیت کرنا"
+            }
+          ]
+        },
+        {
+          "kind": "checklist",
+          "id": "salah_nullifiers",
+          "title_en": "Things that break Salah (Mufsidat)",
+          "title_ur": "مفسداتِ نماز",
+          "source": "Hanafi fiqh",
+          "items": [
+            {
+              "id": "mufsid_1",
+              "text_en": "Speaking — even a single word — deliberately or forgetfully",
+              "text_ur": "بات کرنا — خواہ ایک لفظ ہو — جان بوجھ کر ہو یا بھول کر"
+            },
+            {
+              "id": "mufsid_2",
+              "text_en": "Eating or drinking anything",
+              "text_ur": "کچھ بھی کھانا یا پینا"
+            },
+            {
+              "id": "mufsid_3",
+              "text_en": "Turning the chest away from the qiblah without excuse",
+              "text_ur": "بلا عذر سینہ قبلے سے پھیر لینا"
+            },
+            {
+              "id": "mufsid_4",
+              "text_en": "Laughing audibly (it also breaks wudu if loud)",
+              "text_ur": "آواز سے ہنسنا (قہقہہ وضو بھی توڑ دیتا ہے)"
+            },
+            {
+              "id": "mufsid_5",
+              "text_en": "Excessive movement unrelated to the prayer ('amal kathir)",
+              "text_ur": "نماز سے غیر متعلق کثیر حرکت (عملِ کثیر)"
+            },
+            {
+              "id": "mufsid_6",
+              "text_en": "Wudu breaking during the prayer",
+              "text_ur": "دورانِ نماز وضو ٹوٹ جانا"
+            },
+            {
+              "id": "mufsid_7",
+              "text_en": "The awrah becoming uncovered for the length of one rukn",
+              "text_ur": "ایک رکن کی مقدار ستر کھل جانا"
+            },
+            {
+              "id": "mufsid_8",
+              "text_en": "Replying to someone's greeting or speech",
+              "text_ur": "کسی کے سلام یا بات کا جواب دینا"
+            },
+            {
+              "id": "mufsid_9",
+              "text_en": "Moaning or crying aloud from worldly pain or grief",
+              "text_ur": "دنیاوی تکلیف یا غم سے آواز کے ساتھ کراہنا یا رونا"
+            },
+            {
+              "id": "mufsid_10",
+              "text_en": "A major mistake in recitation that changes the meaning",
+              "text_ur": "قراءت میں ایسی فاش غلطی جس سے معنی بدل جائیں"
+            }
+          ]
+        },
+        {
+          "kind": "table",
+          "id": "rakah_table",
+          "title_en": "Daily prayers — rak'ah counts",
+          "title_ur": "نمازوں کی رکعتیں",
+          "columns": [
+            { "key": "before", "label_en": "Sunnah before", "label_ur": "سنت (پہلے)" },
+            { "key": "fard", "label_en": "Fard", "label_ur": "فرض" },
+            { "key": "after", "label_en": "Sunnah after", "label_ur": "سنت (بعد)" },
+            { "key": "other", "label_en": "Witr / Nafl", "label_ur": "وتر / نفل" }
+          ],
+          "rows": [
+            { "id": "fajr",    "label_en": "Fajr",    "label_ur": "فجر",   "cells": ["2*", "2", "—", "—"] },
+            { "id": "dhuhr",   "label_en": "Dhuhr",   "label_ur": "ظہر",   "cells": ["4*", "4", "2*", "2"] },
+            { "id": "asr",     "label_en": "Asr",     "label_ur": "عصر",   "cells": ["4", "4", "—", "—"] },
+            { "id": "maghrib", "label_en": "Maghrib", "label_ur": "مغرب",  "cells": ["—", "3", "2*", "2"] },
+            { "id": "isha",    "label_en": "Isha",    "label_ur": "عشاء",  "cells": ["4", "4", "2*", "3 Witr + 2"] },
+            { "id": "jumuah",  "label_en": "Jumu'ah", "label_ur": "جمعہ",  "cells": ["4*", "2", "4* + 2*", "—"] }
+          ],
+          "footnote_en": "* = sunnah mu'akkadah (emphasized). Witr is wajib in the Hanafi madhhab. Unmarked sunnahs are ghair mu'akkadah; nafl are optional.",
+          "footnote_ur": "* = سنتِ مؤکدہ۔ حنفی مذہب میں وتر واجب ہیں۔ بغیر نشان کی سنتیں غیر مؤکدہ ہیں؛ نفل اختیاری ہیں۔"
+        }
+      ]
+    },
+    {
+      "id": "how_to_pray",
+      "icon": "🤲",
+      "title_en": "How to Pray — step by step",
+      "title_ur": "نماز کا طریقہ — قدم بہ قدم",
+      "items": [
+        {
+          "kind": "sequence",
+          "id": "how_to_pray",
+          "title_en": "The complete salah, in order",
+          "title_ur": "مکمل نماز، ترتیب وار",
+          "intro_en": "Every position and recitation of the prayer, in order, according to the Hanafi madhhab. Walk through it step by step or jump to any step below.",
+          "intro_ur": "حنفی مذہب کے مطابق نماز کا ہر رکن اور ہر قراءت ترتیب کے ساتھ۔ قدم بہ قدم چلیں یا نیچے کسی بھی مرحلے پر جائیں۔",
+          "source": "Hanafi fiqh",
+          "steps": [
+            {
+              "id": "salah_step_01",
+              "title_en": "Niyyah (intention)",
+              "title_ur": "نیت",
+              "body_en": "Stand facing the qiblah and make the intention in your heart for the specific prayer you are about to offer.",
+              "body_ur": "قبلہ رخ کھڑے ہو کر دل میں اس نماز کی نیت کریں جو ادا کرنے لگے ہیں۔",
+              "hanafiNote_en": "The intention is an act of the heart; pronouncing it verbally is permitted but not required.",
+              "hanafiNote_ur": "نیت دل کے ارادے کا نام ہے؛ زبان سے کہنا جائز ہے مگر ضروری نہیں۔"
+            },
+            {
+              "id": "salah_step_02",
+              "title_en": "Takbir Tahrimah",
+              "title_ur": "تکبیرِ تحریمہ",
+              "body_en": "Raise both hands to the earlobes (men) or shoulders (women) and say the takbir, then fold the hands.",
+              "body_ur": "دونوں ہاتھ کانوں کی لو تک (مرد) یا کندھوں تک (عورت) اٹھا کر تکبیر کہیں، پھر ہاتھ باندھ لیں۔",
+              "fard": true,
+              "recitationIds": ["salah_takbir"],
+              "hanafiNote_en": "Men fold the hands below the navel, right over left; women fold them on the chest.",
+              "hanafiNote_ur": "مرد ناف کے نیچے دایاں ہاتھ بائیں پر رکھ کر باندھیں؛ عورتیں سینے پر۔"
+            },
+            {
+              "id": "salah_step_03",
+              "title_en": "Thana",
+              "title_ur": "ثنا",
+              "body_en": "Recite the opening praise silently.",
+              "body_ur": "ثنا آہستہ پڑھیں۔",
+              "recitationIds": ["salah_thana"]
+            },
+            {
+              "id": "salah_step_04",
+              "title_en": "Ta'awwudh and Tasmiyah",
+              "title_ur": "تعوذ اور تسمیہ",
+              "body_en": "Silently seek refuge with Allah and recite the Bismillah.",
+              "body_ur": "آہستہ تعوذ اور بسم اللہ پڑھیں۔",
+              "recitationIds": ["salah_taawwudh", "salah_tasmiyah"]
+            },
+            {
+              "id": "salah_step_05",
+              "title_en": "Surah Al-Fatiha",
+              "title_ur": "سورۃ الفاتحہ",
+              "body_en": "Recite Surah Al-Fatiha in every rak'ah.",
+              "body_ur": "ہر رکعت میں سورۃ الفاتحہ پڑھیں۔",
+              "recitationIds": ["salah_fatiha"],
+              "hanafiNote_en": "Behind the imam, the follower remains silent — the imam's recitation suffices (Hanafi).",
+              "hanafiNote_ur": "امام کے پیچھے مقتدی خاموش رہے — امام کی قراءت کافی ہے (حنفی)۔"
+            },
+            {
+              "id": "salah_step_06",
+              "title_en": "A short surah",
+              "title_ur": "کوئی سورت ملانا",
+              "body_en": "In the first two rak'ahs of fard (and every rak'ah of sunnah/nafl), recite a surah or at least three short ayahs after Al-Fatiha — for example:",
+              "body_ur": "فرض کی پہلی دو رکعتوں میں (اور سنت و نفل کی ہر رکعت میں) فاتحہ کے بعد کوئی سورت یا کم از کم تین چھوٹی آیتیں پڑھیں — مثلاً:",
+              "recitationIds": ["surah_ikhlas", "surah_kawthar", "surah_falaq", "surah_nas"]
+            },
+            {
+              "id": "salah_step_07",
+              "title_en": "Ruku (bowing)",
+              "title_ur": "رکوع",
+              "body_en": "Saying the takbir, bow with the back straight, grip the knees, and recite the tasbih.",
+              "body_ur": "تکبیر کہتے ہوئے رکوع کریں، کمر سیدھی رکھیں، ہاتھوں سے گھٹنے پکڑیں اور تسبیح پڑھیں۔",
+              "fard": true,
+              "recitationIds": ["salah_ruku_tasbih"]
+            },
+            {
+              "id": "salah_step_08",
+              "title_en": "Qawmah (standing up from ruku)",
+              "title_ur": "قومہ",
+              "body_en": "Rise fully upright, saying the tasmi' while rising and the tahmid once standing.",
+              "body_ur": "رکوع سے اٹھتے ہوئے تسمیع اور سیدھے کھڑے ہو کر تحمید کہیں، اطمینان سے کھڑے ہوں۔",
+              "recitationIds": ["salah_tasmi", "salah_tahmid"]
+            },
+            {
+              "id": "salah_step_09",
+              "title_en": "First Sujood (prostration)",
+              "title_ur": "پہلا سجدہ",
+              "body_en": "Saying the takbir, prostrate with the forehead, nose, palms, knees, and toes on the ground, and recite the tasbih.",
+              "body_ur": "تکبیر کہتے ہوئے سجدہ کریں — پیشانی، ناک، ہتھیلیاں، گھٹنے اور پاؤں کی انگلیاں زمین پر ہوں — اور تسبیح پڑھیں۔",
+              "fard": true,
+              "recitationIds": ["salah_sujood_tasbih"]
+            },
+            {
+              "id": "salah_step_10",
+              "title_en": "Jalsa (sitting between the sujoods)",
+              "title_ur": "جلسہ",
+              "body_en": "Sit up calmly between the two prostrations and recite the dua.",
+              "body_ur": "دونوں سجدوں کے درمیان اطمینان سے بیٹھیں اور دعا پڑھیں۔",
+              "recitationIds": ["salah_bayna_sajdatayn"]
+            },
+            {
+              "id": "salah_step_11",
+              "title_en": "Second Sujood",
+              "title_ur": "دوسرا سجدہ",
+              "body_en": "Perform the second prostration exactly like the first.",
+              "body_ur": "دوسرا سجدہ پہلے کی طرح کریں۔",
+              "fard": true,
+              "recitationIds": ["salah_sujood_tasbih"]
+            },
+            {
+              "id": "salah_step_12",
+              "title_en": "The second rak'ah",
+              "title_ur": "دوسری رکعت",
+              "body_en": "Rise for the second rak'ah saying the takbir and repeat from the Bismillah and Al-Fatiha onward — the thana and ta'awwudh are not repeated.",
+              "body_ur": "تکبیر کہتے ہوئے دوسری رکعت کے لیے کھڑے ہوں اور بسم اللہ اور فاتحہ سے دہرائیں — ثنا اور تعوذ نہیں دہرائے جاتے۔"
+            },
+            {
+              "id": "salah_step_13",
+              "title_en": "Qa'dah & Tashahhud",
+              "title_ur": "قعدہ اور تشہد",
+              "body_en": "After the second sujood of the second rak'ah, sit and recite the tashahhud. In a 3- or 4-rak'ah prayer, rise after the tashahhud and complete the remaining rak'ahs (Al-Fatiha only in fard), then sit for the final qa'dah.",
+              "body_ur": "دوسری رکعت کے دوسرے سجدے کے بعد بیٹھ کر تشہد پڑھیں۔ تین یا چار رکعت والی نماز میں تشہد کے بعد کھڑے ہو کر باقی رکعتیں مکمل کریں (فرض میں صرف فاتحہ)، پھر آخری قعدے میں بیٹھیں۔",
+              "fard": true,
+              "recitationIds": ["salah_tashahhud"]
+            },
+            {
+              "id": "salah_step_14",
+              "title_en": "Durood Ibrahim",
+              "title_ur": "درود ابراہیمی",
+              "body_en": "In the final sitting, after the tashahhud, recite the durood.",
+              "body_ur": "آخری قعدے میں تشہد کے بعد درود پڑھیں۔",
+              "recitationIds": ["salah_durood_ibrahim"]
+            },
+            {
+              "id": "salah_step_15",
+              "title_en": "Dua before salam",
+              "title_ur": "سلام سے پہلے دعا",
+              "body_en": "Recite one or more of the duas narrated from the Prophet ﷺ.",
+              "body_ur": "نبی کریم ﷺ سے منقول کوئی ایک یا زیادہ دعائیں پڑھیں۔",
+              "recitationIds": ["salah_dua_zalamtu", "salah_dua_adhab"]
+            },
+            {
+              "id": "salah_step_16",
+              "title_en": "Salam",
+              "title_ur": "سلام",
+              "body_en": "End the prayer with salam to the right, then to the left.",
+              "body_ur": "پہلے دائیں پھر بائیں جانب سلام پھیر کر نماز مکمل کریں۔",
+              "recitationIds": ["salah_salam"]
+            },
+            {
+              "id": "salah_step_17",
+              "title_en": "Adhkar after salah",
+              "title_ur": "نماز کے بعد کے اذکار",
+              "body_en": "After the prayer, recite the istighfar, Ayat al-Kursi, and the tasbihat.",
+              "body_ur": "نماز کے بعد استغفار، آیت الکرسی اور تسبیحات پڑھیں۔",
+              "recitationIds": ["after_salah_istighfar", "ayat_kursi", "after_salah_tasbihat"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "special",
+      "icon": "🌙",
+      "title_en": "Special Prayers",
+      "title_ur": "خصوصی نمازیں",
+      "items": [
+        {
+          "kind": "sequence",
+          "id": "witr",
+          "title_en": "Witr",
+          "title_ur": "وتر",
+          "intro_en": "Witr is three rak'ahs prayed after Isha, wajib in the Hanafi madhhab.",
+          "intro_ur": "وتر عشاء کے بعد تین رکعتیں ہیں جو حنفی مذہب میں واجب ہیں۔",
+          "source": "Hanafi fiqh; Abu Dawud 1423",
+          "steps": [
+            {
+              "id": "witr_step_01",
+              "title_en": "Three rak'ahs with one salam",
+              "title_ur": "ایک سلام کے ساتھ تین رکعتیں",
+              "body_en": "Pray three rak'ahs like Maghrib — sitting for tashahhud after the second rak'ah, then standing for the third.",
+              "body_ur": "مغرب کی طرح تین رکعتیں پڑھیں — دوسری رکعت کے بعد تشہد کے لیے بیٹھیں، پھر تیسری کے لیے کھڑے ہوں۔"
+            },
+            {
+              "id": "witr_step_02",
+              "title_en": "Surah in every rak'ah",
+              "title_ur": "ہر رکعت میں سورت",
+              "body_en": "Recite Al-Fatiha and a surah in all three rak'ahs.",
+              "body_ur": "تینوں رکعتوں میں فاتحہ کے ساتھ سورت ملائیں۔"
+            },
+            {
+              "id": "witr_step_03",
+              "title_en": "Takbir of Qunoot",
+              "title_ur": "تکبیرِ قنوت",
+              "body_en": "In the third rak'ah, after the surah, raise the hands saying a takbir, fold them again, and recite Dua Qunoot silently.",
+              "body_ur": "تیسری رکعت میں سورت کے بعد تکبیر کہتے ہوئے ہاتھ اٹھائیں، دوبارہ باندھ لیں اور آہستہ دعائے قنوت پڑھیں۔",
+              "recitationIds": ["dua_qunoot"]
+            },
+            {
+              "id": "witr_step_04",
+              "title_en": "Complete the prayer",
+              "title_ur": "نماز مکمل کریں",
+              "body_en": "After the qunoot, perform ruku and sujood as usual and end with the tashahhud, durood, dua, and salam.",
+              "body_ur": "قنوت کے بعد معمول کے مطابق رکوع و سجود کریں اور تشہد، درود، دعا اور سلام کے ساتھ نماز مکمل کریں۔"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "sajda_sahw",
+          "title_en": "Sajda Sahw (prostration of forgetfulness)",
+          "title_ur": "سجدہ سہو",
+          "source": "Hanafi fiqh",
+          "steps": [
+            {
+              "id": "sahw_step_01",
+              "title_en": "When it becomes wajib",
+              "title_ur": "کب واجب ہوتا ہے",
+              "body_en": "Sajda sahw becomes wajib when a wajib act of the prayer is omitted, delayed, or repeated forgetfully — e.g. forgetting Qunoot, the first tashahhud, or delaying a fard.",
+              "body_ur": "جب نماز کا کوئی واجب بھول کر چھوٹ جائے، مؤخر ہو جائے یا دہرا دیا جائے — مثلاً قنوت یا پہلا تشہد بھول جانا — تو سجدہ سہو واجب ہو جاتا ہے۔"
+            },
+            {
+              "id": "sahw_step_02",
+              "title_en": "Method",
+              "title_ur": "طریقہ",
+              "body_en": "In the final sitting after the tashahhud, say one salam to the right, then perform two sujoods with tasbih, then repeat the tashahhud, durood, and dua, and end with salam.",
+              "body_ur": "آخری قعدے میں تشہد کے بعد صرف دائیں جانب ایک سلام پھیریں، پھر تسبیح کے ساتھ دو سجدے کریں، پھر دوبارہ تشہد، درود اور دعا پڑھ کر سلام پھیریں۔"
+            },
+            {
+              "id": "sahw_step_03",
+              "title_en": "What it does not fix",
+              "title_ur": "کس چیز کا ازالہ نہیں کرتا",
+              "body_en": "Sajda sahw does not compensate for omitting a fard — if a fard is missed, the prayer must be repeated.",
+              "body_ur": "سجدہ سہو فرض کے چھوٹنے کا ازالہ نہیں کرتا — فرض چھوٹ جائے تو نماز دہرانا ضروری ہے۔"
+            }
+          ]
+        },
+        {
+          "kind": "checklist",
+          "id": "jumuah_essentials",
+          "title_en": "Jumu'ah — essentials",
+          "title_ur": "جمعہ کے آداب",
+          "source": "Sahih al-Bukhari 877-883",
+          "items": [
+            {
+              "id": "jumuah_1",
+              "text_en": "Perform ghusl and wear clean (preferably best) clothes",
+              "text_ur": "غسل کریں اور صاف (بہتر یہ کہ عمدہ) لباس پہنیں"
+            },
+            {
+              "id": "jumuah_2",
+              "text_en": "Use the miswak and apply perfume if available",
+              "text_ur": "مسواک کریں اور خوشبو میسر ہو تو لگائیں"
+            },
+            {
+              "id": "jumuah_3",
+              "text_en": "Go early to the masjid",
+              "text_ur": "مسجد جلدی جائیں"
+            },
+            {
+              "id": "jumuah_4",
+              "text_en": "Recite Surah Al-Kahf",
+              "text_ur": "سورۃ الکہف کی تلاوت کریں"
+            },
+            {
+              "id": "jumuah_5",
+              "text_en": "Send abundant durood upon the Prophet ﷺ",
+              "text_ur": "نبی کریم ﷺ پر کثرت سے درود بھیجیں"
+            },
+            {
+              "id": "jumuah_6",
+              "text_en": "Listen to the khutbah in complete silence",
+              "text_ur": "خطبہ مکمل خاموشی سے سنیں"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "eid_method",
+          "title_en": "Eid prayer — method",
+          "title_ur": "نمازِ عید کا طریقہ",
+          "intro_en": "The Eid prayer is two rak'ahs, wajib (Hanafi), with six extra takbirs, prayed in congregation after sunrise. There is no adhan or iqamah.",
+          "intro_ur": "نمازِ عید دو رکعت واجب ہے (حنفی) جس میں چھ زائد تکبیریں ہیں، طلوعِ آفتاب کے بعد باجماعت ادا کی جاتی ہے۔ اس میں اذان اور اقامت نہیں۔",
+          "source": "Hanafi fiqh; Abu Dawud 1153",
+          "steps": [
+            {
+              "id": "eid_step_01",
+              "title_en": "Intention and takbir",
+              "title_ur": "نیت اور تکبیر",
+              "body_en": "Make the intention for two rak'ahs of Eid with six extra takbirs behind the imam, then say the opening takbir and recite the thana.",
+              "body_ur": "امام کے پیچھے چھ زائد تکبیروں کے ساتھ دو رکعت نمازِ عید کی نیت کریں، تکبیرِ تحریمہ کہیں اور ثنا پڑھیں۔"
+            },
+            {
+              "id": "eid_step_02",
+              "title_en": "Three takbirs in the first rak'ah",
+              "title_ur": "پہلی رکعت کی تین تکبیریں",
+              "body_en": "After the thana, the imam says three takbirs — raise the hands with each and let them hang; after the third, fold them.",
+              "body_ur": "ثنا کے بعد امام تین تکبیریں کہتا ہے — ہر تکبیر پر ہاتھ اٹھا کر چھوڑ دیں؛ تیسری کے بعد باندھ لیں۔"
+            },
+            {
+              "id": "eid_step_03",
+              "title_en": "Recitation and first rak'ah",
+              "title_ur": "قراءت اور پہلی رکعت",
+              "body_en": "The imam recites Al-Fatiha and a surah aloud; complete the rak'ah with ruku and sujood as usual.",
+              "body_ur": "امام بلند آواز سے فاتحہ اور سورت پڑھتا ہے؛ معمول کے مطابق رکوع و سجود کے ساتھ رکعت مکمل کریں۔"
+            },
+            {
+              "id": "eid_step_04",
+              "title_en": "Three takbirs in the second rak'ah",
+              "title_ur": "دوسری رکعت کی تین تکبیریں",
+              "body_en": "In the second rak'ah, after the recitation, three takbirs are said — hands raised and released each time — and with a fourth takbir go into ruku.",
+              "body_ur": "دوسری رکعت میں قراءت کے بعد تین تکبیریں کہی جاتی ہیں — ہر بار ہاتھ اٹھا کر چھوڑ دیں — اور چوتھی تکبیر کے ساتھ رکوع میں جائیں۔"
+            },
+            {
+              "id": "eid_step_05",
+              "title_en": "Complete and listen to the khutbah",
+              "title_ur": "تکمیل اور خطبہ",
+              "body_en": "Complete the prayer as usual. Listening to the Eid khutbah after the prayer is wajib.",
+              "body_ur": "نماز معمول کے مطابق مکمل کریں۔ نماز کے بعد عید کا خطبہ سننا واجب ہے۔"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "janazah_method",
+          "title_en": "Janazah prayer — method",
+          "title_ur": "نمازِ جنازہ کا طریقہ",
+          "intro_en": "The janazah prayer is fard kifayah — four takbirs, standing only, with no ruku or sujood.",
+          "intro_ur": "نمازِ جنازہ فرضِ کفایہ ہے — چار تکبیریں، صرف قیام، نہ رکوع نہ سجود۔",
+          "source": "Hanafi fiqh",
+          "steps": [
+            {
+              "id": "janazah_step_01",
+              "title_en": "First takbir — Thana",
+              "title_ur": "پہلی تکبیر — ثنا",
+              "body_en": "After the intention, say the first takbir raising the hands, fold them, and recite the thana with 'wa jalla thana'uka'.",
+              "body_ur": "نیت کے بعد پہلی تکبیر کہتے ہوئے ہاتھ اٹھائیں، باندھ لیں اور «وَجَلَّ ثَنَاؤُكَ» کے ساتھ ثنا پڑھیں۔",
+              "recitationIds": ["janazah_thana"]
+            },
+            {
+              "id": "janazah_step_02",
+              "title_en": "Second takbir — Durood",
+              "title_ur": "دوسری تکبیر — درود",
+              "body_en": "Say the second takbir without raising the hands and recite Durood Ibrahim.",
+              "body_ur": "دوسری تکبیر بغیر ہاتھ اٹھائے کہیں اور درود ابراہیمی پڑھیں۔",
+              "recitationIds": ["salah_durood_ibrahim"]
+            },
+            {
+              "id": "janazah_step_03",
+              "title_en": "Third takbir — Dua for the deceased",
+              "title_ur": "تیسری تکبیر — میت کے لیے دعا",
+              "body_en": "Say the third takbir and recite the dua for the deceased.",
+              "body_ur": "تیسری تکبیر کہہ کر میت کے لیے دعا پڑھیں۔",
+              "recitationIds": ["janazah_dua_adult"]
+            },
+            {
+              "id": "janazah_step_04",
+              "title_en": "Fourth takbir — Salam",
+              "title_ur": "چوتھی تکبیر — سلام",
+              "body_en": "Say the fourth takbir, pause briefly, then end with salam to the right and left.",
+              "body_ur": "چوتھی تکبیر کہیں، مختصر توقف کریں، پھر دائیں اور بائیں سلام پھیر دیں۔"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "tahajjud",
+          "title_en": "Tahajjud",
+          "title_ur": "تہجد",
+          "source": "Quran 17:79; Sahih Muslim 1163",
+          "steps": [
+            {
+              "id": "tahajjud_step_01",
+              "title_en": "Time",
+              "title_ur": "وقت",
+              "body_en": "Any time after Isha until the start of Fajr, but the best is the last third of the night after sleeping.",
+              "body_ur": "عشاء کے بعد سے صبح صادق تک کسی بھی وقت، لیکن افضل یہ ہے کہ سو کر رات کے آخری تہائی حصے میں اٹھ کر پڑھی جائے۔"
+            },
+            {
+              "id": "tahajjud_step_02",
+              "title_en": "Rak'ahs",
+              "title_ur": "رکعتیں",
+              "body_en": "Pray in pairs of two rak'ahs — commonly two to eight. The Prophet ﷺ most often prayed eight, followed by Witr.",
+              "body_ur": "دو دو رکعت کر کے پڑھیں — عام طور پر دو سے آٹھ تک۔ نبی کریم ﷺ اکثر آٹھ رکعت پڑھتے، پھر وتر ادا فرماتے۔"
+            },
+            {
+              "id": "tahajjud_step_03",
+              "title_en": "Recitation and dua",
+              "title_ur": "قراءت اور دعا",
+              "body_en": "Lengthen the recitation if you can, and make abundant dua — the last third of the night is a time when dua is accepted.",
+              "body_ur": "ہو سکے تو قراءت لمبی کریں اور کثرت سے دعا مانگیں — رات کا آخری تہائی حصہ قبولیتِ دعا کا وقت ہے۔"
+            }
+          ]
+        },
+        {
+          "kind": "sequence",
+          "id": "sajda_tilawah",
+          "title_en": "Sajda Tilawah (prostration of recitation)",
+          "title_ur": "سجدہ تلاوت",
+          "source": "Hanafi fiqh; Sahih al-Bukhari 1075",
+          "steps": [
+            {
+              "id": "tilawah_step_01",
+              "title_en": "When it is due",
+              "title_ur": "کب واجب ہوتا ہے",
+              "body_en": "On reciting or hearing any of the 14 ayahs of sajdah in the Quran, one sajdah becomes wajib (Hanafi).",
+              "body_ur": "قرآن کی چودہ آیاتِ سجدہ میں سے کوئی پڑھنے یا سننے پر ایک سجدہ واجب ہو جاتا ہے (حنفی)۔"
+            },
+            {
+              "id": "tilawah_step_02",
+              "title_en": "Method",
+              "title_ur": "طریقہ",
+              "body_en": "Standing or sitting with wudu and facing the qiblah, say a takbir without raising the hands, perform one sajdah reciting the tasbih or its dua, then say a takbir and rise. There is no salam.",
+              "body_ur": "باوضو، قبلہ رخ ہو کر بغیر ہاتھ اٹھائے تکبیر کہیں، ایک سجدہ کریں جس میں تسبیح یا اس کی دعا پڑھیں، پھر تکبیر کہہ کر اٹھ جائیں۔ اس میں سلام نہیں۔",
+              "recitationIds": ["sajda_tilawah_dua"]
+            },
+            {
+              "id": "tilawah_step_03",
+              "title_en": "Within salah",
+              "title_ur": "نماز کے اندر",
+              "body_en": "If an ayah of sajdah is recited within salah, the sajdah is performed within the prayer itself.",
+              "body_ur": "اگر آیتِ سجدہ نماز میں پڑھی جائے تو سجدہ نماز ہی میں ادا کیا جاتا ہے۔"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "daily_duas",
+      "icon": "📿",
+      "title_en": "Masnoon Duas for Daily Life",
+      "title_ur": "روزمرہ کی مسنون دعائیں",
+      "items": [
+        { "kind": "dua_link", "id": "link_waking", "duaCategoryId": "waking", "title_en": "Upon Waking Up", "title_ur": "بیداری کے وقت" },
+        { "kind": "dua_link", "id": "link_morning", "duaCategoryId": "morning", "title_en": "Morning Adhkar", "title_ur": "صبح کے اذکار" },
+        { "kind": "dua_link", "id": "link_prayer", "duaCategoryId": "prayer", "title_en": "Prayer Times", "title_ur": "نماز کے اوقات" },
+        { "kind": "dua_link", "id": "link_mosque", "duaCategoryId": "mosque", "title_en": "In the Mosque", "title_ur": "مسجد میں" },
+        { "kind": "dua_link", "id": "link_eating", "duaCategoryId": "eating", "title_en": "Before & After Eating", "title_ur": "کھانے سے پہلے اور بعد" },
+        { "kind": "dua_link", "id": "link_travel", "duaCategoryId": "travel", "title_en": "Travel", "title_ur": "سفر" },
+        { "kind": "dua_link", "id": "link_knowledge", "duaCategoryId": "knowledge", "title_en": "For Knowledge", "title_ur": "علم کے لیے" },
+        { "kind": "dua_link", "id": "link_rizq", "duaCategoryId": "rizq", "title_en": "For Sustenance", "title_ur": "رزق کے لیے" },
+        { "kind": "dua_link", "id": "link_marriage", "duaCategoryId": "marriage", "title_en": "Marriage", "title_ur": "نکاح و ازدواج" },
+        { "kind": "dua_link", "id": "link_parents", "duaCategoryId": "dua_parents", "title_en": "For Parents", "title_ur": "والدین کے لیے" },
+        { "kind": "dua_link", "id": "link_sickness", "duaCategoryId": "sickness", "title_en": "Sickness", "title_ur": "بیماری" },
+        { "kind": "dua_link", "id": "link_distress", "duaCategoryId": "distress", "title_en": "Distress & Hardship", "title_ur": "پریشانی اور مشکل" },
+        { "kind": "dua_link", "id": "link_forgiveness", "duaCategoryId": "forgiveness", "title_en": "Seeking Forgiveness", "title_ur": "استغفار" },
+        { "kind": "dua_link", "id": "link_protection", "duaCategoryId": "protection", "title_en": "Protection", "title_ur": "حفاظت" },
+        { "kind": "dua_link", "id": "link_rain", "duaCategoryId": "rain", "title_en": "Rain & Weather", "title_ur": "بارش اور موسم" },
+        { "kind": "dua_link", "id": "link_friday", "duaCategoryId": "friday", "title_en": "Friday", "title_ur": "جمعہ" },
+        { "kind": "dua_link", "id": "link_evening", "duaCategoryId": "evening", "title_en": "Evening Adhkar", "title_ur": "شام کے اذکار" },
+        { "kind": "dua_link", "id": "link_sleep", "duaCategoryId": "sleep", "title_en": "Before Sleeping", "title_ur": "سونے سے پہلے" }
+      ]
+    }
+  ]
+}
