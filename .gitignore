@@ -57,3 +57,8 @@ content/dua-descriptions-TEMPLATE.csv
 /hadith-urdu/
 /hadith-build/
 
+# Local-only reference material (third-party books/PDFs with unclear
+# licensing). Never tracked, never shipped — app content is built from
+# primary sources.
+/reference/
+

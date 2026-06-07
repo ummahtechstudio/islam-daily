@@ -1,6 +1,6 @@
 # Islam Daily — Data Validation Report
 
-**Generated:** 2026-06-07T07:13:56.711Z
+**Generated:** 2026-06-07T19:01:31.976Z
 **Scanner version:** 1.0
 
 ## Summary
@@ -19,17 +19,21 @@
 |------|--------:|-----:|
 | `assets/data/duas-core.json` | 102 | 108.6 KB |
 | `assets/data/dhikr-core.json` | 40 | 34.8 KB |
-| `assets/data/namaz-core.json` | 33 | 83.6 KB |
+| `assets/data/namaz-core.json` | 33 | 84.9 KB |
 | `assets/data/names99.json` | 100 | 39.1 KB |
 | `assets/daily_knowledge.json` | 52 | 83.1 KB |
 | `assets/islamic_tips.json` | 30 | 7.0 KB |
 | `assets/hadiths.json` | 30 | 22.6 KB |
-| `assets/hadiths/bukhari.json` | 7277 | 12451.9 KB |
-| `assets/hadiths/muslim.json` | 7459 | 11185.5 KB |
-| `assets/hadiths/tirmidhi.json` | 4053 | 7478.5 KB |
-| `assets/hadiths/abudawud.json` | 5276 | 7692.1 KB |
-| `assets/hadiths/ibnmajah.json` | 4345 | 5589.5 KB |
-| `assets/hadiths/nasai.json` | 5768 | 7701.9 KB |
+| `hadith-build/combined/bukhari.json` | 7589 | 22228.4 KB |
+| `hadith-build/combined/muslim.json` | 7564 | 18067.0 KB |
+| `hadith-build/combined/tirmidhi.json` | 3998 | 12270.3 KB |
+| `hadith-build/combined/abudawud.json` | 5274 | 12711.4 KB |
+| `hadith-build/combined/ibnmajah.json` | 4343 | 9039.6 KB |
+| `hadith-build/combined/nasai.json` | 5765 | 11287.5 KB |
+| `hadith-build/combined/malik.json` | 1889 | 4266.6 KB |
+| `hadith-build/combined/nawawi.json` | 42 | 77.6 KB |
+| `hadith-build/combined/qudsi.json` | 40 | 88.6 KB |
+| `hadith-build/combined/dehlawi.json` | 40 | 11.8 KB |
 
 ## Validation Categories
 

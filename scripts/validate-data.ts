@@ -147,20 +147,18 @@ const SURAH_NAME_TO_INDEX: Record<string, number> = {
   annas: 114, nas: 114,
 };
 
-// Hadith collection max counts calibrated for A7med3bdulBaset/hadith-json v1.2.0 dataset.
-// Some collections exceed canonical Darussalam edition counts due to extended numbering
-// (split hadiths, supplementary narrations, edition-specific entries). These are NOT
-// errors — different scholarly editions number hadiths differently. Verified 2026-04-27.
-//   bukhari   7277  canonical, matches our data
-//   muslim    7563  canonical (our file has 7459 — extended editions go higher)
-//   tirmidhi  4053  A7med3bdulBaset edition (canonical Darussalam: 3956)
-//   abudawud  5276  A7med3bdulBaset edition (canonical: 5274)
-//   ibnmajah  4345  A7med3bdulBaset edition (canonical: 4341)
-//   nasai     5768  A7med3bdulBaset edition (canonical: 5767)
+// Hadith collection max numbers calibrated for the hadiths-v2 trilingual set
+// (local build output in hadith-build/combined/, served from R2 hadiths-v2/).
+// Max = highest integer hadithnumber present in each v2 file (fractional
+// sub-narrations like 631.5 truncate to their base number). Some editions
+// number past canonical Darussalam counts — NOT errors. Verified 2026-06-07.
+//   bukhari   7563   muslim    7563   tirmidhi  3956   abudawud  5274
+//   ibnmajah  4341   nasai     5758   malik     1858
+//   nawawi    42     qudsi     40     dehlawi   40
 const HADITH_COLLECTIONS: Record<string, { canonical: string; max: number; aliases: RegExp[] }> = {
   bukhari: {
     canonical: 'Sahih Bukhari',
-    max: 7277,
+    max: 7563,
     aliases: [/\bsahih\s*(?:al-?)?bukhari\b/i, /\bal-?bukhari\b/i, /\bsahih-?bukhari\b/i, /\bbukhari\b/i],
   },
   muslim: {
@@ -170,22 +168,22 @@ const HADITH_COLLECTIONS: Record<string, { canonical: string; max: number; alias
   },
   tirmidhi: {
     canonical: 'Jami at-Tirmidhi',
-    max: 4053,
+    max: 3956,
     aliases: [/\bjami(?:['e])?\s*(?:at-?)?tirmidhi\b/i, /\bat-?tirmidhi\b/i, /\btirmidhi\b/i, /\btirmizi\b/i],
   },
   abudawud: {
     canonical: 'Sunan Abu Dawud',
-    max: 5276,
+    max: 5274,
     aliases: [/\bsunan\s*abu\s*dawud\b/i, /\babu\s*dawud\b/i, /\babu-?da'?ud\b/i, /\babudawud\b/i, /\babu\s*da'ud\b/i],
   },
   ibnmajah: {
     canonical: 'Sunan Ibn Majah',
-    max: 4345,
+    max: 4341,
     aliases: [/\bsunan\s*ibn\s*majah\b/i, /\bibn\s*majah\b/i, /\bibn-?maja\b/i, /\bibnmajah\b/i],
   },
   nasai: {
     canonical: "Sunan an-Nasa'i",
-    max: 5768,
+    max: 5758,
     aliases: [/\bsunan\s*(?:an-?)?nasa'?i\b/i, /\b(?:an-?)?nasa'?i\b/i, /\bnasai\b/i],
   },
   hisnulmuslim: {
@@ -195,8 +193,23 @@ const HADITH_COLLECTIONS: Record<string, { canonical: string; max: number; alias
   },
   malik: {
     canonical: 'Muwatta Imam Malik',
-    max: 1851,
+    max: 1858,
     aliases: [/\bmuwatta\s*(?:imam\s*)?malik\b/i, /\bmuwatta\b/i, /\bmuwatta'\b/i],
+  },
+  nawawi: {
+    canonical: 'Forty Hadith of an-Nawawi',
+    max: 42,
+    aliases: [/\bforty\s*hadith\s*(?:of\s*)?(?:an-?)?nawawi\b/i, /\b(?:an-?)?nawawi\b/i],
+  },
+  qudsi: {
+    canonical: 'Forty Hadith Qudsi',
+    max: 40,
+    aliases: [/\bforty\s*hadith\s*qudsi\b/i, /\bhadith\s*qudsi\b/i],
+  },
+  dehlawi: {
+    canonical: 'Forty Hadith of Shah Waliullah Dehlawi',
+    max: 40,
+    aliases: [/\bforty\s*hadith\s*(?:of\s*)?(?:shah\s*)?waliullah\s*dehlawi\b/i, /\bdehlawi\b/i],
   },
   riyadh: {
     canonical: 'Riyadh us-Saliheen',
@@ -1043,9 +1056,13 @@ function validateHadithBulkFile(file: string, collKey: keyof typeof HADITH_COLLE
   const max = HADITH_COLLECTIONS[collKey].max;
   let outOfRange = 0;
   for (const h of arr) {
-    const numRaw = h?.hadithNumber ?? h?.number ?? h?.idInBook ?? h?.id;
+    // v2 files use lowercase `hadithnumber` (may be fractional, e.g. 631.5 —
+    // the \d+ match below truncates to the base number for the range check).
+    const numRaw = h?.hadithnumber ?? h?.hadithNumber ?? h?.number ?? h?.idInBook ?? h?.id;
     const num = parseInt(String(numRaw).match(/\d+/)?.[0] ?? '', 10);
-    if (Number.isFinite(num) && (num < 1 || num > max)) outOfRange++;
+    // hadithnumber 0 is the conventional number for a collection's
+    // introduction (e.g. Sahih Muslim's muqaddimah) — in range, not an error.
+    if (Number.isFinite(num) && (num < 0 || num > max)) outOfRange++;
   }
   if (outOfRange > 0) {
     record(
@@ -1209,12 +1226,18 @@ function main() {
   validateGenericArray('assets/daily_knowledge.json', ['id', 'category', 'en']);
   validateGenericArray('assets/islamic_tips.json', ['id', 'title', 'tip']);
   validateHadithsBundle();
-  validateHadithBulkFile('assets/hadiths/bukhari.json', 'bukhari');
-  validateHadithBulkFile('assets/hadiths/muslim.json', 'muslim');
-  validateHadithBulkFile('assets/hadiths/tirmidhi.json', 'tirmidhi');
-  validateHadithBulkFile('assets/hadiths/abudawud.json', 'abudawud');
-  validateHadithBulkFile('assets/hadiths/ibnmajah.json', 'ibnmajah');
-  validateHadithBulkFile('assets/hadiths/nasai.json', 'nasai');
+  // hadiths-v2 trilingual set — local build output (gitignored; skipped via
+  // the existsSync guard on machines without it). Mirrors R2 hadiths-v2/.
+  validateHadithBulkFile('hadith-build/combined/bukhari.json', 'bukhari');
+  validateHadithBulkFile('hadith-build/combined/muslim.json', 'muslim');
+  validateHadithBulkFile('hadith-build/combined/tirmidhi.json', 'tirmidhi');
+  validateHadithBulkFile('hadith-build/combined/abudawud.json', 'abudawud');
+  validateHadithBulkFile('hadith-build/combined/ibnmajah.json', 'ibnmajah');
+  validateHadithBulkFile('hadith-build/combined/nasai.json', 'nasai');
+  validateHadithBulkFile('hadith-build/combined/malik.json', 'malik');
+  validateHadithBulkFile('hadith-build/combined/nawawi.json', 'nawawi');
+  validateHadithBulkFile('hadith-build/combined/qudsi.json', 'qudsi');
+  validateHadithBulkFile('hadith-build/combined/dehlawi.json', 'dehlawi');
 
   renderConsole();
 
