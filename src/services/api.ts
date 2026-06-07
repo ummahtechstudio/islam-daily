@@ -103,13 +103,20 @@ export async function fetchRandomVerse() {
   const surahNum = (dayOfYear % 114) + 1;
   const data = await fetchSurah(surahNum);
   const [arabic, english] = data;
-  const verseIdx = dayOfYear % arabic.ayahs.length;
+  // Clamp to the shorter edition: an offline/cached pack could in principle
+  // hold a translation edition with a different ayah count than the Arabic one,
+  // and indexing past its end would throw "undefined is not an object".
+  const arabicAyahs = arabic?.ayahs ?? [];
+  const englishAyahs = english?.ayahs ?? [];
+  const verseIdx = arabicAyahs.length > 0 ? dayOfYear % arabicAyahs.length : 0;
+  const arabicAyah = arabicAyahs[verseIdx];
+  const englishAyah = englishAyahs[verseIdx];
   return {
     surahName: arabic.englishName,
     surahNumber: surahNum,
-    verseNumber: arabic.ayahs[verseIdx].numberInSurah,
-    arabic: arabic.ayahs[verseIdx].text,
-    english: english.ayahs[verseIdx].text,
+    verseNumber: arabicAyah?.numberInSurah ?? verseIdx + 1,
+    arabic: arabicAyah?.text ?? '',
+    english: englishAyah?.text ?? '',
   };
 }
 

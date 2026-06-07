@@ -29,13 +29,13 @@ import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
 import { useDebouncedPositionWriter } from '../../hooks/useQuranLastPosition';
 
 const ALL_PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1);
-// Uniform per-page height estimate used only for getItemLayout. A Mushaf page
-// renders to roughly one screen, so this lets scrollToIndex compute a far
-// page's offset directly (instant jump) without progressively rendering every
-// page in between. Cells still render at their natural height — getItemLayout
-// only feeds scroll math and off-screen spacer sizing, so manual continuous
-// scrolling is unaffected.
-const ITEM_HEIGHT = Dimensions.get('window').height;
+// Per-page height estimate used to seed a far jump via scrollToOffset. A Mushaf
+// page renders to roughly one screen, so jumping to (index * screen height)
+// lands close instantly; a follow-up scrollToIndex then snaps to the exact
+// measured offset. We deliberately do NOT feed this to getItemLayout: real page
+// heights vary (short surahs, font scale), and a constant getItemLayout makes
+// FlatList trust a wrong offset and paint blank cream until the user scrolls.
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 const FONT_SCALE_KEY = 'quran_font_scale';
 const LAST_PAGE_KEY = 'quran_last_page';
 const FONT_SCALE_MIN = 0.7;
@@ -110,14 +110,22 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     };
   }, []);
 
-  // After hydration, jump straight to the last-read page if not page 1.
-  // getItemLayout makes this an instant, direct jump.
+  // After hydration, jump to the last-read page if not page 1. scrollToOffset
+  // with the per-page estimate lands near the target instantly (no intermediate
+  // rendering), then scrollToIndex snaps to the exact measured offset so the
+  // page actually paints in the viewport.
   useEffect(() => {
     if (!hydrated || currentPage <= 1) return;
-    flatListRef.current?.scrollToIndex({
-      index: currentPage - 1,
+    const list = flatListRef.current;
+    if (!list) return;
+    list.scrollToOffset({
+      offset: (currentPage - 1) * SCREEN_HEIGHT,
       animated: false,
     });
+    const t = setTimeout(() => {
+      list.scrollToIndex({ index: currentPage - 1, animated: false });
+    }, 250);
+    return () => clearTimeout(t);
     // Only fire once after first hydration; intentionally no deps on currentPage.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
@@ -185,13 +193,22 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     }, 80);
   }, []);
 
-  // With getItemLayout in place, scrollToIndex computes the target page's
-  // offset directly and lands on it instantly — no animation, no rendering of
-  // the pages in between.
+  // Each Mushaf page renders to roughly screen height. Seeding the jump with
+  // scrollToOffset (estimate) avoids onScrollToIndexFailed's intermediate
+  // render that would otherwise look like a fast scroll; scrollToIndex then
+  // snaps to the exact measured offset so the page paints immediately.
   const jumpToPage = useCallback((page: number) => {
     const clamped = Math.max(1, Math.min(TOTAL_PAGES, page));
+    const list = flatListRef.current;
+    if (!list) return;
     setCurrentPage(clamped);
-    flatListRef.current?.scrollToIndex({ index: clamped - 1, animated: false });
+    list.scrollToOffset({
+      offset: (clamped - 1) * SCREEN_HEIGHT,
+      animated: false,
+    });
+    setTimeout(() => {
+      list.scrollToIndex({ index: clamped - 1, animated: false });
+    }, 50);
   }, []);
 
   useEffect(() => {
@@ -243,11 +260,6 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
         data={ALL_PAGES}
         keyExtractor={(item) => String(item)}
         renderItem={renderPage}
-        getItemLayout={(_, index) => ({
-          length: ITEM_HEIGHT,
-          offset: ITEM_HEIGHT * index,
-          index,
-        })}
         initialNumToRender={2}
         maxToRenderPerBatch={3}
         windowSize={5}
