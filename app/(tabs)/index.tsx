@@ -19,11 +19,9 @@ import Svg, { Path } from 'react-native-svg';
 import { Colors, palette } from '../../src/constants/colors';
 import { typography } from '../../src/constants/typography';
 import { spacing, radius } from '../../src/constants/spacing';
-import { useLocation } from '../../src/hooks/useLocation';
-import { usePrayerTimes } from '../../src/hooks/usePrayerTimes';
 import { useResolvedLocation } from '../../src/hooks/useResolvedLocation';
 import { computePrayerTimes } from '../../src/services/prayerTimesService';
-import { formatPrayerTime, formatCountdown } from '../../src/utils/formatPrayerTime';
+import { formatPrayerTime, formatCountdown, getHijriParts } from '../../src/utils/formatPrayerTime';
 import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
 import { useStore } from '../../src/store';
@@ -557,8 +555,17 @@ export default function HomeScreen() {
   const isDark = settingsScheme === 'dark' || (settingsScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
 
-  const { location } = useLocation();
-  const { data: prayerData, nextPrayer } = usePrayerTimes(location);
+  // Home derives prayer + Hijri data from the SAME canonical engine the Prayer
+  // Times screen and notifications use — computePrayerTimes + useResolvedLocation
+  // (settings) for times, Umm al-Qura getHijriParts for the date. Sehri/Iftar
+  // shown here are therefore structurally identical to the Prayer Times screen
+  // and can never diverge again.
+  const { settings: prayerSettings } = useResolvedLocation();
+  const computed = useMemo(
+    () => computePrayerTimes(prayerSettings, new Date()),
+    [prayerSettings],
+  );
+  const hijri = useMemo(() => getHijriParts(new Date()), []);
 
   const [verse, setVerse] = useState<{
     arabic: string; english: string; surahName: string; surahNumber: number; verseNumber: number;
@@ -608,8 +615,25 @@ export default function HomeScreen() {
     .map((s) => ({ ...s, items: s.items.filter((i) => isTileVisible(i.id)) }))
     .filter((s) => s.items.length > 0);
 
-  const hijriMonth = prayerData?.date?.hijri?.month?.number ?? 0;
+  const hijriMonth = hijri.month;
   const isRamadan = hijriMonth === 9;
+
+  // Next prayer (for the QuickGrid subtitle) and today's Sehri/Iftar, all from
+  // the same `computed` result — the live next-prayer card (PrayerNextCard) and
+  // the Prayer Times screen use this identical engine + settings.
+  const nextEntry = computed.prayers.find((p) => p.name === computed.nextPrayer);
+  const nextPrayer =
+    nextEntry && computed.nextPrayerTime
+      ? {
+          name:
+            nextEntry.isFriday && nextEntry.name === 'dhuhr'
+              ? t('prayers.names.jumuah')
+              : t(`prayers.names.${nextEntry.name}`),
+          time: formatPrayerTime(computed.nextPrayerTime),
+        }
+      : null;
+  const sehriTime = computed.prayers.find((p) => p.name === 'fajr')?.time ?? null;
+  const iftarTime = computed.prayers.find((p) => p.name === 'maghrib')?.time ?? null;
 
   const loadContent = useCallback(async () => {
     setVerseLoading(true);
@@ -671,12 +695,12 @@ export default function HomeScreen() {
       >
         <GreetingCard
           hijriDate={
-            prayerData
-              ? `${prayerData.date.hijri.day} ${
+            hijri.year
+              ? `${hijri.day} ${
                   hijriMonth >= 1 && hijriMonth <= 12
                     ? t(`calendar.hijriMonths.${hijriMonth}`)
-                    : prayerData.date.hijri.month.en
-                } ${prayerData.date.hijri.year}`
+                    : ''
+                } ${hijri.year}`.replace(/\s+/g, ' ').trim()
               : null
           }
         />
@@ -689,11 +713,11 @@ export default function HomeScreen() {
           >
             <Text style={styles.ramadanTitle}>{t('home.ramadan.banner')}</Text>
             <View style={styles.ramadanTimes}>
-              {prayerData?.timings?.Fajr && (
-                <Text style={styles.ramadanTime}>{t('home.ramadan.sehri', { time: prayerData.timings.Fajr.split(' ')[0] })}</Text>
+              {sehriTime && (
+                <Text style={styles.ramadanTime}>{t('home.ramadan.sehri', { time: formatPrayerTime(sehriTime) })}</Text>
               )}
-              {prayerData?.timings?.Maghrib && (
-                <Text style={styles.ramadanTime}>{t('home.ramadan.iftar', { time: prayerData.timings.Maghrib.split(' ')[0] })}</Text>
+              {iftarTime && (
+                <Text style={styles.ramadanTime}>{t('home.ramadan.iftar', { time: formatPrayerTime(iftarTime) })}</Text>
               )}
             </View>
           </TouchableOpacity>
