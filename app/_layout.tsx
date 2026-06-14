@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 // Initialise i18n before any screen renders (the import runs init synchronously).
@@ -71,6 +72,7 @@ export default function RootLayout() {
     };
   }, []);
 
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const loadPersistedData = useStore((s) => s.loadPersistedData);
   const settingsScheme = useStore((s) => s.settings.colorScheme);
@@ -117,6 +119,20 @@ export default function RootLayout() {
       NavigationBar.setVisibilityAsync('visible').catch(() => {});
     }
   }, []);
+
+  // Notification taps that carry a `route` in their data payload deep-link to
+  // that screen (Daily Hadith → /hadith, Friday → Surah Al-Kahf). Prayer and
+  // Tahajjud notifications carry no route, so they just open the app as before.
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { route?: string } | undefined;
+      if (data?.route) {
+        router.push(data.route as never);
+      }
+    });
+    return () => sub.remove();
+  }, [router]);
 
   // Re-arm notifications whenever the app comes back to the foreground.
   // Catches: device left in background past the 7-day window, timezone

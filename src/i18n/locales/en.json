@@ -899,6 +899,14 @@
       "granted": "Permissions granted",
       "undetermined": "Tap \"Enable prayer notifications\" to grant permission."
     },
+    "dailyHadithNotif": {
+      "body": "Your daily hadith is ready — tap to read",
+      "title": "Daily Hadith"
+    },
+    "fridayNotif": {
+      "body": "Jummah Mubarak — read Surah Al-Kahf & send salawat.",
+      "title": "Jummah Mubarak"
+    },
     "prayerNotif": {
       "body": "{{arabic}} · {{time}}{{cityPart}}"
     },

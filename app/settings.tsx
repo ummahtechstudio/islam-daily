@@ -21,6 +21,7 @@ import { urduUiStyle } from '../src/constants/fonts';
 import { useStore } from '../src/store';
 import { CALCULATION_METHODS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
+import { scheduleNotificationsForNext7Days } from '../src/services/notificationsService';
 import i18n from '../src/i18n';
 import {
   getSetting,
@@ -210,16 +211,19 @@ export default function SettingsScreen() {
   const onToggleDailyHadith = async (v: boolean) => {
     setDailyHadith(v);
     await setSetting('daily_hadith', v);
+    scheduleNotificationsForNext7Days().catch(() => {});
   };
 
   const onSelectDailyHadithTime = async (v: string) => {
     setDailyHadithTime(v);
     await setSetting('daily_hadith_time', v);
+    scheduleNotificationsForNext7Days().catch(() => {});
   };
 
   const onToggleFridayReminder = async (v: boolean) => {
     setFridayReminder(v);
     await setSetting('friday_reminder', v);
+    scheduleNotificationsForNext7Days().catch(() => {});
   };
 
   const onSelectTranslationLang = async (v: TranslationLanguage) => {

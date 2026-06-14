@@ -13,6 +13,7 @@ import {
   KARACHI_DEFAULT,
 } from './prayerTimesService';
 import { formatPrayerTime } from '../utils/formatPrayerTime';
+import { getSetting } from '../utils/settings';
 import type { PrayerTimesSettings } from '../types/prayerTimes';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -57,6 +58,14 @@ const SCHEDULE_AHEAD_DAYS = 7;
 const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24h
 const SCHEDULED_TAG = 'prayer-notification';
 const TAHAJJUD_TAG = 'tahajjud-notification';
+const DAILY_HADITH_TAG = 'daily-hadith-notification';
+const FRIDAY_TAG = 'friday-reminder-notification';
+
+// Friday reminder fires at a fixed default time (no per-user time picker yet).
+// expo-notifications weekday is 1=Sunday … 6=Friday … 7=Saturday.
+const FRIDAY_WEEKDAY = 6;
+const FRIDAY_REMINDER_HOUR = 9;
+const FRIDAY_REMINDER_MINUTE = 0;
 
 // Android notification channels — one per sound choice. On API 26+, the
 // channel determines the sound, not the per-notification field.
@@ -64,6 +73,7 @@ const CHANNEL_ADHAN = 'prayer-adhan';
 const CHANNEL_SYSTEM = 'prayer-system';
 const CHANNEL_SILENT = 'prayer-silent';
 const CHANNEL_TAHAJJUD = 'sunnah-tahajjud';
+const CHANNEL_GENERAL = 'general-reminders';
 
 // Notification text is resolved at schedule time via i18n so future locale
 // support only requires updating the locale JSON files.
@@ -213,6 +223,14 @@ async function ensureAndroidChannels(): Promise<void> {
       vibrationPattern: [0, 250, 150, 250],
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     });
+    // General reminders (Daily Hadith, Friday) — gentle, system tone, not adhan.
+    await Notifications.setNotificationChannelAsync(CHANNEL_GENERAL, {
+      name: 'Reminders',
+      importance: AndroidImportance.DEFAULT,
+      sound: 'default',
+      vibrationPattern: [0, 250],
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    });
     channelsConfigured = true;
   } catch (err) {
     console.warn('[notifications] failed to configure channels', err);
@@ -264,6 +282,8 @@ async function cancelExistingTahajjudNotifications(): Promise<void> {
 export async function cancelAllPrayerNotifications(): Promise<void> {
   await cancelExistingPrayerNotifications();
   await cancelExistingTahajjudNotifications();
+  await cancelByTag(DAILY_HADITH_TAG);
+  await cancelByTag(FRIDAY_TAG);
   prefs.delete(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT);
 }
 
@@ -393,6 +413,81 @@ async function scheduleTahajjudNotifications(
   }
 }
 
+// ─── Daily Hadith & Friday reminders ───────────────────────────────────────────
+// These two reminders are stored in AsyncStorage (the `settings_*` keys written
+// by the Settings screen), independent of the MMKV prayer-notification settings.
+// Like Tahajjud, they are their own opt-in streams and are deliberately NOT
+// gated by the prayer master toggle.
+
+function parseHourMinute(
+  value: string,
+  fallbackHour: number,
+  fallbackMinute: number,
+): { hour: number; minute: number } {
+  const [h, m] = value.split(':').map(Number);
+  if (!Number.isInteger(h) || h < 0 || h > 23 || !Number.isInteger(m) || m < 0 || m > 59) {
+    return { hour: fallbackHour, minute: fallbackMinute };
+  }
+  return { hour: h, minute: m };
+}
+
+async function scheduleDailyHadithNotification(): Promise<void> {
+  await cancelByTag(DAILY_HADITH_TAG);
+
+  const enabled = await getSetting<boolean>('daily_hadith', true);
+  if (!enabled) return;
+
+  const timeStr = await getSetting<string>('daily_hadith_time', '08:00');
+  const { hour, minute } = parseHourMinute(timeStr, 8, 0);
+
+  try {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: i18n.t('notifications.dailyHadithNotif.title'),
+        body: i18n.t('notifications.dailyHadithNotif.body'),
+        sound: 'default',
+        data: { tag: DAILY_HADITH_TAG, route: '/hadith' },
+      },
+      trigger: {
+        type: SchedulableTriggerInputTypes.DAILY,
+        hour,
+        minute,
+        ...(Platform.OS === 'android' ? { channelId: CHANNEL_GENERAL } : {}),
+      },
+    });
+  } catch (err) {
+    console.warn('[notifications] schedule daily hadith failed', err);
+  }
+}
+
+async function scheduleFridayReminderNotification(): Promise<void> {
+  await cancelByTag(FRIDAY_TAG);
+
+  const enabled = await getSetting<boolean>('friday_reminder', true);
+  if (!enabled) return;
+
+  try {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: i18n.t('notifications.fridayNotif.title'),
+        body: i18n.t('notifications.fridayNotif.body'),
+        sound: 'default',
+        // Al-Kahf is Surah 18 — deep-link straight to it on tap.
+        data: { tag: FRIDAY_TAG, route: '/quran/18' },
+      },
+      trigger: {
+        type: SchedulableTriggerInputTypes.WEEKLY,
+        weekday: FRIDAY_WEEKDAY,
+        hour: FRIDAY_REMINDER_HOUR,
+        minute: FRIDAY_REMINDER_MINUTE,
+        ...(Platform.OS === 'android' ? { channelId: CHANNEL_GENERAL } : {}),
+      },
+    });
+  } catch (err) {
+    console.warn('[notifications] schedule friday reminder failed', err);
+  }
+}
+
 // Serializes concurrent scheduler invocations. Without this, rapid toggles
 // in settings can cancel notifications that a previous in-flight call is
 // still creating, leading to a flaky "where did my notifications go" UX.
@@ -426,6 +521,8 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
     // timestamp.
     await schedulePrayerNotifications(settings, prayerSettings);
     await scheduleTahajjudNotifications(settings, prayerSettings);
+    await scheduleDailyHadithNotification();
+    await scheduleFridayReminderNotification();
 
     prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
     prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_TIMEZONE_OFFSET, String(new Date().getTimezoneOffset()));
