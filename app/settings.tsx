@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '../src/constants/colors';
 import { urduUiStyle } from '../src/constants/fonts';
 import { useStore } from '../src/store';
-import { CALCULATION_METHODS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
 import { scheduleNotificationsForNext7Days } from '../src/services/notificationsService';
 import i18n from '../src/i18n';
@@ -76,7 +75,6 @@ export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const settings = useStore((s) => s.settings);
-  const updateSettings = useStore((s) => s.updateSettings);
 
   // Existing prefs
   const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(null);
@@ -508,42 +506,6 @@ export default function SettingsScreen() {
                     <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>
                       {t(`settings.fontSize.options.${opt.value}`)}
                     </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        </SectionCard>
-
-        {/* ── PRAYER TIMES ───────────────────────────────────────────────── */}
-        <SectionLabel>{t('settings.sections.prayerTimes')}</SectionLabel>
-        <SectionCard>
-          {/* Existing CALCULATION_METHODS (Aladhan ids) — kept for compatibility with prayer-time service */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#06B6D420' }]}>
-                <Ionicons name="time" size={18} color="#06B6D4" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.providerMethod')}</Text>
-            </View>
-            <View style={styles.pickerColumn}>
-              {CALCULATION_METHODS.map((method) => {
-                const active = settings.calculationMethod === method.id;
-                return (
-                  <TouchableOpacity
-                    key={method.id}
-                    style={[
-                      styles.pickerRow,
-                      {
-                        backgroundColor: active ? Colors.primary + '15' : 'transparent',
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => updateSettings({ calculationMethod: method.id })}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>{method.name}</Text>
-                    {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
                   </TouchableOpacity>
                 );
               })}

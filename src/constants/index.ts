@@ -6,23 +6,6 @@ export * from './spacing';
 export const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 export const PRAYER_ICONS = ['🌙', '🌅', '☀️', '🌤️', '🌇', '⭐'];
 
-export const CALCULATION_METHODS = [
-  { id: 0, name: 'Shafi, Maliki, Hanbali' },
-  { id: 1, name: 'University of Islamic Sciences, Karachi' },
-  { id: 2, name: 'Islamic Society of North America (ISNA)' },
-  { id: 3, name: 'Muslim World League' },
-  { id: 4, name: 'Umm Al-Qura, Makkah' },
-  { id: 5, name: 'Egyptian General Authority of Survey' },
-  { id: 7, name: 'Institute of Geophysics, Tehran' },
-  { id: 8, name: 'Gulf Region' },
-  { id: 9, name: 'Kuwait' },
-  { id: 10, name: 'Qatar' },
-  { id: 11, name: 'Majlis Ugama Islam Singapura' },
-  { id: 12, name: 'Union Organization islamic de France' },
-  { id: 13, name: 'Diyanet İşleri Başkanlığı, Turkey' },
-  { id: 14, name: 'Spiritual Administration of Muslims of Russia' },
-];
-
 export const HADITH_COLLECTIONS = [
   { key: 'bukhari',  name: 'Sahih Bukhari' },
   { key: 'muslim',   name: 'Sahih Muslim' },

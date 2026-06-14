@@ -120,25 +120,7 @@ export async function fetchRandomVerse() {
   };
 }
 
-// ─── Prayer Times ─────────────────────────────────────────────────────────────
-
-export async function fetchPrayerTimes(
-  latitude: number,
-  longitude: number,
-  method = 4
-) {
-  const today = new Date();
-  const dateStr = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-  const key = `api_prayers_${latitude.toFixed(2)}_${longitude.toFixed(2)}_${dateStr}`;
-
-  return cachedFetch(key, async () => {
-    const url = `${ALADHAN_BASE}/timings/${dateStr}?latitude=${latitude}&longitude=${longitude}&method=${method}`;
-    const res = await fetchWithTimeout(url, {}, NET_TIMEOUT_MS);
-    const json = await safeJson(res);
-    if (json.code !== 200) throw new Error('Prayer API error');
-    return json.data as PrayerTimesData;
-  }, 60 * 60 * 1000); // 1 h
-}
+// ─── Qibla ────────────────────────────────────────────────────────────────────
 
 export async function fetchQiblaDirection(latitude: number, longitude: number) {
   const key = `api_qibla_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
@@ -288,23 +270,6 @@ export interface HijriDate {
   month: { number: number; en: string; ar: string };
   year: string;
   holidays: string[];
-}
-
-export interface PrayerTimesData {
-  timings: PrayerTimes;
-  date: {
-    readable: string;
-    timestamp: string;
-    hijri: HijriDate;
-    gregorian: { date: string; format: string; day: string; weekday: { en: string }; month: { number: number; en: string }; year: string };
-  };
-  meta: {
-    latitude: number;
-    longitude: number;
-    timezone: string;
-    method: { id: number; name: string };
-    latitudeAdjustmentMethod: string;
-  };
 }
 
 export interface QuranSearchResult {

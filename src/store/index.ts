@@ -5,7 +5,6 @@ import { CACHE_KEYS } from '../constants';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface AppSettings {
-  calculationMethod: number;
   colorScheme: 'light' | 'dark' | 'system';
   arabicFontSize: number;
   notificationsEnabled: boolean;
@@ -28,7 +27,6 @@ interface AppState {
 // ─── Default settings ─────────────────────────────────────────────────────────
 
 const DEFAULT_SETTINGS: AppSettings = {
-  calculationMethod: 4,
   colorScheme: 'system',
   arabicFontSize: 26,
   notificationsEnabled: false,
