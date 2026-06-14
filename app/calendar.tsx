@@ -14,54 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
-
-// ─── Hijri conversion (Umm al-Qura approximation) ────────────────────────────
-
-function toHijri(date: Date): { day: number; month: number; monthName: string; year: number } {
-  // English fallback names only — the UI normally renders the localized
-  // calendar.hijriMonths.* keys; this is used if the month index is out of range.
-  const HIJRI_MONTHS = [
-    'Muharram', 'Safar', "Rabi' al-Awwal", "Rabi' al-Thani",
-    'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', "Sha'ban",
-    'Ramadan', 'Shawwal', "Dhu al-Qi'dah", 'Dhu al-Hijjah',
-  ];
-
-  // Julian Day Number
-  const Y = date.getFullYear();
-  const M = date.getMonth() + 1;
-  const D = date.getDate();
-  const JD =
-    Math.floor((14 - M) / 12) * (-1) +
-    Math.floor((153 * (M + 12 * Math.floor((14 - M) / 12) - 3) + 2) / 5) +
-    D +
-    365 * (Y + 4800 - Math.floor((14 - M) / 12)) +
-    Math.floor((Y + 4800 - Math.floor((14 - M) / 12)) / 4) -
-    Math.floor((Y + 4800 - Math.floor((14 - M) / 12)) / 100) +
-    Math.floor((Y + 4800 - Math.floor((14 - M) / 12)) / 400) -
-    32045;
-
-  const l = JD - 1948440 + 10632;
-  const n = Math.floor((l - 1) / 10631);
-  const l2 = l - 10631 * n + 354;
-  const j =
-    Math.floor((10985 - l2) / 5316) * Math.floor((50 * l2) / 17719) +
-    Math.floor(l2 / 5670) * Math.floor((43 * l2) / 15238);
-  const l3 =
-    l2 -
-    Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50) -
-    Math.floor(j / 16) * Math.floor((15238 * j) / 43) +
-    29;
-  const month = Math.floor((24 * l3) / 709);
-  const day = l3 - Math.floor((709 * month) / 24);
-  const year = 30 * n + j - 30;
-
-  // Clamp month into the valid 1..12 range. The Julian approximation can
-  // produce out-of-range values at extreme dates; rather than render an
-  // empty month name with awkward spacing, fall back to a numeric label.
-  const safeMonthName =
-    HIJRI_MONTHS[month - 1] ?? (month >= 1 && month <= 12 ? `Month ${month}` : '—');
-  return { day, month, monthName: safeMonthName, year };
-}
+import { getHijriParts } from '../src/utils/formatPrayerTime';
 
 // ─── Islamic events ───────────────────────────────────────────────────────────
 
@@ -107,7 +60,7 @@ export default function CalendarScreen() {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const todayHijri = toHijri(today);
+  const todayHijri = getHijriParts(today);
 
   const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
   const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
@@ -134,7 +87,7 @@ export default function CalendarScreen() {
               monthName:
                 todayHijri.month >= 1 && todayHijri.month <= 12
                   ? t(`calendar.hijriMonths.${todayHijri.month}`)
-                  : todayHijri.monthName,
+                  : '—',
               year: todayHijri.year,
             })}
           </Text>
@@ -173,7 +126,7 @@ export default function CalendarScreen() {
           {cells.map((day, idx) => {
             if (!day) return <View key={`empty-${idx}`} style={styles.cell} />;
             const cellDate = new Date(year, month, day);
-            const hijri = toHijri(cellDate);
+            const hijri = getHijriParts(cellDate);
             const isToday =
               day === today.getDate() &&
               month === today.getMonth() &&

@@ -80,3 +80,42 @@ export function formatHijriDate(date: Date = new Date()): string {
   const cleaned = raw.replace(/\s*A\.?H\.?\s*$/i, '').trim();
   return `${cleaned} AH`;
 }
+
+// Single shared Umm al-Qura formatter. Building an Intl.DateTimeFormat is
+// relatively expensive, and the calendar grid converts ~42 dates per render,
+// so we cache one instance and reuse it.
+let hijriPartsFormatter: Intl.DateTimeFormat | null = null;
+function getHijriPartsFormatter(): Intl.DateTimeFormat {
+  if (!hijriPartsFormatter) {
+    hijriPartsFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    });
+  }
+  return hijriPartsFormatter;
+}
+
+/**
+ * Hijri date as numeric parts via the Umm al-Qura calendar (Intl
+ * 'islamic-umalqura') — the SINGLE source of truth for Hijri dates across the
+ * app (Home greeting, calendar grid + event matching, Ramadan detection).
+ * `month` is 1–12. Returns zeros if the engine can't resolve the calendar
+ * (defensive only — the same calendar already powers formatHijriDate).
+ */
+export function getHijriParts(date: Date = new Date()): { day: number; month: number; year: number } {
+  try {
+    const parts = getHijriPartsFormatter().formatToParts(date);
+    let day = 0;
+    let month = 0;
+    let year = 0;
+    for (const p of parts) {
+      if (p.type === 'day') day = parseInt(p.value, 10);
+      else if (p.type === 'month') month = parseInt(p.value, 10);
+      else if (p.type === 'year') year = parseInt(p.value, 10);
+    }
+    return { day, month, year };
+  } catch {
+    return { day: 0, month: 0, year: 0 };
+  }
+}
