@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -165,6 +165,215 @@ async function fetchWordMeaning(globalAyahNumber: number): Promise<{ arabic: str
   }
 }
 
+// ─── Memoized verse row ────────────────────────────────────────────────────────
+// Extracted + React.memo'd so scrolling (which updates `visibleAyah` on the
+// parent every tick) no longer re-renders or re-parses every verse. A row only
+// re-renders when ITS OWN props change — including its own isPlaying /
+// isLoadingAudio / bookmarked — so the audio highlight still updates live. The
+// per-word tajweed/word-split is useMemo'd on the verse text. Output is byte-for-
+// byte identical to the previous inline renderer.
+
+type VerseRowProps = {
+  item: Ayah;
+  trAyah: Ayah | undefined;
+  quranMode: QuranMode;
+  reciteFontSize: number;
+  fontSize: number;
+  tajweedOn: boolean;
+  showTranslation: boolean;
+  theme: typeof Colors.dark;
+  translationMeta: ReturnType<typeof findTranslation>;
+  isPlaying: boolean;
+  isLoadingAudio: boolean;
+  bookmarked: boolean;
+  onPlay: (item: Ayah) => void;
+  onBookmark: (item: Ayah, trAyah: Ayah | undefined, bookmarked: boolean) => void;
+  onShare: (item: Ayah, trAyah: Ayah | undefined) => void;
+  onWordTap: (word: string, item: Ayah) => void;
+};
+
+const VerseRow = React.memo(function VerseRow({
+  item,
+  trAyah,
+  quranMode,
+  reciteFontSize,
+  fontSize,
+  tajweedOn,
+  showTranslation,
+  theme,
+  translationMeta,
+  isPlaying,
+  isLoadingAudio,
+  bookmarked,
+  onPlay,
+  onBookmark,
+  onShare,
+  onWordTap,
+}: VerseRowProps) {
+  const arabicInk = '#1A3D2F'; // textOnCream
+
+  // Memoized once per verse text (and tajweed toggle) — never re-runs on scroll.
+  const words = useMemo(() => item.text.split(' '), [item.text]);
+  const tajweedTokens = useMemo(
+    () => (tajweedOn ? words.map((w) => parseTajweed(w)) : null),
+    [words, tajweedOn],
+  );
+
+  // ─── Recite mode: Arabic-only, large font, decorative ayah marker ──────
+  if (quranMode === 'recite') {
+    return (
+      <View style={[styles.reciteVerse, { borderBottomColor: GOLD + '30' }]}>
+        <Text
+          style={[
+            styles.reciteArabic,
+            {
+              color: theme.text,
+              fontSize: reciteFontSize,
+              lineHeight: reciteFontSize + 22,
+            },
+          ]}
+          textBreakStrategy="simple"
+        >
+          {item.text}
+        </Text>
+        <Text style={[styles.ayahMarker, { color: GOLD }]}>
+          {`\u{FD3F} ${toArabicNumerals(item.numberInSurah)} \u{FD3E}`}
+        </Text>
+        <View style={styles.reciteActions}>
+          <TouchableOpacity onPress={() => onPlay(item)} hitSlop={8}>
+            {isLoadingAudio ? (
+              <ActivityIndicator size={16} color={Colors.primary} />
+            ) : (
+              <Ionicons
+                name={isPlaying ? 'pause-circle' : 'play-circle-outline'}
+                size={20}
+                color={isPlaying ? Colors.primary : theme.textMuted}
+              />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onBookmark(item, trAyah, bookmarked)} hitSlop={8}>
+            <Ionicons
+              name={bookmarked ? 'bookmark' : 'bookmark-outline'}
+              size={18}
+              color={bookmarked ? Colors.accent : theme.textMuted}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onShare(item, trAyah)} hitSlop={8}>
+            <Ionicons name="share-outline" size={18} color={theme.textMuted} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  // Render Arabic text: either plain or as tappable words with optional tajweed
+  const renderArabicText = () => {
+    if (tajweedOn && tajweedTokens) {
+      // Render word-by-word with tajweed colors and tap-to-look-up
+      return (
+        <Text
+          style={[styles.arabicText, { fontSize, lineHeight: fontSize * 1.9 }]}
+          textBreakStrategy="simple"
+        >
+          {words.map((word, wIdx) => {
+            const tokens = tajweedTokens[wIdx];
+            return (
+              <Text key={wIdx} onPress={() => onWordTap(word, item)}>
+                {tokens.map((tok, tIdx) => (
+                  <Text
+                    key={tIdx}
+                    style={tok.color !== 'inherit' ? { color: tok.color } : { color: arabicInk }}
+                  >
+                    {tok.text}
+                  </Text>
+                ))}
+                {wIdx < words.length - 1 ? ' ' : ''}
+              </Text>
+            );
+          })}
+        </Text>
+      );
+    }
+
+    // Normal mode: tappable words for word-by-word meaning
+    return (
+      <Text
+        style={[styles.arabicText, { color: arabicInk, fontSize, lineHeight: fontSize * 1.9 }]}
+        textBreakStrategy="simple"
+      >
+        {words.map((word, wIdx) => (
+          <Text
+            key={wIdx}
+            onPress={() => onWordTap(word, item)}
+            style={{ color: arabicInk }}
+          >
+            {word}{wIdx < words.length - 1 ? ' ' : ''}
+          </Text>
+        ))}
+      </Text>
+    );
+  };
+
+  return (
+    <View style={[styles.verseContainer, { borderBottomColor: theme.border }]}>
+      {/* Verse actions row */}
+      <View style={styles.verseHeader}>
+        <View style={styles.verseActions}>
+          <TouchableOpacity onPress={() => onPlay(item)} hitSlop={8}>
+            {isLoadingAudio ? (
+              <ActivityIndicator size={18} color={Colors.primary} />
+            ) : (
+              <Ionicons
+                name={isPlaying ? 'pause-circle' : 'play-circle-outline'}
+                size={22}
+                color={isPlaying ? Colors.primary : theme.textMuted}
+              />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onBookmark(item, trAyah, bookmarked)} hitSlop={8}>
+            <Ionicons
+              name={bookmarked ? 'bookmark' : 'bookmark-outline'}
+              size={20}
+              color={bookmarked ? Colors.accent : theme.textMuted}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onShare(item, trAyah)} hitSlop={8}>
+            <Ionicons name="share-outline" size={20} color={theme.textMuted} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Arabic on cream — manuscript treatment */}
+      <View style={styles.arabicCream}>
+        <View style={styles.arabicBadge}>
+          <Text style={styles.arabicBadgeText}>{item.numberInSurah}</Text>
+        </View>
+        {renderArabicText()}
+      </View>
+
+      {/* Translation */}
+      {showTranslation && trAyah && (
+        <View style={[styles.translationBlock, { borderLeftColor: Colors.primary + '40' }]}>
+          <Text style={[styles.translationLabel, { color: Colors.primary }]}>
+            {translationMeta.translationLabel}
+          </Text>
+          <Text
+            style={[
+              styles.translationText,
+              { color: theme.textSecondary },
+              translationMeta.rtl && styles.translationRtl,
+              translationMeta.isUrdu && urduStyle(16),
+            ]}
+            textBreakStrategy="simple"
+          >
+            {trAyah.text}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+});
+
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function SurahReaderScreen() {
@@ -201,7 +410,7 @@ export default function SurahReaderScreen() {
   const theme = isDark ? Colors.dark : Colors.light;
 
   const selectedEdition = settings.selectedTranslation ?? 'ur.jalandhry';
-  const translationMeta = findTranslation(selectedEdition);
+  const translationMeta = useMemo(() => findTranslation(selectedEdition), [selectedEdition]);
 
   const { arabic, translation, loading, error, fromCache } = useSurah(surahNum, selectedEdition);
 
@@ -329,7 +538,7 @@ export default function SurahReaderScreen() {
   const [wordPopup, setWordPopup] = useState<WordMeaning | null>(null);
   const [wordLoading, setWordLoading] = useState(false);
 
-  const handleWordTap = async (word: string, ayah: Ayah) => {
+  const handleWordTap = useCallback(async (word: string, ayah: Ayah) => {
     setWordLoading(true);
     setWordPopup({ word, transliteration: '...', ayahRef: `${surahNum}:${ayah.numberInSurah}` });
     const data = await fetchWordMeaning(ayah.number);
@@ -346,7 +555,7 @@ export default function SurahReaderScreen() {
       setWordPopup({ word, transliteration: translit, ayahRef: `${surahNum}:${ayah.numberInSurah}` });
     }
     setWordLoading(false);
-  };
+  }, [surahNum]);
 
   const playAyah = async (ayah: Ayah) => {
     if (!Audio) {
@@ -397,6 +606,85 @@ export default function SurahReaderScreen() {
     setShowReciterPicker(false);
   };
 
+  // ─── Stable callbacks for the memoized VerseRow ─────────────────────────────
+  // onPlay uses a "latest ref" so it keeps a stable identity even though playAyah
+  // closes over playingAyah — otherwise every row would get a new callback (and
+  // re-render) each time playback state changes. The audio logic is untouched.
+  const playAyahRef = useRef(playAyah);
+  playAyahRef.current = playAyah;
+  const onPlay = useCallback((ayah: Ayah) => playAyahRef.current(ayah), []);
+
+  const onShare = useCallback(
+    (item: Ayah, trAyah: Ayah | undefined) =>
+      shareContent({
+        arabic: item.text,
+        translation: trAyah?.text ?? '',
+        reference: `${arabic?.englishName ?? ''} ${surahNum}:${item.numberInSurah}`,
+        type: 'quran',
+      }),
+    [arabic?.englishName, surahNum],
+  );
+
+  const onBookmark = useCallback(
+    async (item: Ayah, trAyah: Ayah | undefined, currentlyBookmarked: boolean) => {
+      const bookmarkId = `quran_${surahNum}_${item.numberInSurah}`;
+      if (currentlyBookmarked) {
+        await removeBookmark('quran', bookmarkId);
+      } else {
+        await addBookmark({
+          type: 'quran',
+          id: bookmarkId,
+          title: `${arabic?.englishName ?? ''} ${surahNum}:${item.numberInSurah}`,
+          arabic: item.text,
+          translation: trAyah?.text ?? '',
+          reference: `${arabic?.englishName ?? ''} ${surahNum}:${item.numberInSurah}`,
+        });
+      }
+      refreshBookmarks();
+    },
+    [arabic?.englishName, surahNum, refreshBookmarks],
+  );
+
+  const renderItem = useCallback(
+    ({ item, index }: { item: Ayah; index: number }) => {
+      const trAyah = translation?.ayahs[index];
+      const bookmarkId = `quran_${surahNum}_${item.numberInSurah}`;
+      return (
+        <VerseRow
+          item={item}
+          trAyah={trAyah}
+          quranMode={quranMode}
+          reciteFontSize={reciteFontSize}
+          fontSize={fontSize}
+          tajweedOn={tajweedOn}
+          showTranslation={showTranslation}
+          theme={theme}
+          translationMeta={translationMeta}
+          isPlaying={playingAyah === item.number}
+          isLoadingAudio={loadingAyah === item.number}
+          bookmarked={bookmarkedAyahs.has(bookmarkId)}
+          onPlay={onPlay}
+          onBookmark={onBookmark}
+          onShare={onShare}
+          onWordTap={handleWordTap}
+        />
+      );
+    },
+    [
+      translation, surahNum, quranMode, reciteFontSize, fontSize, tajweedOn,
+      showTranslation, theme, translationMeta, playingAyah, loadingAyah,
+      bookmarkedAyahs, onPlay, onBookmark, onShare, handleWordTap,
+    ],
+  );
+
+  // Tells FlatList to re-evaluate cells when any of these change (so a new
+  // highlight propagates); React.memo on VerseRow then re-renders only the
+  // rows whose own props actually changed.
+  const listExtraData = useMemo(
+    () => ({ playingAyah, loadingAyah, bookmarkedAyahs, fontSize, tajweedOn, showTranslation, quranMode, reciteFontSize, theme }),
+    [playingAyah, loadingAyah, bookmarkedAyahs, fontSize, tajweedOn, showTranslation, quranMode, reciteFontSize, theme],
+  );
+
   if (loading) {
     return (
       <SafeAreaView
@@ -411,199 +699,6 @@ export default function SurahReaderScreen() {
   if (error || !arabic || !translation) {
     return <ErrorView message={error ?? t('quran.reader.error')} dark={isDark} />;
   }
-
-  // ─── Verse renderer ───────────────────────────────────────────────────────
-
-  const renderVerse = ({ item, index }: { item: Ayah; index: number }) => {
-    const trAyah = translation.ayahs[index];
-    const bookmarkId = `quran_${surahNum}_${item.numberInSurah}`;
-    const bookmarked = bookmarkedAyahs.has(bookmarkId);
-    const isPlaying = playingAyah === item.number;
-    const isLoadingAudio = loadingAyah === item.number;
-    const reference = `${arabic.englishName} ${surahNum}:${item.numberInSurah}`;
-
-    const handleBookmark = async () => {
-      if (bookmarked) {
-        await removeBookmark('quran', bookmarkId);
-      } else {
-        await addBookmark({
-          type: 'quran',
-          id: bookmarkId,
-          title: `${arabic.englishName} ${surahNum}:${item.numberInSurah}`,
-          arabic: item.text,
-          translation: trAyah?.text ?? '',
-          reference,
-        });
-      }
-      refreshBookmarks();
-    };
-
-    const handleShare = async () => {
-      await shareContent({
-        arabic: item.text,
-        translation: trAyah?.text ?? '',
-        reference,
-        type: 'quran',
-      });
-    };
-
-    // ─── Recite mode: Arabic-only, large font, decorative ayah marker ──────
-    if (quranMode === 'recite') {
-      return (
-        <View style={[styles.reciteVerse, { borderBottomColor: GOLD + '30' }]}>
-          <Text
-            style={[
-              styles.reciteArabic,
-              {
-                color: theme.text,
-                fontSize: reciteFontSize,
-                lineHeight: reciteFontSize + 22,
-              },
-            ]}
-            textBreakStrategy="simple"
-          >
-            {item.text}
-          </Text>
-          <Text style={[styles.ayahMarker, { color: GOLD }]}>
-            {`\u{FD3F} ${toArabicNumerals(item.numberInSurah)} \u{FD3E}`}
-          </Text>
-          <View style={styles.reciteActions}>
-            <TouchableOpacity onPress={() => playAyah(item)} hitSlop={8}>
-              {isLoadingAudio ? (
-                <ActivityIndicator size={16} color={Colors.primary} />
-              ) : (
-                <Ionicons
-                  name={isPlaying ? 'pause-circle' : 'play-circle-outline'}
-                  size={20}
-                  color={isPlaying ? Colors.primary : theme.textMuted}
-                />
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleBookmark} hitSlop={8}>
-              <Ionicons
-                name={bookmarked ? 'bookmark' : 'bookmark-outline'}
-                size={18}
-                color={bookmarked ? Colors.accent : theme.textMuted}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleShare} hitSlop={8}>
-              <Ionicons name="share-outline" size={18} color={theme.textMuted} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      );
-    }
-
-    // Render Arabic text: either plain or as tappable words with optional tajweed
-    const arabicInk = '#1A3D2F'; // textOnCream
-    const renderArabicText = () => {
-      if (tajweedOn) {
-        // Render word-by-word with tajweed colors and tap-to-look-up
-        const words = item.text.split(' ');
-        return (
-          <Text
-            style={[styles.arabicText, { fontSize, lineHeight: fontSize * 1.9 }]}
-            textBreakStrategy="simple"
-          >
-            {words.map((word, wIdx) => {
-              const tokens = parseTajweed(word);
-              return (
-                <Text key={wIdx} onPress={() => handleWordTap(word, item)}>
-                  {tokens.map((tok, tIdx) => (
-                    <Text
-                      key={tIdx}
-                      style={tok.color !== 'inherit' ? { color: tok.color } : { color: arabicInk }}
-                    >
-                      {tok.text}
-                    </Text>
-                  ))}
-                  {wIdx < words.length - 1 ? ' ' : ''}
-                </Text>
-              );
-            })}
-          </Text>
-        );
-      }
-
-      // Normal mode: tappable words for word-by-word meaning
-      const words = item.text.split(' ');
-      return (
-        <Text
-          style={[styles.arabicText, { color: arabicInk, fontSize, lineHeight: fontSize * 1.9 }]}
-          textBreakStrategy="simple"
-        >
-          {words.map((word, wIdx) => (
-            <Text
-              key={wIdx}
-              onPress={() => handleWordTap(word, item)}
-              style={{ color: arabicInk }}
-            >
-              {word}{wIdx < words.length - 1 ? ' ' : ''}
-            </Text>
-          ))}
-        </Text>
-      );
-    };
-
-    return (
-      <View style={[styles.verseContainer, { borderBottomColor: theme.border }]}>
-        {/* Verse actions row */}
-        <View style={styles.verseHeader}>
-          <View style={styles.verseActions}>
-            <TouchableOpacity onPress={() => playAyah(item)} hitSlop={8}>
-              {isLoadingAudio ? (
-                <ActivityIndicator size={18} color={Colors.primary} />
-              ) : (
-                <Ionicons
-                  name={isPlaying ? 'pause-circle' : 'play-circle-outline'}
-                  size={22}
-                  color={isPlaying ? Colors.primary : theme.textMuted}
-                />
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleBookmark} hitSlop={8}>
-              <Ionicons
-                name={bookmarked ? 'bookmark' : 'bookmark-outline'}
-                size={20}
-                color={bookmarked ? Colors.accent : theme.textMuted}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleShare} hitSlop={8}>
-              <Ionicons name="share-outline" size={20} color={theme.textMuted} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Arabic on cream — manuscript treatment */}
-        <View style={styles.arabicCream}>
-          <View style={styles.arabicBadge}>
-            <Text style={styles.arabicBadgeText}>{item.numberInSurah}</Text>
-          </View>
-          {renderArabicText()}
-        </View>
-
-        {/* Translation */}
-        {showTranslation && trAyah && (
-          <View style={[styles.translationBlock, { borderLeftColor: Colors.primary + '40' }]}>
-            <Text style={[styles.translationLabel, { color: Colors.primary }]}>
-              {translationMeta.translationLabel}
-            </Text>
-            <Text
-              style={[
-                styles.translationText,
-                { color: theme.textSecondary },
-                translationMeta.rtl && styles.translationRtl,
-                translationMeta.isUrdu && urduStyle(16),
-              ]}
-              textBreakStrategy="simple"
-            >
-              {trAyah.text}
-            </Text>
-          </View>
-        )}
-      </View>
-    );
-  };
 
   // ─── Reciter name display ─────────────────────────────────────────────────
   const reciterName = RECITERS.find((r) => r.id === selectedReciter)?.name ?? selectedReciter;
@@ -756,7 +851,8 @@ export default function SurahReaderScreen() {
         ref={flatListRef}
         data={arabic.ayahs}
         keyExtractor={(item) => String(item.number)}
-        renderItem={renderVerse}
+        renderItem={renderItem}
+        extraData={listExtraData}
         contentContainerStyle={{ backgroundColor: theme.background }}
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}

@@ -197,7 +197,7 @@ const breakStyles = StyleSheet.create({
 
 // ─── Main component ──────────────────────────────────────────────────────────
 
-export default function MushafPageItem({
+function MushafPageItem({
   pageNumber,
   fontScale = 1,
   onAyahLongPress,
@@ -243,6 +243,11 @@ export default function MushafPageItem({
   );
 }
 
+// Memoized: the Mushaf list re-renders the parent on every scroll tick
+// (currentPage updates), but a page only needs to re-render when its own
+// pageNumber / fontScale change. Output is identical.
+export default React.memo(MushafPageItem);
+
 function PageBody({
   ayahs,
   scale,
@@ -252,38 +257,43 @@ function PageBody({
   scale: number;
   onAyahLongPress?: (surah: number, ayah: number) => void;
 }) {
-  const blocks: Array<
-    | { kind: 'header'; surah: number; key: string }
-    | { kind: 'bismillah'; key: string }
-    | { kind: 'body'; ayahs: MushafAyah[]; key: string }
-  > = [];
+  // Memoized so the O(n) block grouping doesn't re-run on every render —
+  // only when the page's ayahs actually change. Same blocks as before.
+  const blocks = useMemo(() => {
+    const out: Array<
+      | { kind: 'header'; surah: number; key: string }
+      | { kind: 'bismillah'; key: string }
+      | { kind: 'body'; ayahs: MushafAyah[]; key: string }
+    > = [];
 
-  let i = 0;
-  while (i < ayahs.length) {
-    const ayah = ayahs[i];
-    if (ayah.ayah === 1) {
-      blocks.push({
-        kind: 'header',
-        surah: ayah.surah,
-        key: `h-${ayah.surah}`,
-      });
-      // Surah 1 (Al-Faatiha): Bismillah IS ayah 1, already in the body text.
-      // Surah 9 (At-Tawbah): no Bismillah at all.
-      if (ayah.surah !== 1 && ayah.surah !== 9) {
-        blocks.push({ kind: 'bismillah', key: `b-${ayah.surah}` });
+    let i = 0;
+    while (i < ayahs.length) {
+      const ayah = ayahs[i];
+      if (ayah.ayah === 1) {
+        out.push({
+          kind: 'header',
+          surah: ayah.surah,
+          key: `h-${ayah.surah}`,
+        });
+        // Surah 1 (Al-Faatiha): Bismillah IS ayah 1, already in the body text.
+        // Surah 9 (At-Tawbah): no Bismillah at all.
+        if (ayah.surah !== 1 && ayah.surah !== 9) {
+          out.push({ kind: 'bismillah', key: `b-${ayah.surah}` });
+        }
       }
+      const start = i;
+      const surahOfBlock = ayah.surah;
+      while (i < ayahs.length && ayahs[i].surah === surahOfBlock) {
+        i++;
+      }
+      out.push({
+        kind: 'body',
+        ayahs: ayahs.slice(start, i),
+        key: `body-${surahOfBlock}-${start}`,
+      });
     }
-    const start = i;
-    const surahOfBlock = ayah.surah;
-    while (i < ayahs.length && ayahs[i].surah === surahOfBlock) {
-      i++;
-    }
-    blocks.push({
-      kind: 'body',
-      ayahs: ayahs.slice(start, i),
-      key: `body-${surahOfBlock}-${start}`,
-    });
-  }
+    return out;
+  }, [ayahs]);
 
   return (
     <View style={styles.bodyWrap}>
