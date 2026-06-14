@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   useColorScheme,
-  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
-import { LoadingSpinner } from '../src/components/LoadingSpinner';
 import { trackScreen } from '../src/services/analytics';
-import { fetchWithTimeout } from '../src/utils/network';
-
-const NET_TIMEOUT_MS = 15000;
+import { useResolvedLocation } from '../src/hooks/useResolvedLocation';
+import { computePrayerTimes } from '../src/services/prayerTimesService';
+import { formatPrayerTime, getHijriParts } from '../src/utils/formatPrayerTime';
+import type { PrayerTimesSettings } from '../src/types/prayerTimes';
 
 interface DayEntry {
   day: number;
@@ -28,98 +26,111 @@ interface DayEntry {
   hijriDay: string;
 }
 
-const ALADHAN = 'https://api.aladhan.com/v1';
+// Build the full Sehri/Iftar timetable for a single Ramadan, computed entirely
+// locally via the adhan engine (offline, respecting the user's method/madhab/
+// location). Shows the CURRENT Ramadan while it is ongoing, otherwise the
+// UPCOMING one. All Hijri conversion uses the shared Umm al-Qura getHijriParts.
+function buildRamadanTimetable(settings: PrayerTimesSettings): {
+  year: number;
+  isCurrent: boolean;
+  days: DayEntry[];
+} {
+  const now = new Date();
+  now.setHours(12, 0, 0, 0); // midday avoids DST/midnight edge cases
+  const todayH = getHijriParts(now);
+
+  let targetYear: number;
+  let isCurrent = false;
+  if (todayH.month === 9) {
+    targetYear = todayH.year;
+    isCurrent = true;
+  } else if (todayH.month < 9) {
+    targetYear = todayH.year; // Ramadan still ahead this Hijri year
+  } else {
+    targetYear = todayH.year + 1; // Ramadan already passed → next year
+  }
+
+  // Locate any day inside the target Ramadan. Scan starts 35 days back so an
+  // ongoing Ramadan (whose day 1 is in the past) is also caught. getHijriParts
+  // is a cheap Intl conversion — no prayer maths in this loop.
+  const scanStart = new Date(now);
+  scanStart.setDate(scanStart.getDate() - 35);
+  let firstDay: Date | null = null;
+  for (let i = 0; i < 420; i++) {
+    const d = new Date(scanStart);
+    d.setDate(scanStart.getDate() + i);
+    const h = getHijriParts(d);
+    if (h.year === targetYear && h.month === 9) {
+      firstDay = d;
+      break;
+    }
+  }
+  if (!firstDay) return { year: targetYear, isCurrent, days: [] };
+
+  // Walk back to 1 Ramadan in case the scan landed mid-month.
+  let cursor = firstDay;
+  for (;;) {
+    const prev = new Date(cursor);
+    prev.setDate(cursor.getDate() - 1);
+    const ph = getHijriParts(prev);
+    if (ph.year === targetYear && ph.month === 9) cursor = prev;
+    else break;
+  }
+
+  // Collect each day of Ramadan, computing Fajr (Sehri) + Maghrib (Iftar) with
+  // the SAME engine + settings as the Prayer Times screen.
+  const days: DayEntry[] = [];
+  const dcur = new Date(cursor);
+  for (let i = 0; i < 31; i++) {
+    const h = getHijriParts(dcur);
+    if (h.year !== targetYear || h.month !== 9) break;
+    const computed = computePrayerTimes(settings, dcur);
+    const fajr = computed.prayers.find((p) => p.name === 'fajr')?.time ?? null;
+    const maghrib = computed.prayers.find((p) => p.name === 'maghrib')?.time ?? null;
+    const dd = String(dcur.getDate()).padStart(2, '0');
+    const mm = String(dcur.getMonth() + 1).padStart(2, '0');
+    days.push({
+      day: h.day,
+      date: `${dd}-${mm}-${dcur.getFullYear()}`,
+      sehri: fajr ? formatPrayerTime(fajr) : '',
+      iftar: maghrib ? formatPrayerTime(maghrib) : '',
+      hijriDay: String(h.day),
+    });
+    dcur.setDate(dcur.getDate() + 1);
+  }
+  return { year: targetYear, isCurrent, days };
+}
 
 export default function RamadanScreen() {
   useEffect(() => { trackScreen('Ramadan'); }, []);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const settings = useStore((s) => s.settings);
+  const settingsScheme = useStore((s) => s.settings.colorScheme);
   const isDark =
-    settings.colorScheme === 'dark' ||
-    (settings.colorScheme === 'system' && colorScheme === 'dark');
+    settingsScheme === 'dark' ||
+    (settingsScheme === 'system' && colorScheme === 'dark');
   const theme = isDark ? Colors.dark : Colors.light;
 
-  const [timetable, setTimetable] = useState<DayEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isRamadan, setIsRamadan] = useState(false);
-  const [todaySehri, setTodaySehri] = useState<string | null>(null);
-  const [todayIftar, setTodayIftar] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [currentHijriDay, setCurrentHijriDay] = useState<string | null>(null);
+  const { settings: prayerSettings } = useResolvedLocation();
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        let lat = 21.3891;
-        let lon = 39.8579;
-        if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
-          lat = loc.coords.latitude;
-          lon = loc.coords.longitude;
-        }
-        if (cancelled) return;
+  const todayHijri = useMemo(() => getHijriParts(new Date()), []);
+  const isRamadan = todayHijri.month === 9;
+  const monthName =
+    todayHijri.month >= 1 && todayHijri.month <= 12
+      ? t(`calendar.hijriMonths.${todayHijri.month}`)
+      : '';
 
-        const today = new Date();
-        const todayStr = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+  // Whole Ramadan timetable, computed locally (offline) from the user's real
+  // method/madhab/location — identical engine to the Prayer Times screen.
+  const { year, isCurrent, days } = useMemo(
+    () => buildRamadanTimetable(prayerSettings),
+    [prayerSettings],
+  );
 
-        // Get today's timing to check Hijri month
-        const todayRes = await fetchWithTimeout(
-          `${ALADHAN}/timings/${todayStr}?latitude=${lat}&longitude=${lon}&method=${settings.calculationMethod}`,
-          {},
-          NET_TIMEOUT_MS,
-        );
-        if (!todayRes.ok) throw new Error(`HTTP ${todayRes.status}`);
-        const todayJson = await todayRes.json();
-        if (todayJson?.code !== 200) throw new Error('Ramadan API error');
-        if (cancelled) return;
-
-        const hijriMonth: number = todayJson.data?.date?.hijri?.month?.number ?? 0;
-        const hijriDay: string = todayJson.data?.date?.hijri?.day ?? '';
-        setCurrentHijriDay(hijriDay);
-        const ramadan = hijriMonth === 9;
-        setIsRamadan(ramadan);
-
-        if (ramadan) {
-          setTodaySehri(todayJson.data?.timings?.Fajr ?? null);
-          setTodayIftar(todayJson.data?.timings?.Maghrib ?? null);
-        }
-
-        // Fetch full Hijri month 9 calendar
-        const year = todayJson.data?.date?.hijri?.year ?? '1446';
-        const calRes = await fetchWithTimeout(
-          `${ALADHAN}/hijriCalendar/9/${year}?latitude=${lat}&longitude=${lon}&method=${settings.calculationMethod}`,
-          {},
-          NET_TIMEOUT_MS,
-        );
-        if (!calRes.ok) throw new Error(`HTTP ${calRes.status}`);
-        const calJson = await calRes.json();
-        if (cancelled) return;
-        if (calJson.code === 200) {
-          const entries: DayEntry[] = (calJson.data ?? []).map((d: any) => ({
-            day: parseInt(d.date?.hijri?.day ?? '0', 10),
-            date: d.date?.gregorian?.date ?? '',
-            sehri: d.timings?.Fajr ?? '',
-            iftar: d.timings?.Maghrib ?? '',
-            hijriDay: d.date?.hijri?.day ?? '',
-          }));
-          setTimetable(entries);
-        }
-      } catch {
-        if (!cancelled) setError(t('ramadan.error'));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [settings.calculationMethod]);
-
-  if (loading) return <LoadingSpinner message={t('ramadan.loading')} dark={isDark} />;
+  // Today's Sehri/Iftar are simply today's row from that same timetable.
+  const todayEntry = isCurrent ? days.find((d) => d.day === todayHijri.day) : undefined;
+  const todaySehri = todayEntry?.sehri ?? null;
+  const todayIftar = todayEntry?.iftar ?? null;
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
@@ -130,14 +141,9 @@ export default function RamadanScreen() {
           {/* Arabic "رَمَضَان" is content — not translated */}
           <Text style={styles.headerArabic}>رَمَضَان</Text>
           <Text style={styles.headerTitle}>{t('ramadan.header.title')}</Text>
-          {currentHijriDay && (
-            <Text style={styles.headerSub}>
-              {t('ramadan.header.hijriDay', {
-                day: currentHijriDay,
-                month: isRamadan ? t('calendar.hijriMonths.9') : '—',
-              })}
-            </Text>
-          )}
+          <Text style={styles.headerSub}>
+            {t('ramadan.header.hijriDay', { day: todayHijri.day, month: monthName })}
+          </Text>
         </View>
 
         {!isRamadan && (
@@ -156,7 +162,7 @@ export default function RamadanScreen() {
               <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>
                 {t('ramadan.timings.sehriLabel')}
               </Text>
-              <Text style={[styles.timingTime, { color: theme.text }]}>{todaySehri.replace(' (PST)', '').trim()}</Text>
+              <Text style={[styles.timingTime, { color: theme.text }]}>{todaySehri}</Text>
             </View>
             <View style={[styles.timingDivider, { backgroundColor: theme.border }]} />
             <View style={styles.timingBox}>
@@ -164,23 +170,16 @@ export default function RamadanScreen() {
               <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>
                 {t('ramadan.timings.iftarLabel')}
               </Text>
-              <Text style={[styles.timingTime, { color: theme.text }]}>{todayIftar.replace(' (PST)', '').trim()}</Text>
+              <Text style={[styles.timingTime, { color: theme.text }]}>{todayIftar}</Text>
             </View>
           </View>
         )}
 
-        {error && (
-          <View style={[styles.noticeCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <Ionicons name="warning-outline" size={24} color={Colors.warning} />
-            <Text style={[styles.noticeText, { color: theme.text }]}>{error}</Text>
-          </View>
-        )}
-
         {/* Full Month Timetable */}
-        {timetable.length > 0 && (
+        {days.length > 0 && (
           <View style={{ padding: 16 }}>
             <Text style={[styles.sectionLabel, { color: theme.textSecondary }]}>
-              {t('ramadan.timetable.sectionLabel')}
+              {t('ramadan.timetable.sectionLabel')}{year ? `  ·  ${year} AH` : ''}
             </Text>
             <View style={[styles.tableHeader, { backgroundColor: Colors.primary }]}>
               <Text style={[styles.colDay, styles.tableHeaderText]}>{t('ramadan.timetable.colDay')}</Text>
@@ -188,8 +187,8 @@ export default function RamadanScreen() {
               <Text style={[styles.colTime, styles.tableHeaderText]}>{t('ramadan.timetable.colSehri')}</Text>
               <Text style={[styles.colTime, styles.tableHeaderText]}>{t('ramadan.timetable.colIftar')}</Text>
             </View>
-            {timetable.map((entry, idx) => {
-              const isToday = entry.hijriDay === currentHijriDay && isRamadan;
+            {days.map((entry, idx) => {
+              const isToday = isCurrent && entry.day === todayHijri.day;
               return (
                 <View
                   key={idx}
@@ -202,8 +201,8 @@ export default function RamadanScreen() {
                     {entry.hijriDay}
                   </Text>
                   <Text style={[styles.colDate, { color: theme.textSecondary }]}>{entry.date}</Text>
-                  <Text style={[styles.colTime, { color: theme.text }]}>{entry.sehri.replace(/ \([^)]+\)/, '').trim()}</Text>
-                  <Text style={[styles.colTime, { color: Colors.primary }]}>{entry.iftar.replace(/ \([^)]+\)/, '').trim()}</Text>
+                  <Text style={[styles.colTime, { color: theme.text }]}>{entry.sehri}</Text>
+                  <Text style={[styles.colTime, { color: Colors.primary }]}>{entry.iftar}</Text>
                 </View>
               );
             })}
