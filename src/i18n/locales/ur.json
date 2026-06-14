@@ -1400,24 +1400,6 @@
         "title": "تمام سیٹنگز ری سیٹ کریں؟"
       }
     },
-    "appearance": {
-      "arabicFontSize": "عربی فونٹ کا سائز",
-      "englishFontSize": "انگریزی فونٹ کا سائز"
-    },
-    "calcMethod": {
-      "options": {
-        "Dubai": "دبئی",
-        "EgyptianGeneralAuthority": "مصری جنرل اتھارٹی",
-        "ISNA": "ISNA (شمالی امریکہ)",
-        "Karachi": "جامعہ کراچی",
-        "Kuwait": "کویت",
-        "MuslimWorldLeague": "رابطہ عالمِ اسلامی",
-        "Qatar": "قطر",
-        "Singapore": "سنگاپور",
-        "Tehran": "تہران",
-        "UmmAlQura": "ام القریٰ (مکہ)"
-      }
-    },
     "contentLanguage": {
       "options": {
         "ar": "عربی",
@@ -1444,22 +1426,9 @@
         "quran": "Tanzil"
       }
     },
-    "fontSize": {
-      "options": {
-        "large": "بڑا",
-        "medium": "درمیانہ",
-        "small": "چھوٹا"
-      }
-    },
     "homeScreen": {
       "customize": "ہوم اسکرین کو اپنی مرضی سے ترتیب دیں",
       "customizeSub": "منتخب کریں کہ ہوم پر کون سے ٹائلز نظر آئیں"
-    },
-    "madhab": {
-      "options": {
-        "hanafi": "حنفی",
-        "standard": "معیاری (شافعی، مالکی، حنبلی)"
-      }
     },
     "notifSection": {
       "adhanNotifications": "اذان کی اطلاعات",
@@ -1483,29 +1452,15 @@
       "analyticsNote": "آن ہونے پر، Islam Daily ہر بار ایپ کھلنے پر آپ کے تخمینی شہر اور ملک کو ریکارڈ کرتا ہے تاکہ ہمیں پتا چلے کہ ایپ کن علاقوں میں استعمال ہو رہی ہے۔ آپ کا نام، ای میل، ڈیوائس آئی ڈی یا درست لوکیشن کبھی جمع نہیں کی جاتی اور نہ ہی کسی تیسرے فریق کے ساتھ شیئر کی جاتی ہے۔",
       "analyticsSub": "صرف شہر اور ملک — کوئی ذاتی معلومات محفوظ نہیں کی جاتیں"
     },
-    "quran": {
-      "reciter": "آڈیو کے لیے قاری",
-      "showTransliteration": "رومن حروف دکھائیں",
-      "translation": "ترجمہ",
-      "translationNote": "مزید تراجم جلد آ رہے ہیں",
-      "transliterationSub": "رومن حروف میں عربی تلفظ"
-    },
-    "reciter": {
-      "options": {
-        "alafasy": "مشاری راشد العفاسی"
-      }
-    },
     "sections": {
       "about": "ایپ کے بارے میں",
       "appLanguage": "ایپ کی زبان",
-      "appearance": "ظاہری شکل",
       "contentLanguage": "مواد کی زبان",
       "credits": "کریڈٹس اور ڈیٹا ذرائع",
       "homeScreen": "ہوم اسکرین",
       "notifications": "اطلاعات",
       "prayerTimes": "نماز کے اوقات",
       "privacy": "پرائیویسی",
-      "quran": "قرآن",
       "storageData": "اسٹوریج اور ڈیٹا",
       "translationLanguage": "ترجمہ کی زبان / Translation Language"
     },
@@ -1517,14 +1472,6 @@
       "clearCache": "کیشے صاف کریں",
       "noCachedData": "کیشے میں کوئی ڈیٹا نہیں",
       "resetAllSettings": "تمام سیٹنگز ری سیٹ کریں"
-    },
-    "translation": {
-      "options": {
-        "mohsin_khan": "محسن خان (ہلالی-خان)",
-        "pickthall": "Pickthall",
-        "sahih_international": "Saheeh International",
-        "yusuf_ali": "Yusuf Ali"
-      }
     },
     "translationLang": {
       "englishOption": "🇬🇧 انگریزی",

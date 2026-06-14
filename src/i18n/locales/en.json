@@ -1400,24 +1400,6 @@
         "title": "Reset All Settings?"
       }
     },
-    "appearance": {
-      "arabicFontSize": "Arabic Font Size",
-      "englishFontSize": "English Font Size"
-    },
-    "calcMethod": {
-      "options": {
-        "Dubai": "Dubai",
-        "EgyptianGeneralAuthority": "Egyptian General Authority",
-        "ISNA": "ISNA (North America)",
-        "Karachi": "University of Karachi",
-        "Kuwait": "Kuwait",
-        "MuslimWorldLeague": "Muslim World League",
-        "Qatar": "Qatar",
-        "Singapore": "Singapore",
-        "Tehran": "Tehran",
-        "UmmAlQura": "Umm Al-Qura (Makkah)"
-      }
-    },
     "contentLanguage": {
       "options": {
         "ar": "Arabic",
@@ -1444,22 +1426,9 @@
         "quran": "Tanzil"
       }
     },
-    "fontSize": {
-      "options": {
-        "large": "Large",
-        "medium": "Medium",
-        "small": "Small"
-      }
-    },
     "homeScreen": {
       "customize": "Customize Home Screen",
       "customizeSub": "Choose which tiles appear on your home"
-    },
-    "madhab": {
-      "options": {
-        "hanafi": "Hanafi",
-        "standard": "Standard (Shafi'i, Maliki, Hanbali)"
-      }
     },
     "notifSection": {
       "adhanNotifications": "Adhan Notifications",
@@ -1483,29 +1452,15 @@
       "analyticsNote": "When enabled, Islam Daily logs your approximate city and country on each app launch to help us understand which regions the app serves. No name, email, device ID, or precise location is ever collected or shared with third parties.",
       "analyticsSub": "City & country only — no personal data stored"
     },
-    "quran": {
-      "reciter": "Reciter for Audio",
-      "showTransliteration": "Show Transliteration",
-      "translation": "Translation",
-      "translationNote": "More translations coming soon",
-      "transliterationSub": "Romanized Arabic pronunciation"
-    },
-    "reciter": {
-      "options": {
-        "alafasy": "Mishary Rashid Alafasy"
-      }
-    },
     "sections": {
       "about": "About",
       "appLanguage": "App Language",
-      "appearance": "Appearance",
       "contentLanguage": "Content Language",
       "credits": "Credits & Data Sources",
       "homeScreen": "Home Screen",
       "notifications": "Notifications",
       "prayerTimes": "Prayer Times",
       "privacy": "Privacy",
-      "quran": "Quran",
       "storageData": "Storage & Data",
       "translationLanguage": "ترجمہ کی زبان / Translation Language"
     },
@@ -1517,14 +1472,6 @@
       "clearCache": "Clear Cache",
       "noCachedData": "No cached data",
       "resetAllSettings": "Reset All Settings"
-    },
-    "translation": {
-      "options": {
-        "mohsin_khan": "Mohsin Khan (Hilali-Khan)",
-        "pickthall": "Pickthall",
-        "sahih_international": "Saheeh International",
-        "yusuf_ali": "Yusuf Ali"
-      }
     },
     "translationLang": {
       "englishOption": "🇬🇧 English",
