@@ -255,6 +255,7 @@ async function downloadQuranFromApi(
   const TOTAL = 114;
   const BATCH = 5;
   let totalBytes = 0;
+  let okCount = 0;
 
   for (let start = 1; start <= TOTAL; start += BATCH) {
     const nums = Array.from(
@@ -265,7 +266,7 @@ async function downloadQuranFromApi(
     await Promise.all(
       nums.map(async (n) => {
         const existing = await AsyncStorage.getItem(`offline_surah_${n}`);
-        if (existing) { totalBytes += existing.length; return; }
+        if (existing) { totalBytes += existing.length; okCount += 1; return; }
 
         try {
           const res = await fetchWithTimeout(
@@ -279,6 +280,7 @@ async function downloadQuranFromApi(
             const str = JSON.stringify(json.data);
             await AsyncStorage.setItem(`offline_surah_${n}`, str);
             totalBytes += str.length;
+            okCount += 1;
           }
         } catch {
           // A single surah failure shouldn't kill the loop — skip and continue.
@@ -289,7 +291,13 @@ async function downloadQuranFromApi(
     onProgress(Math.round((Math.min(start + BATCH - 1, TOTAL) / TOTAL) * 100));
   }
 
+  if (okCount === 0) {
+    throw new Error('Quran download failed: no surahs could be fetched.');
+  }
   await markDownloaded('quranText', totalBytes);
+  if (okCount < TOTAL) {
+    console.warn(`[download] Quran: ${TOTAL - okCount}/${TOTAL} surahs failed; saved ${okCount}.`);
+  }
 }
 
 // ─── Hadiths ──────────────────────────────────────────────────────────────────
@@ -443,9 +451,16 @@ export async function downloadCalendar(
     onProgress(Math.round(((i + 1) / months.length) * 100));
   }
 
+  if (allMonths.length === 0) {
+    throw new Error('Calendar download failed: no months could be fetched.');
+  }
   const str = JSON.stringify(allMonths);
   await AsyncStorage.setItem('offline_calendar', str);
   await markDownloaded('calendar', str.length);
+  const failed = months.length - allMonths.length;
+  if (failed > 0) {
+    console.warn(`[download] calendar: ${failed}/${months.length} months failed; saved ${allMonths.length}.`);
+  }
 }
 
 // ─── Prayer times ─────────────────────────────────────────────────────────────

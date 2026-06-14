@@ -7,7 +7,6 @@ import { CACHE_KEYS } from '../constants';
 export interface AppSettings {
   colorScheme: 'light' | 'dark' | 'system';
   arabicFontSize: number;
-  notificationsEnabled: boolean;
   selectedTranslation: string;
   selectedTranslationName: string;
   selectedReciter: string;
@@ -29,7 +28,6 @@ interface AppState {
 const DEFAULT_SETTINGS: AppSettings = {
   colorScheme: 'system',
   arabicFontSize: 26,
-  notificationsEnabled: false,
   selectedTranslation: 'ur.jalandhry',
   selectedTranslationName: 'Urdu — Jalandhri',
   selectedReciter: 'ar.alafasy',

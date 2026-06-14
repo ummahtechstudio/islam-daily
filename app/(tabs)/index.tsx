@@ -28,6 +28,7 @@ import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting } from '../../src/utils/settings';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
+import { isRouteHidden } from '../../src/constants/featureFlags';
 
 import { ManuscriptCard } from '../../src/components/ManuscriptCard';
 import { IslamicPattern } from '../../src/components/IslamicPattern';
@@ -612,7 +613,7 @@ export default function HomeScreen() {
 
   const visibleQuickCards = QUICK_CARDS.filter((c) => isTileVisible(c.id));
   const visibleMoreSections = MORE_SECTIONS
-    .map((s) => ({ ...s, items: s.items.filter((i) => isTileVisible(i.id)) }))
+    .map((s) => ({ ...s, items: s.items.filter((i) => isTileVisible(i.id) && !isRouteHidden(i.route)) }))
     .filter((s) => s.items.length > 0);
 
   const hijriMonth = hijri.month;

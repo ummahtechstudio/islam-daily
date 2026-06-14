@@ -37,22 +37,11 @@ import {
 // ─── Option lists ─────────────────────────────────────────────────────────────
 
 type ThemeOption = 'dark' | 'light' | 'auto';
-type FontSize = 'small' | 'medium' | 'large';
 
 const THEME_OPTIONS: { value: ThemeOption; comingSoon: boolean }[] = [
   { value: 'dark', comingSoon: false },
   { value: 'light', comingSoon: true },
   { value: 'auto', comingSoon: true },
-];
-
-const FONT_SIZE_OPTIONS: { value: FontSize }[] = [
-  { value: 'small' },
-  { value: 'medium' },
-  { value: 'large' },
-];
-
-const RECITER_OPTIONS: { value: string }[] = [
-  { value: 'alafasy' },
 ];
 
 const HADITH_TIME_OPTIONS: string[] = [
@@ -81,10 +70,6 @@ export default function SettingsScreen() {
 
   // settings_* prefs
   const [theme, setTheme] = useState<ThemeOption>('dark');
-  const [arabicFontSize, setArabicFontSize] = useState<FontSize>('medium');
-  const [englishFontSize, setEnglishFontSize] = useState<FontSize>('medium');
-  const [showTransliteration, setShowTransliteration] = useState<boolean>(true);
-  const [reciter, setReciter] = useState<string>('alafasy');
   const [dailyHadith, setDailyHadith] = useState<boolean>(true);
   const [dailyHadithTime, setDailyHadithTime] = useState<string>('08:00');
   const [fridayReminder, setFridayReminder] = useState<boolean>(true);
@@ -105,15 +90,10 @@ export default function SettingsScreen() {
     (async () => {
       try {
         const [
-          themeV, arabicV, englishV,
-          transliterationV, reciterV,
+          themeV,
           dailyHadithV, dailyHadithTimeV, fridayV, translationLangV, appLangV,
         ] = await Promise.all([
           getSetting<ThemeOption>('theme', 'dark'),
-          getSetting<FontSize>('arabic_font_size', 'medium'),
-          getSetting<FontSize>('english_font_size', 'medium'),
-          getSetting<boolean>('show_transliteration', true),
-          getSetting<string>('reciter', 'alafasy'),
           getSetting<boolean>('daily_hadith', true),
           getSetting<string>('daily_hadith_time', '08:00'),
           getSetting<boolean>('friday_reminder', true),
@@ -121,10 +101,6 @@ export default function SettingsScreen() {
           getAppLanguage(),
         ]);
         setTheme(themeV);
-        setArabicFontSize(arabicV);
-        setEnglishFontSize(englishV);
-        setShowTransliteration(transliterationV);
-        setReciter(reciterV);
         setDailyHadith(dailyHadithV);
         setDailyHadithTime(dailyHadithTimeV);
         setFridayReminder(fridayV);
@@ -184,26 +160,6 @@ export default function SettingsScreen() {
     }
     setTheme(value);
     await setSetting('theme', value);
-  };
-
-  const onSelectArabicFontSize = async (v: FontSize) => {
-    setArabicFontSize(v);
-    await setSetting('arabic_font_size', v);
-  };
-
-  const onSelectEnglishFontSize = async (v: FontSize) => {
-    setEnglishFontSize(v);
-    await setSetting('english_font_size', v);
-  };
-
-  const onToggleTransliteration = async (v: boolean) => {
-    setShowTransliteration(v);
-    await setSetting('show_transliteration', v);
-  };
-
-  const onSelectReciter = async (v: string) => {
-    setReciter(v);
-    await setSetting('reciter', v);
   };
 
   const onToggleDailyHadith = async (v: boolean) => {
@@ -285,10 +241,6 @@ export default function SettingsScreen() {
           onPress: async () => {
             await resetAllSettings();
             setTheme('dark');
-            setArabicFontSize('medium');
-            setEnglishFontSize('medium');
-            setShowTransliteration(true);
-            setReciter('alafasy');
             setDailyHadith(true);
             setDailyHadithTime('08:00');
             setFridayReminder(true);
@@ -436,138 +388,28 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </SectionCard>
 
-        {/* ── APPEARANCE ─────────────────────────────────────────────────── */}
-        {/* v1 ships dark-only; the Theme radio group (Dark/Light/Auto) and
-            the redundant "Dark Mode" toggle row were removed from the UI for
-            launch. Theme persistence + Colors tokens + the store's
-            colorScheme state are intentionally kept so v1.1 can wire real
-            Light + Auto support without rebuilding the foundation. */}
-        <SectionLabel>{t('settings.sections.appearance')}</SectionLabel>
+        {/* ── PRAYER TIMES ───────────────────────────────────────────────── */}
+        {/* Prayer calculation config lives on the dedicated /prayer-times-settings
+            screen (the single source of truth — method/madhab/location/format).
+            This is just a discoverable entry point from Settings. */}
+        <SectionLabel>{t('settings.sections.prayerTimes')}</SectionLabel>
         <SectionCard>
-          {/* Arabic Font Size slider */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
-                <Ionicons name="text" size={18} color="#F59E0B" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.appearance.arabicFontSize')}</Text>
-            </View>
-            <View style={styles.segmentRow}>
-              {FONT_SIZE_OPTIONS.map((opt) => {
-                const active = arabicFontSize === opt.value;
-                return (
-                  <TouchableOpacity
-                    key={opt.value}
-                    style={[
-                      styles.segment,
-                      {
-                        backgroundColor: active ? Colors.primary : themeColors.surface,
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => onSelectArabicFontSize(opt.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>
-                      {t(`settings.fontSize.options.${opt.value}`)}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          <Divider />
-
-          {/* English Font Size slider */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#3B82F620' }]}>
-                <Ionicons name="text-outline" size={18} color="#3B82F6" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.appearance.englishFontSize')}</Text>
-            </View>
-            <View style={styles.segmentRow}>
-              {FONT_SIZE_OPTIONS.map((opt) => {
-                const active = englishFontSize === opt.value;
-                return (
-                  <TouchableOpacity
-                    key={opt.value}
-                    style={[
-                      styles.segment,
-                      {
-                        backgroundColor: active ? Colors.primary : themeColors.surface,
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => onSelectEnglishFontSize(opt.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>
-                      {t(`settings.fontSize.options.${opt.value}`)}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        </SectionCard>
-
-        {/* ── QURAN ──────────────────────────────────────────────────────── */}
-        <SectionLabel>{t('settings.sections.quran')}</SectionLabel>
-        <SectionCard>
-          {/* Show transliteration */}
-          <View style={styles.row}>
-            <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
-              <Ionicons name="language" size={18} color="#F59E0B" />
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => router.push('/prayer-times-settings' as any)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
+              <Ionicons name="time" size={18} color={Colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.quran.showTransliteration')}</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.quran.transliterationSub')}</Text>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.manage')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>
+                {t('settings.prayerTimes.manageSub')}
+              </Text>
             </View>
-            <Switch
-              value={showTransliteration}
-              onValueChange={onToggleTransliteration}
-              trackColor={{ false: themeColors.border, true: Colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-
-          <Divider />
-
-          {/* Reciter picker */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#8B5CF620' }]}>
-                <Ionicons name="musical-notes" size={18} color="#8B5CF6" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.quran.reciter')}</Text>
-            </View>
-            <View style={styles.pickerColumn}>
-              {RECITER_OPTIONS.map((opt) => {
-                const active = reciter === opt.value;
-                return (
-                  <TouchableOpacity
-                    key={opt.value}
-                    style={[
-                      styles.pickerRow,
-                      {
-                        backgroundColor: active ? Colors.primary + '15' : 'transparent',
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => onSelectReciter(opt.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>
-                      {t(`settings.reciter.options.${opt.value}`)}
-                    </Text>
-                    {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
+            <Ionicons name="chevron-forward" size={18} color={themeColors.textMuted} />
+          </TouchableOpacity>
         </SectionCard>
 
         {/* ── NOTIFICATIONS ──────────────────────────────────────────────── */}

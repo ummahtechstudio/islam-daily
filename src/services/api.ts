@@ -108,7 +108,12 @@ export async function fetchRandomVerse() {
   // and indexing past its end would throw "undefined is not an object".
   const arabicAyahs = arabic?.ayahs ?? [];
   const englishAyahs = english?.ayahs ?? [];
-  const verseIdx = arabicAyahs.length > 0 ? dayOfYear % arabicAyahs.length : 0;
+  let verseIdx = arabicAyahs.length > 0 ? dayOfYear % arabicAyahs.length : 0;
+  // Surah Al-Fatiha counts the Basmala as ayah 1; skip ayah[0] so the verse of
+  // the day is never just the Basmala shown out of context.
+  if (surahNum === 1 && arabicAyahs.length > 1) {
+    verseIdx = 1 + (dayOfYear % (arabicAyahs.length - 1));
+  }
   const arabicAyah = arabicAyahs[verseIdx];
   const englishAyah = englishAyahs[verseIdx];
   return {
@@ -209,9 +214,13 @@ export async function searchQuran(query: string) {
     {},
     NET_TIMEOUT_MS,
   );
-  if (!res.ok) return [];
   const json = await res.json().catch(() => null);
-  if (!json || json.code !== 200) return [];
+  // alquran.cloud returns code 404 when a valid query simply has no matches —
+  // that's "no results", not a failure, so return [] rather than throwing.
+  if (json && json.code === 404) return [];
+  if (!res.ok || !json || json.code !== 200) {
+    throw new Error(`Quran search failed (HTTP ${res.status})`);
+  }
   return (json.data?.matches ?? []) as QuranSearchResult[];
 }
 

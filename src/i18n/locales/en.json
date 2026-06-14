@@ -1320,12 +1320,10 @@
     }
   },
   "ramadan": {
-    "error": "Failed to load Ramadan data. Please check your connection.",
     "header": {
       "hijriDay": "Hijri Day {{day}} · Month {{month}}",
       "title": "Ramadan Mubarak"
     },
-    "loading": "Loading Ramadan timetable...",
     "notice": {
       "notStarted": "Ramadan has not started yet. This screen will show live countdowns and the timetable during Ramadan."
     },
@@ -1477,12 +1475,8 @@
       "preAdhanSub": "10 minutes before each prayer"
     },
     "prayerTimes": {
-      "calcMethod": "Calculation Method",
-      "hijriExplainer": "Adjust if your country sees the moon differently",
-      "hijriOffset": "Hijri Date Offset",
-      "madhab": "Madhab for Asr",
-      "madhabExplainer": "Hanafi madhab uses a later Asr time",
-      "providerMethod": "Provider Method (Aladhan)"
+      "manage": "Prayer Times settings",
+      "manageSub": "Calculation method, madhab, location & time format"
     },
     "privacy": {
       "analyticsLabel": "Anonymous Analytics",
