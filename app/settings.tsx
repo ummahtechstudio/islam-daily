@@ -23,12 +23,6 @@ import { CALCULATION_METHODS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
 import i18n from '../src/i18n';
 import {
-  LANGUAGE_OPTIONS,
-  CONTENT_LANGUAGE_KEY,
-  ContentLanguage,
-  saveContentLanguage,
-} from '../src/services/localization';
-import {
   getSetting,
   setSetting,
   resetAllSettings,
@@ -44,7 +38,6 @@ import {
 
 type ThemeOption = 'dark' | 'light' | 'auto';
 type FontSize = 'small' | 'medium' | 'large';
-type Madhab = 'standard' | 'hanafi';
 
 const THEME_OPTIONS: { value: ThemeOption; comingSoon: boolean }[] = [
   { value: 'dark', comingSoon: false },
@@ -56,33 +49,6 @@ const FONT_SIZE_OPTIONS: { value: FontSize }[] = [
   { value: 'small' },
   { value: 'medium' },
   { value: 'large' },
-];
-
-const CALC_METHOD_OPTIONS: { value: string }[] = [
-  { value: 'MuslimWorldLeague' },
-  { value: 'ISNA' },
-  { value: 'EgyptianGeneralAuthority' },
-  { value: 'UmmAlQura' },
-  { value: 'Karachi' },
-  { value: 'Kuwait' },
-  { value: 'Qatar' },
-  { value: 'Singapore' },
-  { value: 'Tehran' },
-  { value: 'Dubai' },
-];
-
-const MADHAB_OPTIONS: { value: Madhab }[] = [
-  { value: 'standard' },
-  { value: 'hanafi' },
-];
-
-const HIJRI_OFFSETS: number[] = [-2, -1, 0, 1, 2];
-
-const TRANSLATION_OPTIONS: { value: string }[] = [
-  { value: 'sahih_international' },
-  { value: 'mohsin_khan' },
-  { value: 'pickthall' },
-  { value: 'yusuf_ali' },
 ];
 
 const RECITER_OPTIONS: { value: string }[] = [
@@ -113,20 +79,13 @@ export default function SettingsScreen() {
 
   // Existing prefs
   const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(null);
-  const [contentLang, setContentLang] = useState<ContentLanguage | 'auto'>('auto');
 
   // settings_* prefs
   const [theme, setTheme] = useState<ThemeOption>('dark');
   const [arabicFontSize, setArabicFontSize] = useState<FontSize>('medium');
   const [englishFontSize, setEnglishFontSize] = useState<FontSize>('medium');
-  const [calcMethod, setCalcMethod] = useState<string>('MuslimWorldLeague');
-  const [madhab, setMadhab] = useState<Madhab>('standard');
-  const [hijriOffset, setHijriOffset] = useState<number>(0);
-  const [quranTranslation, setQuranTranslation] = useState<string>('sahih_international');
   const [showTransliteration, setShowTransliteration] = useState<boolean>(true);
   const [reciter, setReciter] = useState<string>('alafasy');
-  const [adhanEnabled, setAdhanEnabled] = useState<boolean>(true);
-  const [preAdhan, setPreAdhan] = useState<boolean>(false);
   const [dailyHadith, setDailyHadith] = useState<boolean>(true);
   const [dailyHadithTime, setDailyHadithTime] = useState<string>('08:00');
   const [fridayReminder, setFridayReminder] = useState<boolean>(true);
@@ -140,9 +99,6 @@ export default function SettingsScreen() {
     AsyncStorage.getItem('@privacy_consent')
       .then((v) => setAnalyticsEnabled(v === 'granted'))
       .catch(() => setAnalyticsEnabled(false));
-    AsyncStorage.getItem(CONTENT_LANGUAGE_KEY)
-      .then((v) => setContentLang((v as ContentLanguage | 'auto') ?? 'auto'))
-      .catch(() => setContentLang('auto'));
 
     // Load all settings_* prefs. If any individual read fails we fall through
     // to the per-setting default rather than letting one bad MMKV value stop
@@ -150,21 +106,15 @@ export default function SettingsScreen() {
     (async () => {
       try {
         const [
-          themeV, arabicV, englishV, calcV, madhabV, hijriV,
-          translationV, transliterationV, reciterV, adhanV, preAdhanV,
+          themeV, arabicV, englishV,
+          transliterationV, reciterV,
           dailyHadithV, dailyHadithTimeV, fridayV, translationLangV, appLangV,
         ] = await Promise.all([
           getSetting<ThemeOption>('theme', 'dark'),
           getSetting<FontSize>('arabic_font_size', 'medium'),
           getSetting<FontSize>('english_font_size', 'medium'),
-          getSetting<string>('calc_method', 'MuslimWorldLeague'),
-          getSetting<Madhab>('madhab', 'standard'),
-          getSetting<number>('hijri_offset', 0),
-          getSetting<string>('quran_translation', 'sahih_international'),
           getSetting<boolean>('show_transliteration', true),
           getSetting<string>('reciter', 'alafasy'),
-          getSetting<boolean>('adhan_enabled', true),
-          getSetting<boolean>('pre_adhan', false),
           getSetting<boolean>('daily_hadith', true),
           getSetting<string>('daily_hadith_time', '08:00'),
           getSetting<boolean>('friday_reminder', true),
@@ -174,14 +124,8 @@ export default function SettingsScreen() {
         setTheme(themeV);
         setArabicFontSize(arabicV);
         setEnglishFontSize(englishV);
-        setCalcMethod(calcV);
-        setMadhab(madhabV);
-        setHijriOffset(hijriV);
-        setQuranTranslation(translationV);
         setShowTransliteration(transliterationV);
         setReciter(reciterV);
-        setAdhanEnabled(adhanV);
-        setPreAdhan(preAdhanV);
         setDailyHadith(dailyHadithV);
         setDailyHadithTime(dailyHadithTimeV);
         setFridayReminder(fridayV);
@@ -253,26 +197,6 @@ export default function SettingsScreen() {
     await setSetting('english_font_size', v);
   };
 
-  const onSelectCalcMethod = async (v: string) => {
-    setCalcMethod(v);
-    await setSetting('calc_method', v);
-  };
-
-  const onSelectMadhab = async (v: Madhab) => {
-    setMadhab(v);
-    await setSetting('madhab', v);
-  };
-
-  const onSelectHijriOffset = async (v: number) => {
-    setHijriOffset(v);
-    await setSetting('hijri_offset', v);
-  };
-
-  const onSelectTranslation = async (v: string) => {
-    setQuranTranslation(v);
-    await setSetting('quran_translation', v);
-  };
-
   const onToggleTransliteration = async (v: boolean) => {
     setShowTransliteration(v);
     await setSetting('show_transliteration', v);
@@ -281,16 +205,6 @@ export default function SettingsScreen() {
   const onSelectReciter = async (v: string) => {
     setReciter(v);
     await setSetting('reciter', v);
-  };
-
-  const onToggleAdhan = async (v: boolean) => {
-    setAdhanEnabled(v);
-    await setSetting('adhan_enabled', v);
-  };
-
-  const onTogglePreAdhan = async (v: boolean) => {
-    setPreAdhan(v);
-    await setSetting('pre_adhan', v);
   };
 
   const onToggleDailyHadith = async (v: boolean) => {
@@ -371,14 +285,8 @@ export default function SettingsScreen() {
             setTheme('dark');
             setArabicFontSize('medium');
             setEnglishFontSize('medium');
-            setCalcMethod('MuslimWorldLeague');
-            setMadhab('standard');
-            setHijriOffset(0);
-            setQuranTranslation('sahih_international');
             setShowTransliteration(true);
             setReciter('alafasy');
-            setAdhanEnabled(true);
-            setPreAdhan(false);
             setDailyHadith(true);
             setDailyHadithTime('08:00');
             setFridayReminder(true);
@@ -603,144 +511,9 @@ export default function SettingsScreen() {
           </View>
         </SectionCard>
 
-        {/* ── CONTENT LANGUAGE (existing) ────────────────────────────────── */}
-        <SectionLabel>{t('settings.sections.contentLanguage')}</SectionLabel>
-        <SectionCard>
-          {LANGUAGE_OPTIONS.map((opt, idx) => (
-            <React.Fragment key={opt.value}>
-              <TouchableOpacity
-                style={styles.row}
-                onPress={async () => {
-                  setContentLang(opt.value);
-                  await saveContentLanguage(opt.value);
-                }}
-                activeOpacity={0.7}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.rowLabel, { color: themeColors.text }]}>
-                    {t(`settings.contentLanguage.options.${opt.value}`)}
-                  </Text>
-                  {opt.native !== opt.label && (
-                    <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{opt.native}</Text>
-                  )}
-                </View>
-                {contentLang === opt.value && (
-                  <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
-                )}
-              </TouchableOpacity>
-              {idx < LANGUAGE_OPTIONS.length - 1 && <Divider />}
-            </React.Fragment>
-          ))}
-        </SectionCard>
-
         {/* ── PRAYER TIMES ───────────────────────────────────────────────── */}
         <SectionLabel>{t('settings.sections.prayerTimes')}</SectionLabel>
         <SectionCard>
-          {/* Calculation method (new settings_* picker) */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
-                <Ionicons name="compass" size={18} color={Colors.primary} />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.calcMethod')}</Text>
-            </View>
-            <View style={styles.pickerColumn}>
-              {CALC_METHOD_OPTIONS.map((opt) => {
-                const active = calcMethod === opt.value;
-                return (
-                  <TouchableOpacity
-                    key={opt.value}
-                    style={[
-                      styles.pickerRow,
-                      {
-                        backgroundColor: active ? Colors.primary + '15' : 'transparent',
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => onSelectCalcMethod(opt.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>
-                      {t(`settings.calcMethod.options.${opt.value}`)}
-                    </Text>
-                    {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          <Divider />
-
-          {/* Madhab radios */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#10B98120' }]}>
-                <Ionicons name="book" size={18} color="#10B981" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.madhab')}</Text>
-            </View>
-            <View style={styles.radioColumn}>
-              {MADHAB_OPTIONS.map((opt) => (
-                <TouchableOpacity
-                  key={opt.value}
-                  style={styles.radioRow}
-                  onPress={() => onSelectMadhab(opt.value)}
-                  activeOpacity={0.7}
-                >
-                  <View style={[styles.radioOuter, { borderColor: madhab === opt.value ? Colors.primary : themeColors.border }]}>
-                    {madhab === opt.value && <View style={[styles.radioInner, { backgroundColor: Colors.primary }]} />}
-                  </View>
-                  <Text style={[styles.radioLabel, { color: themeColors.text }]}>
-                    {t(`settings.madhab.options.${opt.value}`)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
-              {t('settings.prayerTimes.madhabExplainer')}
-            </Text>
-          </View>
-
-          <Divider />
-
-          {/* Hijri offset stepper */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: '#EAB30820' }]}>
-                <Ionicons name="calendar" size={18} color="#EAB308" />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.prayerTimes.hijriOffset')}</Text>
-            </View>
-            <View style={styles.segmentRow}>
-              {HIJRI_OFFSETS.map((offset) => {
-                const active = hijriOffset === offset;
-                const label = offset > 0 ? `+${offset}` : `${offset}`;
-                return (
-                  <TouchableOpacity
-                    key={offset}
-                    style={[
-                      styles.segment,
-                      {
-                        backgroundColor: active ? Colors.primary : themeColors.surface,
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => onSelectHijriOffset(offset)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.segmentText, { color: active ? '#fff' : themeColors.text }]}>{label}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>
-              {t('settings.prayerTimes.hijriExplainer')}
-            </Text>
-          </View>
-
-          <Divider />
-
           {/* Existing CALCULATION_METHODS (Aladhan ids) — kept for compatibility with prayer-time service */}
           <View style={[styles.row, styles.rowColumn]}>
             <View style={styles.rowHeader}>
@@ -777,43 +550,6 @@ export default function SettingsScreen() {
         {/* ── QURAN ──────────────────────────────────────────────────────── */}
         <SectionLabel>{t('settings.sections.quran')}</SectionLabel>
         <SectionCard>
-          {/* Translation picker */}
-          <View style={[styles.row, styles.rowColumn]}>
-            <View style={styles.rowHeader}>
-              <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
-                <Ionicons name="library" size={18} color={Colors.primary} />
-              </View>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.quran.translation')}</Text>
-            </View>
-            <View style={styles.pickerColumn}>
-              {TRANSLATION_OPTIONS.map((opt) => {
-                const active = quranTranslation === opt.value;
-                return (
-                  <TouchableOpacity
-                    key={opt.value}
-                    style={[
-                      styles.pickerRow,
-                      {
-                        backgroundColor: active ? Colors.primary + '15' : 'transparent',
-                        borderColor: active ? Colors.primary : themeColors.border,
-                      },
-                    ]}
-                    onPress={() => onSelectTranslation(opt.value)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.pickerText, { color: themeColors.text }]}>
-                      {t(`settings.translation.options.${opt.value}`)}
-                    </Text>
-                    {active && <Ionicons name="checkmark" size={18} color={Colors.primary} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            <Text style={[styles.explainer, { color: themeColors.textMuted }]}>{t('settings.quran.translationNote')}</Text>
-          </View>
-
-          <Divider />
-
           {/* Show transliteration */}
           <View style={styles.row}>
             <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
@@ -871,61 +607,6 @@ export default function SettingsScreen() {
         {/* ── NOTIFICATIONS ──────────────────────────────────────────────── */}
         <SectionLabel>{t('settings.sections.notifications')}</SectionLabel>
         <SectionCard>
-          {/* Existing prayer notifications switch */}
-          <View style={styles.row}>
-            <View style={[styles.iconBox, { backgroundColor: '#3B82F620' }]}>
-              <Ionicons name="notifications" size={18} color="#3B82F6" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.prayerNotifications')}</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.prayerNotificationsSub')}</Text>
-            </View>
-            <Switch
-              value={settings.notificationsEnabled}
-              onValueChange={(v) => updateSettings({ notificationsEnabled: v })}
-              trackColor={{ false: themeColors.border, true: Colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-
-          <Divider />
-
-          <View style={styles.row}>
-            <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
-              <Ionicons name="volume-high" size={18} color={Colors.primary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.adhanNotifications')}</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.adhanNotificationsSub')}</Text>
-            </View>
-            <Switch
-              value={adhanEnabled}
-              onValueChange={onToggleAdhan}
-              trackColor={{ false: themeColors.border, true: Colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-
-          <Divider />
-
-          <View style={styles.row}>
-            <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
-              <Ionicons name="alarm" size={18} color="#F59E0B" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.notifSection.preAdhan')}</Text>
-              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.notifSection.preAdhanSub')}</Text>
-            </View>
-            <Switch
-              value={preAdhan}
-              onValueChange={onTogglePreAdhan}
-              trackColor={{ false: themeColors.border, true: Colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-
-          <Divider />
-
           <View style={styles.row}>
             <View style={[styles.iconBox, { backgroundColor: '#10B98120' }]}>
               <Ionicons name="book" size={18} color="#10B981" />
