@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -62,11 +62,21 @@ export default function HifzTrackerScreen() {
     load();
   }, [load]);
 
+  // Mirror progress so rapid taps each merge onto the latest value instead of a
+  // stale closure (last-write-wins would lose a tick).
+  const progressRef = useRef(progress);
+  useEffect(() => { progressRef.current = progress; }, [progress]);
+
   const toggleSurah = useCallback(async (num: number) => {
-    const next = { ...progress, [num]: !progress[num] };
+    const next = { ...progressRef.current, [num]: !progressRef.current[num] };
+    progressRef.current = next;
     setProgress(next);
-    await AsyncStorage.setItem(CACHE_KEYS.hifzProgress, JSON.stringify(next));
-  }, [progress]);
+    try {
+      await AsyncStorage.setItem(CACHE_KEYS.hifzProgress, JSON.stringify(next));
+    } catch (err) {
+      console.warn('[hifz] save progress failed', err);
+    }
+  }, []);
 
   const memorized = Object.values(progress).filter(Boolean).length;
   const pct = surahs.length ? Math.round((memorized / surahs.length) * 100) : 0;
