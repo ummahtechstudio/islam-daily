@@ -55,6 +55,15 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const sleepRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const speedRef = useRef<Speed>(1);
+  // Guards against the playTrack race: createAsync resolving after the provider
+  // unmounted, or after a newer playTrack started, would otherwise orphan a
+  // native Sound that keeps playing and is never unloaded.
+  const isMountedRef = useRef(true);
+  const loadTokenRef = useRef(0);
+  // Lets onStatus auto-advance without a circular dependency on playTrack.
+  const playTrackRef = useRef<
+    ((track: AudioItem, playlist?: AudioItem[], index?: number) => Promise<void>) | null
+  >(null);
 
   const [state, setState] = useState<AudioState>({
     currentTrack: null,
@@ -84,6 +93,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       shouldDuckAndroid: true,
     }).catch((err) => console.warn('[AudioPlayer] setAudioMode failed', err));
     return () => {
+      isMountedRef.current = false;
       soundRef.current?.unloadAsync().catch(() => {});
       if (sleepRef.current) clearTimeout(sleepRef.current);
       if (saveRef.current) clearInterval(saveRef.current);
@@ -99,7 +109,14 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       durationSec: Math.floor((status.durationMillis ?? 0) / 1000),
     }));
     if (status.didJustFinish) {
-      setState(prev => ({ ...prev, isPlaying: false, positionSec: 0 }));
+      // Auto-advance to the next track in the playlist; otherwise just stop.
+      const { playlist, playlistIndex } = stateRef.current;
+      if (playlistIndex < playlist.length - 1) {
+        const nextIdx = playlistIndex + 1;
+        playTrackRef.current?.(playlist[nextIdx], playlist, nextIdx);
+      } else {
+        setState(prev => ({ ...prev, isPlaying: false, positionSec: 0 }));
+      }
     }
   }, []);
 
@@ -108,6 +125,11 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     playlist: AudioItem[] = [],
     index = 0,
   ) => {
+    // Token for this load. If a newer playTrack starts (or we unmount) while we
+    // await below, this load is stale and must not assign soundRef / start an
+    // interval, or it would orphan a second native Sound that keeps playing.
+    const myToken = ++loadTokenRef.current;
+
     // Clean up previous track
     if (saveRef.current) clearInterval(saveRef.current);
     if (soundRef.current) {
@@ -121,6 +143,8 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       const saved = await AsyncStorage.getItem(posKey(track.id));
       if (saved) startMs = parseInt(saved, 10) * 1000;
     } catch {}
+
+    if (myToken !== loadTokenRef.current || !isMountedRef.current) return;
 
     setState(prev => ({
       ...prev,
@@ -144,6 +168,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         },
         onStatus,
       );
+      // A newer load started (or we unmounted) while createAsync was in flight —
+      // discard this sound so it can't play over the newer one or leak.
+      if (myToken !== loadTokenRef.current || !isMountedRef.current) {
+        sound.unloadAsync().catch(() => {});
+        return;
+      }
       soundRef.current = sound;
       setState(prev => ({ ...prev, isPlaying: true }));
 
@@ -158,6 +188,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       console.warn('[AudioPlayer] load error:', e);
     }
   }, [onStatus]);
+
+  // Keep onStatus's auto-advance pointed at the latest playTrack without making
+  // onStatus depend on it (which would recreate the playback-status callback).
+  useEffect(() => {
+    playTrackRef.current = playTrack;
+  }, [playTrack]);
 
   const togglePlay = useCallback(async () => {
     if (!soundRef.current) return;
