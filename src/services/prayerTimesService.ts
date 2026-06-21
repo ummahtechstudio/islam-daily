@@ -87,7 +87,12 @@ export function computePrayerTimes(
   const currentRaw = today.currentPrayer();
   const nextRaw = today.nextPrayer();
   const currentPrayer = PRAYER_TO_NAME[currentRaw] ?? null;
-  const nextPrayer = PRAYER_TO_NAME[nextRaw] ?? null;
+  // After Isha, adhan returns 'none' for the next prayer until local midnight,
+  // even though the next prayer really is tomorrow's Fajr (nextPrayerTime is set
+  // to it just below). Surface 'fajr' so the next-prayer card shows Fajr with
+  // tomorrow's time instead of vanishing for the rest of the night.
+  const nextPrayer: PrayerName | null =
+    nextRaw === 'none' ? 'fajr' : (PRAYER_TO_NAME[nextRaw] ?? null);
 
   let nextPrayerTime: Date | null = null;
   if (nextRaw !== 'none') {
