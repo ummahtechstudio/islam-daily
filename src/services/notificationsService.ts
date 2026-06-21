@@ -58,8 +58,13 @@ const SCHEDULE_AHEAD_DAYS = 7;
 const REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24h
 const SCHEDULED_TAG = 'prayer-notification';
 const TAHAJJUD_TAG = 'tahajjud-notification';
+const DUHA_TAG = 'duha-notification';
 const DAILY_HADITH_TAG = 'daily-hadith-notification';
 const FRIDAY_TAG = 'friday-reminder-notification';
+
+// Duha becomes valid a short while after sunrise (the disliked moment right at
+// sunrise has passed). 20 minutes is a conservative, widely-used offset.
+const DUHA_AFTER_SUNRISE_MIN = 20;
 
 // Friday reminder fires at a fixed default time (no per-user time picker yet).
 // expo-notifications weekday is 1=Sunday … 6=Friday … 7=Saturday.
@@ -82,6 +87,12 @@ function getTahajjudTitle(): string {
 }
 function getTahajjudBody(): string {
   return i18n.t('notifications.tahajjudNotif.body');
+}
+function getDuhaTitle(): string {
+  return i18n.t('notifications.duhaNotif.title');
+}
+function getDuhaBody(): string {
+  return i18n.t('notifications.duhaNotif.body');
 }
 
 const PRAYER_ARABIC: Record<PrayerName, string> = {
@@ -282,6 +293,7 @@ async function cancelExistingTahajjudNotifications(): Promise<void> {
 export async function cancelAllPrayerNotifications(): Promise<void> {
   await cancelExistingPrayerNotifications();
   await cancelExistingTahajjudNotifications();
+  await cancelByTag(DUHA_TAG);
   await cancelByTag(DAILY_HADITH_TAG);
   await cancelByTag(FRIDAY_TAG);
   prefs.delete(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT);
@@ -321,6 +333,21 @@ function computeTahajjudStart(
   if (nightMs < MIN_TAHAJJUD_NIGHT_MS) return null;
 
   return new Date(fajrNext.getTime() - nightMs / 3);
+}
+
+/**
+ * Duha time = sunrise + a short offset (DUHA_AFTER_SUNRISE_MIN). Sunrise comes
+ * from the existing prayer-times service — no hardcoded times. Returns null if
+ * sunrise can't be resolved (defensive only).
+ */
+function computeDuhaStart(
+  prayerSettings: PrayerTimesSettings,
+  date: Date,
+): Date | null {
+  const today = computePrayerTimes(prayerSettings, date);
+  const sunrise = today.prayers.find((p) => p.name === 'sunrise')?.time;
+  if (!sunrise) return null;
+  return new Date(sunrise.getTime() + DUHA_AFTER_SUNRISE_MIN * 60 * 1000);
 }
 
 async function schedulePrayerNotifications(
@@ -409,6 +436,50 @@ async function scheduleTahajjudNotifications(
       });
     } catch (err) {
       console.warn(`[notifications] schedule tahajjud day ${dayOffset} failed`, err);
+    }
+  }
+}
+
+/**
+ * Duha reminder — opt-in, default OFF, independent of the prayer master toggle.
+ * Stored via the AsyncStorage `settings_*` key pattern (like Daily Hadith /
+ * Friday) and delivered on the general-reminders channel. The fire time is
+ * recomputed from the adhan engine's sunrise each day.
+ */
+async function scheduleDuhaNotifications(
+  prayerSettings: PrayerTimesSettings,
+): Promise<void> {
+  await cancelByTag(DUHA_TAG);
+
+  const enabled = await getSetting<boolean>('duha_reminder', false);
+  if (!enabled) return;
+
+  const now = Date.now();
+
+  for (let dayOffset = 0; dayOffset < SCHEDULE_AHEAD_DAYS; dayOffset++) {
+    const date = new Date();
+    date.setDate(date.getDate() + dayOffset);
+
+    const fireAt = computeDuhaStart(prayerSettings, date);
+    if (!fireAt) continue;
+    if (fireAt.getTime() <= now + 1000) continue;
+
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: getDuhaTitle(),
+          body: getDuhaBody(),
+          sound: 'default',
+          data: { tag: DUHA_TAG, dayOffset },
+        },
+        trigger: {
+          type: SchedulableTriggerInputTypes.DATE,
+          date: fireAt,
+          ...(Platform.OS === 'android' ? { channelId: CHANNEL_GENERAL } : {}),
+        },
+      });
+    } catch (err) {
+      console.warn(`[notifications] schedule duha day ${dayOffset} failed`, err);
     }
   }
 }
@@ -521,6 +592,7 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
     // timestamp.
     await schedulePrayerNotifications(settings, prayerSettings);
     await scheduleTahajjudNotifications(settings, prayerSettings);
+    await scheduleDuhaNotifications(prayerSettings);
     await scheduleDailyHadithNotification();
     await scheduleFridayReminderNotification();
 

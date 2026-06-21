@@ -903,6 +903,14 @@
       "body": "Your daily hadith is ready — tap to read",
       "title": "Daily Hadith"
     },
+    "duha": {
+      "name": "Duha reminder",
+      "sub": "Fires once a short while after sunrise (when Duha begins)"
+    },
+    "duhaNotif": {
+      "body": "Time for Duha prayer",
+      "title": "Duha"
+    },
     "fridayNotif": {
       "body": "Jummah Mubarak — read Surah Al-Kahf & send salawat.",
       "title": "Jummah Mubarak"

@@ -33,6 +33,7 @@ import {
 } from '../services/notificationsService';
 import { computePrayerTimes, getPersistedSettings, KARACHI_DEFAULT } from '../services/prayerTimesService';
 import { formatPrayerTime } from '../utils/formatPrayerTime';
+import { getSetting, setSetting } from '../utils/settings';
 
 const GREEN = '#0F6E56';
 const GOLD = '#EF9F27';
@@ -79,18 +80,23 @@ export function NotificationsSettingsSection({
   const [showTahajjudExplainer, setShowTahajjudExplainer] = useState(false);
   const [showTestPicker, setShowTestPicker] = useState(false);
   const [todayTimes, setTodayTimes] = useState<Partial<Record<PrayerName, Date>>>({});
+  // Duha is stored via the AsyncStorage `settings_*` key pattern (like Daily
+  // Hadith / Friday), separate from the MMKV prayer-notification settings.
+  const [duhaEnabled, setDuhaEnabled] = useState(false);
 
   // Initial load.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [perm, stored] = await Promise.all([
+      const [perm, stored, duha] = await Promise.all([
         getNotificationPermission(),
         getNotificationSettings(),
+        getSetting<boolean>('duha_reminder', false),
       ]);
       if (cancelled) return;
       setPermission(perm);
       setSettings(stored);
+      setDuhaEnabled(duha);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -280,6 +286,49 @@ export function NotificationsSettingsSection({
   const handleTahajjudExplainerCancel = useCallback(() => {
     setShowTahajjudExplainer(false);
   }, []);
+
+  // ─── Sunnah / Duha handlers ────────────────────────────────────────────────
+  // Mirrors the Tahajjud permission gating but persists via the AsyncStorage
+  // key + reschedules through the shared scheduler (Daily Hadith / Friday path).
+
+  const applyDuhaEnabled = useCallback(async (enabled: boolean) => {
+    setDuhaEnabled(enabled);
+    await setSetting('duha_reminder', enabled);
+    scheduleNotificationsForNext7Days().catch((err) =>
+      console.warn('[NotificationsSettings] duha re-schedule failed', err),
+    );
+  }, []);
+
+  const handleDuhaToggle = useCallback(
+    async (value: boolean) => {
+      lightHaptic();
+      if (!value) {
+        applyDuhaEnabled(false);
+        return;
+      }
+      const current = await getNotificationPermission();
+      if (current === 'granted') {
+        applyDuhaEnabled(true);
+        return;
+      }
+      if (current === 'undetermined') {
+        const result = await requestNotificationPermission();
+        setPermission(result);
+        applyDuhaEnabled(result === 'granted');
+        return;
+      }
+      // denied previously — direct user to OS settings
+      Alert.alert(
+        t('notifications.alerts.disabledTitle'),
+        t('notifications.alerts.disabledMessage'),
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('notifications.alerts.openSettings'), onPress: () => Linking.openSettings().catch(() => {}) },
+        ],
+      );
+    },
+    [applyDuhaEnabled, t],
+  );
 
   // ─── Test ──────────────────────────────────────────────────────────────────
 
@@ -490,6 +539,28 @@ export function NotificationsSettingsSection({
           <Switch
             value={settings.sunnah.tahajjud.enabled && permission !== 'denied'}
             onValueChange={handleTahajjudToggle}
+            trackColor={{ false: '#D1D5DB', true: GREEN }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        <View style={[styles.sunnahDivider, { backgroundColor: borderColor }]} />
+
+        <View style={styles.tahajjudRow}>
+          <View style={styles.tahajjudIconWrap}>
+            <Ionicons name="sunny" size={18} color={GREEN} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.tahajjudName, { color: textColor }]}>
+              {t('notifications.duha.name')}
+            </Text>
+            <Text style={[styles.tahajjudSub, { color: textMutedColor }]}>
+              {t('notifications.duha.sub')}
+            </Text>
+          </View>
+          <Switch
+            value={duhaEnabled && permission !== 'denied'}
+            onValueChange={handleDuhaToggle}
             trackColor={{ false: '#D1D5DB', true: GREEN }}
             thumbColor="#FFFFFF"
           />
@@ -720,6 +791,7 @@ const styles = StyleSheet.create({
   },
   tahajjudName: { fontSize: 15, fontWeight: '700' },
   tahajjudSub: { fontSize: 12, marginTop: 2, lineHeight: 17 },
+  sunnahDivider: { height: StyleSheet.hairlineWidth, marginHorizontal: 14 },
 
   modalBackdrop: {
     flex: 1,
