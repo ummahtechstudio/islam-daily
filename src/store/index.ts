@@ -52,7 +52,25 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       const settingsRaw = await AsyncStorage.getItem(CACHE_KEYS.settings);
       const persisted = settingsRaw ? JSON.parse(settingsRaw) : {};
-      const settings = { ...DEFAULT_SETTINGS, ...persisted };
+      const merged = { ...DEFAULT_SETTINGS, ...persisted };
+      // Coerce each field against a corrupt / schema-drifted blob so downstream
+      // code never sees a NaN font size or an unknown colour scheme.
+      const str = (v: unknown, fallback: string) =>
+        typeof v === 'string' && v ? v : fallback;
+      const settings: AppSettings = {
+        colorScheme: (['light', 'dark', 'system'] as const).includes(merged.colorScheme)
+          ? merged.colorScheme
+          : DEFAULT_SETTINGS.colorScheme,
+        arabicFontSize:
+          Number.isFinite(merged.arabicFontSize) &&
+          merged.arabicFontSize >= 14 &&
+          merged.arabicFontSize <= 60
+            ? merged.arabicFontSize
+            : DEFAULT_SETTINGS.arabicFontSize,
+        selectedTranslation: str(merged.selectedTranslation, DEFAULT_SETTINGS.selectedTranslation),
+        selectedTranslationName: str(merged.selectedTranslationName, DEFAULT_SETTINGS.selectedTranslationName),
+        selectedReciter: str(merged.selectedReciter, DEFAULT_SETTINGS.selectedReciter),
+      };
       set({ settings });
     } catch {}
   },
