@@ -573,11 +573,23 @@ export default function HomeScreen() {
   // shown here are therefore structurally identical to the Prayer Times screen
   // and can never diverge again.
   const { settings: prayerSettings } = useResolvedLocation();
+  // Re-derive prayer + Hijri data on a minute tick and on foreground return, so
+  // the next-prayer subtitle, Hijri date, Ramadan banner and Sehri/Iftar don't
+  // freeze at the value captured on mount when the app is left open across
+  // midnight or a prayer boundary.
+  const [homeTick, setHomeTick] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setHomeTick(Date.now()), 60_000);
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'active') setHomeTick(Date.now());
+    });
+    return () => { clearInterval(id); sub.remove(); };
+  }, []);
   const computed = useMemo(
-    () => computePrayerTimes(prayerSettings, new Date()),
-    [prayerSettings],
+    () => computePrayerTimes(prayerSettings, new Date(homeTick)),
+    [prayerSettings, homeTick],
   );
-  const hijri = useMemo(() => getHijriParts(new Date()), []);
+  const hijri = useMemo(() => getHijriParts(new Date(homeTick)), [homeTick]);
 
   const translationLanguage = useTranslationLanguage();
   const [verse, setVerse] = useState<{
