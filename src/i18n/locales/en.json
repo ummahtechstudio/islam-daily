@@ -1390,15 +1390,18 @@
         "successTitle": "Cache Cleared",
         "title": "Clear Cache?"
       },
-      "comingSoon": {
-        "message": "Light and Auto themes will be available in a future update."
-      },
       "resetSettings": {
         "message": "This will restore all preferences to their defaults. Your bookmarks will be kept.",
         "successMessage": "All preferences have been restored to defaults.",
         "successTitle": "Settings Reset",
         "title": "Reset All Settings?"
       }
+    },
+    "appearance": {
+      "auto": "Auto",
+      "dark": "Dark",
+      "explainer": "Choose the app theme. Auto follows your device's light or dark setting.",
+      "light": "Light"
     },
     "contentLanguage": {
       "options": {
@@ -1454,6 +1457,7 @@
     },
     "sections": {
       "about": "About",
+      "appearance": "Appearance",
       "appLanguage": "App Language",
       "contentLanguage": "Content Language",
       "credits": "Credits & Data Sources",

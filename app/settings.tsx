@@ -36,12 +36,15 @@ import {
 
 // ─── Option lists ─────────────────────────────────────────────────────────────
 
-type ThemeOption = 'dark' | 'light' | 'auto';
+// Appearance maps directly onto the store's colorScheme ('system' = follow
+// device). The whole app already reads store.settings.colorScheme to pick
+// Colors.light / Colors.dark, so selecting here switches every themed screen.
+type Appearance = 'light' | 'dark' | 'system';
 
-const THEME_OPTIONS: { value: ThemeOption; comingSoon: boolean }[] = [
-  { value: 'dark', comingSoon: false },
-  { value: 'light', comingSoon: true },
-  { value: 'auto', comingSoon: true },
+const APPEARANCE_OPTIONS: { value: Appearance; labelKey: string; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { value: 'light',  labelKey: 'settings.appearance.light', icon: 'sunny-outline' },
+  { value: 'dark',   labelKey: 'settings.appearance.dark',  icon: 'moon-outline' },
+  { value: 'system', labelKey: 'settings.appearance.auto',  icon: 'phone-portrait-outline' },
 ];
 
 const HADITH_TIME_OPTIONS: string[] = [
@@ -64,12 +67,12 @@ export default function SettingsScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const settings = useStore((s) => s.settings);
+  const updateSettings = useStore((s) => s.updateSettings);
 
   // Existing prefs
   const [analyticsEnabled, setAnalyticsEnabled] = useState<boolean | null>(null);
 
   // settings_* prefs
-  const [theme, setTheme] = useState<ThemeOption>('dark');
   const [dailyHadith, setDailyHadith] = useState<boolean>(true);
   const [dailyHadithTime, setDailyHadithTime] = useState<string>('08:00');
   const [fridayReminder, setFridayReminder] = useState<boolean>(true);
@@ -90,17 +93,14 @@ export default function SettingsScreen() {
     (async () => {
       try {
         const [
-          themeV,
           dailyHadithV, dailyHadithTimeV, fridayV, translationLangV, appLangV,
         ] = await Promise.all([
-          getSetting<ThemeOption>('theme', 'dark'),
           getSetting<boolean>('daily_hadith', true),
           getSetting<string>('daily_hadith_time', '08:00'),
           getSetting<boolean>('friday_reminder', true),
           getTranslationLanguage(),
           getAppLanguage(),
         ]);
-        setTheme(themeV);
         setDailyHadith(dailyHadithV);
         setDailyHadithTime(dailyHadithTimeV);
         setFridayReminder(fridayV);
@@ -153,13 +153,11 @@ export default function SettingsScreen() {
 
   // ─── Persistent setters ────────────────────────────────────────────────────
 
-  const onSelectTheme = async (value: ThemeOption) => {
-    if (value !== 'dark') {
-      Alert.alert(t('common.comingSoon'), t('settings.alerts.comingSoon.message'));
-      return;
-    }
-    setTheme(value);
-    await setSetting('theme', value);
+  // Persists to the Zustand store (CACHE_KEYS.settings). The root layout and
+  // every themed screen subscribe to settings.colorScheme, so the switch is
+  // instant app-wide. 'system' follows the device's light/dark setting.
+  const onSelectAppearance = (value: Appearance) => {
+    updateSettings({ colorScheme: value });
   };
 
   const onToggleDailyHadith = async (v: boolean) => {
@@ -240,7 +238,7 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             await resetAllSettings();
-            setTheme('dark');
+            updateSettings({ colorScheme: 'system' });
             setDailyHadith(true);
             setDailyHadithTime('08:00');
             setFridayReminder(true);
@@ -280,17 +278,55 @@ export default function SettingsScreen() {
     <View style={[styles.divider, { backgroundColor: themeColors.border }]} />
   );
 
-  const ComingSoonBadge = () => (
-    <View style={[styles.badge, { backgroundColor: themeColors.surface, borderColor: themeColors.border }]}>
-      <Text style={[styles.badgeText, { color: themeColors.textMuted }]}>{t('common.comingSoon')}</Text>
-    </View>
-  );
-
   // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
     <SafeAreaView style={[styles.flex, { backgroundColor: themeColors.background }]} edges={['bottom']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+
+        {/* ── APPEARANCE (theme) ────────────────────────────────────────── */}
+        {/* Light / Dark / Auto. Writes store.settings.colorScheme, which the
+            root layout and every themed screen already read. */}
+        <SectionLabel>{t('settings.sections.appearance')}</SectionLabel>
+        <SectionCard>
+          <View style={styles.segmentWrap}>
+            {APPEARANCE_OPTIONS.map((opt) => {
+              const active = settings.colorScheme === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  style={[
+                    styles.appearanceSegment,
+                    {
+                      backgroundColor: active ? Colors.primary : themeColors.surface,
+                      borderColor: active ? Colors.primary : themeColors.border,
+                    },
+                  ]}
+                  onPress={() => onSelectAppearance(opt.value)}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons
+                    name={opt.icon}
+                    size={18}
+                    color={active ? '#fff' : themeColors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.appearanceSegmentText,
+                      { color: active ? '#fff' : themeColors.text },
+                      isUrduUI && urduUiStyle(13),
+                    ]}
+                  >
+                    {t(opt.labelKey)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <Text style={[styles.explainer, { color: themeColors.textMuted, paddingHorizontal: 14, paddingBottom: 14 }, isUrduUI && urduUiStyle(12)]}>
+            {t('settings.appearance.explainer')}
+          </Text>
+        </SectionCard>
 
         {/* ── APP LANGUAGE (interface) ──────────────────────────────────── */}
         {/* Switches the whole UI via i18next. Choosing Urdu also flips the
@@ -727,6 +763,19 @@ const styles = StyleSheet.create({
   },
   radioInner: { width: 10, height: 10, borderRadius: 5 },
   radioLabel: { flex: 1, fontSize: 14 },
+  // Appearance segments
+  segmentWrap: { flexDirection: 'row', gap: 8, padding: 14, paddingBottom: 4 },
+  appearanceSegment: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  appearanceSegmentText: { fontSize: 13, fontWeight: '700' },
   // Segment
   segmentRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   segment: {
