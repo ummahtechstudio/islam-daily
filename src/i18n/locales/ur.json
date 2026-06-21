@@ -499,7 +499,8 @@
       "cuisine": "حلال کھانے"
     },
     "header": {
-      "found": "{{radius}}km کے اندر {{count}} {{restaurantWord}} ملے",
+      "found_one": "{{radius}}km کے اندر {{count}} ریسٹورنٹ ملا",
+      "found_other": "{{radius}}km کے اندر {{count}} ریسٹورنٹس ملے",
       "loading": "آپ کے قریب حلال ریسٹورنٹس تلاش کیے جا رہے ہیں…",
       "locating": "آپ کی لوکیشن تلاش کی جا رہی ہے…",
       "none": "{{radius}}km کے اندر کوئی ریسٹورنٹ نہیں",
@@ -792,7 +793,8 @@
       "locationFailed": "آپ کی لوکیشن حاصل کرنے میں ناکامی۔"
     },
     "header": {
-      "found": "{{radius}}km کے اندر {{count}} {{mosqueWord}} ملیں",
+      "found_one": "{{radius}}km کے اندر {{count}} مسجد ملی",
+      "found_other": "{{radius}}km کے اندر {{count}} مساجد ملیں",
       "loading": "آپ کے قریب مساجد تلاش کی جا رہی ہیں…",
       "locating": "آپ کی لوکیشن تلاش کی جا رہی ہے…",
       "none": "{{radius}}km کے اندر کوئی مسجد نہیں",

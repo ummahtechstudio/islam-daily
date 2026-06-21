@@ -255,11 +255,12 @@ export default function HalalFinderScreen() {
             {loading
               ? t('halalFinder.header.loading')
               : userLat != null && places.length > 0
-              ? t('halalFinder.header.found', {
-                  count: places.length,
-                  restaurantWord: places.length === 1 ? 'restaurant' : 'restaurants',
-                  radius: effectiveRadiusKm,
-                })
+              ? t(
+                  places.length === 1
+                    ? 'halalFinder.header.found_one'
+                    : 'halalFinder.header.found_other',
+                  { count: places.length, radius: effectiveRadiusKm },
+                )
               : userLat != null
               ? t('halalFinder.header.none', { radius: effectiveRadiusKm })
               : t('halalFinder.header.locating')}

@@ -499,7 +499,8 @@
       "cuisine": "Halal cuisine"
     },
     "header": {
-      "found": "Found {{count}} {{restaurantWord}} within {{radius}}km",
+      "found_one": "Found {{count}} restaurant within {{radius}}km",
+      "found_other": "Found {{count}} restaurants within {{radius}}km",
       "loading": "Finding halal restaurants near you...",
       "locating": "Finding your location...",
       "none": "No restaurants within {{radius}}km",
@@ -792,7 +793,8 @@
       "locationFailed": "Failed to get your location."
     },
     "header": {
-      "found": "Found {{count}} {{mosqueWord}} within {{radius}}km",
+      "found_one": "Found {{count}} mosque within {{radius}}km",
+      "found_other": "Found {{count}} mosques within {{radius}}km",
       "loading": "Finding mosques near you...",
       "locating": "Finding your location...",
       "none": "No mosques within {{radius}}km",

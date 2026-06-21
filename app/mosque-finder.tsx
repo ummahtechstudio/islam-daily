@@ -238,11 +238,12 @@ export default function MosqueFinder() {
             {loading
               ? t('mosqueFinder.header.loading')
               : userLat != null && mosques.length > 0
-              ? t('mosqueFinder.header.found', {
-                  count: mosques.length,
-                  mosqueWord: mosques.length === 1 ? 'mosque' : 'mosques',
-                  radius: effectiveRadiusKm,
-                })
+              ? t(
+                  mosques.length === 1
+                    ? 'mosqueFinder.header.found_one'
+                    : 'mosqueFinder.header.found_other',
+                  { count: mosques.length, radius: effectiveRadiusKm },
+                )
               : userLat != null
               ? t('mosqueFinder.header.none', { radius: effectiveRadiusKm })
               : t('mosqueFinder.header.locating')}
