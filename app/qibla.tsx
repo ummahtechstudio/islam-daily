@@ -11,7 +11,6 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Magnetometer } from 'expo-sensors';
 import * as Location from 'expo-location';
 import Svg, { Circle, Line, Polygon, Text as SvgText } from 'react-native-svg';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -32,14 +31,6 @@ const KAABA_LAT = 21.4225;
 const KAABA_LNG = 39.8262;
 const ALIGN_THRESHOLD_DEG = 5;
 const AR_LINE_LENGTH = Math.min(SCREEN_H * 0.32, 280);
-
-function magToCompassHeading(x: number, y: number): number {
-  // Convert magnetometer X/Y (device coords) to compass heading
-  // 0 = North, 90 = East, 180 = South, 270 = West (clockwise)
-  let angle = Math.atan2(y, x) * (180 / Math.PI);
-  angle = 90 - angle;
-  return ((angle % 360) + 360) % 360;
-}
 
 function greatCircleBearing(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const φ1 = (lat1 * Math.PI) / 180;
@@ -123,44 +114,36 @@ export default function QiblaScreen() {
     if (!orientationReady) return;
     let mounted = true;
     let headingSub: Location.LocationSubscription | undefined;
-    let magnetSub: ReturnType<typeof Magnetometer.addListener> | undefined;
 
     const start = async () => {
-      // Path 1: expo-location heading (preferred on iOS / Android)
-      if (Platform.OS !== 'web') {
-        try {
-          const { status } = await Location.requestForegroundPermissionsAsync();
-          if (status === 'granted') {
-            headingSub = await Location.watchHeadingAsync((data) => {
-              if (!mounted) return;
-              const h = data.trueHeading >= 0 ? data.trueHeading : data.magHeading;
-              if (typeof h === 'number' && h >= 0) {
-                setCompassHeading(h);
-                setHasCompass(true);
-              }
-            });
-            return;
-          }
-        } catch (e) {
-          console.warn('[Qibla] watchHeadingAsync failed, falling back to Magnetometer', e);
-        }
+      // Use expo-location's heading (system sensor fusion → a declination-
+      // corrected trueHeading referenced to TRUE north, matching the Qibla
+      // bearing). The old raw-magnetometer fallback was removed: it reports a
+      // MAGNETIC-north heading with no declination correction, so subtracting it
+      // from the true-north bearing produced a needle wrong by the local
+      // declination (10–20°+ across the Americas / high latitudes). When heading
+      // isn't available we show the static bearing card (hasCompass = false)
+      // rather than a confidently-wrong needle.
+      if (Platform.OS === 'web') {
+        setHasCompass(false);
+        return;
       }
-
-      // Path 2: raw magnetometer fallback
       try {
-        const available = await Magnetometer.isAvailableAsync();
-        if (!available) {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
           setHasCompass(false);
           return;
         }
-        Magnetometer.setUpdateInterval(100);
-        magnetSub = Magnetometer.addListener(({ x, y }) => {
+        headingSub = await Location.watchHeadingAsync((data) => {
           if (!mounted) return;
-          setCompassHeading(magToCompassHeading(x, y));
-          setHasCompass(true);
+          const h = data.trueHeading >= 0 ? data.trueHeading : data.magHeading;
+          if (typeof h === 'number' && h >= 0) {
+            setCompassHeading(h);
+            setHasCompass(true);
+          }
         });
       } catch (e) {
-        console.warn('[Qibla] Magnetometer unavailable', e);
+        console.warn('[Qibla] watchHeadingAsync failed; showing static bearing', e);
         setHasCompass(false);
       }
     };
@@ -169,7 +152,6 @@ export default function QiblaScreen() {
     return () => {
       mounted = false;
       headingSub?.remove();
-      magnetSub?.remove();
     };
   }, [orientationReady]);
 
