@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -39,20 +39,26 @@ export default function SearchScreen() {
   // Accepts an explicit query override so the suggestion-chip path
   // (which calls handleSearch right after setQuery) doesn't race the
   // useState update and end up searching the previous value.
+  // Monotonic id so an older in-flight search resolving after a newer one can't
+  // overwrite the newer results (or clear its spinner).
+  const searchSeq = useRef(0);
   const handleSearch = useCallback(async (override?: string) => {
     const q = (override ?? query).trim();
     if (!q) return;
+    const seq = ++searchSeq.current;
     setLoading(true);
     setSearched(true);
     setSearchError(false);
     try {
       const data = await searchQuran(q);
+      if (seq !== searchSeq.current) return;
       setResults(data);
     } catch {
+      if (seq !== searchSeq.current) return;
       setResults([]);
       setSearchError(true);
     }
-    setLoading(false);
+    if (seq === searchSeq.current) setLoading(false);
   }, [query]);
 
   const renderResult = ({ item }: { item: QuranSearchResult }) => (
