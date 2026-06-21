@@ -25,7 +25,10 @@ export function getCachedDailyKnowledge(): DailyKnowledgeCache | null {
 
 export async function fetchTodaysDailyKnowledge(): Promise<DailyKnowledge | null> {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    // Local calendar day, not UTC: toISOString() would roll to "tomorrow" in
+    // the evening for negative-UTC users and surface a future-dated entry.
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const { data, error } = await supabase
       .from('daily_knowledge')
       .select('*')
