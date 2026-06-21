@@ -92,6 +92,10 @@ export function TasbeehCounterView({
   const timerIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownIdRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const celebrationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Always points at the latest `increment`. The timer interval reads it via
+  // incrementRef.current so each tick uses the current count instead of a stale
+  // closure (see the timer effect + the sync effect after `increment`).
+  const incrementRef = useRef<() => void>(() => {});
 
   useEffect(() => () => {
     if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
@@ -197,6 +201,16 @@ export function TasbeehCounterView({
     }
   }, [selected, settings]);
 
+  // Keep the timer's tick bound to the latest increment. The timer effect below
+  // intentionally doesn't depend on `increment` (depending on it would tear down
+  // and recreate the interval on every count change, resetting the countdown),
+  // so without this ref the running interval would call a stale increment that
+  // recomputes newCount from a frozen currentCount every tick — freezing the
+  // auto-count at start + 1.
+  useEffect(() => {
+    incrementRef.current = increment;
+  }, [increment]);
+
   useEffect(() => {
     if (timerIdRef.current) {
       clearInterval(timerIdRef.current);
@@ -208,7 +222,7 @@ export function TasbeehCounterView({
     }
     if (mode === 'timer' && timerRunning && selected) {
       const tick = () => {
-        increment();
+        incrementRef.current();
         setNextCountdown(timerInterval);
       };
       setNextCountdown(timerInterval);
