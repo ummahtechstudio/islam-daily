@@ -1200,6 +1200,7 @@
   },
   "qibla": {
     "aligned": "✓ Facing Qibla",
+    "approximate": "Approximate direction — using a default location. Enable location access for an accurate Qibla.",
     "calibrate": {
       "instructions": "Rotate your phone until the line and Kaaba point straight up."
     },

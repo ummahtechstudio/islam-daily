@@ -59,7 +59,7 @@ export default function QiblaScreen() {
     settings.colorScheme === 'dark' ||
     (settings.colorScheme === 'system' && colorScheme === 'dark');
 
-  const { location, loading: locLoading, error: locError } = useLocation();
+  const { location, loading: locLoading, error: locError, isFallback } = useLocation();
   const [qiblaAngle, setQiblaAngle] = useState<number | null>(null);
   const [compassHeading, setCompassHeading] = useState(0);
   const [hasCompass, setHasCompass] = useState(true);
@@ -266,6 +266,11 @@ export default function QiblaScreen() {
         <Text style={[styles.bearingValue, { color: Colors.primary }]}>
           {t('qibla.noCompass.bearingValue', { degrees: qiblaAngle.toFixed(1) })}
         </Text>
+        {isFallback && (
+          <Text style={[styles.permMsg, { color: GOLD, marginTop: 8, fontWeight: '600' }]}>
+            {t('qibla.approximate')}
+          </Text>
+        )}
         <Text style={[styles.permMsg, { color: isDark ? Colors.dark.textSecondary : Colors.light.textSecondary, marginTop: 8 }]}>
           {t('qibla.noCompass.physicalCompass')}
         </Text>
@@ -331,6 +336,9 @@ export default function QiblaScreen() {
               ? t('qibla.sub.withCamera')
               : t('qibla.sub.withoutCamera')}
           </Text>
+          {isFallback && (
+            <Text style={styles.approxHint}>{t('qibla.approximate')}</Text>
+          )}
           {!cameraGranted && (
             <TouchableOpacity
               onPress={handleEnableCamera}
@@ -464,6 +472,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   sub: { fontSize: 13, color: 'rgba(255,255,255,0.85)', textAlign: 'center', marginTop: 4 },
+  approxHint: { fontSize: 12, color: GOLD, fontWeight: '600', textAlign: 'center', marginTop: 6 },
   cameraCta: {
     marginTop: 12,
     paddingHorizontal: 16,

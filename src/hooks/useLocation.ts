@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CACHE_KEYS } from '../constants';
+import { KARACHI_DEFAULT } from '../services/prayerTimesService';
 
 export interface LocationData {
   latitude: number;
@@ -9,20 +10,44 @@ export interface LocationData {
   city?: string;
 }
 
+// Non-Kaaba fallback, shared with useResolvedLocation's default. Using the
+// Kaaba's own coordinates here (the old behaviour) made the Qibla bearing
+// compute to a confident, aligned "0.0°" — greatCircleBearing(Kaaba, Kaaba) is
+// 0 — as if the user were standing inside the Haram. Falling back to Karachi and
+// flagging it `isFallback` lets the screen show an honest "approximate" hint
+// instead of a precise-looking wrong direction.
+const FALLBACK_LOCATION: LocationData = {
+  latitude: KARACHI_DEFAULT.location.latitude,
+  longitude: KARACHI_DEFAULT.location.longitude,
+  city: KARACHI_DEFAULT.location.city,
+};
+
 export function useLocation() {
   const [location, setLocation] = useState<LocationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFallback, setIsFallback] = useState(false);
+  // Mirror of the latest resolved location. The effect runs once (empty deps),
+  // so a closure that reads `location` directly always sees the mount-time null
+  // — reading the ref instead means a failed LIVE fetch can't clobber a good
+  // cached location with the fallback.
+  const locationRef = useRef<LocationData | null>(null);
 
   useEffect(() => {
     let mounted = true;
+
+    const apply = (data: LocationData, fallback: boolean) => {
+      locationRef.current = data;
+      setLocation(data);
+      setIsFallback(fallback);
+    };
 
     async function getLocation() {
       // Try cached first
       try {
         const cached = await AsyncStorage.getItem(CACHE_KEYS.location);
         if (cached && mounted) {
-          setLocation(JSON.parse(cached));
+          apply(JSON.parse(cached), false);
           setLoading(false);
         }
       } catch {}
@@ -32,9 +57,9 @@ export function useLocation() {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           if (mounted) {
-            setError('Location permission denied. Using default location (Makkah).');
-            const defaultLoc = { latitude: 21.4225, longitude: 39.8262, city: 'Makkah' };
-            setLocation(defaultLoc);
+            setError('Location permission denied. Using approximate location.');
+            // Don't overwrite a good cached location with the fallback.
+            if (!locationRef.current) apply(FALLBACK_LOCATION, true);
             setLoading(false);
           }
           return;
@@ -62,7 +87,7 @@ export function useLocation() {
           city,
         };
 
-        setLocation(locationData);
+        apply(locationData, false);
         setLoading(false);
         setError(null);
 
@@ -70,9 +95,9 @@ export function useLocation() {
       } catch (err) {
         if (mounted) {
           setError('Could not get location.');
-          if (!location) {
-            setLocation({ latitude: 21.4225, longitude: 39.8262, city: 'Makkah' });
-          }
+          // Read the latest location via ref (the captured `location` is the
+          // mount-time null), so a failed refresh never clobbers a cached fix.
+          if (!locationRef.current) apply(FALLBACK_LOCATION, true);
           setLoading(false);
         }
       }
@@ -82,5 +107,5 @@ export function useLocation() {
     return () => { mounted = false; };
   }, []);
 
-  return { location, loading, error };
+  return { location, loading, error, isFallback };
 }
