@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { useResolvedLocation } from '../src/hooks/useResolvedLocation';
-import { autoDetectMethodAndMadhab } from '../src/services/prayerTimesService';
+import { autoDetectMethodAndMadhab, getPersistedSettings } from '../src/services/prayerTimesService';
 import type { PrayerTimesSettings } from '../src/types/prayerTimes';
 import { trackScreen } from '../src/services/analytics';
 import citiesData from '../assets/data/cities.json';
@@ -123,7 +123,9 @@ export default function CityPickerScreen() {
         method,
         madhab,
         iqamahOffsets: null,
-        highLatitudeRule: 'middleOfTheNight',
+        // Preserve the user's chosen high-latitude rule instead of resetting it
+        // on every city change (it's persisted in settings.highLatitudeRule).
+        highLatitudeRule: getPersistedSettings()?.highLatitudeRule ?? 'middleOfTheNight',
       };
       setManualSettings(next);
       router.back();

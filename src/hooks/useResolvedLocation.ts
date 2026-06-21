@@ -84,7 +84,9 @@ async function resolveFromGps(): Promise<{
     method,
     madhab,
     iqamahOffsets: null,
-    highLatitudeRule: 'middleOfTheNight',
+    // Preserve the user's chosen high-latitude rule instead of resetting it on
+    // every GPS refresh (it's persisted in settings.highLatitudeRule).
+    highLatitudeRule: getPersistedSettings()?.highLatitudeRule ?? 'middleOfTheNight',
   };
 
   return { settings: resolved, source: 'gps' };
