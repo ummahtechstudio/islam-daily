@@ -53,6 +53,19 @@ import {
 
 SplashScreen.preventAutoHideAsync();
 
+// Present notifications even while the app is foregrounded. expo-notifications
+// suppresses foreground presentation unless a handler opts in, so without this a
+// prayer-time (or the in-app Test) notification that fires while the app is open
+// would show no banner and play no sound.
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 export const unstable_settings = {
   anchor: '(tabs)',
 };
@@ -125,12 +138,28 @@ export default function RootLayout() {
   // Tahajjud notifications carry no route, so they just open the app as before.
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+
+    // Dedup so a tap that cold-starts the app isn't routed twice — once from
+    // getLastNotificationResponseAsync() below and once from the live listener.
+    const handled = new Set<string>();
+    const routeFrom = (response: Notifications.NotificationResponse | null) => {
+      if (!response) return;
+      const id = response.notification.request.identifier;
+      if (handled.has(id)) return;
+      handled.add(id);
       const data = response.notification.request.content.data as { route?: string } | undefined;
       if (data?.route) {
         router.push(data.route as never);
       }
-    });
+    };
+
+    // Cold start: when a tap launches the app from a fully killed state, the
+    // launching response is delivered before the listener attaches, so the live
+    // listener never sees it. Read it explicitly once on mount.
+    Notifications.getLastNotificationResponseAsync().then(routeFrom).catch(() => {});
+
+    // Warm taps while the JS runtime is already alive.
+    const sub = Notifications.addNotificationResponseReceivedListener(routeFrom);
     return () => sub.remove();
   }, [router]);
 
