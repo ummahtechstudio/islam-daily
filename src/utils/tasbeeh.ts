@@ -17,18 +17,21 @@ const DEFAULT_SETTINGS: TasbeehSettings = {
 import { getCachedOrBundledDhikr } from '../services/content';
 
 export const getCounters = async (): Promise<TasbeehCounter[]> => {
+  const seed = async (): Promise<TasbeehCounter[]> => {
+    const seeded = DEFAULT_TASBEEHS.map((c) => ({ ...c, createdAt: Date.now() }));
+    try { await AsyncStorage.setItem(COUNTERS_KEY, JSON.stringify(seeded)); } catch {}
+    return seeded;
+  };
   try {
     const raw = await AsyncStorage.getItem(COUNTERS_KEY);
-    if (!raw) {
-      const seeded = DEFAULT_TASBEEHS.map((c) => ({ ...c, createdAt: Date.now() }));
-      await AsyncStorage.setItem(COUNTERS_KEY, JSON.stringify(seeded));
-      return seeded;
-    }
+    if (!raw) return seed();
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return DEFAULT_TASBEEHS;
+    // Re-seed (and persist) on corrupt/empty data instead of returning the raw
+    // defaults — otherwise storage stays corrupt and every call re-parses/fails.
+    if (!Array.isArray(parsed) || parsed.length === 0) return seed();
     return parsed as TasbeehCounter[];
   } catch {
-    return DEFAULT_TASBEEHS;
+    return seed();
   }
 };
 
