@@ -39,7 +39,12 @@ export function getBundledNamesOfAllah(): NameOfAllah[] {
 export function getCachedOrBundledNamesOfAllah(): NameOfAllah[] {
   try {
     const cached = cache.getJSON<NameOfAllah[]>(CACHE_KEYS.NAMES_99);
-    if (cached && cached.length) return cached;
+    // Only trust a snapshot at least as complete as the bundled set (100 rows)
+    // that still contains the id=0 "Greatest Name" hero — a sparse remote
+    // snapshot would otherwise drop the hero card from the grid.
+    if (cached && cached.length >= NAMES_BUNDLED.length && cached.some((n) => n.id === 0)) {
+      return cached;
+    }
   } catch { /* storage not ready -> fall through */ }
   return NAMES_BUNDLED;
 }
@@ -51,7 +56,14 @@ export async function refreshNamesOfAllah(): Promise<void> {
       .select('id, number, arabic, transliteration, english_meaning, urdu_meaning, quran_reference, dua')
       .order('id');
     if (error || !data?.length) return;
-    cache.setJSON<NameOfAllah[]>(CACHE_KEYS.NAMES_99, data as NameOfAllah[]);
+    // The remote table has no meaning_detail column; merge it back from the
+    // bundled set by id so the cached snapshot keeps the extended descriptions.
+    const detailById = new Map(NAMES_BUNDLED.map((n) => [n.id, n.meaning_detail] as const));
+    const merged = (data as NameOfAllah[]).map((n) => ({
+      ...n,
+      meaning_detail: n.meaning_detail ?? detailById.get(n.id),
+    }));
+    cache.setJSON<NameOfAllah[]>(CACHE_KEYS.NAMES_99, merged);
   } catch {
     // bundled content is always available
   }
@@ -109,15 +121,19 @@ export async function refreshDuas(): Promise<void> {
       .order('id');
     if (error || !data?.length) return;
 
-    // Group flat rows into DuaCategory[] using the bundled icons as a lookup.
+    // Group flat rows into DuaCategory[] using the bundled category metadata as
+    // a lookup: a row's own `title` is an individual dua's headline, NOT the
+    // category name, so the category title must come from the bundled set.
     const iconByCat = new Map(DUAS_BUNDLED.map((c) => [c.id, c.icon] as const));
+    const titleByCat = new Map(DUAS_BUNDLED.map((c) => [c.id, c.title] as const));
+    const bundledByCat = new Map(DUAS_BUNDLED.map((c) => [c.id, c.duas] as const));
     const grouped = new Map<string, DuaCategory>();
     for (const row of data as unknown as SupabaseDuaRow[]) {
       let cat = grouped.get(row.category);
       if (!cat) {
         cat = {
           id: row.category,
-          title: row.title,
+          title: titleByCat.get(row.category) ?? row.category,
           icon: iconByCat.get(row.category) ?? '',
           duas: [],
         };
@@ -135,6 +151,19 @@ export async function refreshDuas(): Promise<void> {
       });
     }
     const remote = Array.from(grouped.values());
+    // Carry the bundled scan labels (title_en/title_ur — absent from the remote
+    // table) across when a category's duas line up 1:1 with the bundled order.
+    // On a count mismatch the order can't be trusted, so leave them unset rather
+    // than mislabel a card.
+    for (const cat of remote) {
+      const bundled = bundledByCat.get(cat.id);
+      if (bundled && bundled.length === cat.duas.length) {
+        cat.duas.forEach((d, i) => {
+          d.title_en = bundled[i].title_en;
+          d.title_ur = bundled[i].title_ur;
+        });
+      }
+    }
     // Refuse to cache a snapshot that is sparser than the bundled baseline —
     // it would downgrade verified content and empty out entire categories.
     if (!coversAllBundledCategories(remote)) return;
