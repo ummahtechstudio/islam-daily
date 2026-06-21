@@ -66,6 +66,14 @@ function formatMoney(n: number): string {
   return Math.round(n).toLocaleString();
 }
 
+// The Zakat obligation is to pay AT LEAST the amount due, so round the displayed
+// figure UP — never present a value a user could copy verbatim and underpay
+// with. (Asset totals stay on formatMoney's nearest-unit rounding.)
+function formatZakatDue(n: number): string {
+  if (!Number.isFinite(n)) return '0';
+  return Math.ceil(n).toLocaleString();
+}
+
 // Convert a per-unit price into per-gram so all calculations share one basis.
 function pricePerGram(pricePerUnit: number, unit: WeightUnit): number {
   if (unit === 'tola') return pricePerUnit / TOLA_TO_GRAMS;
@@ -534,7 +542,7 @@ export default function ZakatCalculatorScreen() {
                   {t('zakat.result.zakatDueLabel')}
                 </Text>
                 <Text style={[styles.zakatAmount, { color: Colors.primary }]}>
-                  {currencyLabel} {formatMoney(calc.zakatDue)}
+                  {currencyLabel} {formatZakatDue(calc.zakatDue)}
                 </Text>
               </>
             ) : (
