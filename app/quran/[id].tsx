@@ -88,7 +88,7 @@ function isArabicLetter(char: string): boolean {
 
 type TajweedToken = { text: string; color: string };
 
-function parseTajweed(text: string): TajweedToken[] {
+function parseTajweed(text: string, nextWordChar = ''): TajweedToken[] {
   const tokens: TajweedToken[] = [];
   let i = 0;
 
@@ -103,13 +103,18 @@ function parseTajweed(text: string): TajweedToken[] {
       j++;
     }
 
-    const nextLetter = j < text.length ? text[j] : '';
+    // At the end of a word, fall back to the first letter of the NEXT word so
+    // ikhfa/idgham across a word boundary (noon-saakin/tanwin followed by an
+    // ikhfa/idgham letter that starts the next word) is detected, not missed.
+    const nextLetter = j < text.length ? text[j] : nextWordChar;
     let color = 'inherit';
 
     if (!isArabicLetter(char)) {
       // Space or non-Arabic character — no colour
       color = 'inherit';
-    } else if (QALQALA.has(char)) {
+    } else if (QALQALA.has(char) && token.includes(SUKOON)) {
+      // Qalqala applies only when the letter actually carries sukoon — colouring
+      // every ق/ط/ب/ج/د regardless overstated the rule and misled learners.
       color = '#4B9BFF'; // blue — qalqala
     } else if ((char === 'ن' || char === 'م') && token.includes(SHADDAH)) {
       color = '#4CAF50'; // green — ghunna with shaddah
@@ -215,7 +220,7 @@ const VerseRow = React.memo(function VerseRow({
   // Memoized once per verse text (and tajweed toggle) — never re-runs on scroll.
   const words = useMemo(() => item.text.split(' '), [item.text]);
   const tajweedTokens = useMemo(
-    () => (tajweedOn ? words.map((w) => parseTajweed(w)) : null),
+    () => (tajweedOn ? words.map((w, idx) => parseTajweed(w, words[idx + 1]?.[0] ?? '')) : null),
     [words, tajweedOn],
   );
 
