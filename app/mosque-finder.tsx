@@ -69,7 +69,11 @@ async function fetchNearbyMosques(
   `;
   const response = await fetchWithTimeout(
     'https://overpass-api.de/api/interpreter',
-    { method: 'POST', body: query },
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `data=${encodeURIComponent(query)}`,
+    },
     20000,
   );
   if (!response.ok) {

@@ -148,7 +148,9 @@ export default function RootLayout() {
       if (handled.has(id)) return;
       handled.add(id);
       const data = response.notification.request.content.data as { route?: string } | undefined;
-      if (data?.route) {
+      // Only follow internal absolute paths (e.g. /hadith, /quran/18) — never an
+      // arbitrary or external string, should a remote push ever carry one.
+      if (data?.route && /^\/[\w-]+(\/[\w-]+)*$/.test(data.route)) {
         router.push(data.route as never);
       }
     };
