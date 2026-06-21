@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchWithTimeout } from '../utils/network';
+import { getQuranFromCache } from './quranCache';
+import { SURAH_META } from '../constants/surahMeta';
 
 const QURAN_BASE = 'https://api.alquran.cloud/v1';
 const ALADHAN_BASE = 'https://api.aladhan.com/v1';
@@ -223,20 +225,54 @@ export async function fetchRandomHadith() {
 
 // ─── Islamic Search (client-side across Quran) ────────────────────────────────
 
-export async function searchQuran(query: string) {
-  const res = await fetchWithTimeout(
-    `${QURAN_BASE}/search/${encodeURIComponent(query)}/all/en.asad`,
-    {},
-    NET_TIMEOUT_MS,
-  );
-  const json = await res.json().catch(() => null);
-  // alquran.cloud returns code 404 when a valid query simply has no matches —
-  // that's "no results", not a failure, so return [] rather than throwing.
-  if (json && json.code === 404) return [];
-  if (!res.ok || !json || json.code !== 200) {
-    throw new Error(`Quran search failed (HTTP ${res.status})`);
+// Offline fallback: substring-scan the bundled Quran's English translation so
+// search still works without a network (the full Quran ships locally). Mirrors
+// the remote en.asad behaviour closely enough; results are capped to keep the
+// list bounded.
+function searchBundledQuran(query: string): QuranSearchResult[] {
+  const idx = getQuranFromCache();
+  const q = query.trim().toLowerCase();
+  if (!idx || !q) return [];
+  const results: QuranSearchResult[] = [];
+  for (const surah of SURAH_META) {
+    const ayahs = idx.bySurah[surah.number];
+    if (!ayahs) continue;
+    for (const a of ayahs) {
+      const text = a.translation_en ?? '';
+      if (text.toLowerCase().includes(q)) {
+        results.push({
+          number: 0,
+          text,
+          edition: { identifier: 'en.bundled', language: 'en' },
+          surah: { number: surah.number, name: surah.name_arabic, englishName: surah.name_english },
+          numberInSurah: a.ayah,
+        });
+        if (results.length >= 100) return results;
+      }
+    }
   }
-  return (json.data?.matches ?? []) as QuranSearchResult[];
+  return results;
+}
+
+export async function searchQuran(query: string): Promise<QuranSearchResult[]> {
+  try {
+    const res = await fetchWithTimeout(
+      `${QURAN_BASE}/search/${encodeURIComponent(query)}/all/en.asad`,
+      {},
+      NET_TIMEOUT_MS,
+    );
+    const json = await res.json().catch(() => null);
+    // alquran.cloud returns code 404 when a valid query simply has no matches —
+    // that's "no results", not a failure, so return [] rather than throwing.
+    if (json && json.code === 404) return [];
+    if (!res.ok || !json || json.code !== 200) {
+      throw new Error(`Quran search failed (HTTP ${res.status})`);
+    }
+    return (json.data?.matches ?? []) as QuranSearchResult[];
+  } catch {
+    // Offline or remote failure → scan the bundled Quran instead of erroring.
+    return searchBundledQuran(query);
+  }
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
