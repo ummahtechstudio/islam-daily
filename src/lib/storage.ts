@@ -66,9 +66,13 @@ function makeNamespace(store: SyncKV) {
       if (!isClient) return undefined;
       try { return store.getString(key); } catch { return undefined; }
     },
-    set: (key: string, value: string): void => {
-      if (!isClient) return;
-      try { store.set(key, value); } catch { /* swallow */ }
+    set: (key: string, value: string): boolean => {
+      if (!isClient) return false;
+      try { store.set(key, value); return true; }
+      catch (err) {
+        if (__DEV__) console.warn(`[storage] set failed for "${key}"`, err);
+        return false;
+      }
     },
     getJSON: <T>(key: string): T | null => {
       if (!isClient) return null;
@@ -77,9 +81,15 @@ function makeNamespace(store: SyncKV) {
       if (!raw) return null;
       try { return JSON.parse(raw) as T; } catch { return null; }
     },
-    setJSON: <T>(key: string, value: T): void => {
-      if (!isClient) return;
-      try { store.set(key, JSON.stringify(value)); } catch { /* swallow */ }
+    setJSON: <T>(key: string, value: T): boolean => {
+      if (!isClient) return false;
+      try { store.set(key, JSON.stringify(value)); return true; }
+      catch (err) {
+        // Large blobs (e.g. a full trilingual hadith book ~22 MB) can exceed
+        // MMKV limits; report failure so callers don't believe it persisted.
+        if (__DEV__) console.warn(`[storage] setJSON failed for "${key}" (value may be too large)`, err);
+        return false;
+      }
     },
     delete: (key: string): void => {
       if (!isClient) return;

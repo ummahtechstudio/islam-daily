@@ -121,7 +121,13 @@ export async function downloadHadithBook(
       totalCount: hadiths.length,
     };
 
-    cache.setJSON<HadithBookCache>(CACHE_KEYS.HADITH_BOOK(slug), entry);
+    const persisted = cache.setJSON<HadithBookCache>(CACHE_KEYS.HADITH_BOOK(slug), entry);
+    if (!persisted && __DEV__) {
+      console.warn(
+        `[hadithCache] "${slug}" did not persist (likely too large for MMKV); ` +
+        `it will serve this session but re-download on next launch.`,
+      );
+    }
     inMemoryBookCache.set(slug, entry);
     onProgress?.({
       bookSlug: slug,
