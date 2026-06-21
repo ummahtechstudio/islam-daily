@@ -59,11 +59,17 @@ export function RecitationCard({ entry, compact }: RecitationCardProps) {
     audio.current.ayah >= entry.ayahStart &&
     audio.current.ayah <= entry.ayahEnd;
 
+  // On a failed load the context keeps `current` set (so isActive stays true)
+  // but flips `error` — without this the button would sit as a steady "stop"
+  // while nothing plays. Surface a retry affordance instead.
+  const hasError = isActive && !!audio.error;
+
   const onToggleAudio = () => {
     if (entry.kind !== 'quran') return;
-    if (isActive) {
+    if (isActive && !hasError) {
       void audio.stop();
     } else {
+      // Start, or retry after a failed load.
       void audio.playRange(entry.surah, entry.ayahStart, entry.ayahEnd);
     }
   };
@@ -91,16 +97,16 @@ export function RecitationCard({ entry, compact }: RecitationCardProps) {
               onPress={onToggleAudio}
               hitSlop={8}
               accessibilityLabel={
-                isActive ? t('namaz.stopAudio') : t('namaz.playAudio')
+                isActive && !hasError ? t('namaz.stopAudio') : t('namaz.playAudio')
               }
             >
               {isActive && audio.isLoading ? (
                 <ActivityIndicator size="small" color={Colors.primary} />
               ) : (
                 <Ionicons
-                  name={isActive ? 'stop-circle' : 'play-circle'}
+                  name={hasError ? 'alert-circle' : isActive ? 'stop-circle' : 'play-circle'}
                   size={28}
-                  color={Colors.primary}
+                  color={hasError ? Colors.warning : Colors.primary}
                 />
               )}
             </TouchableOpacity>
