@@ -203,7 +203,9 @@ async function downloadQuranFromSupabase(
 
   let totalBytes = 0;
   let done = 0;
+  const writtenKeys: string[] = [];
 
+  try {
   for (const [surahNum, ayahs] of bySurah) {
     const meta = surahMeta.find((s: any) => s.number === surahNum);
 
@@ -239,10 +241,18 @@ async function downloadQuranFromSupabase(
     };
 
     const str = JSON.stringify([arabicEdition, translationEdition]);
-    await AsyncStorage.setItem(`offline_surah_${surahNum}`, str);
+    const key = `offline_surah_${surahNum}`;
+    await AsyncStorage.setItem(key, str);
+    writtenKeys.push(key);
     totalBytes += str.length;
     done++;
     onProgress(70 + Math.round((done / 114) * 28));
+  }
+  } catch (err) {
+    // Don't leave a half-written Quran on disk: clear the partial keys so the
+    // reader can't serve an incomplete Quran while status shows not-downloaded.
+    if (writtenKeys.length) await AsyncStorage.multiRemove(writtenKeys).catch(() => {});
+    throw err;
   }
 
   onProgress(100);
@@ -480,7 +490,9 @@ export async function downloadPrayerTimes(
   }
 
   onProgress(100);
-  await markDownloaded('prayerTimes', Math.max(totalBytes, 50_000));
+  // Prayer times are computed locally (the adhan engine) and need no download,
+  // so record the real cached size (often 0) rather than fabricating ~50 KB.
+  await markDownloaded('prayerTimes', totalBytes);
 }
 
 // ─── Download all (serial) ────────────────────────────────────────────────────
