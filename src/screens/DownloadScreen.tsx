@@ -245,7 +245,9 @@ export default function DownloadScreen() {
         );
         return;
       }
-      if (active.has(pack.id)) return;
+      // Don't run an individual pack download concurrently with Download-All —
+      // they'd write the same keys and double-count sizes.
+      if (active.has(pack.id) || downloadingAll) return;
       if (!(await checkWifiWarning())) return;
 
       setActive((prev) => new Set(prev).add(pack.id));
@@ -276,7 +278,7 @@ export default function DownloadScreen() {
         return next;
       });
     },
-    [active, refresh, wifiOnly, isOnline]
+    [active, refresh, wifiOnly, isOnline, downloadingAll]
   );
 
   // ─── Download all ─────────────────────────────────────────────────────────
@@ -410,8 +412,9 @@ export default function DownloadScreen() {
           ) : isDownloaded ? (
             <>
               <TouchableOpacity
-                style={[styles.iconBtn, { backgroundColor: Colors.success + '18' }]}
+                style={[styles.iconBtn, { backgroundColor: Colors.success + '18', opacity: downloadingAll ? 0.4 : 1 }]}
                 onPress={() => startDownload(pack)}
+                disabled={downloadingAll}
                 hitSlop={6}
               >
                 <Ionicons name="refresh" size={15} color={Colors.success} />
@@ -426,8 +429,9 @@ export default function DownloadScreen() {
             </>
           ) : (
             <TouchableOpacity
-              style={[styles.dlBtn, { backgroundColor: pack.accentColor }]}
+              style={[styles.dlBtn, { backgroundColor: pack.accentColor, opacity: downloadingAll ? 0.4 : 1 }]}
               onPress={() => startDownload(pack)}
+              disabled={downloadingAll}
             >
               <Ionicons name="cloud-download-outline" size={15} color="#fff" />
             </TouchableOpacity>
