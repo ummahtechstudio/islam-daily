@@ -373,6 +373,10 @@ async function schedulePrayerNotifications(
       if (!entry) continue;
 
       const fireTime = entry.time.getTime();
+      // At extreme latitudes adhan can return an Invalid Date (NaN) for Fajr/
+      // Isha. `NaN <= now + 1000` is false, so without this guard we'd schedule
+      // a notification with an invalid trigger date. Skip it.
+      if (!Number.isFinite(fireTime)) continue;
       if (fireTime <= now + 1000) continue;
 
       const arabic = PRAYER_ARABIC[prayer];
