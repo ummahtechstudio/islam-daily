@@ -453,6 +453,13 @@ export default function SurahReaderScreen() {
   const [showReciterPicker, setShowReciterPicker] = useState(false);
   const [showReciteSettings, setShowReciteSettings] = useState(false);
   const [selectedReciter, setSelectedReciter] = useState(settings.selectedReciter ?? 'ar.alafasy');
+  // Adopt the persisted reciter once the store hydrates — a cold-start deep-link
+  // into a surah can mount before loadPersistedData finishes, which would
+  // otherwise lock the default reciter. User picks go through updateSettings
+  // (below), so this tracks the store rather than fighting them.
+  useEffect(() => {
+    if (settings.selectedReciter) setSelectedReciter(settings.selectedReciter);
+  }, [settings.selectedReciter]);
   const [playingAyah, setPlayingAyah] = useState<number | null>(null);
   const [loadingAyah, setLoadingAyah] = useState<number | null>(null);
   const soundRef = useRef<any>(null);
