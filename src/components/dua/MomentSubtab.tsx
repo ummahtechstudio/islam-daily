@@ -81,7 +81,7 @@ function getDuaOfMoment(
     catId = 'morning'; reason = 'Morning adhkar time';
   } else if (hour >= 12 && hour < 13) {
     catId = 'prayer'; reason = 'Dhuhr prayer time';
-  } else if (hour >= 13 && hour < 16) {
+  } else if (hour >= 13 && hour < 15) {
     catId = 'knowledge'; reason = 'Midday — seek knowledge';
   } else if (hour >= 15 && hour < 18) {
     catId = 'evening'; reason = 'Evening adhkar time';
@@ -121,6 +121,14 @@ export function MomentSubtab({ theme }: MomentSubtabProps) {
       return () => { active = false; };
     }, []),
   );
+
+  // Re-render on a minute tick so the moment dua updates when the screen is
+  // left open across an hour boundary (without needing a tab revisit).
+  const [, setMomentTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setMomentTick((n) => n + 1), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   const moment = getDuaOfMoment(hisnulMuslim);
   const translationFor = (item: { english: string; urdu?: string }) =>

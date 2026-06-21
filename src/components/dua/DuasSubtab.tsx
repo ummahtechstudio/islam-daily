@@ -109,6 +109,9 @@ export function DuasSubtab({ theme, initialCategory }: DuasSubtabProps) {
   useFocusEffect(
     useCallback(() => {
       let active = true;
+      // Re-read in case a background content refresh wrote a newer snapshot
+      // after this screen first mounted.
+      setHisnulMuslim(getCachedOrBundledDuas());
       (async () => {
         const lang = await getTranslationLanguage();
         if (active) setLanguage(lang);
