@@ -104,7 +104,14 @@ export default function QiblaScreen() {
     );
     setQiblaAngle(localBearing);
     fetchQiblaDirection(location.latitude, location.longitude)
-      .then((data) => setQiblaAngle(data.direction))
+      .then((data) => {
+        // Only override the trustworthy local great-circle bearing if the API
+        // returned a valid in-range direction (a malformed-but-200 response or a
+        // stale bad cache value must not replace it).
+        if (Number.isFinite(data.direction) && data.direction >= 0 && data.direction < 360) {
+          setQiblaAngle(data.direction);
+        }
+      })
       .catch(() => { /* keep local bearing */ });
   }, [location]);
 
