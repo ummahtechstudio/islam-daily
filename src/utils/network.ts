@@ -10,6 +10,20 @@ export class OfflineError extends Error {
   }
 }
 
+// Reject a promise that doesn't settle within `ms`. Used to bound calls that
+// have no built-in timeout (e.g. Location.getCurrentPositionAsync, which can
+// hang indefinitely on a cold/indoor GPS fix) so callers can show an error +
+// retry instead of an infinite spinner.
+export function withTimeout<T>(promise: Promise<T>, ms: number, label = 'Timed out'): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(label)), ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
 export async function fetchWithTimeout(
   input: RequestInfo,
   init: RequestInit = {},

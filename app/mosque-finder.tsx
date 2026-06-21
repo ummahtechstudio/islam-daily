@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
-import { fetchWithTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
+import { fetchWithTimeout, withTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
 import { useIsOnline } from '../src/hooks/useIsOnline';
 import MosqueFinderEmptyState from '../src/components/MosqueFinderEmptyState';
 
@@ -181,7 +181,14 @@ export default function MosqueFinder() {
           setLoading(false);
           return;
         }
-        const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        // Bound the GPS fix: getCurrentPositionAsync has no timeout and can hang
+        // indefinitely on a cold/indoor fix, which would leave the spinner stuck
+        // with no way to retry (the refresh control is disabled while loading).
+        const loc = await withTimeout(
+          Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+          12000,
+          'Location timed out',
+        );
         const { latitude, longitude } = loc.coords;
         setUserLat(latitude);
         setUserLng(longitude);
