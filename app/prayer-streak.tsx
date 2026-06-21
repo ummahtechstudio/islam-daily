@@ -40,7 +40,13 @@ function getLast7Days(): string[] {
 
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 function dayIndex(dateStr: string): number {
-  return new Date(dateStr).getDay();
+  // Parse as LOCAL midnight: new Date('YYYY-MM-DD') parses as UTC, so getDay()
+  // returns the wrong weekday in negative-UTC timezones.
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).getDay();
+}
+function dateKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export default function PrayerStreakScreen() {
@@ -83,20 +89,19 @@ export default function PrayerStreakScreen() {
   // of having to wait until tomorrow.
   const streak = (() => {
     let s = 0;
-    const sortedDays = [...last7].reverse();
-    for (const d of sortedDays) {
-      const rec = records[d];
+    const cursor = new Date();
+    // A partial today shouldn't break an otherwise-intact chain: if today isn't
+    // fully done, start counting from yesterday.
+    const todayDoneAll = PRAYER_LIST.every((p) => records[today]?.prayers[p]);
+    if (!todayDoneAll) cursor.setDate(cursor.getDate() - 1);
+    // Walk backwards over ALL stored records (not just the last 7) until the
+    // first incomplete day. Bounded to avoid an unbounded loop on bad data.
+    for (let i = 0; i < 4000; i++) {
+      const rec = records[dateKey(cursor)];
       const allDone = PRAYER_LIST.every((p) => rec?.prayers[p]);
-      if (d === today) {
-        if (allDone) {
-          s++;
-          continue;
-        }
-        // Today incomplete — keep counting prior days that were fully done.
-        continue;
-      }
-      if (allDone) s++;
-      else break;
+      if (!allDone) break;
+      s++;
+      cursor.setDate(cursor.getDate() - 1);
     }
     return s;
   })();
@@ -159,7 +164,7 @@ export default function PrayerStreakScreen() {
                   {t(`prayerStreak.days.${DAY_KEYS[dayIndex(d)]}`)}
                 </Text>
                 <Text style={[styles.dayNum, { color: d === today ? Colors.primary : theme.textMuted }]}>
-                  {new Date(d).getDate()}
+                  {Number(d.split('-')[2])}
                 </Text>
               </View>
             ))}
