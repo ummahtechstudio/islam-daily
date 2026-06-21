@@ -22,7 +22,6 @@ export const shareContent = async (content: ShareableContent): Promise<void> => 
     typeLabel ? `Shared from Islam Daily — ${typeLabel}` : 'Shared from Islam Daily',
     '— Get the app: https://play.google.com/store/apps/details?id=com.luqman.islamdaily',
   ]
-    .filter((line) => line !== null)
     .join('\n')
     .trim();
 

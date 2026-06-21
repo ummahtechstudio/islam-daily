@@ -14,12 +14,9 @@ export interface AppSettings {
 
 interface AppState {
   settings: AppSettings;
-  dhikrCount: number;
 
   // Actions
   updateSettings: (partial: Partial<AppSettings>) => void;
-  incrementDhikr: () => void;
-  resetDhikr: () => void;
   loadPersistedData: () => Promise<void>;
 }
 
@@ -37,16 +34,12 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 export const useStore = create<AppState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
-  dhikrCount: 0,
 
   updateSettings: (partial) => {
     const settings = { ...get().settings, ...partial };
     set({ settings });
     AsyncStorage.setItem(CACHE_KEYS.settings, JSON.stringify(settings)).catch(() => {});
   },
-
-  incrementDhikr: () => set((s) => ({ dhikrCount: s.dhikrCount + 1 })),
-  resetDhikr: () => set({ dhikrCount: 0 }),
 
   loadPersistedData: async () => {
     try {
