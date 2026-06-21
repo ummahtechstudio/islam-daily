@@ -1,8 +1,12 @@
-// Madani 15-line Mushaf juz boundaries (page numbers where each juz starts).
-// 30 entries: index i holds the start page of juz (i + 1).
+// Juz boundaries as page numbers where each juz starts, aligned to the bundled
+// IndoPak `page_indopak` layout (assets/data/quran.json). 30 entries: index i
+// holds the start page of juz (i + 1). Two boundaries differ from the Madani
+// 604-page standard because the bundled mushaf is IndoPak: juz 11 (Surah 9:93)
+// starts on page 201, and juz 13 (Surah 12:53) starts on page 242 — verified
+// against the data. The other 28 boundaries coincide with the Madani table.
 const JUZ_START_PAGES = [
   1, 22, 42, 62, 82, 102, 121, 142, 162, 182,
-  202, 222, 241, 262, 282, 302, 322, 342, 362, 382,
+  201, 222, 242, 262, 282, 302, 322, 342, 362, 382,
   402, 422, 442, 462, 482, 502, 522, 542, 562, 582,
 ];
 
