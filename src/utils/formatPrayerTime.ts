@@ -50,6 +50,9 @@ export function formatPrayerTime(date: Date, opts?: { hour12?: boolean }): strin
 export function formatCountdown(target: Date, now: Date = new Date()): string {
   const diff = target.getTime() - now.getTime();
   if (diff <= 0) return 'now';
+  // Under a minute, Math.round would floor to "in 0m" in the final ~30s; show
+  // "in <1m" instead so the countdown never reads zero before the prayer.
+  if (diff < 60000) return 'in <1m';
   const mins = Math.round(diff / 60000);
   if (mins < 60) return `in ${mins}m`;
   const hours = Math.floor(mins / 60);
