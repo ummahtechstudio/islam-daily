@@ -24,6 +24,7 @@ import { computePrayerTimes } from '../../src/services/prayerTimesService';
 import { formatPrayerTime, formatCountdown, getHijriParts } from '../../src/utils/formatPrayerTime';
 import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
+import { useTranslationLanguage } from '../../src/hooks/useTranslationLanguage';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting } from '../../src/utils/settings';
@@ -319,9 +320,9 @@ const quickStyles = StyleSheet.create({
 
 // ─── Verse of the Day card — manuscript treatment ────────────────────────────
 function VerseCard({
-  arabic, english, reference, onPress,
+  arabic, translation, isUrdu, reference, onPress,
 }: {
-  arabic: string; english: string; reference: string; onPress: () => void;
+  arabic: string; translation: string; isUrdu: boolean; reference: string; onPress: () => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -342,7 +343,9 @@ function VerseCard({
           {arabic}
         </Text>
         <View style={verseStyles.divider} />
-        <Text style={verseStyles.english}>{english}</Text>
+        <Text style={[verseStyles.english, isUrdu && verseStyles.translationUrdu]}>
+          {translation}
+        </Text>
         <View style={verseStyles.readRow}>
           <Text style={verseStyles.readBtn}>{t('home.verseOfDay.continue')}</Text>
         </View>
@@ -399,6 +402,14 @@ const verseStyles = StyleSheet.create({
     ...typography.bodySmall,
     color: palette.textOnCreamSecondary,
     fontStyle: 'italic',
+  },
+  // Urdu translation renders RTL in Nastaliq, not Latin italic.
+  translationUrdu: {
+    fontFamily: 'NotoNastaliqUrdu_400Regular',
+    fontStyle: 'normal',
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    lineHeight: 34,
   },
   readRow: { marginTop: spacing.sm, alignItems: 'flex-end' },
   readBtn: {
@@ -568,8 +579,10 @@ export default function HomeScreen() {
   );
   const hijri = useMemo(() => getHijriParts(new Date()), []);
 
+  const translationLanguage = useTranslationLanguage();
   const [verse, setVerse] = useState<{
-    arabic: string; english: string; surahName: string; surahNumber: number; verseNumber: number;
+    arabic: string; translation: string; lang: 'urdu' | 'english';
+    surahName: string; surahNumber: number; verseNumber: number;
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [verseLoading, setVerseLoading] = useState(true);
@@ -640,7 +653,7 @@ export default function HomeScreen() {
     setVerseLoading(true);
     setVerseError(false);
     try {
-      const v = await fetchRandomVerse();
+      const v = await fetchRandomVerse(translationLanguage);
       setVerse(v);
     } catch {
       // Verse-of-the-Day depends on alquran.cloud — on first launch offline
@@ -649,7 +662,7 @@ export default function HomeScreen() {
       setVerseError(true);
     }
     setVerseLoading(false);
-  }, []);
+  }, [translationLanguage]);
 
   useEffect(() => { trackScreen('Home'); }, []);
   useEffect(() => { loadContent(); }, [loadContent]);
@@ -747,7 +760,8 @@ export default function HomeScreen() {
         ) : verse ? (
           <VerseCard
             arabic={verse.arabic}
-            english={verse.english}
+            translation={verse.translation}
+            isUrdu={verse.lang === 'urdu'}
             reference={`${verse.surahName} ${verse.surahNumber}:${verse.verseNumber}`}
             onPress={() => navigate('/quran')}
           />

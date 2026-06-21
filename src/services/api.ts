@@ -93,7 +93,18 @@ export async function fetchSurah(
   }, 7 * 24 * 60 * 60 * 1000);
 }
 
-export async function fetchRandomVerse() {
+export type VerseTranslationLanguage = 'urdu' | 'english';
+
+// Translation editions for the Verse of the Day, keyed by the user's translation
+// language. Previously fetchSurah's default ('ur.jalandhry') was always used, so
+// the Urdu text was returned and rendered in the English slot regardless of the
+// user's setting.
+const VERSE_EDITIONS: Record<VerseTranslationLanguage, string> = {
+  urdu: 'ur.jalandhry',
+  english: 'en.sahih',
+};
+
+export async function fetchRandomVerse(lang: VerseTranslationLanguage = 'urdu') {
   // Deterministic per local calendar day: same verse for every user on the same day,
   // rotates at local midnight.
   const now = new Date();
@@ -101,13 +112,16 @@ export async function fetchRandomVerse() {
     (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
   );
   const surahNum = (dayOfYear % 114) + 1;
-  const data = await fetchSurah(surahNum);
-  const [arabic, english] = data;
+  const data = await fetchSurah(surahNum, VERSE_EDITIONS[lang]);
+  // Guard the destructure: a malformed offline/cached pack could have a missing
+  // element 0, which would throw on `.englishName` / `.ayahs` below.
+  const arabic = data?.[0];
+  const translationEd = data?.[1];
   // Clamp to the shorter edition: an offline/cached pack could in principle
   // hold a translation edition with a different ayah count than the Arabic one,
   // and indexing past its end would throw "undefined is not an object".
   const arabicAyahs = arabic?.ayahs ?? [];
-  const englishAyahs = english?.ayahs ?? [];
+  const translationAyahs = translationEd?.ayahs ?? [];
   let verseIdx = arabicAyahs.length > 0 ? dayOfYear % arabicAyahs.length : 0;
   // Surah Al-Fatiha counts the Basmala as ayah 1; skip ayah[0] so the verse of
   // the day is never just the Basmala shown out of context.
@@ -115,13 +129,14 @@ export async function fetchRandomVerse() {
     verseIdx = 1 + (dayOfYear % (arabicAyahs.length - 1));
   }
   const arabicAyah = arabicAyahs[verseIdx];
-  const englishAyah = englishAyahs[verseIdx];
+  const translationAyah = translationAyahs[verseIdx];
   return {
-    surahName: arabic.englishName,
+    surahName: arabic?.englishName ?? '',
     surahNumber: surahNum,
     verseNumber: arabicAyah?.numberInSurah ?? verseIdx + 1,
     arabic: arabicAyah?.text ?? '',
-    english: englishAyah?.text ?? '',
+    translation: translationAyah?.text ?? '',
+    lang,
   };
 }
 
