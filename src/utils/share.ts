@@ -22,6 +22,9 @@ export const shareContent = async (content: ShareableContent): Promise<void> => 
     typeLabel ? `Shared from Islam Daily — ${typeLabel}` : 'Shared from Islam Daily',
     '— Get the app: https://play.google.com/store/apps/details?id=com.luqman.islamdaily',
   ]
+    // Drop empty fields (e.g. a dhikr with no translation) so they don't leave
+    // blank lines mid-message — together with the separator strings as well.
+    .filter(Boolean)
     .join('\n')
     .trim();
 
