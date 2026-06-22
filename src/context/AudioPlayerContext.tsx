@@ -87,6 +87,10 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   // Configure audio session once on mount
   useEffect(() => {
+    // Re-arm on (re)mount so a StrictMode/Fast-Refresh remount — whose cleanup
+    // already set this false — doesn't leave the ref permanently false and
+    // suppress post-load playback. Mirrors QuranAudioContext.
+    isMountedRef.current = true;
     Audio.setAudioModeAsync({
       staysActiveInBackground: true,
       playsInSilentModeIOS: true,
