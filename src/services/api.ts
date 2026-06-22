@@ -95,18 +95,12 @@ export async function fetchSurah(
   }, 7 * 24 * 60 * 60 * 1000);
 }
 
-export type VerseTranslationLanguage = 'urdu' | 'english';
-
-// Translation editions for the Verse of the Day, keyed by the user's translation
-// language. Previously fetchSurah's default ('ur.jalandhry') was always used, so
-// the Urdu text was returned and rendered in the English slot regardless of the
-// user's setting.
-const VERSE_EDITIONS: Record<VerseTranslationLanguage, string> = {
-  urdu: 'ur.jalandhry',
-  english: 'en.sahih',
-};
-
-export async function fetchRandomVerse(lang: VerseTranslationLanguage = 'urdu') {
+// The Verse of the Day is a Quran verse, so its translation follows the user's
+// Quran translation edition (settings.selectedTranslation — the reader's edition
+// picker), NOT the dua/dhikr language toggle. The edition is passed straight to
+// fetchSurah and echoed back so the caller can resolve its direction/font via
+// findTranslation().
+export async function fetchRandomVerse(edition: string = 'ur.jalandhry') {
   // Deterministic per local calendar day: same verse for every user on the same day,
   // rotates at local midnight.
   const now = new Date();
@@ -114,7 +108,7 @@ export async function fetchRandomVerse(lang: VerseTranslationLanguage = 'urdu') 
     (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
   );
   const surahNum = (dayOfYear % 114) + 1;
-  const data = await fetchSurah(surahNum, VERSE_EDITIONS[lang]);
+  const data = await fetchSurah(surahNum, edition);
   // Guard the destructure: a malformed offline/cached pack could have a missing
   // element 0, which would throw on `.englishName` / `.ayahs` below.
   const arabic = data?.[0];
@@ -138,7 +132,7 @@ export async function fetchRandomVerse(lang: VerseTranslationLanguage = 'urdu') 
     verseNumber: arabicAyah?.numberInSurah ?? verseIdx + 1,
     arabic: arabicAyah?.text ?? '',
     translation: translationAyah?.text ?? '',
-    lang,
+    edition,
   };
 }
 

@@ -19,12 +19,12 @@ import Svg, { Path } from 'react-native-svg';
 import { Colors, palette } from '../../src/constants/colors';
 import { typography } from '../../src/constants/typography';
 import { spacing, radius } from '../../src/constants/spacing';
+import { findTranslation } from '../../src/constants/translations';
 import { useResolvedLocation } from '../../src/hooks/useResolvedLocation';
 import { computePrayerTimes } from '../../src/services/prayerTimesService';
 import { formatPrayerTime, formatCountdown, getHijriParts } from '../../src/utils/formatPrayerTime';
 import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
-import { useTranslationLanguage } from '../../src/hooks/useTranslationLanguage';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting } from '../../src/utils/settings';
@@ -320,9 +320,9 @@ const quickStyles = StyleSheet.create({
 
 // ─── Verse of the Day card — manuscript treatment ────────────────────────────
 function VerseCard({
-  arabic, translation, isUrdu, reference, onPress,
+  arabic, translation, rtl, isUrdu, reference, onPress,
 }: {
-  arabic: string; translation: string; isUrdu: boolean; reference: string; onPress: () => void;
+  arabic: string; translation: string; rtl: boolean; isUrdu: boolean; reference: string; onPress: () => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -343,7 +343,13 @@ function VerseCard({
           {arabic}
         </Text>
         <View style={verseStyles.divider} />
-        <Text style={[verseStyles.english, isUrdu && verseStyles.translationUrdu]}>
+        <Text
+          style={[
+            verseStyles.english,
+            rtl && !isUrdu && verseStyles.translationRtl,
+            isUrdu && verseStyles.translationUrdu,
+          ]}
+        >
           {translation}
         </Text>
         <View style={verseStyles.readRow}>
@@ -410,6 +416,13 @@ const verseStyles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
     lineHeight: 34,
+  },
+  // Non-Urdu RTL editions (e.g. Arabic tafsir) read right-to-left in the
+  // default face — no Nastaliq, no Latin italic.
+  translationRtl: {
+    textAlign: 'right',
+    writingDirection: 'rtl',
+    fontStyle: 'normal',
   },
   readRow: { marginTop: spacing.sm, alignItems: 'flex-end' },
   readBtn: {
@@ -591,9 +604,12 @@ export default function HomeScreen() {
   );
   const hijri = useMemo(() => getHijriParts(new Date(homeTick)), [homeTick]);
 
-  const translationLanguage = useTranslationLanguage();
+  // Verse of the Day is a Quran verse, so it follows the reader's translation
+  // edition (settings.selectedTranslation) — reactive via the store, so changing
+  // the edition in the mushaf updates the Home card too.
+  const selectedTranslation = useStore((s) => s.settings.selectedTranslation);
   const [verse, setVerse] = useState<{
-    arabic: string; translation: string; lang: 'urdu' | 'english';
+    arabic: string; translation: string; edition: string;
     surahName: string; surahNumber: number; verseNumber: number;
   } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -665,7 +681,7 @@ export default function HomeScreen() {
     setVerseLoading(true);
     setVerseError(false);
     try {
-      const v = await fetchRandomVerse(translationLanguage);
+      const v = await fetchRandomVerse(selectedTranslation);
       setVerse(v);
     } catch {
       // Verse-of-the-Day depends on alquran.cloud — on first launch offline
@@ -674,7 +690,7 @@ export default function HomeScreen() {
       setVerseError(true);
     }
     setVerseLoading(false);
-  }, [translationLanguage]);
+  }, [selectedTranslation]);
 
   useEffect(() => { trackScreen('Home'); }, []);
   useEffect(() => { loadContent(); }, [loadContent]);
@@ -686,6 +702,10 @@ export default function HomeScreen() {
   }, [loadContent]);
 
   const navigate = (route: string) => router.push(route as any);
+
+  // Direction/font for the verse translation, resolved from the edition the
+  // verse was actually fetched with (matches what the mushaf renders).
+  const verseMeta = findTranslation(verse?.edition ?? selectedTranslation);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: palette.green }]} edges={['top']}>
@@ -773,7 +793,8 @@ export default function HomeScreen() {
           <VerseCard
             arabic={verse.arabic}
             translation={verse.translation}
-            isUrdu={verse.lang === 'urdu'}
+            rtl={verseMeta.rtl}
+            isUrdu={verseMeta.isUrdu}
             reference={`${verse.surahName} ${verse.surahNumber}:${verse.verseNumber}`}
             onPress={() => navigate('/quran')}
           />
