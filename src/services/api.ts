@@ -241,7 +241,9 @@ function searchBundledQuran(query: string): QuranSearchResult[] {
       const text = a.translation_en ?? '';
       if (text.toLowerCase().includes(q)) {
         results.push({
-          number: 0,
+          // Unique global ayah number (surah×1000 + ayah) so the search list's
+          // keyExtractor doesn't collide on a shared "0" for every offline hit.
+          number: surah.number * 1000 + a.ayah,
           text,
           edition: { identifier: 'en.bundled', language: 'en' },
           surah: { number: surah.number, name: surah.name_arabic, englishName: surah.name_english },
