@@ -284,7 +284,10 @@ export default function DownloadScreen() {
   // ─── Download all ─────────────────────────────────────────────────────────
 
   const startDownloadAll = useCallback(async () => {
-    if (downloadingAll) return;
+    // Mutual exclusion with individual pack downloads: bail if Download-All is
+    // already running OR any single pack is mid-download (they'd write the same
+    // keys and double-count sizes). startDownload guards the inverse direction.
+    if (downloadingAll || active.size > 0) return;
     if (!(await checkWifiWarning())) return;
     setDownloadingAll(true);
 
@@ -308,7 +311,7 @@ export default function DownloadScreen() {
     setDownloadingAll(false);
     setProgress({});
     setActive(new Set());
-  }, [downloadingAll, refresh, wifiOnly, isOnline]);
+  }, [downloadingAll, active, refresh, wifiOnly, isOnline]);
 
   // ─── Delete pack ──────────────────────────────────────────────────────────
 
@@ -515,10 +518,10 @@ export default function DownloadScreen() {
             style={[
               styles.downloadAllBtn,
               { borderColor: Colors.primary },
-              (downloadingAll || !isOnline) && { opacity: 0.5 },
+              (downloadingAll || !isOnline || active.size > 0) && { opacity: 0.5 },
             ]}
             onPress={startDownloadAll}
-            disabled={downloadingAll || !isOnline}
+            disabled={downloadingAll || !isOnline || active.size > 0}
             activeOpacity={0.75}
           >
             <Ionicons
