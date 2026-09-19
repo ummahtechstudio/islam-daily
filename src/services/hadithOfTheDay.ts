@@ -4,12 +4,14 @@
  * text is bundled or typed in here; if no eligible collection is downloaded the
  * result is null and callers fall back to the generic "Daily Hadith" nudge.
  *
- * Pool rules (documented in docs/session-report.md, flagged for review):
+ * Pool rules:
  *  - Sahih al-Bukhari and Sahih Muslim: every record. The data carries no
  *    per-hadith gradings for the Sahihayn — the collection itself is the grade.
  *  - Jami at-Tirmidhi, Sunan Abu Dawud, Sunan Ibn Majah, Sunan an-Nasa'i,
  *    Muwatta Malik: only records where EVERY embedded grading (Al-Albani,
- *    Zubair Ali Zai, …) says sahih and none says da'if.
+ *    Zubair Ali Zai, …) says sahih — and none says da'if or marks it as
+ *    mawquf / maqtu' / mursal (a Companion's or Successor's statement, not a
+ *    marfu' hadith of the Prophet).
  *  - The three "Forty Hadith" sets carry no gradings and are not Sahih
  *    collections, so they are excluded.
  *  - "Suited to a card": Arabic + English + Urdu all present, whole-number
@@ -42,12 +44,19 @@ const MAX_ENGLISH_CHARS = 420;
 const RELAXED_ENGLISH_CHARS = 900;
 const MIN_SHORT_POOL = 40;
 
-const WEAK_MARKERS = ['daif', "da'if", 'da’if', 'dhaif', 'weak', 'munkar', 'mawdu', 'batil', 'shadh', 'matruk'];
+// Anything that disqualifies a "Sahih" grade string: weakness markers, and
+// the non-Prophetic categories the graders label with a "Sahih" chain —
+// mawquf (a Companion's statement), maqtu' (a Successor's) and mursal.
+// "Hadith of the Day" is meant to be a marfu' hadith of the Prophet ﷺ.
+const EXCLUDED_MARKERS = [
+  'daif', "da'if", 'da’if', 'dhaif', 'weak', 'munkar', 'mawdu', 'batil', 'shadh', 'matruk',
+  'mauquf', 'mawquf', 'muquf', 'maqtu', 'mursal',
+];
 
 export function isSahihGrade(grade: string): boolean {
   const g = grade.toLowerCase();
   if (!g.includes('sahih')) return false;
-  return !WEAK_MARKERS.some((w) => g.includes(w));
+  return !EXCLUDED_MARKERS.some((w) => g.includes(w));
 }
 
 function isUnanimouslySahih(h: SupabaseHadith): boolean {
@@ -101,6 +110,22 @@ function buildPool(maxEnglish: number): { pool: SupabaseHadith[]; signature: str
 let memo: { key: string; value: HadithOfTheDay | null } | null = null;
 
 /**
+ * Bring every cached collection into memory ONE AT A TIME, yielding to the
+ * event loop between books. getHadithBookFromCache JSON.parses a whole book
+ * (up to ~20 MB) on a memory miss; a user with the full Offline pack has ~70 MB
+ * of them, and doing that synchronously inside a screen's focus effect froze
+ * the JS thread for seconds at launch. After this, getHadithOfTheDay() is a
+ * cheap memo/Map hit for the rest of the session.
+ */
+export async function warmHadithOfTheDayPool(isCancelled: () => boolean = () => false): Promise<void> {
+  for (const slug of COLLECTION_ORDER) {
+    if (isCancelled()) return;
+    getHadithBookFromCache(slug);
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  }
+}
+
+/**
  * Today's hadith, or null when no eligible collection is cached on-device.
  * Memoised per (date, set of cached collections).
  */
@@ -113,8 +138,9 @@ export function getHadithOfTheDay(now: Date = new Date()): HadithOfTheDay | null
   if (memo && memo.key === key) return memo.value;
 
   let { pool } = buildPool(MAX_ENGLISH_CHARS);
-  if (pool.length > 0 && pool.length < MIN_SHORT_POOL) {
-    pool = buildPool(RELAXED_ENGLISH_CHARS).pool;
+  if (pool.length < MIN_SHORT_POOL) {
+    const relaxed = buildPool(RELAXED_ENGLISH_CHARS).pool;
+    if (relaxed.length > pool.length) pool = relaxed;
   }
 
   const value: HadithOfTheDay | null =

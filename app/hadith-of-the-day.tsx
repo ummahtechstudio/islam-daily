@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Platform,
   ScrollView,
   StyleSheet,
@@ -20,7 +21,7 @@ import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import CardActionsRow from '../components/CardActionsRow';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
-import { getHadithOfTheDay, type HadithOfTheDay } from '../src/services/hadithOfTheDay';
+import { getHadithOfTheDay, warmHadithOfTheDayPool, type HadithOfTheDay } from '../src/services/hadithOfTheDay';
 import { COLLECTION_NAMES, type HadithCollectionKey } from '../src/services/hadiths';
 import { getTranslationLanguage, type TranslationLanguage } from '../src/utils/settings';
 
@@ -44,20 +45,37 @@ export default function HadithOfTheDayScreen() {
   const theme = isDark ? Colors.dark : Colors.light;
 
   const [today, setToday] = useState<HadithOfTheDay | null>(null);
+  const [ready, setReady] = useState(false);
   const [language, setLanguage] = useState<TranslationLanguage>('urdu');
 
   // Recomputed on every focus: the day may have rolled over, or a collection
-  // may have been downloaded since the screen was last shown.
+  // may have been downloaded since the screen was last shown. Books are
+  // warmed one at a time first (a notification cold-start lands here with
+  // nothing parsed yet), so the JS thread is not frozen by one big parse.
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      setToday(getHadithOfTheDay());
+      warmHadithOfTheDayPool(() => !active).then(() => {
+        if (!active) return;
+        setToday(getHadithOfTheDay());
+        setReady(true);
+      });
       getTranslationLanguage().then((lang) => {
         if (active) setLanguage(lang);
       });
       return () => { active = false; };
     }, []),
   );
+
+  if (!ready) {
+    return (
+      <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
+        <View style={styles.centered}>
+          <ActivityIndicator color={Colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!today) {
     return (

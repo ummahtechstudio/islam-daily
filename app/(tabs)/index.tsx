@@ -9,6 +9,7 @@ import {
   useColorScheme,
   Dimensions,
   AppState,
+  InteractionManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -28,7 +29,7 @@ import { fetchRandomVerse } from '../../src/services/api';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting, getTranslationLanguage, type TranslationLanguage } from '../../src/utils/settings';
-import { getHadithOfTheDay, type HadithOfTheDay } from '../../src/services/hadithOfTheDay';
+import { getHadithOfTheDay, localDateKey, warmHadithOfTheDayPool, type HadithOfTheDay } from '../../src/services/hadithOfTheDay';
 import { COLLECTION_NAMES, type HadithCollectionKey } from '../../src/services/hadiths';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 import { isRouteHidden } from '../../src/constants/featureFlags';
@@ -660,19 +661,27 @@ export default function HomeScreen() {
   const [tilesLoaded, setTilesLoaded] = useState(false);
 
   // Hadith of the Day comes from the on-device hadith cache (no network), so
-  // it is recomputed on focus: a collection may have just been downloaded, or
-  // the local day may have rolled over.
+  // it is recomputed on focus (a collection may have just been downloaded) and
+  // when the LOCAL day rolls over — keyed on the date string, not the minute
+  // tick, so this does not re-run every 60 s. The books are warmed off the
+  // first paint, one at a time, because parsing a full Offline pack (~70 MB
+  // of JSON) synchronously here froze the launch screen.
+  const todayKey = localDateKey(new Date(homeTick));
   const [hadithToday, setHadithToday] = useState<HadithOfTheDay | null>(null);
   const [hadithLanguage, setHadithLanguage] = useState<TranslationLanguage>('urdu');
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      setHadithToday(getHadithOfTheDay(new Date(homeTick)));
+      const task = InteractionManager.runAfterInteractions(() => {
+        warmHadithOfTheDayPool(() => cancelled).then(() => {
+          if (!cancelled) setHadithToday(getHadithOfTheDay());
+        });
+      });
       getTranslationLanguage().then((lang) => {
         if (!cancelled) setHadithLanguage(lang);
       });
-      return () => { cancelled = true; };
-    }, [homeTick]),
+      return () => { cancelled = true; task.cancel(); };
+    }, [todayKey]),
   );
 
   useFocusEffect(
