@@ -1271,7 +1271,7 @@
           "heading": "App version"
         },
         "cityCountry": {
-          "desc": "Your city and country as returned by your device's built-in reverse geocoder (e.g. \"London, GB\"), plus your coordinates rounded to one decimal place (about 10 km). The precise GPS fix is used only on your device and is never uploaded.",
+          "desc": "Your city, country and two-letter country code as returned by your device's built-in reverse geocoder (e.g. \"London, GB\"), plus your coordinates rounded to one decimal place (about 10 km). The precise GPS fix is used only on your device and is never uploaded.",
           "heading": "Approximate location"
         },
         "platformDevice": {
@@ -1279,7 +1279,7 @@
           "heading": "Platform & device"
         },
         "sessionTimestamp": {
-          "desc": "The UTC time the app was opened.",
+          "desc": "The time the record reaches our server (a few seconds after the app was opened).",
           "heading": "Session timestamp"
         }
       },
