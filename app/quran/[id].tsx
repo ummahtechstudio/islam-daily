@@ -69,21 +69,49 @@ const TANWIN_FATH = '\u064B';
 const TANWIN_KASR = '\u064D';
 const TANWIN_DAMM = '\u064C';
 const ALIF = 'ا';
+const ALIF_MAQSURA = 'ى';
 const WAW = 'و';
 const YA = 'ي';
+// Letters that turn a hidden noon-saakin/tanwin into idgham WITH ghunna (م ن و ي)
+// or iqlab (ب). Both are coloured under the legend's "Ghunna" entry.
+const IDGHAM_GHUNNA_LETTERS = new Set(['م', 'ن', 'و', 'ي']);
+const IQLAB_LETTER = 'ب';
+const VOWEL_MARKS = ['َ', 'ُ', 'ِ', SHADDAH, SUKOON, TANWIN_FATH, TANWIN_KASR, TANWIN_DAMM];
 
 function isDiacritic(char: string): boolean {
   const code = char.charCodeAt(0);
   return (
     (code >= 0x0610 && code <= 0x061a) ||
     (code >= 0x064b && code <= 0x065f) ||
-    code === 0x0670
+    code === 0x0670 ||
+    // Quranic annotation marks (small high meem ۢ, small low meem ۭ, small
+    // waw/yeh, rounded zero ۟ …). Tanzil Uthmani writes these AFTER the
+    // tanwin/noon, so they must ride along with the letter's token or the
+    // look-ahead sees the mark instead of the next real letter.
+    (code >= 0x06d6 && code <= 0x06dc) ||
+    (code >= 0x06df && code <= 0x06e8) ||
+    (code >= 0x06ea && code <= 0x06ed)
   );
 }
 
 function isArabicLetter(char: string): boolean {
   const code = char.charCodeAt(0);
   return (code >= 0x0600 && code <= 0x06ff) || (code >= 0xfe70 && code <= 0xfeff);
+}
+
+// First base (non-mark) letter of a word — what a preceding noon/tanwin "hears".
+function firstLetterOf(word: string | undefined): string {
+  if (!word) return '';
+  for (const ch of word) {
+    if (!isDiacritic(ch) && isArabicLetter(ch)) return ch;
+  }
+  return '';
+}
+
+function hasTanwin(token: string): boolean {
+  return (
+    token.includes(TANWIN_FATH) || token.includes(TANWIN_KASR) || token.includes(TANWIN_DAMM)
+  );
 }
 
 type TajweedToken = { text: string; color: string };
@@ -104,9 +132,20 @@ function parseTajweed(text: string, nextWordChar = ''): TajweedToken[] {
     }
 
     // At the end of a word, fall back to the first letter of the NEXT word so
-    // ikhfa/idgham across a word boundary (noon-saakin/tanwin followed by an
-    // ikhfa/idgham letter that starts the next word) is detected, not missed.
-    const nextLetter = j < text.length ? text[j] : nextWordChar;
+    // ikhfa/idgham/iqlab across a word boundary (noon-saakin/tanwin followed by
+    // a letter that starts the next word) is detected, not missed.
+    let nextLetter = j < text.length ? text[j] : nextWordChar;
+    const tanwin = hasTanwin(token);
+    // Tanwin fath sits on the letter BEFORE a silent word-final alif / alif
+    // maqsura (كَثِيرًا, هُدًى). That alif is not pronounced, so look past it.
+    if (
+      tanwin &&
+      j < text.length &&
+      (text[j] === ALIF || text[j] === ALIF_MAQSURA) &&
+      [...text.slice(j + 1)].every(isDiacritic)
+    ) {
+      nextLetter = nextWordChar;
+    }
     let color = 'inherit';
 
     if (!isArabicLetter(char)) {
@@ -118,16 +157,18 @@ function parseTajweed(text: string, nextWordChar = ''): TajweedToken[] {
       color = '#4B9BFF'; // blue — qalqala
     } else if ((char === 'ن' || char === 'م') && token.includes(SHADDAH)) {
       color = '#4CAF50'; // green — ghunna with shaddah
-    } else if (char === 'ن') {
-      const hasTanwinOrSukoon =
-        token.includes(SUKOON) ||
-        token.includes(TANWIN_FATH) ||
-        token.includes(TANWIN_KASR) ||
-        token.includes(TANWIN_DAMM);
-      if (hasTanwinOrSukoon && IKHFA_LETTERS.has(nextLetter)) {
+    } else if (tanwin || (char === 'ن' && !VOWEL_MARKS.some((m) => token.includes(m)))) {
+      // Noon-saakin / tanwin rules — and they apply to tanwin on ANY final
+      // letter (سَمِيعٌ بَصِير), not only to noon. Tanzil Uthmani encodes the
+      // "hidden" noon by leaving it BARE (أَنتُمْ, مِن تَحْتِهَا, مِنۢ بَعْدِ); an
+      // explicit sukoon is written only where the noon is pronounced clearly
+      // (izhar, and the izhar-mutlaq words دُنْيَا / بُنْيَان / صِنْوَان / قِنْوَان),
+      // so "bare noon or any tanwin" is exactly the set of positions where
+      // these rules can apply. The next letter then decides which one.
+      if (IKHFA_LETTERS.has(nextLetter)) {
         color = '#FF9800'; // orange — ikhfa
-      } else if (hasTanwinOrSukoon && (nextLetter === 'م' || nextLetter === 'ن')) {
-        color = '#4CAF50'; // green — ghunna (idgham with ghunna)
+      } else if (IDGHAM_GHUNNA_LETTERS.has(nextLetter) || nextLetter === IQLAB_LETTER) {
+        color = '#4CAF50'; // green — ghunna (idgham with ghunna / iqlab)
       }
     } else if (char === ALIF) {
       color = '#F5C518'; // yellow — madd alif
@@ -220,7 +261,7 @@ const VerseRow = React.memo(function VerseRow({
   // Memoized once per verse text (and tajweed toggle) — never re-runs on scroll.
   const words = useMemo(() => item.text.split(' '), [item.text]);
   const tajweedTokens = useMemo(
-    () => (tajweedOn ? words.map((w, idx) => parseTajweed(w, words[idx + 1]?.[0] ?? '')) : null),
+    () => (tajweedOn ? words.map((w, idx) => parseTajweed(w, firstLetterOf(words[idx + 1]))) : null),
     [words, tajweedOn],
   );
 
