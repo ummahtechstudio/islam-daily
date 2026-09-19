@@ -8,7 +8,6 @@ import {
   ScrollView,
   BackHandler,
   Platform,
-  Dimensions,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
@@ -146,8 +145,6 @@ export function WelcomeModal() {
   );
 }
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -161,7 +158,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: '100%',
     maxWidth: 420,
-    maxHeight: SCREEN_HEIGHT * 0.85,
+    // Percentage of the full-screen overlay (not a Dimensions snapshot) so the
+    // sheet still fits after a rotation on large screens.
+    maxHeight: '85%',
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },

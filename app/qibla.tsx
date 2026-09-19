@@ -7,7 +7,7 @@ import {
   useColorScheme,
   Platform,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,13 +23,9 @@ import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { LoadingSpinner } from '../src/components/LoadingSpinner';
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
-const COMPASS_SIZE = Math.min(SCREEN_W * 0.62, 260);
-const R = COMPASS_SIZE / 2;
 const KAABA_LAT = 21.4225;
 const KAABA_LNG = 39.8262;
 const ALIGN_THRESHOLD_DEG = 5;
-const AR_LINE_LENGTH = Math.min(SCREEN_H * 0.32, 280);
 
 function greatCircleBearing(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const φ1 = (lat1 * Math.PI) / 180;
@@ -42,6 +38,13 @@ function greatCircleBearing(lat1: number, lng1: number, lat2: number, lng2: numb
 
 export default function QiblaScreen() {
   const { t } = useTranslation();
+  // Sizes follow the live window: Android 16 ignores the portrait lock on
+  // large screens, so a module-scope Dimensions snapshot would be stale
+  // after rotation.
+  const { width: SCREEN_W, height: SCREEN_H } = useWindowDimensions();
+  const COMPASS_SIZE = Math.min(SCREEN_W * 0.62, 260);
+  const R = COMPASS_SIZE / 2;
+  const AR_LINE_LENGTH = Math.min(SCREEN_H * 0.32, 280);
   useEffect(() => { trackScreen('Qibla'); }, []);
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);

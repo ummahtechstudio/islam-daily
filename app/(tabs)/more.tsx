@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
-  Dimensions,
+  useWindowDimensions,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,8 +20,6 @@ import { trackScreen } from '../../src/services/analytics';
 import { getBookmarks } from '../../src/utils/bookmarks';
 import { isRouteHidden } from '../../src/constants/featureFlags';
 
-const { width: W } = Dimensions.get('window');
-const CARD_W = (W - 48) / 2;
 const GOLD = '#EF9F27';
 
 // Coming-soon overlay no longer needed in v1 — the audio library entry is
@@ -132,6 +130,10 @@ const SECTIONS = [
 export default function MoreScreen() {
   useEffect(() => { trackScreen('More'); }, []);
   const { t } = useTranslation();
+  // Live width (not a module-scope snapshot): Android 16 lets large screens
+  // rotate despite the portrait lock, so the 2-column card width must follow.
+  const { width: W } = useWindowDimensions();
+  const CARD_W = (W - 48) / 2;
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);

@@ -8,7 +8,7 @@ import {
   useColorScheme,
   TextInput,
   Linking,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,8 +38,6 @@ const RECENTS_MAX = 10;
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const GOLD = '#C9A84C';
-const { width: W } = Dimensions.get('window');
-const CAT_W = (W - 44) / 2;
 
 type LangFilter = 'all' | AudioLanguage;
 
@@ -64,6 +62,10 @@ const fmtDuration = (m: number) => {
 function AudioLibraryScreenInner() {
   useEffect(() => { trackScreen('AudioLibrary'); }, []);
   const { t } = useTranslation();
+  // Live width so the 2-column category grid survives rotation on large
+  // screens (Android 16 ignores the portrait lock there).
+  const { width: W } = useWindowDimensions();
+  const CAT_W = (W - 44) / 2;
 
   const colorScheme = useColorScheme();
   const settings = useStore(s => s.settings);

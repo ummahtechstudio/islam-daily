@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
   Platform,
-  Dimensions,
+  useWindowDimensions,
   Alert,
   Modal,
   ScrollView,
@@ -29,11 +29,16 @@ import {
 } from '../../utils/tasbeeh';
 import type { TasbeehCounter, TasbeehSettings } from '../../types/tasbeeh';
 
-const { width: SCREEN_W } = Dimensions.get('window');
-const RING_SIZE = Math.min(SCREEN_W * 0.72, 320);
 const RING_STROKE = 14;
-const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
-const RING_CIRC = 2 * Math.PI * RING_RADIUS;
+// Ring geometry is derived from the live window width inside the component
+// (see ringGeometry): Android 16 ignores the portrait lock on large screens,
+// so a module-scope Dimensions snapshot would be stale after rotation.
+function ringGeometry(windowWidth: number) {
+  const RING_SIZE = Math.min(windowWidth * 0.72, 320);
+  const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
+  const RING_CIRC = 2 * Math.PI * RING_RADIUS;
+  return { RING_SIZE, RING_RADIUS, RING_CIRC };
+}
 const GOLD = '#EF9F27';
 
 type Mode = 'touch' | 'timer';
@@ -75,6 +80,8 @@ export function TasbeehCounterView({
   onBack,
 }: TasbeehCounterViewProps) {
   const { t } = useTranslation();
+  const { width: windowWidth } = useWindowDimensions();
+  const { RING_SIZE, RING_RADIUS, RING_CIRC } = ringGeometry(windowWidth);
   const [counters, setCounters] = useState<TasbeehCounter[]>([]);
   const [selectedId, setSelectedIdState] = useState<string>(initialCounterId || 'default-1');
   const [settings, setSettings] = useState<TasbeehSettings | null>(null);
@@ -416,11 +423,12 @@ export function TasbeehCounterView({
         </View>
       </View>
 
-      <View style={styles.ringWrap}>
+      <View style={[styles.ringWrap, { flexBasis: RING_SIZE + 16 }]}>
         <Pressable
           onPress={mode === 'touch' ? increment : undefined}
           style={({ pressed }) => [
             styles.ringPress,
+            { width: RING_SIZE, height: RING_SIZE },
             pressed && mode === 'touch' && { transform: [{ scale: 0.97 }] },
           ]}
         >
@@ -772,7 +780,6 @@ const styles = StyleSheet.create({
   ringWrap: {
     flexGrow: 1,
     flexShrink: 0,
-    flexBasis: RING_SIZE + 16,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
@@ -781,8 +788,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   ringPress: {
-    width: RING_SIZE,
-    height: RING_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   useColorScheme,
-  Dimensions,
+  useWindowDimensions,
   AppState,
   InteractionManager,
 } from 'react-native';
@@ -38,7 +38,6 @@ import { ManuscriptCard } from '../../src/components/ManuscriptCard';
 import { IslamicPattern } from '../../src/components/IslamicPattern';
 import { MinaretIcon, PrayerBeadsIcon } from '../../src/components/icons';
 
-const { width: W } = Dimensions.get('window');
 
 // ─── Subtle diamond watermark for header ─────────────────────────────────────
 function GeometricPattern({ width, height }: { width: number; height: number }) {
@@ -266,6 +265,9 @@ function QuickGrid({ nextPrayer, onPress, cards }: {
   cards: QuickCard[];
 }) {
   const { t } = useTranslation();
+  // Read the live width: Android 16 ignores the portrait lock on large
+  // screens, so a module-scope Dimensions snapshot goes stale on rotation.
+  const { width: W } = useWindowDimensions();
   const half = Math.floor((W - 32 - 12) / 2);
 
   return (
@@ -615,6 +617,7 @@ const stStyles = StyleSheet.create({
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const { width: W } = useWindowDimensions();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settingsScheme = useStore((s) => s.settings.colorScheme);
