@@ -143,10 +143,17 @@ export default function QiblaScreen() {
         }
         headingSub = await Location.watchHeadingAsync((data) => {
           if (!mounted) return;
-          const h = data.trueHeading >= 0 ? data.trueHeading : data.magHeading;
+          // trueHeading is -1 when the OS cannot supply a declination-corrected
+          // heading. magHeading is NOT an acceptable stand-in (see the note
+          // above), so treat that exactly like having no compass: the static
+          // bearing card is shown instead of a needle that is off by the local
+          // declination. Recovers automatically once trueHeading returns.
+          const h = data.trueHeading;
           if (typeof h === 'number' && h >= 0) {
             setCompassHeading(h);
             setHasCompass(true);
+          } else {
+            setHasCompass(false);
           }
         });
       } catch (e) {
