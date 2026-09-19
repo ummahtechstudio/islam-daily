@@ -237,7 +237,7 @@
     "footer": "If you believe a source is missing or credited incorrectly, please tell us through Settings → Send Feedback.",
     "privacy": {
       "title": "No ads. No third-party tracking.",
-      "body": "The app contains no advertising, analytics or tracking SDKs. Prayer times and Hijri dates are computed on your device. Two features send your coordinates to a third party only when you use them: the Qibla screen computes the bearing on your device and then refines it with the Aladhan API's value, and the Mosque / Halal finders send your location and search radius to the Overpass API to find places near you. All other content is fetched only from the sources listed here. One optional exception: if you agreed in the privacy prompt, an anonymous session record (your location coordinates, city and country, device model, OS and app version) is sent to our own backend — you can turn this off any time in Settings → Privacy. Feedback you choose to send (including screenshots) also goes only to our own backend."
+      "body": "The app contains no advertising, analytics or tracking SDKs. Prayer times, the Qibla bearing and Hijri dates are computed on your device. One feature sends your coordinates to a third party, and only when you use it: the Mosque / Halal finders send your location and search radius to the Overpass API to find places near you. All other content is fetched only from the sources listed here. One optional exception: if you agreed in the privacy prompt, an anonymous session record (your approximate location — city, country and coordinates rounded to about 10 km — plus device model, OS and app version) is sent to our own backend once per launch; you can turn this off any time in Settings → Privacy. Feedback you choose to send (including screenshots) also goes only to our own backend."
     },
     "sections": {
       "quranText": "Quran text",
@@ -253,7 +253,7 @@
     },
     "entries": {
       "adhanJs": "Prayer times are calculated on your device with this library, using your chosen calculation method and location.",
-      "aladhan": "Used to cross-check the Qibla bearing, to download the offline Hijri calendar pack, and as a lightweight connectivity check; prayer times themselves are not fetched from it.",
+      "aladhan": "Used to download the offline Hijri calendar pack and as a lightweight connectivity check; prayer times and the Qibla bearing are computed on your device, not fetched from it.",
       "alquranCloud": "Verse of the Day, word-by-word meanings and the additional translation editions below are fetched from this API when you are online.",
       "amiri": "Arabic typeface for Quran, dua and dhikr text.",
       "archiveOrg": "Lectures, tafseer, nasheeds and Urdu hadith audio in the Audio Library are streamed from public Internet Archive collections; each item remains the property of its speaker or publisher.",
@@ -1247,16 +1247,16 @@
   "privacy": {
     "consent": {
       "accept": "OK, I understand",
-      "body1": "Islam Daily collects <bold>anonymous location data</bold> to understand where our users are and improve the app experience for Muslims worldwide.",
-      "body1After": "to understand where our users are and improve the app experience for Muslims worldwide.",
+      "body1": "Islam Daily collects <bold>anonymous, approximate location data</bold> to understand which regions our users are in and improve the app experience for Muslims worldwide.",
+      "body1After": "to understand which regions our users are in and improve the app experience for Muslims worldwide.",
       "body1Before": "Islam Daily collects",
-      "body1Highlight": "anonymous location data",
-      "body1Plain": "Islam Daily collects anonymous location data to understand where our users are and improve the app experience for Muslims worldwide.",
+      "body1Highlight": "anonymous, approximate location data",
+      "body1Plain": "Islam Daily collects anonymous, approximate location data to understand which regions our users are in and improve the app experience for Muslims worldwide.",
       "body2": "No personal information — no name, email, or device ID — is ever stored or shared.",
       "bullets": {
-        "location": "Approximate city & country only",
+        "location": "Approximate location only — city, country and coordinates rounded to about 10 km",
         "noIdentity": "Not linked to your identity",
-        "noShare": "Never sold or shared with third parties",
+        "noShare": "Never sold or shared with third parties — stored only on our own backend",
         "optOut": "Can be disabled any time in Settings"
       },
       "learnMore": "Learn More",
@@ -1264,15 +1264,15 @@
       "title": "A quick note on privacy"
     },
     "detail": {
-      "footer": "Data is stored in Supabase (EU region) and is only accessible to the Islam Daily development team. You can opt out at any time from Settings → Privacy.",
+      "footer": "Data is stored in our own Supabase database and is only accessible to the Islam Daily development team. It is never sold. You can opt out at any time from Settings → Privacy.",
       "items": {
         "appVersion": {
           "desc": "So we know which build a session came from.",
           "heading": "App version"
         },
         "cityCountry": {
-          "desc": "Derived from GPS coordinates via on-device reverse geocoding. Only the text (e.g. \"London, GB\") is stored — raw coordinates are stored rounded to 4 decimal places (~11 m precision).",
-          "heading": "City & country"
+          "desc": "Your city and country as returned by your device's built-in reverse geocoder (e.g. \"London, GB\"), plus your coordinates rounded to one decimal place (about 10 km). The precise GPS fix is used only on your device and is never uploaded.",
+          "heading": "Approximate location"
         },
         "platformDevice": {
           "desc": "Android or iOS, OS version, and device model (e.g. \"Pixel 7\"). No device ID or advertising ID.",
@@ -1539,8 +1539,8 @@
     },
     "privacy": {
       "analyticsLabel": "Anonymous Analytics",
-      "analyticsNote": "When enabled, Islam Daily logs your approximate city and country on each app launch to help us understand which regions the app serves. No name, email, device ID, or precise location is ever collected or shared with third parties.",
-      "analyticsSub": "City & country only — no personal data stored"
+      "analyticsNote": "When enabled, Islam Daily logs your approximate location (city, country and coordinates rounded to about 10 km), device model, OS version and app version once per app launch, to help us understand which regions the app serves. No name, email, device ID or precise location is ever collected, and nothing is sold or shared with third parties.",
+      "analyticsSub": "Approximate location only — no personal data"
     },
     "sections": {
       "about": "About",

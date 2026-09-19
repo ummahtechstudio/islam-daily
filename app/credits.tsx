@@ -48,9 +48,10 @@ export default function CreditsScreen() {
 
         {/* Privacy statement — wording verified against the shipped code: no
             ad / analytics / tracking SDKs exist. Outbound personal data is
-            limited to: coordinates sent to Aladhan (Qibla) and Overpass
-            (finders) when those features are used, the opt-in first-party
-            session log (locationAnalytics.ts) and user-sent feedback. */}
+            limited to: coordinates sent to Overpass (finders) when that
+            feature is used, the opt-in first-party session log
+            (locationAnalytics.ts — coordinates rounded to 1 dp) and
+            user-sent feedback. Keep in step with main:privacy.html. */}
         <View style={[styles.privacyCard, { backgroundColor: Colors.primary + '14', borderColor: Colors.primary + '40' }]}>
           <View style={styles.privacyHeader}>
             <Ionicons name="shield-checkmark" size={18} color={Colors.primary} />
