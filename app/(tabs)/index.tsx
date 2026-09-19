@@ -672,15 +672,28 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;
-      const task = InteractionManager.runAfterInteractions(() => {
+      // On a first launch the background Bukhari prefetch (_layout) can land
+      // AFTER this warm finished; while nothing is cached yet, re-check a few
+      // times so the card appears without needing another focus.
+      let retries = 0;
+      let retryTimer: ReturnType<typeof setTimeout> | undefined;
+      const compute = () => {
         warmHadithOfTheDayPool(() => cancelled).then(() => {
-          if (!cancelled) setHadithToday(getHadithOfTheDay());
+          if (cancelled) return;
+          const today = getHadithOfTheDay();
+          setHadithToday(today);
+          if (!today && retries++ < 6) retryTimer = setTimeout(compute, 20_000);
         });
-      });
+      };
+      const task = InteractionManager.runAfterInteractions(compute);
       getTranslationLanguage().then((lang) => {
         if (!cancelled) setHadithLanguage(lang);
       });
-      return () => { cancelled = true; task.cancel(); };
+      return () => {
+        cancelled = true;
+        task.cancel();
+        if (retryTimer) clearTimeout(retryTimer);
+      };
     }, [todayKey]),
   );
 
