@@ -4,7 +4,6 @@ import { getQuranFromCache } from './quranCache';
 import { SURAH_META } from '../constants/surahMeta';
 
 const QURAN_BASE = 'https://api.alquran.cloud/v1';
-const ALADHAN_BASE = 'https://api.aladhan.com/v1';
 
 // Single source of truth for timeouts so all third-party calls behave the same
 // on flaky networks. 15 s matches network.ts's default and is the upper bound
@@ -134,22 +133,6 @@ export async function fetchRandomVerse(edition: string = 'ur.jalandhry') {
     translation: translationAyah?.text ?? '',
     edition,
   };
-}
-
-// ─── Qibla ────────────────────────────────────────────────────────────────────
-
-export async function fetchQiblaDirection(latitude: number, longitude: number) {
-  const key = `api_qibla_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
-  return cachedFetch(key, async () => {
-    const res = await fetchWithTimeout(
-      `${ALADHAN_BASE}/qibla/${latitude}/${longitude}`,
-      {},
-      NET_TIMEOUT_MS,
-    );
-    const json = await safeJson(res);
-    if (json.code !== 200) throw new Error('Qibla API error');
-    return json.data as { latitude: number; longitude: number; direction: number };
-  }, 30 * 24 * 60 * 60 * 1000);
 }
 
 // ─── Hadith ───────────────────────────────────────────────────────────────────

@@ -23,6 +23,19 @@ export async function saveConsent(granted: boolean): Promise<void> {
   ]);
 }
 
+// Coordinates in the session row are deliberately COARSE: rounded to one
+// decimal place (~11 km latitude / ≤11 km longitude). That is enough to see
+// which regions the app serves, which is the only reason the row exists —
+// a precise GPS fix has no diagnostic value and must never be uploaded.
+// (The precise fix is still used on-device for the reverse geocode, exactly
+// as the Prayer Times city label already does.)
+export const SESSION_COORD_DECIMALS = 1;
+
+export function coarsenCoordinate(value: number): number {
+  const factor = 10 ** SESSION_COORD_DECIMALS;
+  return Math.round(value * factor) / factor;
+}
+
 // Call once per app launch after consent is confirmed. Never throws.
 export async function logSession(): Promise<void> {
   try {
@@ -51,11 +64,16 @@ export async function logSession(): Promise<void> {
           Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
           7000,
         );
-        latitude = loc.coords.latitude;
-        longitude = loc.coords.longitude;
+        // Coarsen BEFORE the geocode so a slow geocoder still leaves the
+        // (coarse) coordinates on the row, as before.
+        latitude = coarsenCoordinate(loc.coords.latitude);
+        longitude = coarsenCoordinate(loc.coords.longitude);
 
         const [geo] = await withTimeout(
-          Location.reverseGeocodeAsync({ latitude, longitude }),
+          Location.reverseGeocodeAsync({
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          }),
           3000,
         );
         if (geo) {
