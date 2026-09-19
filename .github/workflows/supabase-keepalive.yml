@@ -27,7 +27,7 @@ jobs:
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}") || RC=$?
           if [ "$RC" -ne 0 ]; then
-            echo "::error::curl exited $RC without an HTTP response (6 = DNS failure, 7 = connection refused, 28 = timeout). Is the Supabase project paused or still restoring?"
+            echo "::error::curl exited $RC (6 = DNS failure, 7 = connection refused, 28 = timeout; last HTTP status seen: ${CODE:-none}). Is the Supabase project paused or still restoring?"
             exit 1
           fi
           echo "HTTP status: $CODE"
@@ -45,7 +45,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # github.workflow_ref looks like "owner/repo/.github/workflows/<file>.yml@refs/heads/main"
-          WORKFLOW_FILE=$(basename "${GITHUB_WORKFLOW_REF%@*}")
+          WORKFLOW_FILE=$(basename "${GITHUB_WORKFLOW_REF%%@*}")
           echo "Re-enabling ${WORKFLOW_FILE} on ${GITHUB_REPOSITORY}"
           gh api --method PUT \
             -H "Accept: application/vnd.github+json" \
