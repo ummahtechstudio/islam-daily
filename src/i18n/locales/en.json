@@ -237,7 +237,7 @@
     "footer": "If you believe a source is missing or credited incorrectly, please tell us through Settings → Send Feedback.",
     "privacy": {
       "title": "No ads. No third-party tracking.",
-      "body": "The app contains no advertising, analytics or tracking SDKs. Prayer times and Hijri dates are computed on your device; the Qibla bearing is computed on your device and cross-checked against the Aladhan API, which receives your coordinates for that one request. Content is fetched only from the sources listed here. One optional exception: if you agreed in the privacy prompt, an anonymous session record (your location coordinates, city and country, device model, OS and app version) is sent to our own backend — you can turn this off any time in Settings → Privacy. Feedback you choose to send (including screenshots) also goes only to our own backend."
+      "body": "The app contains no advertising, analytics or tracking SDKs. Prayer times and Hijri dates are computed on your device. Two features send your coordinates to a third party only when you use them: the Qibla screen computes the bearing on your device and then refines it with the Aladhan API's value, and the Mosque / Halal finders send your location and search radius to the Overpass API to find places near you. All other content is fetched only from the sources listed here. One optional exception: if you agreed in the privacy prompt, an anonymous session record (your location coordinates, city and country, device model, OS and app version) is sent to our own backend — you can turn this off any time in Settings → Privacy. Feedback you choose to send (including screenshots) also goes only to our own backend."
     },
     "sections": {
       "quranText": "Quran text",
@@ -267,7 +267,7 @@
       "hisn": "Duas and adhkar are compiled from this collection; every entry carries its own hadith reference.",
       "indopakFont": "Typeface used to render the IndoPak Mushaf.",
       "ionicons": "Interface icons.",
-      "islamicFinder": "Makkah, Madinah and Mishary adhan recordings previewed in the Custom Adhan screen.",
+      "islamicFinder": "Makkah, Madinah, Mishary, Abdul Basit and Egyptian adhan recordings previewed in the Custom Adhan screen.",
       "islamicNetworkCdn": "Per-ayah audio used for playback in the study view.",
       "namazGuide": "Quranic passages are taken from the app's Tanzil text and never retyped; duas and in-salah recitations follow Hisn al-Muslim with sources; the salah method follows standard Hanafi fiqh.",
       "names99": "Bundled with the app, with Qur'anic references for each name.",
@@ -276,7 +276,7 @@
       "notoNastaliq": "Urdu typeface (Nastaliq).",
       "osm": "Nearby mosques and halal restaurants are found in OpenStreetMap data. Map data © OpenStreetMap contributors, available under the Open Database License. This attribution also appears on the finder screens themselves.",
       "ossLibraries": "The app is built with these open-source libraries, all under the MIT license (via Expo and the React Native ecosystem).",
-      "overpass": "The public query service used to search OpenStreetMap data near you.",
+      "overpass": "The public query service used to search OpenStreetMap data near you; it receives your coordinates and search radius for each search.",
       "qul": "IndoPak (Nastaleeq) script text used in the Mushaf view.",
       "quranCom": "16-line page mapping (which ayah falls on which page) for the Mushaf view.",
       "quranicAudio": "Full-Quran and per-surah recitations in the Audio Library.",

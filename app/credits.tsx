@@ -47,9 +47,10 @@ export default function CreditsScreen() {
         <Text style={[styles.intro, bodyStyle, { color: theme.textSecondary }]}>{t('credits.intro')}</Text>
 
         {/* Privacy statement — wording verified against the shipped code: no
-            ad / analytics / tracking SDKs exist; the only outbound data is the
-            Aladhan Qibla cross-check, the opt-in first-party session log
-            (locationAnalytics.ts, sends coordinates) and user-sent feedback. */}
+            ad / analytics / tracking SDKs exist. Outbound personal data is
+            limited to: coordinates sent to Aladhan (Qibla) and Overpass
+            (finders) when those features are used, the opt-in first-party
+            session log (locationAnalytics.ts) and user-sent feedback. */}
         <View style={[styles.privacyCard, { backgroundColor: Colors.primary + '14', borderColor: Colors.primary + '40' }]}>
           <View style={styles.privacyHeader}>
             <Ionicons name="shield-checkmark" size={18} color={Colors.primary} />

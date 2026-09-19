@@ -12,11 +12,10 @@ This directory contains adhan audio used by prayer notifications scheduled by
 
 ## Current status
 
-**Placeholder only.** The notification scheduling pipeline (settings UI,
-permission flow, 7-day scheduler, plugin wiring) is fully in place. The audio
-file itself has not been added yet — until it is, notifications scheduled with
-the "Adhan" sound choice will fall back to the device's default notification
-tone on Android, and to the default sound on iOS.
+**adhan.mp3 is present** (added in commit 49982cc) and is wired through the
+`expo-notifications` plugin in app.json, so the "Adhan" sound choice plays it.
+Its source / recording rights are not recorded anywhere in this repo — please
+add the provenance here (and to Settings → Sources & Credits) once confirmed.
 
 ## Adding the real adhan file
 
