@@ -37,6 +37,7 @@ import {
   refreshDuas,
   refreshNamesOfAllah,
 } from '../src/services/content';
+import { purgeLegacyQiblaCache } from '../src/services/api';
 // Daily Knowledge is deferred to v1.1+; the background warm-up is suspended.
 // Re-enable this import (and the call below) when the curated content lands.
 // import { fetchTodaysDailyKnowledge } from '../src/services/dailyKnowledgeService';
@@ -216,6 +217,7 @@ export default function RootLayout() {
     refreshNamesOfAllah();
     refreshDuas();
     refreshDhikr();
+    purgeLegacyQiblaCache(); // one-off tidy-up of pre-828ef8f cache rows
     // fetchTodaysDailyKnowledge() — suspended; see DailyKnowledgeCard for rationale.
 
     // (The Quran is bundled inside the APK at assets/data/quran.json — no
