@@ -694,6 +694,9 @@ export default function HomeScreen() {
         task.cancel();
         if (retryTimer) clearTimeout(retryTimer);
       };
+      // todayKey is not read inside — it is the re-key that re-runs this
+      // effect when the local date changes (see comment above).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [todayKey]),
   );
 
