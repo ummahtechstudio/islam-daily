@@ -17,41 +17,44 @@ import { useSurahList } from '../../hooks/useQuran';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { ErrorView } from '../ErrorView';
 import { SurahMeta } from '../../services/api';
+import { juzStartPage } from '../../utils/quranNav';
 
 const GOLD = '#EF9F27';
 const LAST_READ_KEY = 'last_read_surah';
 
+// Juz names + canonical start ayah. Start PAGE is not stored here: it comes
+// from quranNav's data-verified JUZ_START_PAGES via juzStartPage(juz).
 const JUZ_DATA = [
-  { juz: 1,  name: 'Alif Lam Meem',        surah: 1,   ayah: 1,   page: 1 },
-  { juz: 2,  name: 'Sayaqool',              surah: 2,   ayah: 142, page: 22 },
-  { juz: 3,  name: 'Tilkar Rusul',          surah: 2,   ayah: 253, page: 42 },
-  { juz: 4,  name: 'Lantanalo',             surah: 3,   ayah: 92,  page: 62 },
-  { juz: 5,  name: 'Wal Mohsanat',          surah: 4,   ayah: 24,  page: 82 },
-  { juz: 6,  name: 'La Yuhibbullah',        surah: 4,   ayah: 148, page: 102 },
-  { juz: 7,  name: 'Wa Iza Samiu',          surah: 5,   ayah: 82,  page: 121 },
-  { juz: 8,  name: 'Wa Lau Annana',         surah: 6,   ayah: 111, page: 142 },
-  { juz: 9,  name: 'Qalal Mala',            surah: 7,   ayah: 88,  page: 162 },
-  { juz: 10, name: 'Wa Alamu',              surah: 8,   ayah: 41,  page: 182 },
-  { juz: 11, name: 'Yatazeroon',            surah: 9,   ayah: 93,  page: 202 },
-  { juz: 12, name: 'Wa Mamin Dabbah',       surah: 11,  ayah: 6,   page: 222 },
-  { juz: 13, name: 'Wa Ma Ubarri',          surah: 12,  ayah: 53,  page: 241 },
-  { juz: 14, name: 'Rubama',                surah: 15,  ayah: 1,   page: 262 },
-  { juz: 15, name: 'Subhanallazi',          surah: 17,  ayah: 1,   page: 282 },
-  { juz: 16, name: 'Qal Alam',              surah: 18,  ayah: 75,  page: 302 },
-  { juz: 17, name: 'Aqtarabo',              surah: 21,  ayah: 1,   page: 322 },
-  { juz: 18, name: 'Qad Aflaha',            surah: 23,  ayah: 1,   page: 342 },
-  { juz: 19, name: 'Wa Qalallazina',        surah: 25,  ayah: 21,  page: 362 },
-  { juz: 20, name: 'Amman Khalaqa',         surah: 27,  ayah: 56,  page: 382 },
-  { juz: 21, name: 'Utlu Ma Oohiya',        surah: 29,  ayah: 46,  page: 402 },
-  { juz: 22, name: 'Wa Manyaqnut',          surah: 33,  ayah: 31,  page: 422 },
-  { juz: 23, name: 'Wa Mali',               surah: 36,  ayah: 28,  page: 442 },
-  { juz: 24, name: 'Faman Azlam',           surah: 39,  ayah: 32,  page: 462 },
-  { juz: 25, name: 'Elahe Yuruddo',         surah: 41,  ayah: 47,  page: 482 },
-  { juz: 26, name: 'Ha Meem',               surah: 46,  ayah: 1,   page: 502 },
-  { juz: 27, name: 'Qala Fama Khatbukum',   surah: 51,  ayah: 31,  page: 522 },
-  { juz: 28, name: 'Qad Sami Allah',        surah: 58,  ayah: 1,   page: 542 },
-  { juz: 29, name: 'Tabarakalazi',          surah: 67,  ayah: 1,   page: 562 },
-  { juz: 30, name: 'Amma Yatasa-aloon',     surah: 78,  ayah: 1,   page: 582 },
+  { juz: 1,  name: 'Alif Lam Meem',        surah: 1,   ayah: 1 },
+  { juz: 2,  name: 'Sayaqool',              surah: 2,   ayah: 142 },
+  { juz: 3,  name: 'Tilkar Rusul',          surah: 2,   ayah: 253 },
+  { juz: 4,  name: 'Lantanalo',             surah: 3,   ayah: 92 },
+  { juz: 5,  name: 'Wal Mohsanat',          surah: 4,   ayah: 24 },
+  { juz: 6,  name: 'La Yuhibbullah',        surah: 4,   ayah: 148 },
+  { juz: 7,  name: 'Wa Iza Samiu',          surah: 5,   ayah: 82 },
+  { juz: 8,  name: 'Wa Lau Annana',         surah: 6,   ayah: 111 },
+  { juz: 9,  name: 'Qalal Mala',            surah: 7,   ayah: 88 },
+  { juz: 10, name: 'Wa Alamu',              surah: 8,   ayah: 41 },
+  { juz: 11, name: 'Yatazeroon',            surah: 9,   ayah: 93 },
+  { juz: 12, name: 'Wa Mamin Dabbah',       surah: 11,  ayah: 6 },
+  { juz: 13, name: 'Wa Ma Ubarri',          surah: 12,  ayah: 53 },
+  { juz: 14, name: 'Rubama',                surah: 15,  ayah: 1 },
+  { juz: 15, name: 'Subhanallazi',          surah: 17,  ayah: 1 },
+  { juz: 16, name: 'Qal Alam',              surah: 18,  ayah: 75 },
+  { juz: 17, name: 'Aqtarabo',              surah: 21,  ayah: 1 },
+  { juz: 18, name: 'Qad Aflaha',            surah: 23,  ayah: 1 },
+  { juz: 19, name: 'Wa Qalallazina',        surah: 25,  ayah: 21 },
+  { juz: 20, name: 'Amman Khalaqa',         surah: 27,  ayah: 56 },
+  { juz: 21, name: 'Utlu Ma Oohiya',        surah: 29,  ayah: 46 },
+  { juz: 22, name: 'Wa Manyaqnut',          surah: 33,  ayah: 31 },
+  { juz: 23, name: 'Wa Mali',               surah: 36,  ayah: 28 },
+  { juz: 24, name: 'Faman Azlam',           surah: 39,  ayah: 32 },
+  { juz: 25, name: 'Elahe Yuruddo',         surah: 41,  ayah: 47 },
+  { juz: 26, name: 'Ha Meem',               surah: 46,  ayah: 1 },
+  { juz: 27, name: 'Qala Fama Khatbukum',   surah: 51,  ayah: 31 },
+  { juz: 28, name: 'Qad Sami Allah',        surah: 58,  ayah: 1 },
+  { juz: 29, name: 'Tabarakalazi',          surah: 67,  ayah: 1 },
+  { juz: 30, name: 'Amma Yatasa-aloon',     surah: 78,  ayah: 1 },
 ];
 
 type SurahTab = 'surahs' | 'juz';
@@ -183,7 +186,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
           {t('quran.juz.pageLabel')}
         </Text>
         <Text style={[styles.juzPageNum, { color: Colors.primary }]}>
-          {item.page}
+          {juzStartPage(item.juz)}
         </Text>
       </View>
     </TouchableOpacity>

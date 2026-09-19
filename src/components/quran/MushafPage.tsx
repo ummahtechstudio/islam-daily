@@ -8,6 +8,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { getSurahMeta } from '../../constants/surahMeta';
+import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
 import {
   MUSHAF_COLORS,
   MUSHAF_FONT_SIZE,
@@ -25,7 +26,6 @@ type MushafAyah = {
   text_indopak: string;
 };
 
-const TOTAL_PAGES = 604;
 const BISMILLAH_TEXT = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
 
 const pageCache = new Map<number, MushafAyah[]>();
@@ -37,19 +37,6 @@ export function toArabicDigits(n: number): string {
     .split('')
     .map((d) => ARABIC_DIGITS[parseInt(d, 10)] ?? d)
     .join('');
-}
-
-const JUZ_START_PAGES = [
-  1, 22, 42, 62, 82, 102, 121, 142, 162, 182,
-  202, 222, 241, 262, 282, 302, 322, 342, 362, 382,
-  402, 422, 442, 462, 482, 502, 522, 542, 562, 582,
-];
-
-function getJuzFromPage(page: number): number {
-  for (let i = JUZ_START_PAGES.length - 1; i >= 0; i--) {
-    if (page >= JUZ_START_PAGES[i]) return i + 1;
-  }
-  return 1;
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -311,7 +298,7 @@ export default function MushafPage({
             )}
             <PageFooter
               pageNumber={pageNumber}
-              juzNumber={getJuzFromPage(pageNumber)}
+              juzNumber={pageToJuz(pageNumber)}
               surahName={
                 ayahs.length > 0
                   ? getSurahMeta(ayahs[0].surah)?.name_english ?? ''
