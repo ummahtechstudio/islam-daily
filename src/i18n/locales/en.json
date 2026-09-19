@@ -961,6 +961,7 @@
         "title": "Notifications"
       },
       "sunnah": {
+        "aboutCard": "Optional reminders for voluntary (nafl) prayers — off by default. When a reminder is on, its time is recomputed from your prayer settings each day, so it always follows your local prayer times. Each reminder explains its own timing above.",
         "subtitle": "Optional voluntary reminders — separate from the five daily prayers",
         "title": "Sunnah Reminders"
       }
@@ -973,7 +974,6 @@
       }
     },
     "tahajjud": {
-      "aboutCard": "Off by default. When on, the reminder time is recomputed from your prayer settings each day, so it always matches your Maghrib and Fajr.",
       "name": "Tahajjud reminder",
       "sub": "Fires once at the start of the last third of the night (Maghrib → Fajr)"
     },

@@ -567,10 +567,12 @@ export function NotificationsSettingsSection({
         </View>
       </View>
 
+      {/* Section-level note: neutral about optional sunnah prayers in general —
+          each reminder's own timing is explained on its row above. */}
       <View style={[styles.aboutCard, { backgroundColor: CREAM }]}>
         <Ionicons name="information-circle" size={16} color={GREEN} />
         <Text style={styles.aboutText}>
-          {t('notifications.tahajjud.aboutCard')}
+          {t('notifications.sections.sunnah.aboutCard')}
         </Text>
       </View>
 
