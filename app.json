@@ -26,8 +26,7 @@
       "bundleIdentifier": "com.luqman.islamdaily",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Islam Daily uses your location to calculate accurate prayer times and Qibla direction.",
-        "NSLocationAlwaysUsageDescription": "Islam Daily uses your location to send prayer time notifications.",
-        "NSCameraUsageDescription": "Islam Daily uses your camera for the AR Qibla finder, QR codes, and profile images.",
+        "NSCameraUsageDescription": "Islam Daily uses your camera for the AR Qibla finder.",
         "NSUserNotificationsUsageDescription": "Islam Daily sends prayer time reminders and Islamic daily notifications.",
         "UIBackgroundModes": ["audio"]
       }
@@ -40,6 +39,9 @@
       },
       "edgeToEdgeEnabled": true,
       "softwareKeyboardLayoutMode": "pan",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -59,13 +61,23 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Islam Daily uses your location to calculate accurate prayer times and Qibla direction."
+          "locationWhenInUsePermission": "Islam Daily uses your location to calculate accurate prayer times and Qibla direction.",
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Islam Daily uses your camera for the AR Qibla finder."
+          "cameraPermission": "Islam Daily uses your camera for the AR Qibla finder.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": false
         }
       ],
       [
