@@ -7,7 +7,7 @@
  * so the screen reads correctly in English and Urdu.
  *
  * Inventory basis (2026-09-19): package.json runtime deps + every fetch()/URL
- * in src/ and app/ + assets/data + assets/fonts. See docs/session-report.md.
+ * in src/ and app/ + assets/data + assets/fonts + assets/audio.
  */
 
 export type CreditEntry = {
@@ -84,11 +84,12 @@ export const CREDIT_SECTIONS: CreditSection[] = [
     titleKey: 'audio',
     entries: [
       { name: 'EveryAyah.com', descKey: 'everyayah', url: 'https://everyayah.com' },
-      { name: 'Mishary Rashid Alafasy · Abdul Basit Abdul Samad (Mujawwad) · Abdul Rahman Al-Sudais · Saad Al-Ghamdi · Maher Al-Muaiqly', descKey: 'reciters' },
+      { name: 'Mishary Rashid Alafasy · Abdul Basit Abdul Samad (Mujawwad & Murattal) · Abdul Rahman Al-Sudais · Saad Al-Ghamdi · Maher Al-Muaiqly · Muhammad Siddiq Al-Minshawi (Murattal)', descKey: 'reciters' },
       { name: 'Islamic Network CDN (cdn.islamic.network)', descKey: 'islamicNetworkCdn', url: 'https://islamic.network' },
       { name: 'QuranicAudio.com', descKey: 'quranicAudio', url: 'https://quranicaudio.com' },
       { name: 'Internet Archive (archive.org)', descKey: 'archiveOrg', url: 'https://archive.org' },
       { name: 'IslamicFinder.org — adhan recordings', descKey: 'islamicFinder', url: 'https://www.islamicfinder.org' },
+      { name: 'Notification adhan clip (assets/audio/adhan.mp3)', descKey: 'notificationAdhan' },
     ],
   },
   {

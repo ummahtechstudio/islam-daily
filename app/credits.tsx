@@ -46,9 +46,10 @@ export default function CreditsScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={[styles.intro, bodyStyle, { color: theme.textSecondary }]}>{t('credits.intro')}</Text>
 
-        {/* Privacy statement — wording verified against the shipped code, see
-            docs/session-report.md Phase 4: no ad / analytics / tracking SDKs;
-            only an opt-in first-party session log. */}
+        {/* Privacy statement — wording verified against the shipped code: no
+            ad / analytics / tracking SDKs exist; the only outbound data is the
+            Aladhan Qibla cross-check, the opt-in first-party session log
+            (locationAnalytics.ts, sends coordinates) and user-sent feedback. */}
         <View style={[styles.privacyCard, { backgroundColor: Colors.primary + '14', borderColor: Colors.primary + '40' }]}>
           <View style={styles.privacyHeader}>
             <Ionicons name="shield-checkmark" size={18} color={Colors.primary} />
@@ -83,7 +84,7 @@ export default function CreditsScreen() {
           </View>
         ))}
 
-        <Text style={[styles.footer, bodyStyle, { color: theme.textMuted }]}>{t('credits.footer')}</Text>
+        <Text style={[styles.footer, bodyStyle, styles.footerAlign, { color: theme.textMuted }]}>{t('credits.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -155,5 +156,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
-  footer: { fontSize: 12, lineHeight: 18, textAlign: 'center', paddingHorizontal: spacing.md },
+  footer: { fontSize: 12, lineHeight: 18, paddingHorizontal: spacing.md },
+  // Listed after urduStyle so the footer stays centred in Urdu too.
+  footerAlign: { textAlign: 'center' },
 });
