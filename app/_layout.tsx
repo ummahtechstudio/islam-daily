@@ -273,6 +273,7 @@ export default function RootLayout() {
         <Stack.Screen name="downloads" options={{ title: t('nav.titles.downloads') }} />
         <Stack.Screen name="language" options={{ title: t('nav.titles.language') }} />
         <Stack.Screen name="settings" options={{ title: t('nav.titles.settings') }} />
+        <Stack.Screen name="credits" options={{ title: t('nav.titles.credits') }} />
         <Stack.Screen name="customize-home" options={{ title: t('nav.titles.customizeHome') }} />
         <Stack.Screen name="hifz-tracker" options={{ title: t('nav.titles.hifzTracker') }} />
         <Stack.Screen name="prayer-streak" options={{ title: t('nav.titles.prayerStreak') }} />

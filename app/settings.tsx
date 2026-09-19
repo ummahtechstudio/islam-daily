@@ -658,17 +658,20 @@ export default function SettingsScreen() {
         {/* ── CREDITS ────────────────────────────────────────────────────── */}
         <SectionLabel>{t('settings.sections.credits')}</SectionLabel>
         <SectionCard>
-          <View style={[styles.creditsBlock, { backgroundColor: themeColors.surface }]}>
-            <Text style={[styles.creditsHeader, { color: themeColors.text }]}>
-              {t('settings.credits.header')}
-            </Text>
-            <View style={styles.creditsList}>
-              <CreditLine labelKey="quran" colorScheme={themeColors} />
-              <CreditLine labelKey="hadith" colorScheme={themeColors} />
-              <CreditLine labelKey="duas" colorScheme={themeColors} />
-              <CreditLine labelKey="prayerTimes" colorScheme={themeColors} />
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => router.push('/credits' as any)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#F59E0B20' }]}>
+              <Ionicons name="ribbon" size={18} color="#F59E0B" />
             </View>
-          </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t('settings.credits.open')}</Text>
+              <Text style={[styles.rowSub, { color: themeColors.textMuted }]}>{t('settings.credits.openSub')}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={themeColors.textMuted} />
+          </TouchableOpacity>
         </SectionCard>
 
         <View style={[styles.about, { borderTopColor: themeColors.border }]}>
@@ -682,26 +685,6 @@ export default function SettingsScreen() {
 }
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
-
-function CreditLine({
-  labelKey,
-  colorScheme,
-}: {
-  labelKey: 'quran' | 'hadith' | 'duas' | 'prayerTimes';
-  colorScheme: typeof Colors.dark;
-}) {
-  const { t } = useTranslation();
-  return (
-    <View style={styles.creditRow}>
-      <Text style={[styles.creditLabel, { color: colorScheme.textSecondary }]}>
-        {t(`settings.credits.labels.${labelKey}`)}
-      </Text>
-      <Text style={[styles.creditSource, { color: colorScheme.text }]}>
-        {t(`settings.credits.sources.${labelKey}`)}
-      </Text>
-    </View>
-  );
-}
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 
@@ -821,12 +804,6 @@ const styles = StyleSheet.create({
   privacyNote: { padding: 14 },
   privacyNoteText: { fontSize: 12, lineHeight: 18 },
   // Credits
-  creditsBlock: { padding: 14, gap: 10 },
-  creditsHeader: { fontSize: 13, fontWeight: '600' },
-  creditsList: { gap: 6 },
-  creditRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  creditLabel: { fontSize: 12, fontWeight: '600' },
-  creditSource: { fontSize: 12 },
   // Footer
   about: {
     alignItems: 'center',

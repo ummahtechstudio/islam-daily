@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../src/constants/colors';
+import { OsmAttribution } from '../src/components/OsmAttribution';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { fetchWithTimeout, withTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
@@ -363,6 +364,8 @@ export default function MosqueFinder() {
           )}
         />
       )}
+      {/* ODbL: OpenStreetMap attribution must appear wherever OSM data is shown */}
+      <OsmAttribution theme={theme} />
     </SafeAreaView>
   );
 }

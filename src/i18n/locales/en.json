@@ -232,6 +232,59 @@
     "quranReference": "Qur'an, Surah {{surah}} ({{count}} ayahs) — bundled Tanzil text",
     "placeholder": "not yet in the app's verified data"
   },
+  "credits": {
+    "intro": "Islam Daily is built on the work of many people and projects. Everything below is used with gratitude, and under the terms each source sets.",
+    "footer": "If you believe a source is missing or credited incorrectly, please tell us through Settings → Send Feedback.",
+    "privacy": {
+      "title": "No ads. No third-party tracking.",
+      "body": "The app contains no advertising, analytics or tracking SDKs. Prayer times, Qibla direction and Hijri dates are computed on your device. Content is fetched only from the sources listed here. One optional exception: if you agreed in the privacy prompt, an anonymous session record (city-level location, device model, app version) is sent to our own server — you can turn this off any time in Settings → Privacy. Feedback you choose to send (including screenshots) also goes only to our own server."
+    },
+    "sections": {
+      "quranText": "Quran text",
+      "mushaf": "Mushaf (IndoPak script & page layout)",
+      "translations": "Quran translations",
+      "audio": "Recitations & audio",
+      "hadith": "Hadith",
+      "duas": "Duas, dhikr & the Namaz guide",
+      "prayer": "Prayer times, Qibla & Hijri calendar",
+      "maps": "Mosque & Halal finders (map data)",
+      "fonts": "Fonts & icons",
+      "libraries": "Open-source libraries"
+    },
+    "entries": {
+      "tanzil": "The Arabic text of the Qur'an bundled in the app is the Tanzil Uthmani text, used verbatim and unaltered. Source: Tanzil Project — tanzil.net. The full notice required by Tanzil's terms is reproduced below.",
+      "qul": "IndoPak (Nastaleeq) script text used in the Mushaf view.",
+      "quranCom": "16-line page mapping (which ayah falls on which page) for the Mushaf view.",
+      "indopakFont": "Typeface used to render the IndoPak Mushaf.",
+      "bundledEn": "English translation bundled in the app (default English edition).",
+      "bundledUr": "Urdu translation bundled in the app (default Urdu edition).",
+      "alquranCloud": "Verse of the Day, word-by-word meanings and the additional translation editions below are fetched from this API when you are online.",
+      "networkEditions": "Additional translation editions available online, credited to their translators.",
+      "everyayah": "Ayah-by-ayah recitation streamed in the Quran reader.",
+      "reciters": "Reciters available in the app.",
+      "islamicNetworkCdn": "Per-ayah audio used for playback in the study view.",
+      "quranicAudio": "Full-Quran and per-surah recitations in the Audio Library.",
+      "archiveOrg": "Lectures, tafseer, nasheeds and Urdu hadith audio in the Audio Library are streamed from public Internet Archive collections; each item remains the property of its speaker or publisher.",
+      "islamicFinder": "Makkah, Madinah and Mishary adhan recordings used for prayer notifications.",
+      "hadithApi": "All hadith text (Arabic, English, Urdu) and the scholarly gradings come from this open dataset, served from our own CDN.",
+      "collections": "Collections available in the app.",
+      "graders": "Gradings (Sahih / Hasan / Da'if) shown per hadith are exactly as embedded in the dataset, attributed to these scholars. Sahih al-Bukhari and Sahih Muslim carry no per-hadith gradings in the dataset.",
+      "englishTranslators": "English translators where the source identifies them; other collections as credited in the source dataset.",
+      "urduTranslators": "Not specified in the source dataset.",
+      "hisn": "Duas and adhkar are compiled from this collection; every entry carries its own hadith reference.",
+      "namazGuide": "Quranic passages are taken from the app's Tanzil text and never retyped; duas and in-salah recitations follow Hisn al-Muslim with sources; the salah method follows standard Hanafi fiqh.",
+      "names99": "Bundled with the app, with Qur'anic references for each name.",
+      "adhanJs": "Prayer times are calculated on your device with this library, using your chosen calculation method and location.",
+      "aladhan": "Used to cross-check the Qibla bearing and to download the offline Hijri calendar pack; prayer times themselves are not fetched from it.",
+      "ummAlQura": "Hijri dates use the Umm al-Qura calendar via your device's built-in calendar support (islamic-umalqura).",
+      "osm": "Nearby mosques and halal restaurants are found in OpenStreetMap data. Map data © OpenStreetMap contributors, available under the Open Database License. This attribution also appears on the finder screens themselves.",
+      "overpass": "The public query service used to search OpenStreetMap data near you.",
+      "amiri": "Arabic typeface for Quran, dua and dhikr text.",
+      "notoNastaliq": "Urdu typeface (Nastaliq).",
+      "ionicons": "Interface icons.",
+      "ossLibraries": "The app is built with these open-source libraries, all under the MIT license (via Expo and the React Native ecosystem)."
+    }
+  },
   "dhikr": {
     "countWithTasbeeh": "Count this with Tasbeeh →",
     "loading": {
@@ -884,6 +937,7 @@
       "afterSalah": "After-Salah Adhkar",
       "audioLibrary": "Audio Library — آڈیو لائبریری",
       "calendar": "Islamic Calendar",
+      "credits": "Sources & Credits",
       "customAdhan": "Custom Adhan",
       "customizeHome": "Customize Home Screen",
       "downloads": "Offline Downloads",
@@ -1458,19 +1512,8 @@
       }
     },
     "credits": {
-      "header": "We gratefully acknowledge these open data sources:",
-      "labels": {
-        "duas": "Duas",
-        "hadith": "Hadith",
-        "prayerTimes": "Prayer Times",
-        "quran": "Quran"
-      },
-      "sources": {
-        "duas": "Hisn al-Muslim",
-        "hadith": "fawazahmed0/hadith-api",
-        "prayerTimes": "Aladhan API",
-        "quran": "Tanzil"
-      }
+      "open": "Sources & Credits",
+      "openSub": "Every data source, license and library — plus our privacy statement"
     },
     "homeScreen": {
       "customize": "Customize Home Screen",
