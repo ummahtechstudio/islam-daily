@@ -51,6 +51,10 @@ export type HadithDownloadProgress = {
 
 const inMemoryBookCache = new Map<HadithCollectionKey, HadithBookCache>();
 const inflightDownloads = new Map<HadithCollectionKey, Promise<HadithBookCache>>();
+// Books whose download could NOT be written to MMKV (setJSON returned false —
+// usually the blob is too large). They are served from memory for this session
+// only, and must never be reported as "downloaded" to the Downloads screen.
+const unpersistedBooks = new Set<HadithCollectionKey>();
 
 export function getHadithBookFromCache(
   slug: HadithCollectionKey,
@@ -68,6 +72,25 @@ export function getHadithBookFromCache(
 
 export function isHadithBookCached(slug: HadithCollectionKey): boolean {
   return !!getHadithBookFromCache(slug);
+}
+
+/** True only if the book is cached AND that cache survived to disk. */
+export function isHadithBookPersisted(slug: HadithCollectionKey): boolean {
+  return !unpersistedBooks.has(slug) && isHadithBookCached(slug);
+}
+
+/**
+ * Re-attempt writing an in-memory-only book to MMKV without re-downloading it.
+ * Returns whether the book is now persisted.
+ */
+export function persistHadithBook(slug: HadithCollectionKey): boolean {
+  if (isHadithBookPersisted(slug)) return true;
+  const entry = inMemoryBookCache.get(slug);
+  if (!entry) return false;
+  const persisted = cache.setJSON<HadithBookCache>(CACHE_KEYS.HADITH_BOOK(slug), entry);
+  if (persisted) unpersistedBooks.delete(slug);
+  else unpersistedBooks.add(slug);
+  return persisted;
 }
 
 export function getHadithsForBook(slug: HadithCollectionKey): SupabaseHadith[] {
@@ -122,7 +145,10 @@ export async function downloadHadithBook(
     };
 
     const persisted = cache.setJSON<HadithBookCache>(CACHE_KEYS.HADITH_BOOK(slug), entry);
-    if (!persisted && __DEV__) {
+    if (persisted) {
+      unpersistedBooks.delete(slug);
+    } else {
+      unpersistedBooks.add(slug);
       console.warn(
         `[hadithCache] "${slug}" did not persist (likely too large for MMKV); ` +
         `it will serve this session but re-download on next launch.`,
@@ -150,10 +176,12 @@ export function clearHadithCache(slug?: HadithCollectionKey): void {
   if (slug) {
     cache.delete(CACHE_KEYS.HADITH_BOOK(slug));
     inMemoryBookCache.delete(slug);
+    unpersistedBooks.delete(slug);
     return;
   }
   for (const s of ALL_BOOK_SLUGS) {
     cache.delete(CACHE_KEYS.HADITH_BOOK(s));
   }
   inMemoryBookCache.clear();
+  unpersistedBooks.clear();
 }

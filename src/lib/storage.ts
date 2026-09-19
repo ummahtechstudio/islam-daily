@@ -70,7 +70,9 @@ function makeNamespace(store: SyncKV) {
       if (!isClient) return false;
       try { store.set(key, value); return true; }
       catch (err) {
-        if (__DEV__) console.warn(`[storage] set failed for "${key}"`, err);
+        // Deliberately NOT gated on __DEV__: a silent write failure in a release
+        // build is exactly how "downloaded" content vanishes on next launch.
+        console.warn(`[storage] set failed for "${key}" (${value.length} chars)`, err);
         return false;
       }
     },
@@ -83,11 +85,16 @@ function makeNamespace(store: SyncKV) {
     },
     setJSON: <T>(key: string, value: T): boolean => {
       if (!isClient) return false;
-      try { store.set(key, JSON.stringify(value)); return true; }
+      let raw = '';
+      try { raw = JSON.stringify(value); store.set(key, raw); return true; }
       catch (err) {
         // Large blobs (e.g. a full trilingual hadith book ~22 MB) can exceed
         // MMKV limits; report failure so callers don't believe it persisted.
-        if (__DEV__) console.warn(`[storage] setJSON failed for "${key}" (value may be too large)`, err);
+        // Deliberately NOT gated on __DEV__ — see `set` above.
+        console.warn(
+          `[storage] setJSON failed for "${key}" (${raw.length} chars — value may be too large)`,
+          err,
+        );
         return false;
       }
     },
