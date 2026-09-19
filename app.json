@@ -81,6 +81,13 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Islam Daily needs access to your photos only to attach a screenshot to feedback you send.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
