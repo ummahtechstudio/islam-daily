@@ -13,6 +13,7 @@ import {
   isQuranCached,
 } from '../services/quranCache';
 import { SURAH_META } from '../constants/surahMeta';
+import { splitLeadingBismillah } from '../utils/bismillah';
 
 // Cumulative ayah offsets so we can compute global ayah numbers (used by the
 // audio CDN URL: /quran/audio/128/<reciter>/<globalAyahNumber>.mp3).
@@ -45,17 +46,15 @@ function ayahFromCache(a: AyahLite, text: string, offset: number): Ayah {
 // ayah 1). For all other surahs the surah header already shows Bismillah, so
 // keeping it on ayah 1 too produces a duplicate. Strip it on the Translation
 // path; the Mushaf view uses `text_indopak` (already clean) and is untouched.
-const BISMILLAH_PREFIX = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
-
+// The match is combining-mark-order-insensitive (see utils/bismillah): the
+// bundled quran.json is not NFC-normalised, so the previous fixed-string
+// startsWith never matched it and the Bismillah was rendered twice.
 function stripBismillahFromFirstAyah(s: SurahEdition): SurahEdition {
   if (s.number === 1) return s; // Al-Fatiha: Bismillah IS ayah 1
   const ayahs = s.ayahs.map((a) => {
     if (a.numberInSurah !== 1) return a;
-    // Skip optional BOM / zero-width / NBSP at the start, then check prefix.
-    const head = a.text.replace(/^[﻿‌‎‏ ]+/, '');
-    if (!head.startsWith(BISMILLAH_PREFIX)) return a;
-    const rest = head.slice(BISMILLAH_PREFIX.length).replace(/^\s+/, '');
-    if (rest.length === 0) return a; // Defensive: never strip if it would empty the ayah
+    const { bismillah, rest } = splitLeadingBismillah(a.text);
+    if (!bismillah) return a; // Also covers "would empty the ayah" — the helper never strips to ''
     return { ...a, text: rest };
   });
   return { ...s, ayahs };
