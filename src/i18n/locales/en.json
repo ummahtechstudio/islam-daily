@@ -218,6 +218,20 @@
     },
     "stale": "Updated {{time}}"
   },
+  "afterSalah": {
+    "title": "After-Salah Adhkar",
+    "subtitle": "The Sunnah sequence to recite after every fard prayer, in order. Every item below comes from the app's verified dhikr and Quran text.",
+    "entry": {
+      "title": "After-Salah Adhkar",
+      "subtitle": "Guided sequence: istighfar, tasbeeh 33×3, Ayat al-Kursi, the three Quls"
+    },
+    "step": "Step {{n}}",
+    "times": "× {{n}}",
+    "reciteOnce": "Recite once",
+    "surah": "Surah {{name}}",
+    "quranReference": "Qur'an, Surah {{surah}} ({{count}} ayahs) — bundled Tanzil text",
+    "placeholder": "not yet in the app's verified data"
+  },
   "dhikr": {
     "countWithTasbeeh": "Count this with Tasbeeh →",
     "loading": {
@@ -851,6 +865,7 @@
   },
   "nav": {
     "titles": {
+      "afterSalah": "After-Salah Adhkar",
       "audioLibrary": "Audio Library — آڈیو لائبریری",
       "calendar": "Islamic Calendar",
       "customAdhan": "Custom Adhan",
@@ -862,16 +877,16 @@
       "islamicBooks": "Islamic Library",
       "language": "Translation Language",
       "mosqueFinder": "Mosque Finder",
+      "namaz": "Namaz Guide",
+      "namazAbout": "About this Guide",
+      "namazHowToPray": "How to Pray",
       "names": "99 Names of Allah",
       "prayerStreak": "Prayer Streak",
       "qibla": "Qibla Finder",
       "quranReader": "Quran Reader",
       "ramadan": "Ramadan",
       "settings": "Settings",
-      "zakatCalculator": "Zakat Calculator",
-      "namaz": "Namaz Guide",
-      "namazHowToPray": "How to Pray",
-      "namazAbout": "About this Guide"
+      "zakatCalculator": "Zakat Calculator"
     }
   },
   "notifications": {

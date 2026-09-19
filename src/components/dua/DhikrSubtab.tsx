@@ -8,7 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../constants/colors';
@@ -56,6 +56,7 @@ export interface DhikrSubtabProps {
 
 export function DhikrSubtab({ theme, onCountWithTasbeeh }: DhikrSubtabProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   // SSR-safe: bundled-only on first render, upgrade in useEffect.
   const [data, setData] = useState<DhikrCategory[]>(() => getBundledDhikr());
   const [language, setLanguage] = useState<TranslationLanguage>('urdu');
@@ -114,6 +115,25 @@ export function DhikrSubtab({ theme, onCountWithTasbeeh }: DhikrSubtabProps) {
       data={entries}
       keyExtractor={(e) => e.key}
       contentContainerStyle={styles.list}
+      ListHeaderComponent={
+        <TouchableOpacity
+          style={[styles.afterSalahCard, { backgroundColor: Colors.primary + '14', borderColor: Colors.primary + '40' }]}
+          onPress={() => router.push('/after-salah' as any)}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+        >
+          <Text style={styles.afterSalahEmoji}>🕌</Text>
+          <View style={styles.afterSalahBody}>
+            <Text style={[styles.afterSalahTitle, { color: theme.text }]}>
+              {t('afterSalah.entry.title')}
+            </Text>
+            <Text style={[styles.afterSalahSubtitle, { color: theme.textSecondary }]}>
+              {t('afterSalah.entry.subtitle')}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+        </TouchableOpacity>
+      }
       renderItem={({ item: entry }) => (
         <DhikrCard
           entry={entry}
@@ -208,6 +228,19 @@ function DhikrCard({
 
 const styles = StyleSheet.create({
   list: { padding: 12, gap: 12, paddingBottom: 32 },
+
+  afterSalahCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+  },
+  afterSalahEmoji: { fontSize: 26 },
+  afterSalahBody: { flex: 1, gap: 2 },
+  afterSalahTitle: { fontSize: 15, fontWeight: '800' },
+  afterSalahSubtitle: { fontSize: 12, lineHeight: 17 },
 
   card: {
     borderRadius: 16,

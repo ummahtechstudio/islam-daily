@@ -218,6 +218,20 @@
     },
     "stale": "اپڈیٹ ہوا {{time}}"
   },
+  "afterSalah": {
+    "title": "نماز کے بعد کے اذکار",
+    "subtitle": "ہر فرض نماز کے بعد ترتیب سے پڑھے جانے والے مسنون اذکار۔ نیچے دی گئی ہر چیز ایپ کے تصدیق شدہ ذکر اور قرآنی متن سے لی گئی ہے۔",
+    "entry": {
+      "title": "نماز کے بعد کے اذکار",
+      "subtitle": "ترتیب وار: استغفار، تسبیحات ۳۳×۳، آیت الکرسی، تین قل"
+    },
+    "step": "مرحلہ {{n}}",
+    "times": "× {{n}}",
+    "reciteOnce": "ایک بار پڑھیں",
+    "surah": "سورۃ {{name}}",
+    "quranReference": "قرآن، سورۃ {{surah}} ({{count}} آیات) — ایپ میں شامل تنزیل متن",
+    "placeholder": "ابھی ایپ کے تصدیق شدہ مواد میں موجود نہیں"
+  },
   "dhikr": {
     "countWithTasbeeh": "اسے تسبیح کے ساتھ گنیں ←",
     "loading": {
@@ -851,6 +865,7 @@
   },
   "nav": {
     "titles": {
+      "afterSalah": "نماز کے بعد کے اذکار",
       "audioLibrary": "آڈیو لائبریری",
       "calendar": "اسلامی کیلنڈر",
       "customAdhan": "اپنی پسند کی اذان",
@@ -862,16 +877,16 @@
       "islamicBooks": "اسلامی لائبریری",
       "language": "ترجمہ کی زبان",
       "mosqueFinder": "مسجد تلاش کریں",
+      "namaz": "نماز گائیڈ",
+      "namazAbout": "اس گائیڈ کے بارے میں",
+      "namazHowToPray": "نماز کا طریقہ",
       "names": "اللہ کے 99 نام",
       "prayerStreak": "نماز کا تسلسل",
       "qibla": "قبلہ کی سمت",
       "quranReader": "قرآن ریڈر",
       "ramadan": "رمضان",
       "settings": "ترتیبات",
-      "zakatCalculator": "زکوٰۃ کیلکولیٹر",
-      "namaz": "نماز گائیڈ",
-      "namazHowToPray": "نماز کا طریقہ",
-      "namazAbout": "اس گائیڈ کے بارے میں"
+      "zakatCalculator": "زکوٰۃ کیلکولیٹر"
     }
   },
   "notifications": {

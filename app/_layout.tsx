@@ -286,6 +286,7 @@ export default function RootLayout() {
         <Stack.Screen name="namaz/[category]" options={{ title: t('nav.titles.namaz') }} />
         <Stack.Screen name="namaz/how-to-pray" options={{ title: t('nav.titles.namazHowToPray') }} />
         <Stack.Screen name="namaz/about" options={{ title: t('nav.titles.namazAbout') }} />
+        <Stack.Screen name="after-salah" options={{ title: t('nav.titles.afterSalah') }} />
         <Stack.Screen name="tasbeeh" options={{ headerShown: false }} />
         <Stack.Screen name="tasbeeh-list" options={{ headerShown: false }} />
         <Stack.Screen name="tasbeeh-edit" options={{ headerShown: false }} />
