@@ -85,14 +85,17 @@ function makeNamespace(store: SyncKV) {
     },
     setJSON: <T>(key: string, value: T): boolean => {
       if (!isClient) return false;
-      let raw = '';
-      try { raw = JSON.stringify(value); store.set(key, raw); return true; }
+      // JSON.stringify returns undefined (not a string) for undefined /
+      // functions / symbols, so size it defensively — the catch must never throw.
+      let raw: string | undefined;
+      try { raw = JSON.stringify(value); store.set(key, raw as string); return true; }
       catch (err) {
         // Large blobs (e.g. a full trilingual hadith book ~22 MB) can exceed
         // MMKV limits; report failure so callers don't believe it persisted.
         // Deliberately NOT gated on __DEV__ — see `set` above.
+        const size = typeof raw === 'string' ? raw.length : 0;
         console.warn(
-          `[storage] setJSON failed for "${key}" (${raw.length} chars — value may be too large)`,
+          `[storage] setJSON failed for "${key}" (${size} chars — value may be too large)`,
           err,
         );
         return false;

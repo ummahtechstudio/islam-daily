@@ -4,6 +4,7 @@ import { fetchSurahList } from './api';
 import { fetchWithTimeout } from '../utils/network';
 import {
   downloadHadithBook,
+  isHadithBookCached,
   isHadithBookPersisted,
   persistHadithBook,
   clearHadithCache,
@@ -311,15 +312,17 @@ async function downloadQuranFromApi(
     onProgress(Math.round((Math.min(start + BATCH - 1, TOTAL) / TOTAL) * 100));
   }
 
-  if (okCount === 0) {
-    throw new Error('Quran download failed: no surahs could be fetched.');
-  }
   if (writeFailures > 0) {
-    // Saved surahs stay on disk so a retry can resume, but the pack is not
-    // "downloaded" until every surah actually persisted.
+    // Checked before okCount so a storage-full run is reported as a storage
+    // problem, not as "nothing could be fetched". Saved surahs stay on disk so
+    // a retry can resume, but the pack is not "downloaded" until every surah
+    // actually persisted.
     throw new Error(
       `Quran download failed: ${writeFailures} surah(s) could not be saved to device storage.`,
     );
+  }
+  if (okCount === 0) {
+    throw new Error('Quran download failed: no surahs could be fetched.');
   }
   await markDownloaded('quranText', totalBytes);
   if (okCount < TOTAL) {
@@ -360,23 +363,28 @@ export async function downloadHadiths(
   for (let i = 0; i < ALL_HADITH_BOOKS.length; i++) {
     const slug = ALL_HADITH_BOOKS[i];
     // "Persisted", not merely "cached": a book that only made it into memory
-    // (MMKV write failed) is retried from memory first, and if it still won't
-    // save, the pack must NOT be marked downloaded — on next launch the reader
-    // would find nothing while the Downloads screen claimed otherwise.
-    if (!isHadithBookPersisted(slug) && !persistHadithBook(slug)) {
-      try {
-        const entry = await downloadHadithBook(slug);
-        // Rough size proxy — hadithCache doesn't expose stored byte size, but
-        // ~1 KB per hadith is the right order of magnitude for status display.
-        totalBytes += entry.totalCount * 1024;
-      } catch (err) {
-        console.warn(`[downloadHadiths] book ${slug} failed`, err);
-        throw err;
-      }
-      if (!isHadithBookPersisted(slug)) {
-        throw new Error(
-          `Hadith book "${slug}" could not be saved to device storage; not marking the pack as downloaded.`,
-        );
+    // (MMKV write failed) must NOT let the pack be marked downloaded — on next
+    // launch the reader would find nothing while the Downloads screen claimed
+    // otherwise.
+    if (!isHadithBookPersisted(slug)) {
+      const unsaveable = new Error(
+        `Hadith book "${slug}" could not be saved to device storage; not marking the pack as downloaded.`,
+      );
+      if (isHadithBookCached(slug)) {
+        // Memory-only copy: retry the write from memory. Never re-download
+        // ~20 MB only to fail the identical write again.
+        if (!persistHadithBook(slug)) throw unsaveable;
+      } else {
+        try {
+          const entry = await downloadHadithBook(slug);
+          // Rough size proxy — hadithCache doesn't expose stored byte size, but
+          // ~1 KB per hadith is the right order of magnitude for status display.
+          totalBytes += entry.totalCount * 1024;
+        } catch (err) {
+          console.warn(`[downloadHadiths] book ${slug} failed`, err);
+          throw err;
+        }
+        if (!isHadithBookPersisted(slug)) throw unsaveable;
       }
     }
     onProgress(Math.round(((i + 1) / ALL_HADITH_BOOKS.length) * 100));
