@@ -64,6 +64,7 @@ const IKHFA_LETTERS = new Set([
   'ت', 'ث', 'ج', 'د', 'ذ', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ف', 'ق', 'ك',
 ]);
 const SHADDAH = '\u0651';
+const MADDAH = '\u0653';
 const SUKOON = '\u0652';
 const TANWIN_FATH = '\u064B';
 const TANWIN_KASR = '\u064D';
@@ -76,7 +77,7 @@ const YA = 'ي';
 // or iqlab (ب). Both are coloured under the legend's "Ghunna" entry.
 const IDGHAM_GHUNNA_LETTERS = new Set(['م', 'ن', 'و', 'ي']);
 const IQLAB_LETTER = 'ب';
-const VOWEL_MARKS = ['َ', 'ُ', 'ِ', SHADDAH, SUKOON, TANWIN_FATH, TANWIN_KASR, TANWIN_DAMM];
+const VOWEL_MARKS = ['\u064E', '\u064F', '\u0650', SHADDAH, SUKOON, TANWIN_FATH, TANWIN_KASR, TANWIN_DAMM];
 
 function isDiacritic(char: string): boolean {
   const code = char.charCodeAt(0);
@@ -104,6 +105,18 @@ function firstLetterOf(word: string | undefined): string {
   if (!word) return '';
   for (const ch of word) {
     if (!isDiacritic(ch) && isArabicLetter(ch)) return ch;
+  }
+  return '';
+}
+
+// Tanzil writes every pause mark (ۖ ۚ ۗ ۙ …) as its own space-separated
+// token. Such mark-only "words" have no base letter, so skip past them to the
+// next real word — the mushaf's own sequential-tanwin / bare-noon marking at
+// those positions already encodes the rule as it applies when reading on.
+function nextWordFirstLetter(words: string[], idx: number): string {
+  for (let k = idx + 1; k < words.length; k++) {
+    const ch = firstLetterOf(words[k]);
+    if (ch) return ch;
   }
   return '';
 }
@@ -157,7 +170,12 @@ function parseTajweed(text: string, nextWordChar = ''): TajweedToken[] {
       color = '#4B9BFF'; // blue — qalqala
     } else if ((char === 'ن' || char === 'م') && token.includes(SHADDAH)) {
       color = '#4CAF50'; // green — ghunna with shaddah
-    } else if (tanwin || (char === 'ن' && !VOWEL_MARKS.some((m) => token.includes(m)))) {
+    } else if (
+      tanwin ||
+      // A bare noon carrying only a maddah (نٓ, 68:1) is the letter-name of the
+      // muqatta'at, read with izhar — never a hidden noon-saakin.
+      (char === 'ن' && !VOWEL_MARKS.some((m) => token.includes(m)) && !token.includes(MADDAH))
+    ) {
       // Noon-saakin / tanwin rules — and they apply to tanwin on ANY final
       // letter (سَمِيعٌ بَصِير), not only to noon. Tanzil Uthmani encodes the
       // "hidden" noon by leaving it BARE (أَنتُمْ, مِن تَحْتِهَا, مِنۢ بَعْدِ); an
@@ -261,7 +279,7 @@ const VerseRow = React.memo(function VerseRow({
   // Memoized once per verse text (and tajweed toggle) — never re-runs on scroll.
   const words = useMemo(() => item.text.split(' '), [item.text]);
   const tajweedTokens = useMemo(
-    () => (tajweedOn ? words.map((w, idx) => parseTajweed(w, firstLetterOf(words[idx + 1]))) : null),
+    () => (tajweedOn ? words.map((w, idx) => parseTajweed(w, nextWordFirstLetter(words, idx))) : null),
     [words, tajweedOn],
   );
 
