@@ -43,6 +43,9 @@ const FONT_SCALE_MAX = 2.0;
 const FONT_SCALE_STEP = 0.1;
 const GOLD = '#EF9F27';
 
+// Start page of each surah in the bundled IndoPak layout (index = surah
+// number; [0] is a placeholder). Verified against assets/data/quran.json —
+// surahs 102/105/108 were previously one page late.
 const SURAH_PAGE_STARTS = [
   0,
   1,   2,   50,  77,  106, 128, 151, 177, 187, 208,
@@ -55,7 +58,7 @@ const SURAH_PAGE_STARTS = [
   570, 572, 574, 575, 577, 578, 580, 582, 583, 585,
   586, 587, 587, 589, 590, 591, 591, 592, 593, 594,
   595, 595, 596, 596, 597, 597, 598, 598, 599, 599,
-  600, 601, 601, 601, 602, 602, 602, 603, 603, 603,
+  600, 600, 601, 601, 601, 602, 602, 602, 603, 603,
   603, 604, 604, 604,
 ];
 
