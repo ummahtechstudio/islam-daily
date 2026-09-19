@@ -494,6 +494,16 @@
       "resultsCount": "{{count}} results"
     }
   },
+  "hadithOfDay": {
+    "badge": "Hadith of the Day",
+    "openInCollection": "Open in {{collection}}",
+    "poolNote": "Chosen each day from the Sahih hadiths in the collections downloaded on this device — Sahih al-Bukhari, Sahih Muslim, and narrations that every listed grader rates Sahih.",
+    "unavailable": {
+      "body": "Download Sahih al-Bukhari or another collection to receive a Sahih hadith here every day.",
+      "browse": "Browse Hadith Collections",
+      "title": "No hadith collection downloaded yet"
+    }
+  },
   "halalFinder": {
     "autoExpand": "No restaurants within {{requested}}km — showing within {{effective}}km",
     "directions": "Go",
@@ -648,6 +658,12 @@
       "error": "Couldn't load today's verse. Tap to retry.",
       "loading": "Loading verse...",
       "title": "Verse of the Day"
+    },
+    "hadithOfDay": {
+      "badge": "Hadith of the Day",
+      "fallback": "Download a hadith collection to get a Sahih hadith here every day. Tap to open the collections.",
+      "readMore": "Read Today's Hadith →",
+      "title": "Hadith of the Day"
     }
   },
   "islamicBooks": {
@@ -872,6 +888,7 @@
       "customizeHome": "Customize Home Screen",
       "downloads": "Offline Downloads",
       "hadith": "Hadith Browser",
+      "hadithOfDay": "Hadith of the Day",
       "halalFinder": "Halal Restaurant Finder",
       "hifzTracker": "Hifz Tracker",
       "islamicBooks": "Islamic Library",

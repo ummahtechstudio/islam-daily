@@ -27,7 +27,9 @@ import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
-import { getSetting } from '../../src/utils/settings';
+import { getSetting, getTranslationLanguage, type TranslationLanguage } from '../../src/utils/settings';
+import { getHadithOfTheDay, type HadithOfTheDay } from '../../src/services/hadithOfTheDay';
+import { COLLECTION_NAMES, type HadithCollectionKey } from '../../src/services/hadiths';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 import { isRouteHidden } from '../../src/constants/featureFlags';
 
@@ -432,6 +434,44 @@ const verseStyles = StyleSheet.create({
   },
 });
 
+// ─── Hadith of the Day — deterministic Sahih pick over cached collections ─────
+function HadithOfDayCard({
+  today, language, onPress,
+}: {
+  today: HadithOfTheDay; language: TranslationLanguage; onPress: () => void;
+}) {
+  const { t } = useTranslation();
+  const { hadith } = today;
+  const collName = COLLECTION_NAMES[hadith.collection_key as HadithCollectionKey] ?? hadith.collection_name;
+  const showUrdu = language === 'urdu' && !!hadith.urdu;
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={{ marginBottom: spacing.md }}>
+      <ManuscriptCard variant="bordered">
+        <View style={verseStyles.refRow}>
+          <View style={verseStyles.refBadge}>
+            <Text style={verseStyles.refBadgeText}>{t('home.hadithOfDay.badge')}</Text>
+          </View>
+          {/* collName is the proper-noun collection name — content, not translated */}
+          <Text style={verseStyles.reference}>{collName} #{hadith.hadith_number}</Text>
+        </View>
+        <Text style={verseStyles.arabic} textBreakStrategy="simple" numberOfLines={3}>
+          {hadith.arabic}
+        </Text>
+        <View style={verseStyles.divider} />
+        <Text
+          style={[verseStyles.english, showUrdu && verseStyles.translationUrdu]}
+          numberOfLines={showUrdu ? 3 : 4}
+        >
+          {showUrdu ? hadith.urdu : hadith.english}
+        </Text>
+        <View style={verseStyles.readRow}>
+          <Text style={verseStyles.readBtn}>{t('home.hadithOfDay.readMore')}</Text>
+        </View>
+      </ManuscriptCard>
+    </TouchableOpacity>
+  );
+}
+
 // ─── More Features Section ────────────────────────────────────────────────────
 type MoreItem = { id: string; icon: keyof typeof Ionicons.glyphMap | string; label: string; sub: string; route: string; useCustomIcon?: 'minaret' };
 type MoreSection = { id: string; title: string; ionicon: keyof typeof Ionicons.glyphMap; color: string; items: MoreItem[] };
@@ -618,6 +658,22 @@ export default function HomeScreen() {
 
   const [enabledIds, setEnabledIds] = useState<string[]>(DEFAULT_ENABLED_TILE_IDS);
   const [tilesLoaded, setTilesLoaded] = useState(false);
+
+  // Hadith of the Day comes from the on-device hadith cache (no network), so
+  // it is recomputed on focus: a collection may have just been downloaded, or
+  // the local day may have rolled over.
+  const [hadithToday, setHadithToday] = useState<HadithOfTheDay | null>(null);
+  const [hadithLanguage, setHadithLanguage] = useState<TranslationLanguage>('urdu');
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      setHadithToday(getHadithOfTheDay(new Date(homeTick)));
+      getTranslationLanguage().then((lang) => {
+        if (!cancelled) setHadithLanguage(lang);
+      });
+      return () => { cancelled = true; };
+    }, [homeTick]),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -809,6 +865,29 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
         ) : null}
+
+        <GoldDivider />
+
+        <SectionTitle title={t('home.hadithOfDay.title')} isDark={isDark} />
+        {hadithToday ? (
+          <HadithOfDayCard
+            today={hadithToday}
+            language={hadithLanguage}
+            onPress={() => navigate('/hadith-of-the-day')}
+          />
+        ) : (
+          // No eligible collection downloaded yet — generic nudge to the
+          // collection list; no hadith text is shown here.
+          <TouchableOpacity
+            style={[styles.loadingCard, { backgroundColor: theme.card, borderColor: theme.border }]}
+            onPress={() => navigate('/hadith')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+              {t('home.hadithOfDay.fallback')}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <GoldDivider />
 

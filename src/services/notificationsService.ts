@@ -521,7 +521,9 @@ async function scheduleDailyHadithNotification(): Promise<void> {
         title: i18n.t('notifications.dailyHadithNotif.title'),
         body: i18n.t('notifications.dailyHadithNotif.body'),
         sound: 'default',
-        data: { tag: DAILY_HADITH_TAG, route: '/hadith' },
+        // Lands on TODAY's Hadith of the Day (computed at open time), which
+        // itself falls back to the /hadith list when nothing is downloaded.
+        data: { tag: DAILY_HADITH_TAG, route: '/hadith-of-the-day' },
       },
       trigger: {
         type: SchedulableTriggerInputTypes.DAILY,

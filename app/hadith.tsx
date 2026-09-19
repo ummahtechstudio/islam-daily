@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
@@ -256,6 +256,19 @@ export default function HadithScreen() {
       setProgress(null);
     }
   }, [isOnline, startDownload]);
+
+  // Deep link (Hadith of the Day → "Open in collection", or a notification):
+  // /hadith?collection=bukhari&number=123 opens that collection with the list
+  // filtered to exactly that hadith number (the numeric search path).
+  const { collection: collectionParam, number: numberParam } =
+    useLocalSearchParams<{ collection?: string; number?: string }>();
+  useEffect(() => {
+    if (!collectionParam) return;
+    if (!HADITH_COLLECTIONS.some((c) => c.key === collectionParam)) return;
+    handleSelectCollection(collectionParam as HadithCollectionKey);
+    if (numberParam && /^\d+(\.\d+)?$/.test(numberParam)) setSearchQuery(numberParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collectionParam, numberParam]);
 
   // If we entered the screen offline-without-cache, then connectivity comes back,
   // start the download automatically.

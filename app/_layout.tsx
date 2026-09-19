@@ -134,7 +134,7 @@ export default function RootLayout() {
   }, []);
 
   // Notification taps that carry a `route` in their data payload deep-link to
-  // that screen (Daily Hadith → /hadith, Friday → Surah Al-Kahf). Prayer and
+  // that screen (Daily Hadith → /hadith-of-the-day, Friday → Surah Al-Kahf). Prayer and
   // Tahajjud notifications carry no route, so they just open the app as before.
   useEffect(() => {
     if (Platform.OS === 'web') return;
@@ -266,6 +266,7 @@ export default function RootLayout() {
         <Stack.Screen name="search" options={{ headerShown: false }} />
         <Stack.Screen name="qibla" options={{ title: t('nav.titles.qibla') }} />
         <Stack.Screen name="hadith" options={{ title: t('nav.titles.hadith') }} />
+        <Stack.Screen name="hadith-of-the-day" options={{ title: t('nav.titles.hadithOfDay') }} />
         <Stack.Screen name="names" options={{ title: t('nav.titles.names') }} />
         <Stack.Screen name="calendar" options={{ title: t('nav.titles.calendar') }} />
         <Stack.Screen name="quran/[id]" options={{ title: t('nav.titles.quranReader') }} />
