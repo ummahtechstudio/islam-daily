@@ -143,14 +143,24 @@ export default function QiblaScreen() {
         }
         headingSub = await Location.watchHeadingAsync((data) => {
           if (!mounted) return;
-          // trueHeading is -1 when the OS cannot supply a declination-corrected
-          // heading. magHeading is NOT an acceptable stand-in (see the note
-          // above), so treat that exactly like having no compass: the static
-          // bearing card is shown instead of a needle that is off by the local
-          // declination. Recovers automatically once trueHeading returns.
+          // A missing declination-corrected heading is treated exactly like
+          // having no compass: magHeading is NOT an acceptable stand-in (see the
+          // note above), so the static bearing card is shown instead of a
+          // needle that is off by the local declination. Recovers on the next
+          // valid sample.
+          //
+          // "Missing" differs per platform. iOS: any negative trueHeading is
+          // invalid (CLHeading). Android: expo-location returns exactly -1 when
+          // it has no location fix / permission, but otherwise computes
+          // (magNorth + declination) % 360 with a sign-preserving modulo, so a
+          // perfectly VALID heading can be slightly negative in west-declination
+          // regions (e.g. New York: magNorth 5° → -8°). Normalise those instead
+          // of flapping to the card whenever the user faces near true north.
           const h = data.trueHeading;
-          if (typeof h === 'number' && h >= 0) {
-            setCompassHeading(h);
+          const unavailable =
+            typeof h !== 'number' || !Number.isFinite(h) || (Platform.OS === 'android' ? h === -1 : h < 0);
+          if (!unavailable) {
+            setCompassHeading(((h % 360) + 360) % 360);
             setHasCompass(true);
           } else {
             setHasCompass(false);
