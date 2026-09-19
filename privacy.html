@@ -66,7 +66,7 @@
     <p><strong>Please do not include anything sensitive in a screenshot.</strong> Uploaded screenshots are stored in a public storage bucket: they can be viewed without a login by anyone who has the link or who lists the bucket. If you give an e-mail address we use it only to reply to you.</p>
 
     <h3>1.3 Information that stays on your device</h3>
-    <p>The following is stored only on your phone and is never sent to us: bookmarks and favourites, prayer log and streaks, Hifz (memorisation) progress, tasbeeh counts, reading position, notification and prayer-time settings, chosen city, theme and language, downloaded Quran / hadith / dua / audio content, and the app's internal usage counters (screens opened, features used). These counters exist only locally and are not uploaded. All of it is removed when you uninstall the app. Inside the app, <strong>Settings → Storage &amp; Data</strong> lets you clear cached data and delete downloaded packs; <strong>Reset All Settings</strong> restores your preferences to their defaults but keeps your bookmarks.</p>
+    <p>The following is stored only on your phone and is never sent to us: bookmarks and favourites, prayer log and streaks, Hifz (memorisation) progress, tasbeeh counts, reading position, notification and prayer-time settings, chosen city, theme and language, downloaded Quran / hadith / dua / audio content, and the app's internal usage counters (screens opened, features used). These counters exist only locally and are not uploaded. All of it is removed when you uninstall the app. Inside the app, <strong>Settings → Storage &amp; Data → Reset All Settings</strong> restores your preferences to their defaults but keeps your bookmarks, and the <strong>Downloads</strong> screen (More → Downloads) deletes downloaded packs.</p>
 
     <h3>1.4 What we do not collect</h3>
     <ul>
@@ -94,13 +94,12 @@
     <table>
       <tr><th>Service</th><th>Used for</th><th>What it receives</th></tr>
       <tr><td><strong>Supabase</strong> (our backend host)</td><td>Storing the optional session records and your feedback; serving refreshed duas and 99 Names content and the optional Quran text download pack.</td><td>The session record (1.1) and feedback (1.2) you send; otherwise only content requests.</td></tr>
-      <tr><td><strong>Cloudflare R2</strong> (our content CDN)</td><td>Hadith collections and other downloadable content.</td><td>Content requests only.</td></tr>
+      <tr><td><strong>Cloudflare R2</strong> (our content CDN)</td><td>Hadith collections and other downloadable content. On iOS the app's network library also uses this host for its "is the internet reachable?" check (a tiny request about once a minute for the rest of the session after an offline-aware screen has been opened); Android uses the operating system's own network status instead.</td><td>Content requests only. No data.</td></tr>
       <tr><td><strong>OpenStreetMap — Overpass API</strong> (overpass-api.de)</td><td>Mosque Finder, Halal Finder.</td><td>Your position and search radius, while you search. Map data © OpenStreetMap contributors (ODbL).</td></tr>
       <tr><td><strong>Aladhan API</strong> (aladhan.com)</td><td>Downloading the offline Hijri calendar pack; a lightweight "am I online?" check on the Downloads screen.</td><td>Month/year, or an empty request. No location.</td></tr>
       <tr><td><strong>AlQuran.cloud API</strong></td><td>Additional Quran translation editions, word-by-word meanings, and Quran text search when online.</td><td>Surah/ayah numbers, edition names, and the search text you type.</td></tr>
       <tr><td><strong>Audio hosts</strong>: EveryAyah.com, Islamic Network CDN, QuranicAudio.com, Internet Archive (archive.org), IslamicFinder.org</td><td>Streaming recitations, lectures and adhan previews when you press play.</td><td>Which file you play.</td></tr>
       <tr><td><strong>Your device's operating system</strong> (Google Play services on Android, Apple on iOS)</td><td>Location fixes and reverse geocoding (city name).</td><td>Handled by the OS under Google's / Apple's own policies.</td></tr>
-      <tr><td><strong>Google connectivity check</strong> (clients3.google.com/generate_204) — iOS only</td><td>The app's network library confirms that the internet is reachable so offline-aware screens can tell "no connection" from "server down". On Android the operating system's own network status is used instead.</td><td>An empty request, about once a minute while such a screen is open. No data.</td></tr>
       <tr><td><strong>Apps you open from Islam Daily</strong> (maps app, browser, e-mail)</td><td>Directions to a mosque or restaurant, links in Sources &amp; Credits, contacting us.</td><td>Only what is in the link — never your position.</td></tr>
     </table>
     <p>We do not sell, rent or share your information with advertisers or data brokers, and we do not share it with anyone else except the hosting providers named above, who process it on our behalf.</p>
@@ -109,14 +108,14 @@
     <ul>
       <li><strong>Session records and feedback text</strong> are stored in our database hosted by Supabase, protected by HTTPS in transit, and accessible only to the Islam Daily development team. <strong>Feedback screenshots</strong> are stored in a public storage bucket (see 1.2).</li>
       <li><strong>Retention:</strong> session records are anonymous and are kept in aggregate for as long as they are useful for understanding where the app is used. Feedback is kept while we work on the issue it describes and for reference afterwards. There is no automatic deletion; we delete on request (see 5).</li>
-      <li><strong>Content</strong> (Quran, hadith, duas, audio) is stored on your device once downloaded and can be cleared at any time from <strong>Settings → Storage &amp; Data</strong>.</li>
+      <li><strong>Content</strong> (Quran, hadith, duas, audio) is stored on your device once downloaded and can be deleted pack by pack from the <strong>Downloads</strong> screen.</li>
     </ul>
 
     <h2 id="your-choices">5. Your choices and rights</h2>
     <ul>
       <li><strong>Turn the session record off:</strong> Settings → Privacy → Anonymous Analytics. Declining on first launch has the same effect. Nothing else in the app depends on it.</li>
       <li><strong>Revoke permissions</strong> (location, camera, notifications) at any time in your phone's settings. The app keeps working; features that need a permission will ask again or offer a manual alternative.</li>
-      <li><strong>Delete local data:</strong> uninstall the app. Settings → Storage &amp; Data clears cached data and downloaded packs; Reset All Settings restores preferences (bookmarks are kept).</li>
+      <li><strong>Delete local data:</strong> uninstall the app. Settings → Storage &amp; Data → Reset All Settings restores preferences (bookmarks are kept); the Downloads screen deletes downloaded packs.</li>
       <li><strong>Delete feedback you sent:</strong> e-mail us with the approximate date and the message text (or the e-mail address you entered) and we will delete the row and any screenshot. Because session records contain no identifier we cannot single out "your" records, but you can stop new ones at any time.</li>
       <li><strong>Access, correction, objection, complaint:</strong> if you are in the EU/EEA, UK or another region with data-protection rights, you can ask us what we hold, ask for it to be corrected or erased, or object to its use, by e-mailing us. You also have the right to complain to your local data-protection authority.</li>
     </ul>
@@ -129,7 +128,7 @@
       <li><strong>Notifications / exact alarms:</strong> adhan and prayer-time reminders, daily hadith and other reminders you enable. On Android the app uses exact alarms so reminders fire at the prayer time; it re-schedules them after a restart (boot-completed permission).</li>
       <li><strong>Internet:</strong> to download content, stream audio and send feedback.</li>
     </ul>
-    <p>The installed package also declares a few permissions that come from the libraries the app is built with and that the app never asks you for or uses to collect anything: <em>modify audio settings</em> (audio playback), <em>read/write external storage</em> (legacy photo-picker access on older Android versions), <em>display over other apps</em> (development tooling) and <em>vibrate</em> (haptic feedback). It does not declare microphone or physical-activity permissions; the app never records audio or reads motion sensors.</p>
+    <p>The installed package also declares a few permissions that come from the libraries the app is built with and that the app never asks you for or uses to collect anything: <em>network state / Wi-Fi state</em> (to know whether you are online), <em>wake lock</em> and <em>post notifications</em> (to deliver scheduled reminders), <em>modify audio settings</em> (audio playback), <em>read/write external storage</em> (legacy photo-picker access on older Android versions), <em>display over other apps</em> (development tooling), <em>vibrate</em> (haptic feedback) and a push-messaging receiver that ships inside the notifications library but is never activated (the app has no push-messaging configuration). It does not declare microphone or physical-activity permissions; the app never records audio or reads motion sensors.</p>
 
     <h2 id="children">7. Children's privacy</h2>
     <p>Islam Daily is suitable for all ages. We do not knowingly collect personal information from anyone, including children under 13. The only information that reaches us is the anonymous session record (if enabled) and feedback that is deliberately sent; if a child has sent us personal information through the feedback form, contact us and we will delete it.</p>
