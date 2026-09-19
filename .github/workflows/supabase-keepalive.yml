@@ -18,13 +18,21 @@ jobs:
     steps:
       - name: Query Supabase to reset the inactivity timer
         run: |
+          # `|| RC=$?` keeps `bash -e` from aborting before we can print a
+          # useful message when curl fails at the transport level (DNS, TLS…).
+          RC=0
           CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 30 --retry 3 --retry-delay 15 --retry-all-errors \
             "https://vchfykblowmrcvyaljxn.supabase.co/rest/v1/names_of_allah?select=id&limit=1" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}") || RC=$?
+          if [ "$RC" -ne 0 ]; then
+            echo "::error::curl exited $RC without an HTTP response (6 = DNS failure, 7 = connection refused, 28 = timeout). Is the Supabase project paused or still restoring?"
+            exit 1
+          fi
           echo "HTTP status: $CODE"
           if [ "$CODE" != "200" ]; then
-            echo "Keep-alive failed — got $CODE instead of 200."
+            echo "::error::Keep-alive failed — got $CODE instead of 200."
             exit 1
           fi
           echo "Keep-alive OK."
