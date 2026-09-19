@@ -23,94 +23,124 @@
     ul { padding-left: 24px; }
     li { margin-bottom: 8px; }
     .contact { background: #f0f7f5; padding: 16px; border-radius: 8px; margin-top: 24px; }
+    .summary { background: #fff8ec; border-left: 4px solid #EF9F27; padding: 12px 16px; border-radius: 6px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 12px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f0f7f5; color: #0F6E56; }
+    code { background: #f3f3f0; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    @media (max-width: 600px) { .container { padding: 20px; } table { font-size: 13px; } }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🕌 Privacy Policy — Islam Daily</h1>
-    <p class="updated"><strong>Last Updated:</strong> April 27, 2026</p>
+    <p class="updated"><strong>Last Updated:</strong> September 20, 2026</p>
 
     <h2>Introduction</h2>
-    <p>Islam Daily ("we", "our", "the app") is developed by <strong>Ummah Tech Studio</strong>. This Privacy Policy explains how we handle information when you use our mobile application.</p>
-    <p><strong>We respect your privacy.</strong> Islam Daily is designed to work primarily offline and we collect minimal information.</p>
+    <p>Islam Daily ("we", "our", "the app") is developed by <strong>Ummah Tech Studio</strong>. This policy describes, in plain words, exactly what information the app sends off your device, why, where it goes, and how you control it. It was written by checking every network request in the app's source code, and it is updated whenever that changes.</p>
 
-    <h2>Information We Collect</h2>
+    <div class="summary">
+      <p><strong>In short</strong></p>
+      <ul>
+        <li>Islam Daily has <strong>no accounts, no advertising, and no analytics or tracking SDKs</strong>. It works mostly offline.</li>
+        <li>Only two things ever reach our own servers, and both are under your control: an <strong>optional, anonymous session record</strong> (approximate location only — you are asked on first launch and can switch it off in Settings) and any <strong>feedback you choose to send</strong>.</li>
+        <li>Your precise GPS position is used <strong>on your device</strong> for prayer times and the Qibla direction. It is sent to a third party in one situation only: when you use the Mosque or Halal finder, the search area goes to the OpenStreetMap Overpass service so it can look up places near you.</li>
+        <li>Everything else — bookmarks, prayer log, memorisation progress, tasbeeh counts, settings, downloaded content — stays on your phone.</li>
+      </ul>
+    </div>
 
-    <h3>1. Information You Provide</h3>
+    <h2>1. Information we collect</h2>
+
+    <h3>1.1 Optional anonymous session record ("Anonymous Analytics")</h3>
+    <p>The first time you open the app you are asked whether Islam Daily may record an anonymous session each time it is launched. Nothing is sent unless you tap <em>OK, I understand</em>. You can change your answer at any time in <strong>Settings → Privacy → Anonymous Analytics</strong>.</p>
+    <p>If you agree, the app sends <strong>one record per launch</strong> to our own database containing only:</p>
     <ul>
-      <li><strong>Feedback:</strong> If you submit feedback through the app, we receive your message, optional name, and optional email. This is stored securely in our Supabase database.</li>
-      <li><strong>Bookmarks:</strong> Your bookmarks (favorite hadiths, duas, ayahs) are stored locally on your device only. We do not collect this data.</li>
-      <li><strong>Settings:</strong> Your preferences (theme, prayer times calculation method, etc.) are stored locally on your device only.</li>
+      <li><strong>Approximate location:</strong> your city and country (as reported by your device's built-in reverse geocoder), plus your latitude and longitude <strong>rounded to one decimal place — about 10 km</strong>. The precise GPS reading is never uploaded. If you have not granted the app location permission, this part is simply left empty — the app never asks for the permission for this purpose.</li>
+      <li><strong>Device and app:</strong> platform (Android or iOS), operating-system version, device model name (for example "Pixel 7") and the app version.</li>
+      <li><strong>Time:</strong> when the record arrived.</li>
+    </ul>
+    <p>The record contains <strong>no name, e-mail, account, device ID, advertising ID or any other identifier</strong>. No identifier is stored, so we have no way to tell which records came from the same phone. We use these records for one purpose: to understand which regions and devices the app serves, so we can prioritise languages, calculation methods and testing.</p>
+
+    <h3>1.2 Feedback you send</h3>
+    <p>If you use <strong>Settings → Send Feedback</strong>, we receive what you type: your message, category, optional star rating, an optional name and an optional e-mail address (both may be left blank), together with the app version, platform and device model so we can reproduce problems. If you attach a screenshot, the image is resized and uploaded too.</p>
+    <p><strong>Please do not include anything sensitive in a screenshot.</strong> Uploaded screenshots are stored in a storage bucket that can be reached by URL without a login. If you give an e-mail address we use it only to reply to you.</p>
+
+    <h3>1.3 Information that stays on your device</h3>
+    <p>The following is stored only on your phone and is never sent to us: bookmarks and favourites, prayer log and streaks, Hifz (memorisation) progress, tasbeeh counts, reading position, notification and prayer-time settings, chosen city, theme and language, downloaded Quran / hadith / dua / audio content, and the app's internal usage counters (screens opened, features used). These counters exist only locally and are not uploaded. All of it is removed when you uninstall the app, or when you use <strong>Settings → Storage &amp; Data → Reset All Settings</strong>.</p>
+
+    <h3>1.4 What we do not collect</h3>
+    <ul>
+      <li>❌ No accounts, logins or passwords — the app has none.</li>
+      <li>❌ No name, e-mail or phone number, unless you type them into the feedback form.</li>
+      <li>❌ No device identifier, advertising ID or push-notification token (all reminders are scheduled locally on your phone).</li>
+      <li>❌ No reading history, bookmarks or in-app behaviour.</li>
+      <li>❌ No contacts, photos (other than a screenshot you choose to attach), microphone audio or camera images.</li>
+      <li>❌ No advertising, analytics, crash-reporting or tracking SDKs of any kind.</li>
     </ul>
 
-    <h3>2. Information Collected Automatically</h3>
+    <h2>2. How your location is used</h2>
+    <p>Location permission is optional. If you decline it you can still choose a city manually for prayer times.</p>
+    <table>
+      <tr><th>Feature</th><th>What happens with your position</th></tr>
+      <tr><td>Prayer times &amp; Hijri calendar</td><td>Calculated <strong>on your device</strong> (adhan-js library, Umm al-Qura calendar). Your position is not sent to any server for this.</td></tr>
+      <tr><td>Qibla direction</td><td>Calculated <strong>on your device</strong> from your position and the coordinates of the Kaaba. No server is contacted.</td></tr>
+      <tr><td>City name shown on Home / Prayer Times</td><td>Your device's built-in reverse geocoder turns coordinates into a city name. On Android this is provided by Google Play services and on iOS by Apple; the request is made by the operating system under its own privacy policy.</td></tr>
+      <tr><td>Mosque Finder &amp; Halal Finder</td><td>Your current position and the search radius you pick are sent to the public <strong>OpenStreetMap Overpass API</strong> (overpass-api.de) so it can return places near you. This is the only third-party service that receives your position from the app, and only while you use these screens. When you tap "Directions", only the <em>destination's</em> coordinates are handed to your maps app.</td></tr>
+      <tr><td>Anonymous session record (optional)</td><td>Rounded to about 10 km before it is sent — see 1.1.</td></tr>
+    </table>
+
+    <h2>3. Third-party services</h2>
+    <p>Like any app that loads content from the internet, Islam Daily contacts the servers below. Each of them sees the request itself and your device's IP address, as any website does. <strong>None of them receives your name, an identifier, or — except Overpass, above — your location.</strong></p>
+    <table>
+      <tr><th>Service</th><th>Used for</th><th>What it receives</th></tr>
+      <tr><td><strong>Supabase</strong> (our backend host)</td><td>Storing the optional session records and your feedback; serving refreshed duas and 99 Names content.</td><td>The session record (1.1) and feedback (1.2) you send; otherwise only content requests.</td></tr>
+      <tr><td><strong>Cloudflare R2</strong> (our content CDN)</td><td>Hadith collections and other downloadable content.</td><td>Content requests only.</td></tr>
+      <tr><td><strong>OpenStreetMap — Overpass API</strong> (overpass-api.de)</td><td>Mosque Finder, Halal Finder.</td><td>Your position and search radius, while you search. Map data © OpenStreetMap contributors (ODbL).</td></tr>
+      <tr><td><strong>Aladhan API</strong> (aladhan.com)</td><td>Downloading the offline Hijri calendar pack; a lightweight "am I online?" check on the Downloads screen.</td><td>Month/year, or an empty request. No location.</td></tr>
+      <tr><td><strong>AlQuran.cloud API</strong></td><td>Additional Quran translation editions, word-by-word meanings, and Quran text search when online.</td><td>Surah/ayah numbers, edition names, and the search text you type.</td></tr>
+      <tr><td><strong>Audio hosts</strong>: EveryAyah.com, Islamic Network CDN, QuranicAudio.com, Internet Archive (archive.org), IslamicFinder.org</td><td>Streaming recitations, lectures and adhan previews when you press play.</td><td>Which file you play.</td></tr>
+      <tr><td><strong>Your device's operating system</strong> (Google Play services on Android, Apple on iOS)</td><td>Location fixes and reverse geocoding (city name); on iOS, the system connectivity check.</td><td>Handled by the OS under Google's / Apple's own policies.</td></tr>
+      <tr><td><strong>Apps you open from Islam Daily</strong> (maps app, browser, e-mail)</td><td>Directions to a mosque or restaurant, links in Sources &amp; Credits, contacting us.</td><td>Only what is in the link — never your position.</td></tr>
+    </table>
+    <p>We do not sell, rent or share your information with advertisers or data brokers, and we do not share it with anyone else except the hosting providers named above, who process it on our behalf.</p>
+
+    <h2>4. Where data is stored and for how long</h2>
     <ul>
-      <li><strong>Location (Optional):</strong> If you grant location permission, we use your device's GPS to:
-        <ul>
-          <li>Calculate accurate prayer times for your location</li>
-          <li>Show the Qibla direction</li>
-          <li>Find nearby mosques</li>
-        </ul>
-        Your location is processed on your device. We do not store or transmit your location to our servers.
-      </li>
-      <li><strong>Device Information:</strong> When you submit feedback, we collect basic device info (OS type and app version) to help diagnose issues.</li>
+      <li><strong>Session records and feedback</strong> are stored in our database and file storage hosted by Supabase, protected by HTTPS in transit, and accessible only to the Islam Daily development team.</li>
+      <li><strong>Retention:</strong> session records are anonymous and are kept in aggregate for as long as they are useful for understanding where the app is used. Feedback is kept while we work on the issue it describes and for reference afterwards. There is no automatic deletion; we delete on request (see 5).</li>
+      <li><strong>Content</strong> (Quran, hadith, duas, audio) is stored on your device once downloaded and can be cleared at any time from <strong>Settings → Storage &amp; Data</strong>.</li>
     </ul>
 
-    <h3>3. Information We DO NOT Collect</h3>
+    <h2>5. Your choices and rights</h2>
     <ul>
-      <li>❌ We do not collect your name, email, or phone number unless you voluntarily submit it via feedback</li>
-      <li>❌ We do not track your reading habits, bookmarks, or app usage</li>
-      <li>❌ We do not use cookies or web tracking</li>
-      <li>❌ We do not share your information with advertisers</li>
-      <li>❌ We do not have user accounts or login systems</li>
+      <li><strong>Turn the session record off:</strong> Settings → Privacy → Anonymous Analytics. Declining on first launch has the same effect. Nothing else in the app depends on it.</li>
+      <li><strong>Revoke permissions</strong> (location, camera, notifications) at any time in your phone's settings. The app keeps working; features that need a permission will ask again or offer a manual alternative.</li>
+      <li><strong>Delete local data:</strong> Settings → Storage &amp; Data → Reset All Settings, or uninstall the app.</li>
+      <li><strong>Delete feedback you sent:</strong> e-mail us with the approximate date and the message text (or the e-mail address you entered) and we will delete the row and any screenshot. Because session records contain no identifier we cannot single out "your" records, but you can stop new ones at any time.</li>
+      <li><strong>Access, correction, objection, complaint:</strong> if you are in the EU/EEA, UK or another region with data-protection rights, you can ask us what we hold, ask for it to be corrected or erased, or object to its use, by e-mailing us. You also have the right to complain to your local data-protection authority.</li>
     </ul>
 
-    <h2>Third-Party Services</h2>
-    <p>Islam Daily uses the following third-party services to provide content:</p>
+    <h2>6. Permissions the app may ask for</h2>
     <ul>
-      <li><strong>Aladhan API</strong> — for prayer times calculation (sends only city/coordinates)</li>
-      <li><strong>OpenStreetMap (Overpass API)</strong> — for finding nearby mosques (sends only your coordinates and search radius)</li>
-      <li><strong>Cloudflare R2</strong> — for hosting hadith content (no user data sent)</li>
-      <li><strong>Supabase</strong> — for storing feedback submissions only</li>
-    </ul>
-    <p>These services may collect basic technical information per their own privacy policies. We do not share any personal information with them.</p>
-
-    <h2>Data Storage</h2>
-    <ul>
-      <li><strong>On your device:</strong> Bookmarks, settings, and reading progress are stored locally using AsyncStorage. They never leave your phone.</li>
-      <li><strong>On our servers:</strong> Only feedback messages (if you submit them). We may keep these to improve the app.</li>
+      <li><strong>Location (optional):</strong> prayer times, Qibla, Mosque/Halal finders, city name, and the optional session record described in 1.1.</li>
+      <li><strong>Camera (optional):</strong> the augmented-reality Qibla view only. No photo or video is captured, stored or sent.</li>
+      <li><strong>Photos (optional):</strong> only to pick a screenshot to attach to feedback. Only the image you select is uploaded.</li>
+      <li><strong>Notifications / exact alarms:</strong> adhan and prayer-time reminders, daily hadith and other reminders you enable. On Android the app uses exact alarms so reminders fire at the prayer time; it re-schedules them after a restart (boot-completed permission).</li>
+      <li><strong>Internet:</strong> to download content, stream audio and send feedback.</li>
     </ul>
 
-    <h2>Permissions</h2>
-    <p>The app requests the following permissions:</p>
-    <ul>
-      <li><strong>Location:</strong> For prayer times, Qibla, and mosque finder. Optional.</li>
-      <li><strong>Notifications:</strong> For Adhan reminders and daily hadith notifications. Optional.</li>
-      <li><strong>Internet:</strong> To download Quran/Hadith content and submit feedback.</li>
-    </ul>
-    <p>You can revoke any permission at any time through your device's settings.</p>
+    <h2>7. Children's privacy</h2>
+    <p>Islam Daily is suitable for all ages. We do not knowingly collect personal information from anyone, including children under 13. The only information that reaches us is the anonymous session record (if enabled) and feedback that is deliberately sent; if a child has sent us personal information through the feedback form, contact us and we will delete it.</p>
 
-    <h2>Children's Privacy</h2>
-    <p>Islam Daily is suitable for all ages. We do not knowingly collect personal information from anyone, including children under 13.</p>
+    <h2>8. Security</h2>
+    <p>All network requests use HTTPS. Data on our backend is accessible only to the development team. Local data is kept in the app's private storage on your device.</p>
 
-    <h2>Data Security</h2>
-    <p>We use industry-standard security measures including HTTPS encryption for all network requests. Local data is stored in your device's secure storage.</p>
+    <h2>9. Changes to this policy</h2>
+    <p>If we change what the app collects, this page and the matching text inside the app (the first-launch privacy prompt, Settings → Privacy, and Sources &amp; Credits) are updated together, and the "Last Updated" date above changes. Significant changes will also be pointed out inside the app.</p>
 
-    <h2>Your Rights</h2>
-    <p>You have the right to:</p>
-    <ul>
-      <li>Stop using the app at any time</li>
-      <li>Clear all local data via Settings → Storage & Data → Reset All Settings</li>
-      <li>Request deletion of any feedback you submitted (contact us with the message details)</li>
-      <li>Ask questions about your data (contact us)</li>
-    </ul>
-
-    <h2>Changes to This Policy</h2>
-    <p>We may update this Privacy Policy occasionally. The "Last Updated" date at the top will reflect any changes. Significant changes will be communicated within the app.</p>
-
-    <h2>Contact Us</h2>
+    <h2>10. Contact</h2>
     <div class="contact">
-      <p>If you have questions about this Privacy Policy or your data:</p>
+      <p>Questions about this policy or your data, or a deletion request:</p>
       <p>📧 Email: <a href="mailto:ummahtech.studio@gmail.com">ummahtech.studio@gmail.com</a></p>
       <p>🏢 Developer: Ummah Tech Studio</p>
       <p>📍 Location: Dubai, United Arab Emirates</p>
