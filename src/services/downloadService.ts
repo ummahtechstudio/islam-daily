@@ -14,7 +14,7 @@ import type { HadithCollectionKey } from './hadiths';
 
 // Per-request timeout for third-party calls inside the long download loops.
 // 20 s leaves room for slow mobile networks without letting a single hung
-// request stall the entire 114-surah / 12-month batch.
+// request stall the entire 114-surah batch.
 const DL_TIMEOUT_MS = 20000;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -472,12 +472,15 @@ export async function purgeRemovedPacks(): Promise<void> {
     const stale = keys.filter((k) => k === 'offline_calendar' || k === 'offline_calendar_dates');
     if (stale.length > 0) await AsyncStorage.multiRemove(stale);
 
-    const raw = await AsyncStorage.getItem(STATUS_KEY);
-    if (raw) {
+    // Both the current status record and the v1 one getDownloadStatus()
+    // migrates from, so the entry can't be carried over on the next launch.
+    for (const statusKey of [STATUS_KEY, 'dl_status_v1']) {
+      const raw = await AsyncStorage.getItem(statusKey);
+      if (!raw) continue;
       const parsed = JSON.parse(raw) as Record<string, unknown>;
-      if ('calendar' in parsed) {
+      if (parsed && typeof parsed === 'object' && 'calendar' in parsed) {
         delete parsed.calendar;
-        await AsyncStorage.setItem(STATUS_KEY, JSON.stringify(parsed));
+        await AsyncStorage.setItem(statusKey, JSON.stringify(parsed));
       }
     }
   } catch {
@@ -491,20 +494,11 @@ export async function downloadPrayerTimes(
   onProgress: (pct: number) => void
 ): Promise<void> {
   onProgress(30);
-  const keys = await AsyncStorage.getAllKeys();
-  const prayerKeys = keys.filter((k) => k.startsWith('api_prayers_'));
-  onProgress(70);
-
-  let totalBytes = 0;
-  if (prayerKeys.length > 0) {
-    const pairs = await AsyncStorage.multiGet(prayerKeys);
-    for (const [, v] of pairs) if (v) totalBytes += v.length;
-  }
-
   onProgress(100);
-  // Prayer times are computed locally (the adhan engine) and need no download,
-  // so record the real cached size (often 0) rather than fabricating ~50 KB.
-  await markDownloaded('prayerTimes', totalBytes);
+  // Prayer times are computed locally (the adhan engine) and need no download.
+  // Nothing writes `api_prayers_*` any more (and Clear Cache sweeps `api_*`),
+  // so record 0 rather than a size that goes stale.
+  await markDownloaded('prayerTimes', 0);
 }
 
 // ─── Download all (serial) ────────────────────────────────────────────────────

@@ -53,9 +53,9 @@ async function cachedFetch<T>(
 
 // Builds before 828ef8f cached the Aladhan Qibla response under
 // `api_qibla_<lat>_<lng>` (2-dp coordinates, on-device only). The call is
-// gone and Settings → Clear Cache only sweeps `cache_*` keys, so remove the
-// orphans once so stale coordinates don't linger in AsyncStorage. Safe to
-// call every launch: it's a no-op once the keys are gone.
+// gone, so remove the orphans at launch rather than waiting for the user to
+// press Settings → Clear Cache (which now sweeps `api_*` too). Safe to call
+// every launch: it's a no-op once the keys are gone.
 export async function purgeLegacyQiblaCache(): Promise<void> {
   try {
     const keys = await AsyncStorage.getAllKeys();

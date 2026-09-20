@@ -1492,9 +1492,11 @@
           "content": "content snapshots (names, duas, dhikr)",
           "dailyKnowledge": "the Daily Knowledge card"
         },
-        "message": "This removes cached data the app can fetch again: Quran API responses, content snapshots and the Daily Knowledge card. Settings, bookmarks, progress and downloaded packs are kept.",
+        "message": "This removes cached data the app can fetch again: Quran API responses and the content snapshots (names, duas, dhikr) refreshed at launch. Settings, bookmarks, progress and downloaded packs are kept — hadith books and the offline Quran are managed on the Downloads screen.",
         "nothingMessage": "There was no cached data to remove.",
-        "successMessage": "Removed {{n}} cached entries ({{size}}): {{kinds}}.",
+        "successMessage": "Removed {{count}} cached entries ({{size}}): {{kinds}}.",
+        "successMessage_one": "Removed 1 cached entry ({{size}}): {{kinds}}.",
+        "successMessage_other": "Removed {{count}} cached entries ({{size}}): {{kinds}}.",
         "successTitle": "Cache Cleared",
         "title": "Clear Cache?"
       },

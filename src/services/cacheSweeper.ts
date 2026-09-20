@@ -38,7 +38,7 @@ export type CacheSweepGroup = 'api' | 'content' | 'dailyKnowledge';
 export type CacheSweepSummary = {
   /** Number of storage entries found / removed. */
   entries: number;
-  /** Approximate size (UTF-16 code units of the stored strings ≈ bytes). */
+  /** Size of the stored strings in UTF-8 bytes (what they occupy on disk). */
   bytes: number;
   /** Which kinds of data were present, for the confirmation message. */
   groups: CacheSweepGroup[];
@@ -49,6 +49,23 @@ type Found = {
   mmkvKeys: string[];
   summary: CacheSweepSummary;
 };
+
+// Arabic/Urdu JSON is 2–3 UTF-8 bytes per UTF-16 code unit, so `.length`
+// would under-report by up to half. Hermes ships TextEncoder; fall back to
+// a manual count if it is ever missing.
+function utf8Bytes(s: string | null | undefined): number {
+  if (!s) return 0;
+  if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(s).length;
+  let bytes = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c < 0x80) bytes += 1;
+    else if (c < 0x800) bytes += 2;
+    else if (c >= 0xd800 && c <= 0xdbff) { bytes += 4; i++; }
+    else bytes += 3;
+  }
+  return bytes;
+}
 
 function groupFor(key: string): CacheSweepGroup {
   if (key === CACHE_KEYS.DAILY_KNOWLEDGE_LAST) return 'dailyKnowledge';
@@ -67,7 +84,7 @@ async function findClearableCache(): Promise<Found> {
     const pairs = await AsyncStorage.multiGet(asyncKeys);
     for (const [k, v] of pairs) {
       entries += 1;
-      bytes += v?.length ?? 0;
+      bytes += utf8Bytes(v);
       groups.add(groupFor(k));
     }
   }
@@ -75,7 +92,7 @@ async function findClearableCache(): Promise<Found> {
   const mmkvKeys = MMKV_CACHE_KEYS.filter((k) => cache.has(k));
   for (const k of mmkvKeys) {
     entries += 1;
-    bytes += cache.get(k)?.length ?? 0;
+    bytes += utf8Bytes(cache.get(k));
     groups.add(groupFor(k));
   }
 

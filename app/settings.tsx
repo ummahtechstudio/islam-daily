@@ -75,7 +75,8 @@ function describeCacheSweep(
   const kinds = result.groups
     .map((g) => t(`settings.alerts.clearCache.groups.${g}`))
     .join(t('settings.alerts.clearCache.groupSeparator'));
-  return t('settings.alerts.clearCache.successMessage', { n: result.entries, size, kinds });
+  // `count` selects successMessage_one / _other (i18next plural forms).
+  return t('settings.alerts.clearCache.successMessage', { count: result.entries, size, kinds });
 }
 
 export default function SettingsScreen() {
