@@ -63,7 +63,7 @@
 
     <h3 id="feedback">1.2 Feedback you send</h3>
     <p>If you use <strong>Settings → Send Feedback</strong>, we receive what you type: your message, category, optional star rating, an optional name and an optional e-mail address (both may be left blank), together with the app version, platform and device model so we can reproduce problems. If you attach a screenshot, the image is resized and uploaded too.</p>
-    <p><strong>Please do not include anything sensitive in a screenshot.</strong> Uploaded screenshots are stored in a public storage bucket: they can be viewed without a login by anyone who has the link or who lists the bucket. If you give an e-mail address we use it only to reply to you.</p>
+    <p>Uploaded screenshots are stored in a private storage bucket on our backend that is accessible only to the Islam Daily development team: they cannot be opened by a plain link, the bucket cannot be listed from the app or the public internet, and only the development team can generate the time-limited links used to view them. Please still avoid including anything sensitive in a screenshot, since we keep it until you ask us to delete it (see 5). If you give an e-mail address we use it only to reply to you.</p>
 
     <h3>1.3 Information that stays on your device</h3>
     <p>The following is stored only on your phone and is never sent to us: bookmarks and favourites, prayer log and streaks, Hifz (memorisation) progress, tasbeeh counts, reading position, notification and prayer-time settings, chosen city, theme and language, downloaded Quran / hadith / dua / audio content, and the app's internal usage counters (screens opened, features used). These counters exist only locally and are not uploaded. All of it is removed when you uninstall the app. Inside the app, <strong>Settings → Storage &amp; Data → Reset All Settings</strong> restores your preferences to their defaults but keeps your bookmarks, and the <strong>Downloads</strong> screen (More → Downloads) deletes downloaded packs.</p>
@@ -106,7 +106,7 @@
 
     <h2 id="storage-retention">4. Where data is stored and for how long</h2>
     <ul>
-      <li><strong>Session records and feedback text</strong> are stored in our database hosted by Supabase in <strong>Australia (Sydney region)</strong>, protected by HTTPS in transit, and accessible only to the Islam Daily development team. <strong>Feedback screenshots</strong> are stored in a public storage bucket (see 1.2).</li>
+      <li><strong>Session records and feedback text</strong> are stored in our database hosted by Supabase in <strong>Australia (Sydney region)</strong>, protected by HTTPS in transit, and accessible only to the Islam Daily development team. <strong>Feedback screenshots</strong> are stored in a private storage bucket on the same backend, likewise accessible only to the development team (see 1.2).</li>
       <li><strong>Retention:</strong> session records are anonymous and are kept in aggregate for as long as they are useful for understanding where the app is used. Feedback is kept while we work on the issue it describes and for reference afterwards. There is no automatic deletion; we delete on request (see 5).</li>
       <li><strong>Content</strong> (Quran, hadith, duas, audio) is stored on your device once downloaded and can be deleted pack by pack from the <strong>Downloads</strong> screen.</li>
     </ul>
@@ -134,7 +134,7 @@
     <p>Islam Daily is suitable for all ages. We do not knowingly collect personal information from anyone, including children under 13. The only information that reaches us is the anonymous session record (if enabled) and feedback that is deliberately sent; if a child has sent us personal information through the feedback form, contact us and we will delete it.</p>
 
     <h2 id="security">8. Security</h2>
-    <p>All network requests use HTTPS. Session records and feedback text on our backend are accessible only to the development team; feedback screenshots are in a public bucket (see 1.2). Local data is kept in the app's private storage on your device.</p>
+    <p>All network requests use HTTPS. Session records, feedback text and feedback screenshots on our backend are accessible only to the development team (see 1.2). Local data is kept in the app's private storage on your device.</p>
 
     <h2 id="changes">9. Changes to this policy</h2>
     <p>If we change what the app collects, this page and the matching text inside the app (the first-launch privacy prompt, Settings → Privacy, and Sources &amp; Credits) are updated together, and the "Last Updated" date above changes. Significant changes will also be pointed out inside the app.</p>
