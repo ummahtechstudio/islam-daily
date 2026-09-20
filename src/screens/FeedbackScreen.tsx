@@ -119,8 +119,11 @@ export default function FeedbackScreen() {
       .from(SCREENSHOT_BUCKET)
       .upload(filename, blob, { contentType: mime, upsert: false });
     if (error) throw error;
-    const { data } = supabase.storage.from(SCREENSHOT_BUCKET).getPublicUrl(filename);
-    return data.publicUrl ?? null;
+    // Store the object path, not a public URL: the bucket is private, so a
+    // `/object/public/` link would be dead. The team opens the object from the
+    // Storage dashboard (or a signed URL) by this path; older rows still hold
+    // full URLs from when the bucket was public.
+    return `${SCREENSHOT_BUCKET}/${filename}`;
   };
 
   const insertFeedbackRow = async (
