@@ -89,7 +89,7 @@ export const CREDIT_SECTIONS: CreditSection[] = [
       { name: 'QuranicAudio.com', descKey: 'quranicAudio', url: 'https://quranicaudio.com' },
       { name: 'Internet Archive (archive.org)', descKey: 'archiveOrg', url: 'https://archive.org' },
       { name: 'IslamicFinder.org — adhan recordings', descKey: 'islamicFinder', url: 'https://www.islamicfinder.org' },
-      { name: 'Notification adhan — "Beautiful adhan" by Adam-synagda (Wikimedia Commons), opening takbir', descKey: 'notificationAdhan', license: 'CC0 1.0 (public domain dedication)', url: 'https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg' },
+      { name: 'Notification adhan — "Adhan" recorded by Aishatu98 (Wikimedia Commons), opening', descKey: 'notificationAdhan', license: 'CC0 1.0 (public domain dedication)', url: 'https://commons.wikimedia.org/wiki/File:Adhan.ogg' },
     ],
   },
   {

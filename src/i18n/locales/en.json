@@ -272,7 +272,7 @@
       "namazGuide": "Quranic passages are taken from the app's Tanzil text and never retyped; duas and in-salah recitations follow Hisn al-Muslim with sources; the salah method follows standard Hanafi fiqh.",
       "names99": "Bundled with the app, with Qur'anic references for each name.",
       "networkEditions": "Additional translation editions available online, credited to their translators.",
-      "notificationAdhan": "The short adhan clip bundled with the app and played by prayer notifications — the opening takbir of a CC0 recording, trimmed and loudness-normalised.",
+      "notificationAdhan": "The short adhan clip bundled with the app and played by prayer notifications — the opening of a CC0 field recording of a live adhan, trimmed and loudness-normalised.",
       "notoNastaliq": "Urdu typeface (Nastaliq).",
       "osm": "Nearby mosques and halal restaurants are found in OpenStreetMap data. Map data © OpenStreetMap contributors, available under the Open Database License. This attribution also appears on the finder screens themselves.",
       "ossLibraries": "The app is built with these open-source libraries, all under the MIT license (via Expo and the React Native ecosystem).",
