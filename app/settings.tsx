@@ -21,6 +21,11 @@ import { urduUiStyle } from '../src/constants/fonts';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { scheduleNotificationsForNext7Days } from '../src/services/notificationsService';
+import {
+  clearClearableCache,
+  measureClearableCache,
+  type CacheSweepSummary,
+} from '../src/services/cacheSweeper';
 import i18n from '../src/i18n';
 import {
   getSetting,
@@ -57,6 +62,21 @@ const PRIVACY_URL = 'https://ummahtechstudio.github.io/islam-daily/privacy.html'
 const TERMS_URL = 'https://ummahtechstudio.github.io/islam-daily/terms.html';
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
+// Builds the "what was cleared" sentence: "Removed 6 cached entries (312 KB):
+// Quran API responses, content snapshots." — or the nothing-to-clear line.
+function describeCacheSweep(
+  result: CacheSweepSummary,
+  t: (key: string, opts?: Record<string, unknown>) => string,
+): string {
+  if (result.entries === 0) return t('settings.alerts.clearCache.nothingMessage');
+  const kb = Math.max(1, Math.round(result.bytes / 1024));
+  const size = kb < 1024 ? `${kb} KB` : `${(kb / 1024).toFixed(1)} MB`;
+  const kinds = result.groups
+    .map((g) => t(`settings.alerts.clearCache.groups.${g}`))
+    .join(t('settings.alerts.clearCache.groupSeparator'));
+  return t('settings.alerts.clearCache.successMessage', { n: result.entries, size, kinds });
+}
 
 export default function SettingsScreen() {
   const { t, i18n: i18nInstance } = useTranslation();
@@ -116,20 +136,11 @@ export default function SettingsScreen() {
     computeCacheSize();
   }, []);
 
+  // Same key set Clear Cache removes, so the row and the action agree.
   const computeCacheSize = useCallback(async () => {
     try {
-      const keys = await AsyncStorage.getAllKeys();
-      const cacheKeys = keys.filter((k) => k.startsWith('cache_'));
-      if (cacheKeys.length === 0) {
-        setCacheSizeKB(0);
-        return;
-      }
-      const entries = await AsyncStorage.multiGet(cacheKeys);
-      let bytes = 0;
-      for (const [, v] of entries) {
-        if (v) bytes += v.length;
-      }
-      setCacheSizeKB(Math.round(bytes / 1024));
+      const { entries, bytes } = await measureClearableCache();
+      setCacheSizeKB(entries === 0 ? 0 : Math.max(1, Math.round(bytes / 1024)));
     } catch {
       setCacheSizeKB(null);
     }
@@ -210,13 +221,11 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              const keys = await AsyncStorage.getAllKeys();
-              const cacheKeys = keys.filter((k) => k.startsWith('cache_'));
-              if (cacheKeys.length > 0) await AsyncStorage.multiRemove(cacheKeys);
+              const result = await clearClearableCache();
               await computeCacheSize();
               Alert.alert(
                 t('settings.alerts.clearCache.successTitle'),
-                t('settings.alerts.clearCache.successMessage'),
+                describeCacheSweep(result, t),
               );
             } catch {
               Alert.alert(t('common.error'), t('settings.alerts.clearCache.errorMessage'));

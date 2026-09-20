@@ -1490,8 +1490,15 @@
       },
       "clearCache": {
         "errorMessage": "Could not clear cache.",
-        "message": "This will remove cached prayer times, Quran data, and hadith data. Your bookmarks and settings will be kept.",
-        "successMessage": "Cached data has been removed.",
+        "groupSeparator": ", ",
+        "groups": {
+          "api": "Quran API responses",
+          "content": "content snapshots (names, duas, dhikr)",
+          "dailyKnowledge": "the Daily Knowledge card"
+        },
+        "message": "This removes cached data the app can fetch again: Quran API responses, content snapshots and the Daily Knowledge card. Settings, bookmarks, progress and downloaded packs are kept.",
+        "nothingMessage": "There was no cached data to remove.",
+        "successMessage": "Removed {{n}} cached entries ({{size}}): {{kinds}}.",
         "successTitle": "Cache Cleared",
         "title": "Clear Cache?"
       },
