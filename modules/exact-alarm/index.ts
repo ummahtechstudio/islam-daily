@@ -7,7 +7,7 @@
  * module existed from throwing at import time.
  */
 import { Platform } from 'react-native';
-import { requireOptionalNativeModule } from 'expo-modules-core';
+import { requireOptionalNativeModule } from 'expo';
 
 type ExactAlarmNativeModule = {
   canScheduleExactAlarms(): boolean;

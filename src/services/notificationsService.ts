@@ -590,6 +590,11 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
 
     await ensureAndroidChannels();
 
+    // Sampled before arming: expo-notifications decides exact vs inexact per
+    // alarm at schedule time, so if the grant flips mid-pass the stored value
+    // is the stale one and the next check re-arms everything (safe direction).
+    const exactAlarmAtStart = exactAlarmFlag();
+
     const settings = await getNotificationSettings();
     const prayerSettings = getPersistedSettings() ?? KARACHI_DEFAULT;
 
@@ -605,7 +610,7 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
 
     prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
     prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_TIMEZONE_OFFSET, String(new Date().getTimezoneOffset()));
-    prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_EXACT_ALARM, exactAlarmFlag());
+    prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_EXACT_ALARM, exactAlarmAtStart);
   })();
 
   try {

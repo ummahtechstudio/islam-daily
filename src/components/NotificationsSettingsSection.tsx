@@ -43,6 +43,7 @@ import {
 const GREEN = '#0F6E56';
 const GOLD = '#EF9F27';
 const CREAM = '#FBF6E4';
+const INK_ON_CREAM = '#3F3F3F';
 
 const PRAYERS: { key: PrayerName; arabic: string }[] = [
   { key: 'fajr',    arabic: 'الفجر'   },
@@ -224,6 +225,10 @@ export function NotificationsSettingsSection({
   useEffect(() => {
     if (exactAlarmNeeded && exactAlarmPromptShown === false) {
       setShowExactAlarmPrompt(true);
+    } else if (!exactAlarmNeeded) {
+      // e.g. the user granted it in system settings while the modal was open
+      // and came back — asking again would just reopen a page already set.
+      setShowExactAlarmPrompt(false);
     }
   }, [exactAlarmNeeded, exactAlarmPromptShown]);
 
@@ -486,10 +491,10 @@ export function NotificationsSettingsSection({
               accessibilityRole="button"
             >
               <Ionicons name="alarm-outline" size={14} color={GOLD} />
-              <Text style={[styles.permText, styles.exactAlarmText, { color: textColor }]}>
+              <Text style={[styles.permText, styles.exactAlarmText]}>
                 {t('notifications.exactAlarm.inline')}
               </Text>
-              <Ionicons name="chevron-forward" size={14} color={textMutedColor} />
+              <Ionicons name="chevron-forward" size={14} color={INK_ON_CREAM} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -838,7 +843,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: CREAM,
   },
-  exactAlarmText: { flex: 1, fontWeight: '500' },
+  // Fixed ink like aboutText/modalBody: the row sits on CREAM in both themes.
+  exactAlarmText: { flex: 1, fontWeight: '500', color: INK_ON_CREAM },
 
   prayerRow: {
     paddingHorizontal: 14,
