@@ -30,7 +30,6 @@ import {
   downloadHadiths,
   downloadNames,
   downloadDuas,
-  downloadCalendar,
   downloadPrayerTimes,
   downloadAll,
 } from '../services/downloadService';
@@ -106,13 +105,6 @@ const PACKS: PackConfig[] = [
     accentColor: '#22C55E',
     unavailable: 'Adhan sounds require expo-file-system',
     download: downloadQuranAudio,
-  },
-  {
-    id: 'calendar',
-    icon: '📅',
-    sizeMB: 1,
-    accentColor: '#EC4899',
-    download: downloadCalendar,
   },
   {
     id: 'prayerTimes',

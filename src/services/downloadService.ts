@@ -25,7 +25,6 @@ export type PackId =
   | 'quranAudioAbdulBasit'
   | 'hadiths'
   | 'names99'
-  | 'calendar'
   | 'duas'
   | 'prayerTimes'
   | 'islamicBooks'
@@ -47,7 +46,6 @@ const DEFAULT_STATUS: DownloadStatus = {
   quranAudioAbdulBasit:{ downloaded: false, downloadedAt: 0, sizeBytes: 0 },
   hadiths:             { downloaded: false, downloadedAt: 0, sizeBytes: 0 },
   names99:             { downloaded: false, downloadedAt: 0, sizeBytes: 0 },
-  calendar:            { downloaded: false, downloadedAt: 0, sizeBytes: 0 },
   duas:                { downloaded: false, downloadedAt: 0, sizeBytes: 0 },
   prayerTimes:         { downloaded: false, downloadedAt: 0, sizeBytes: 0 },
   islamicBooks:        { downloaded: false, downloadedAt: 0, sizeBytes: 0 },
@@ -108,9 +106,6 @@ export async function clearPack(pack: PackId): Promise<void> {
       break;
     case 'duas':
       await AsyncStorage.removeItem('supabase_duas');
-      break;
-    case 'calendar':
-      await AsyncStorage.multiRemove(['offline_calendar', 'offline_calendar_dates']);
       break;
     case 'prayerTimes':
       await AsyncStorage.removeItem('offline_prayer_times');
@@ -464,46 +459,29 @@ export async function downloadQuranAudio(
   throw new Error('NEEDS_FILE_SYSTEM: Install expo-file-system to enable audio downloads.');
 }
 
-// ─── Islamic calendar ─────────────────────────────────────────────────────────
+// ─── Removed packs ────────────────────────────────────────────────────────────
 
-export async function downloadCalendar(
-  onProgress: (pct: number) => void
-): Promise<void> {
-  const now = new Date();
-  const months: { month: number; year: number }[] = [];
-  for (let i = 0; i < 12; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    months.push({ month: d.getMonth() + 1, year: d.getFullYear() });
-  }
+// The Hijri "calendar" pack (12 months of Aladhan /v1/calendar responses in
+// `offline_calendar`) was downloadable but never read — the Calendar screen
+// computes Hijri dates on-device. Devices that downloaded it still hold the
+// blob (~1 MB) and a `calendar` entry in the status record; remove both once.
+// Safe to call every launch: it's a no-op once they are gone.
+export async function purgeRemovedPacks(): Promise<void> {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const stale = keys.filter((k) => k === 'offline_calendar' || k === 'offline_calendar_dates');
+    if (stale.length > 0) await AsyncStorage.multiRemove(stale);
 
-  const allMonths: any[] = [];
-  for (let i = 0; i < months.length; i++) {
-    const { month, year } = months[i];
-    try {
-      const res = await fetchWithTimeout(
-        `https://api.aladhan.com/v1/calendar?month=${month}&year=${year}`,
-        {},
-        DL_TIMEOUT_MS,
-      );
-      if (res.ok) {
-        const json = await res.json();
-        if (json.code === 200 && Array.isArray(json.data)) {
-          allMonths.push({ month, year, data: json.data });
-        }
+    const raw = await AsyncStorage.getItem(STATUS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if ('calendar' in parsed) {
+        delete parsed.calendar;
+        await AsyncStorage.setItem(STATUS_KEY, JSON.stringify(parsed));
       }
-    } catch {}
-    onProgress(Math.round(((i + 1) / months.length) * 100));
-  }
-
-  if (allMonths.length === 0) {
-    throw new Error('Calendar download failed: no months could be fetched.');
-  }
-  const str = JSON.stringify(allMonths);
-  await AsyncStorage.setItem('offline_calendar', str);
-  await markDownloaded('calendar', str.length);
-  const failed = months.length - allMonths.length;
-  if (failed > 0) {
-    console.warn(`[download] calendar: ${failed}/${months.length} months failed; saved ${allMonths.length}.`);
+    }
+  } catch {
+    // Housekeeping only — never surface.
   }
 }
 
@@ -539,7 +517,6 @@ export async function downloadAll(onProgress: ProgressCallback): Promise<void> {
     ['hadiths',     downloadHadiths],
     ['names99',     downloadNames],
     ['prayerTimes', downloadPrayerTimes],
-    ['calendar',    downloadCalendar],
     ['quranText',   downloadQuran],
   ];
 
@@ -594,14 +571,3 @@ export async function getOfflineDuas(): Promise<any[] | null> {
   } catch { return null; }
 }
 
-export async function getOfflineCalendar(
-  month: number,
-  year: number
-): Promise<any[] | null> {
-  try {
-    const raw = await AsyncStorage.getItem('offline_calendar');
-    if (!raw) return null;
-    const all: { month: number; year: number; data: any[] }[] = JSON.parse(raw);
-    return all.find((m) => m.month === month && m.year === year)?.data ?? null;
-  } catch { return null; }
-}
