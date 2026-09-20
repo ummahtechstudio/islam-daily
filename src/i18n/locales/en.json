@@ -974,6 +974,13 @@
       "webOnlyMessage": "Test notifications fire only on a real device or development build, not in the web preview.",
       "webOnlyTitle": "Test on device"
     },
+    "exactAlarm": {
+      "body": "Android delays app alarms unless “Alarms & reminders” is allowed, so the adhan can arrive minutes late. Allow it for Islam Daily to hear the adhan exactly on time.",
+      "inline": "“Alarms & reminders” is off — the adhan may arrive late. Tap to allow.",
+      "laterBtn": "Not now",
+      "openBtn": "Allow Alarms & reminders",
+      "title": "Adhan exactly on time"
+    },
     "explainerModal": {
       "allowBtn": "Allow notifications",
       "body": "We'll notify you at each prayer time with your chosen sound — adhan, silent, or system tone. You can customize each prayer individually.",

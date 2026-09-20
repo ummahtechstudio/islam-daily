@@ -34,6 +34,11 @@ import {
 import { computePrayerTimes, getPersistedSettings, KARACHI_DEFAULT } from '../services/prayerTimesService';
 import { formatPrayerTime } from '../utils/formatPrayerTime';
 import { getSetting, setSetting } from '../utils/settings';
+import {
+  EXACT_ALARM_GATE_APPLIES,
+  canScheduleExactAlarms,
+  openExactAlarmSettings,
+} from '../../modules/exact-alarm';
 
 const GREEN = '#0F6E56';
 const GOLD = '#EF9F27';
@@ -48,6 +53,11 @@ const PRAYERS: { key: PrayerName; arabic: string }[] = [
 ];
 
 const SOUND_OPTION_KEYS: PrayerSoundChoice[] = ['adhan', 'system', 'silent'];
+
+// AsyncStorage `settings_*` key — the "Alarms & reminders" explainer is shown
+// once per install (Reset All Settings clears it, which is fine: the inline
+// row below the master toggle keeps the state visible in between).
+const EXACT_ALARM_PROMPT_SHOWN_KEY = 'exact_alarm_prompt_shown';
 
 const SOUND_ICONS: Record<PrayerSoundChoice, keyof typeof Ionicons.glyphMap> = {
   adhan:  'volume-high',
@@ -83,30 +93,42 @@ export function NotificationsSettingsSection({
   // Duha is stored via the AsyncStorage `settings_*` key pattern (like Daily
   // Hadith / Friday), separate from the MMKV prayer-notification settings.
   const [duhaEnabled, setDuhaEnabled] = useState(false);
+  // Android 12+ "Alarms & reminders". While it is off, expo-notifications
+  // schedules inexact alarms and the adhan can arrive minutes late. Synchronous
+  // native read; always true where the gate does not apply.
+  const [exactAlarmOk, setExactAlarmOk] = useState<boolean>(() => canScheduleExactAlarms());
+  // null until loaded so the one-time prompt never fires on a stale default.
+  const [exactAlarmPromptShown, setExactAlarmPromptShown] = useState<boolean | null>(null);
+  const [showExactAlarmPrompt, setShowExactAlarmPrompt] = useState(false);
 
   // Initial load.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [perm, stored, duha] = await Promise.all([
+      const [perm, stored, duha, exactShown] = await Promise.all([
         getNotificationPermission(),
         getNotificationSettings(),
         getSetting<boolean>('duha_reminder', false),
+        getSetting<boolean>(EXACT_ALARM_PROMPT_SHOWN_KEY, false),
       ]);
       if (cancelled) return;
       setPermission(perm);
       setSettings(stored);
       setDuhaEnabled(duha);
+      setExactAlarmPromptShown(exactShown);
     })();
     return () => { cancelled = true; };
   }, []);
 
-  // Re-check permission when app returns to foreground (user may have changed
-  // it in OS settings).
+  // Re-check permissions when app returns to foreground (user may have
+  // changed them in OS settings — including "Alarms & reminders" via the
+  // button below). Re-arming the alarms after that change is handled by the
+  // app-level foreground refresh in app/_layout.tsx, not here.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
       if (state === 'active') {
         getNotificationPermission().then(setPermission).catch(() => {});
+        setExactAlarmOk(canScheduleExactAlarms());
       }
     });
     return () => sub.remove();
@@ -188,6 +210,42 @@ export function NotificationsSettingsSection({
 
   const handleExplainerCancel = useCallback(() => {
     setShowExplainer(false);
+  }, []);
+
+  // ─── Exact-alarm ("Alarms & reminders") prompt ─────────────────────────────
+  // Shown once per install, only while prayer notifications are actually on
+  // (master enabled + OS permission granted) and the grant is missing — that
+  // covers opening this screen in that state and flipping the master toggle
+  // on. Afterwards the inline row under the master toggle stays until fixed.
+
+  const exactAlarmNeeded =
+    EXACT_ALARM_GATE_APPLIES && !exactAlarmOk && settings.enabled && permission === 'granted';
+
+  useEffect(() => {
+    if (exactAlarmNeeded && exactAlarmPromptShown === false) {
+      setShowExactAlarmPrompt(true);
+    }
+  }, [exactAlarmNeeded, exactAlarmPromptShown]);
+
+  const markExactAlarmPromptShown = useCallback(() => {
+    setShowExactAlarmPrompt(false);
+    setExactAlarmPromptShown(true);
+    setSetting(EXACT_ALARM_PROMPT_SHOWN_KEY, true).catch(() => {});
+  }, []);
+
+  const handleExactAlarmOpenSettings = useCallback(() => {
+    lightHaptic();
+    markExactAlarmPromptShown();
+    if (!openExactAlarmSettings()) {
+      Linking.openSettings().catch(() => {});
+    }
+  }, [markExactAlarmPromptShown]);
+
+  const handleExactAlarmInlinePress = useCallback(() => {
+    lightHaptic();
+    if (!openExactAlarmSettings()) {
+      Linking.openSettings().catch(() => {});
+    }
   }, []);
 
   // ─── Per-prayer handlers ───────────────────────────────────────────────────
@@ -420,6 +478,20 @@ export function NotificationsSettingsSection({
         </View>
         <View style={styles.permWrap}>
           <PermissionStatus />
+          {exactAlarmNeeded ? (
+            <TouchableOpacity
+              style={[styles.permRow, styles.exactAlarmRow]}
+              onPress={handleExactAlarmInlinePress}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+            >
+              <Ionicons name="alarm-outline" size={14} color={GOLD} />
+              <Text style={[styles.permText, styles.exactAlarmText, { color: textColor }]}>
+                {t('notifications.exactAlarm.inline')}
+              </Text>
+              <Ionicons name="chevron-forward" size={14} color={textMutedColor} />
+            </TouchableOpacity>
+          ) : null}
         </View>
       </View>
 
@@ -607,6 +679,42 @@ export function NotificationsSettingsSection({
         </View>
       </Modal>
 
+      {/* ── "Alarms & reminders" one-time explainer (Android 12+) ─────────── */}
+      <Modal
+        visible={showExactAlarmPrompt}
+        transparent
+        animationType="fade"
+        onRequestClose={markExactAlarmPromptShown}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalIconWrap}>
+              <Ionicons name="alarm" size={32} color={GREEN} />
+            </View>
+            <Text style={styles.modalTitle}>{t('notifications.exactAlarm.title')}</Text>
+            <Text style={styles.modalBody}>
+              {t('notifications.exactAlarm.body')}
+            </Text>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnGhost]}
+                onPress={markExactAlarmPromptShown}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalBtnGhostText}>{t('notifications.exactAlarm.laterBtn')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnPrimary]}
+                onPress={handleExactAlarmOpenSettings}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalBtnPrimaryText}>{t('notifications.exactAlarm.openBtn')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* ── Tahajjud pre-explainer modal ──────────────────────────────────── */}
       <Modal
         visible={showTahajjudExplainer}
@@ -723,6 +831,14 @@ const styles = StyleSheet.create({
   },
   permRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   permText: { fontSize: 12, fontWeight: '600' },
+  exactAlarmRow: {
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: radius.md,
+    backgroundColor: CREAM,
+  },
+  exactAlarmText: { flex: 1, fontWeight: '500' },
 
   prayerRow: {
     paddingHorizontal: 14,

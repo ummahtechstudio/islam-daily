@@ -143,6 +143,10 @@ export const PREFS_KEYS = {
   // Persists `Date.getTimezoneOffset()` from the last schedule so we can
   // detect timezone / DST changes on next startup and re-schedule.
   NOTIFICATIONS_LAST_TIMEZONE_OFFSET: 'notifications_last_timezone_offset',
+  // '1' / '0' — whether Android "Alarms & reminders" was granted when the
+  // notifications were last scheduled. A change means the OS queue holds the
+  // wrong alarm kind (or, on revoke, nothing at all) and must be re-armed.
+  NOTIFICATIONS_LAST_EXACT_ALARM: 'notifications_last_exact_alarm',
   // Zakat calculator: only the *settings* (currency, weight unit, last
   // entered metal prices, chosen nisab basis) are persisted. Wealth
   // amounts are not — they change frequently and shouldn't auto-save.

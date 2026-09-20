@@ -15,6 +15,7 @@ import {
 import { formatPrayerTime } from '../utils/formatPrayerTime';
 import { getSetting } from '../utils/settings';
 import type { PrayerTimesSettings } from '../types/prayerTimes';
+import { canScheduleExactAlarms } from '../../modules/exact-alarm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -604,6 +605,7 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
 
     prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT, String(Date.now()));
     prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_TIMEZONE_OFFSET, String(new Date().getTimezoneOffset()));
+    prefs.set(PREFS_KEYS.NOTIFICATIONS_LAST_EXACT_ALARM, exactAlarmFlag());
   })();
 
   try {
@@ -613,24 +615,38 @@ export async function scheduleNotificationsForNext7Days(): Promise<void> {
   }
 }
 
+// Android 12+ "Alarms & reminders" state as a stable pref string. Always '1'
+// on iOS / Android < 12, where exact scheduling needs no special access.
+function exactAlarmFlag(): '1' | '0' {
+  return canScheduleExactAlarms() ? '1' : '0';
+}
+
 /**
  * Called from app startup. No-op if last refresh is < 24h ago AND the device
  * timezone hasn't changed since the last schedule (timezone change usually
  * means a flight or DST shift, which invalidates the pre-scheduled absolute
- * Date objects in the OS queue).
+ * Date objects in the OS queue) AND the Android "Alarms & reminders" grant is
+ * unchanged. expo-notifications picks exact vs inexact alarms at schedule
+ * time, so alarms armed before the user allowed exact alarms stay inexact
+ * until re-armed — and when the user revokes the grant, Android cancels the
+ * app's exact alarms outright, so they must be re-armed as inexact ones.
  */
 export async function refreshNotificationsIfStale(): Promise<void> {
   if (Platform.OS === 'web') return;
   const last = prefs.get(PREFS_KEYS.NOTIFICATIONS_LAST_SCHEDULED_AT);
   const lastTzRaw = prefs.get(PREFS_KEYS.NOTIFICATIONS_LAST_TIMEZONE_OFFSET);
+  const lastExact = prefs.get(PREFS_KEYS.NOTIFICATIONS_LAST_EXACT_ALARM);
   const lastMs = last ? Number(last) : 0;
   const lastTz = lastTzRaw != null ? Number(lastTzRaw) : NaN;
   const currentTz = new Date().getTimezoneOffset();
 
   const freshEnough = Number.isFinite(lastMs) && Date.now() - lastMs < REFRESH_INTERVAL_MS;
   const sameTimezone = Number.isFinite(lastTz) && lastTz === currentTz;
+  // Installs from before this flag existed have none stored → one extra
+  // re-arm on the first launch, after which it is tracked.
+  const sameExactAlarm = lastExact === exactAlarmFlag();
 
-  if (freshEnough && sameTimezone) return;
+  if (freshEnough && sameTimezone && sameExactAlarm) return;
   await scheduleNotificationsForNext7Days();
 }
 
