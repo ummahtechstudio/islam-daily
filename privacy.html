@@ -93,7 +93,7 @@
     <p>Like any app that loads content from the internet, Islam Daily contacts the servers below. Each of them sees the request itself and your device's IP address, as any website does. <strong>None of them receives your name, an identifier, or — except Overpass, above — your location.</strong></p>
     <table>
       <tr><th>Service</th><th>Used for</th><th>What it receives</th></tr>
-      <tr><td><strong>Supabase</strong> (our backend host)</td><td>Storing the optional session records and your feedback; serving refreshed duas and 99 Names content and the optional Quran text download pack.</td><td>The session record (1.1) and feedback (1.2) you send; otherwise only content requests.</td></tr>
+      <tr><td><strong>Supabase</strong> (our backend host; project hosted in Sydney, Australia)</td><td>Storing the optional session records and your feedback; serving refreshed duas and 99 Names content and the optional Quran text download pack.</td><td>The session record (1.1) and feedback (1.2) you send; otherwise only content requests.</td></tr>
       <tr><td><strong>Cloudflare R2</strong> (our content CDN)</td><td>Hadith collections and other downloadable content. On iOS the app's network library also uses this host for its "is the internet reachable?" check (a tiny request about once a minute for the rest of the session after an offline-aware screen has been opened); Android uses the operating system's own network status instead.</td><td>Content requests only. No data.</td></tr>
       <tr><td><strong>OpenStreetMap — Overpass API</strong> (overpass-api.de)</td><td>Mosque Finder, Halal Finder.</td><td>Your position and search radius, while you search. Map data © OpenStreetMap contributors (ODbL).</td></tr>
       <tr><td><strong>Aladhan API</strong> (aladhan.com)</td><td>Downloading the offline Hijri calendar pack; a lightweight "am I online?" check on the Downloads screen.</td><td>Month/year, or an empty request. No location.</td></tr>
@@ -106,7 +106,7 @@
 
     <h2 id="storage-retention">4. Where data is stored and for how long</h2>
     <ul>
-      <li><strong>Session records and feedback text</strong> are stored in our database hosted by Supabase, protected by HTTPS in transit, and accessible only to the Islam Daily development team. <strong>Feedback screenshots</strong> are stored in a public storage bucket (see 1.2).</li>
+      <li><strong>Session records and feedback text</strong> are stored in our database hosted by Supabase in <strong>Australia (Sydney region)</strong>, protected by HTTPS in transit, and accessible only to the Islam Daily development team. <strong>Feedback screenshots</strong> are stored in a public storage bucket (see 1.2).</li>
       <li><strong>Retention:</strong> session records are anonymous and are kept in aggregate for as long as they are useful for understanding where the app is used. Feedback is kept while we work on the issue it describes and for reference afterwards. There is no automatic deletion; we delete on request (see 5).</li>
       <li><strong>Content</strong> (Quran, hadith, duas, audio) is stored on your device once downloaded and can be deleted pack by pack from the <strong>Downloads</strong> screen.</li>
     </ul>
