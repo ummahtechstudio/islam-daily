@@ -265,7 +265,7 @@
       "graders": "Gradings (Sahih / Hasan / Da'if) shown per hadith are exactly as embedded in the dataset, attributed to these scholars. Sahih al-Bukhari and Sahih Muslim carry no per-hadith gradings in the dataset.",
       "hadithApi": "All hadith text (Arabic, English, Urdu) and the scholarly gradings come from this open dataset, served from our own CDN.",
       "hisn": "Duas and adhkar are compiled from this collection; every entry carries its own hadith reference.",
-      "indopakFont": "Typeface used to render the IndoPak Mushaf.",
+      "indopakFont": "Typeface and IndoPak script text used to render the Mushaf, bundled with QuranWBW.com's written permission.",
       "ionicons": "Interface icons.",
       "islamicFinder": "Makkah, Madinah, Mishary, Abdul Basit and Egyptian adhan recordings previewed in the Custom Adhan screen.",
       "islamicNetworkCdn": "Per-ayah audio used for playback in the study view.",

@@ -62,7 +62,7 @@ export const CREDIT_SECTIONS: CreditSection[] = [
     entries: [
       { name: 'QUL — Quranic Universal Library (Tarteel): "Quran Script: IndoPak Nastaleeq"', descKey: 'qul', url: 'https://qul.tarteel.ai' },
       { name: 'Quran.com API (api.qurancdn.com)', descKey: 'quranCom', url: 'https://quran.com' },
-      { name: 'AlQuran IndoPak font by QuranWBW (Ayman Siddiqui)', descKey: 'indopakFont', license: 'Based on Al Qalam Quran Majeed / KFGQPC — see quranwbw.com', url: 'https://quranwbw.com' },
+      { name: 'QuranWBW.com — AlQuran IndoPak font and IndoPak script text (Ayman Siddiqui)', descKey: 'indopakFont', license: 'Used with written permission from QuranWBW.com (2026-09-20) · based on Al Qalam Quran Majeed / KFGQPC', url: 'https://quranwbw.com' },
     ],
   },
   {
