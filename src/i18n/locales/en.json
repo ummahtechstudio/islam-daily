@@ -1267,7 +1267,7 @@
       "title": "A quick note on privacy"
     },
     "detail": {
-      "footer": "Data is stored in our own Supabase database and is only accessible to the Islam Daily development team. It is never sold. You can opt out at any time from Settings → Privacy.",
+      "footer": "Data is stored in our own Supabase database, hosted in Australia (Sydney region), and is only accessible to the Islam Daily development team. It is never sold. You can opt out at any time from Settings → Privacy.",
       "items": {
         "appVersion": {
           "desc": "So we know which build a session came from.",
