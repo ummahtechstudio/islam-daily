@@ -1386,7 +1386,8 @@
       "floatingIndicator": "صفحہ {{page}} / {{total}} · پارہ {{juz}}",
       "increaseSize": "متن کا سائز بڑھائیں",
       "jumpToPageOrSurah": "صفحے یا سورہ پر جائیں",
-      "textSize": "متن کا سائز"
+      "textSize": "متن کا سائز",
+      "previousPage": "پچھلا صفحہ ({{page}})"
     },
     "reciterPicker": {
       "title": "قاری منتخب کریں"

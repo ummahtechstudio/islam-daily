@@ -15,7 +15,6 @@ import {
   Modal,
   Pressable,
   Platform,
-  Dimensions,
   KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,13 +28,12 @@ import { pageToJuz, TOTAL_PAGES } from '../../utils/quranNav';
 import { useDebouncedPositionWriter } from '../../hooks/useQuranLastPosition';
 
 const ALL_PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1);
-// Per-page height estimate used to seed a far jump via scrollToOffset. A Mushaf
-// page renders to roughly one screen, so jumping to (index * screen height)
-// lands close instantly; a follow-up scrollToIndex then snaps to the exact
-// measured offset. We deliberately do NOT feed this to getItemLayout: real page
-// heights vary (short surahs, font scale), and a constant getItemLayout makes
-// FlatList trust a wrong offset and paint blank cream until the user scrolls.
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+// Jumping: Mushaf pages have variable, unknown heights (≈2–3 screens each), so
+// a scroll offset for page N cannot be computed without rendering every page
+// before it. Instead the list's data STARTS at the target page (`startPage`)
+// and is remounted on each jump — the target is simply the first item, so the
+// jump is exact and instant. Earlier pages are re-added one at a time from the
+// "previous page" button at the top of the list.
 const FONT_SCALE_KEY = 'quran_font_scale';
 const LAST_PAGE_KEY = 'quran_last_page';
 const FONT_SCALE_MIN = 0.7;
@@ -79,6 +77,13 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [jumpModalOpen, setJumpModalOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  // The saved page, kept outside state: the list's first viewability callback
+  // (page 1, before hydration) would otherwise overwrite it.
+  const restoredPageRef = useRef(1);
+  // First page in the list's data, and a key that remounts the list on a jump.
+  const [startPage, setStartPage] = useState(1);
+  const [listKey, setListKey] = useState(0);
+  const pages = useMemo(() => ALL_PAGES.slice(startPage - 1), [startPage]);
 
   // Load persisted state on mount
   useEffect(() => {
@@ -98,6 +103,7 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
         if (pageRaw) {
           const p = parseInt(pageRaw, 10);
           if (!isNaN(p) && p >= 1 && p <= TOTAL_PAGES) {
+            restoredPageRef.current = p;
             setCurrentPage(p);
           }
         }
@@ -113,23 +119,14 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     };
   }, []);
 
-  // After hydration, jump to the last-read page if not page 1. scrollToOffset
-  // with the per-page estimate lands near the target instantly (no intermediate
-  // rendering), then scrollToIndex snaps to the exact measured offset so the
-  // page actually paints in the viewport.
+  // After hydration, open at the last-read page: start the list there.
   useEffect(() => {
-    if (!hydrated || currentPage <= 1) return;
-    const list = flatListRef.current;
-    if (!list) return;
-    list.scrollToOffset({
-      offset: (currentPage - 1) * SCREEN_HEIGHT,
-      animated: false,
-    });
-    const t = setTimeout(() => {
-      list.scrollToIndex({ index: currentPage - 1, animated: false });
-    }, 250);
-    return () => clearTimeout(t);
-    // Only fire once after first hydration; intentionally no deps on currentPage.
+    const page = restoredPageRef.current;
+    if (!hydrated || page <= 1) return;
+    setCurrentPage(page);
+    setStartPage(page);
+    setListKey((k) => k + 1);
+    // Only once, right after hydration.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
 
@@ -183,36 +180,40 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     }
   });
 
-  const onScrollToIndexFailed = useCallback((info: any) => {
-    flatListRef.current?.scrollToOffset({
-      offset: info.averageItemLength * info.index,
-      animated: false,
-    });
-    setTimeout(() => {
-      flatListRef.current?.scrollToIndex({
-        index: info.index,
-        animated: false,
-      });
-    }, 80);
-  }, []);
-
-  // Each Mushaf page renders to roughly screen height. Seeding the jump with
-  // scrollToOffset (estimate) avoids onScrollToIndexFailed's intermediate
-  // render that would otherwise look like a fast scroll; scrollToIndex then
-  // snaps to the exact measured offset so the page paints immediately.
   const jumpToPage = useCallback((page: number) => {
     const clamped = Math.max(1, Math.min(TOTAL_PAGES, page));
-    const list = flatListRef.current;
-    if (!list) return;
     setCurrentPage(clamped);
-    list.scrollToOffset({
-      offset: (clamped - 1) * SCREEN_HEIGHT,
-      animated: false,
-    });
-    setTimeout(() => {
-      list.scrollToIndex({ index: clamped - 1, animated: false });
-    }, 50);
+    setStartPage(clamped);
+    setListKey((k) => k + 1);
   }, []);
+
+  // Re-add the page before the current start. It becomes the first item, so
+  // the list (still at the top) shows it immediately.
+  const showPreviousPage = useCallback(() => {
+    const next = Math.max(1, startPage - 1);
+    setStartPage(next);
+    setCurrentPage(next);
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [startPage]);
+
+  const previousPageHeader = useMemo(
+    () =>
+      startPage > 1 ? (
+        <TouchableOpacity
+          style={styles.prevPageBtn}
+          onPress={showPreviousPage}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={t('quran.reciteTab.previousPage', { page: startPage - 1 })}
+        >
+          <Ionicons name="chevron-up" size={16} color={Colors.primary} />
+          <Text style={styles.prevPageText}>
+            {t('quran.reciteTab.previousPage', { page: startPage - 1 })}
+          </Text>
+        </TouchableOpacity>
+      ) : null,
+    [startPage, showPreviousPage, t],
+  );
 
   useEffect(() => {
     if (!jumpRequest || !hydrated) return;
@@ -259,8 +260,9 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
 
       {/* Continuous scroll list */}
       <FlatList
+        key={listKey}
         ref={flatListRef}
-        data={ALL_PAGES}
+        data={pages}
         keyExtractor={(item) => String(item)}
         renderItem={renderPage}
         initialNumToRender={2}
@@ -270,7 +272,7 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged.current}
         viewabilityConfig={viewabilityConfig.current}
-        onScrollToIndexFailed={onScrollToIndexFailed}
+        ListHeaderComponent={previousPageHeader}
       />
 
       {/* Floating page indicator */}
@@ -437,6 +439,21 @@ function JumpToModal({
 }
 
 const styles = StyleSheet.create({
+  prevPageBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginHorizontal: 12,
+    marginTop: 10,
+    marginBottom: 2,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.primary + '40',
+    backgroundColor: '#FBF6E4',
+  },
+  prevPageText: { color: Colors.primary, fontWeight: '700', fontSize: 13 },
   flex: { flex: 1, backgroundColor: '#FBF6E4' },
   toolbar: {
     flexDirection: 'row',

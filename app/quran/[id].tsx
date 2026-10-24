@@ -506,6 +506,8 @@ export default function SurahReaderScreen() {
         }
       } catch {}
     })();
+    // Mount-only: forcedMode comes from the route params of this visit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateQuranMode = (m: QuranMode) => {

@@ -1386,7 +1386,8 @@
       "floatingIndicator": "Page {{page}} / {{total}} · Juz {{juz}}",
       "increaseSize": "Increase text size",
       "jumpToPageOrSurah": "Jump to page or surah",
-      "textSize": "Text size"
+      "textSize": "Text size",
+      "previousPage": "Previous page ({{page}})"
     },
     "reciterPicker": {
       "title": "Select Reciter"
