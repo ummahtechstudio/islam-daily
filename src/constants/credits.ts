@@ -88,7 +88,6 @@ export const CREDIT_SECTIONS: CreditSection[] = [
       { name: 'Islamic Network CDN (cdn.islamic.network)', descKey: 'islamicNetworkCdn', url: 'https://islamic.network' },
       { name: 'QuranicAudio.com', descKey: 'quranicAudio', url: 'https://quranicaudio.com' },
       { name: 'Internet Archive (archive.org)', descKey: 'archiveOrg', url: 'https://archive.org' },
-      { name: 'IslamicFinder.org — adhan recordings', descKey: 'islamicFinder', url: 'https://www.islamicfinder.org' },
       { name: 'Notification adhan — "Adhan" recorded by Aishatu98 (Wikimedia Commons), opening', descKey: 'notificationAdhan', license: 'CC0 1.0 (public domain dedication)', url: 'https://commons.wikimedia.org/wiki/File:Adhan.ogg' },
     ],
   },

@@ -317,13 +317,11 @@ export function TasbeehCounterView({
     }
   }, [tapTimes, settings]);
 
+  // Starts at the tempo shown (1.00 s by default); tapping the tempo button is
+  // optional fine-tuning, not a prerequisite.
   const startStopTimer = useCallback(() => {
-    if (tapTimes.length < 2) {
-      Alert.alert(t('tasbeeh.counter.alerts.setTempoTitle'), t('tasbeeh.counter.alerts.setTempoMessage'));
-      return;
-    }
     setTimerRunning((v) => !v);
-  }, [tapTimes, t]);
+  }, []);
 
   const updateSettingsField = useCallback(
     async (patch: Partial<TasbeehSettings>) => {

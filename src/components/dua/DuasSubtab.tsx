@@ -132,16 +132,19 @@ export function DuasSubtab({ theme, initialCategory }: DuasSubtabProps) {
 
   const currentCategory = hisnulMuslim.find((c) => c.id === selectedCategory);
   const baseDuas = currentCategory?.duas ?? [];
+  // Search covers every category (searching "travel" while "Waking" is
+  // selected used to find nothing), including the bilingual titles.
   const filteredDuas = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return baseDuas;
-    return baseDuas.filter((d) =>
-      (d.english || '').toLowerCase().includes(q) ||
-      (d.urdu || '').toLowerCase().includes(q) ||
-      (d.transliteration || '').toLowerCase().includes(q) ||
-      (d.reference || '').toLowerCase().includes(q),
-    );
-  }, [baseDuas, searchQuery]);
+    return hisnulMuslim
+      .flatMap((c) => c.duas)
+      .filter((d) =>
+        [d.title_en, d.title_ur, d.english, d.urdu, d.transliteration, d.reference].some((f) =>
+          (f || '').toLowerCase().includes(q),
+        ),
+      );
+  }, [baseDuas, hisnulMuslim, searchQuery]);
 
   return (
     <View style={{ flex: 1 }}>

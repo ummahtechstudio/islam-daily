@@ -24,6 +24,15 @@ export const FEATURES = {
    * Coming back in v1.1 once the audio is curated.
    */
   audioLibrary: false,
+
+  /**
+   * Per-prayer adhan voice picker. Hidden in v1: the choice is never used by
+   * the notification scheduler (every adhan notification plays the bundled
+   * adhan.mp3), and its previews stream recordings from islamicfinder.org that
+   * the app has no licence to use. Re-enable once licensed voices are bundled
+   * and wired into the notification channels.
+   */
+  customAdhan: false,
 } as const;
 
 /**
@@ -34,6 +43,7 @@ export const FEATURES = {
 export const V1_HIDDEN_ROUTES: readonly string[] = [
   ...(FEATURES.islamicBooks ? [] : ['/islamic-books']),
   ...(FEATURES.audioLibrary ? [] : ['/audio-library']),
+  ...(FEATURES.customAdhan ? [] : ['/custom-adhan']),
 ];
 
 export function isRouteHidden(path: string): boolean {

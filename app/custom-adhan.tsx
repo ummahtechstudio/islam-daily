@@ -18,6 +18,8 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { ADHAN_SOUNDS, CACHE_KEYS, PRAYER_LIST } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
+import { Redirect } from 'expo-router';
+import { FEATURES } from '../src/constants/featureFlags';
 import { safeJsonParse } from '../src/utils/safeJsonParse';
 
 type AdhanPrefs = Record<string, string>; // prayerName -> soundId
@@ -28,7 +30,13 @@ try {
   Audio = require('expo-av').Audio;
 } catch {}
 
-export default function CustomAdhanScreen() {
+// Hidden in v1 (see FEATURES.customAdhan): a stale deep link lands on Home.
+export default function CustomAdhanRoute() {
+  if (!FEATURES.customAdhan) return <Redirect href={'/' as any} />;
+  return <CustomAdhanScreen />;
+}
+
+function CustomAdhanScreen() {
   const { t } = useTranslation();
   useEffect(() => { trackScreen('CustomAdhan'); }, []);
   const colorScheme = useColorScheme();
