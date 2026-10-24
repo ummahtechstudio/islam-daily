@@ -15,6 +15,7 @@ import { Colors, palette } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { prefs, PREFS_KEYS } from '../src/lib/storage';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 // ─── Zakat constants ──────────────────────────────────────────────────────────
 // These are the widely-accepted classical nisab thresholds and the standard
@@ -582,7 +583,7 @@ interface PriceRowProps {
 function PriceRow({ icon, label, value, onChange, theme }: PriceRowProps) {
   return (
     <View style={styles.priceRow}>
-      <Text style={styles.priceIcon}>{icon}</Text>
+      <GlyphIcon glyph={icon} size={18} color={icon === '🥈' ? '#9CA3AF' : '#C9A84C'} />
       <Text style={[styles.priceLabel, { color: theme.text }]}>{label}</Text>
       <TextInput
         style={[
@@ -619,7 +620,7 @@ function AssetRow({ icon, color, label, sub, value, onChange, theme, isLast }: A
       ]}
     >
       <View style={[styles.fieldIcon, { backgroundColor: color + '20' }]}>
-        <Text style={{ fontSize: 18 }}>{icon}</Text>
+        <GlyphIcon glyph={icon} size={18} color={color} />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={[styles.fieldLabel, { color: theme.text }]}>{label}</Text>
@@ -661,7 +662,7 @@ function DualAssetRow({
     <View style={[styles.dualRow, { borderBottomColor: theme.border }]}>
       <View style={styles.dualHeader}>
         <View style={[styles.fieldIcon, { backgroundColor: color + '20' }]}>
-          <Text style={{ fontSize: 18 }}>{icon}</Text>
+          <GlyphIcon glyph={icon} size={18} color={color} />
         </View>
         <Text style={[styles.fieldLabel, { color: theme.text }]}>{label}</Text>
       </View>

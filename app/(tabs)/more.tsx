@@ -19,6 +19,7 @@ import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getBookmarks } from '../../src/utils/bookmarks';
 import { isRouteHidden } from '../../src/constants/featureFlags';
+import { GlyphIcon } from '../../src/components/GlyphIcon';
 
 const GOLD = '#EF9F27';
 
@@ -201,7 +202,7 @@ export default function MoreScreen() {
             activeOpacity={0.85}
           >
             <View style={[styles.tasbeehIconBox, { backgroundColor: Colors.primary }]}>
-              <Text style={styles.tasbeehIcon}>📿</Text>
+              <GlyphIcon glyph="📿" size={26} color="#fff" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.tasbeehLabel, { color: theme.text }]}>{t('more.tasbeeh.label')}</Text>
@@ -256,7 +257,7 @@ export default function MoreScreen() {
                     activeOpacity={0.72}
                   >
                     <View style={[styles.cardIconBg, { backgroundColor: item.bg }]}>
-                      <Text style={styles.cardIcon}>{item.icon}</Text>
+                      <GlyphIcon glyph={item.icon} size={22} color={Colors.primary} />
                     </View>
                     <Text style={[styles.cardLabel, { color: theme.text }]} numberOfLines={1}>
                       {t(`more.items.${item.itemKey}.label`)}
@@ -295,7 +296,7 @@ export default function MoreScreen() {
             activeOpacity={0.8}
           >
             <View style={styles.featuredLeft}>
-              <Text style={styles.featuredIcon}>📿</Text>
+              <GlyphIcon glyph="📿" size={30} color="#fff" />
               <View>
                 <Text style={styles.featuredLabel}>{t('more.items.hifzTracker.label')}</Text>
                 <Text style={styles.featuredSub}>{t('more.items.hifzTracker.sub')}</Text>

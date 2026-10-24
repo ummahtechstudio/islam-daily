@@ -28,6 +28,7 @@ import {
 } from '../../utils/settings';
 import CardActionsRow from '../../../components/CardActionsRow';
 import type { Dua, DuaCategory } from '../../types/content';
+import { GlyphIcon } from '../GlyphIcon';
 
 const URDU_DISCLAIMER_KEY = 'urdu_disclaimer_dismissed';
 
@@ -78,7 +79,7 @@ export interface DuasSubtabProps {
 }
 
 export function DuasSubtab({ theme, initialCategory }: DuasSubtabProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [hisnulMuslim, setHisnulMuslim] = useState<DuaCategory[]>(() => getBundledDuas());
   // Defensive: if the bundle is ever empty (broken JSON, content not yet
   // populated), fall back to an empty sentinel id rather than crashing on
@@ -152,9 +153,12 @@ export function DuasSubtab({ theme, initialCategory }: DuasSubtabProps) {
             <Text style={[styles.disclaimerText, { color: theme.textSecondary }]}>
               {t('dua.duas.disclaimer')}
             </Text>
-            <Text style={[styles.disclaimerTextUrdu, { color: theme.textMuted }]}>
-              ℹ️ اردو تراجم مستند اسلامی ذرائع پر مبنی ہیں۔ تصدیق کے لیے براہ کرم حصن المسلم کی اردو طبع شدہ کتاب سے رجوع کریں۔
-            </Text>
+            {/* English UI also gets the note in Urdu; in Urdu UI the line above already is. */}
+            {i18n.language !== 'ur' ? (
+              <Text style={[styles.disclaimerTextUrdu, { color: theme.textMuted }]}>
+                اردو تراجم مستند اسلامی ذرائع پر مبنی ہیں۔ تصدیق کے لیے براہ کرم حصن المسلم کی اردو طبع شدہ کتاب سے رجوع کریں۔
+              </Text>
+            ) : null}
           </View>
           <TouchableOpacity onPress={dismissDisclaimer} hitSlop={8}>
             <Ionicons name="close" size={18} color={theme.textMuted} />
@@ -220,7 +224,7 @@ export function DuasSubtab({ theme, initialCategory }: DuasSubtabProps) {
 
       {filteredDuas.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyEmoji}>{searchQuery ? '🔍' : '🤲'}</Text>
+          <View style={styles.emptyEmoji}><GlyphIcon glyph={searchQuery ? '🔍' : '🤲'} size={44} color={theme.textMuted} /></View>
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
             {searchQuery ? t('dua.duas.empty.searchTitle') : t('dua.duas.empty.categoryTitle')}
           </Text>
@@ -502,7 +506,7 @@ const styles = StyleSheet.create({
     padding: 32,
     gap: 8,
   },
-  emptyEmoji: { fontSize: 48, marginBottom: 8 },
+  emptyEmoji: { marginBottom: 8 },
   emptyTitle: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
   emptySubtitle: { fontSize: 13, textAlign: 'center' },
 });

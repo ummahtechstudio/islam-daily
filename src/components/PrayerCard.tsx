@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
 import { useTranslation } from 'react-i18next';
+import { GlyphIcon } from './GlyphIcon';
 
 const ICONS: Record<string, string> = {
   Fajr: '🌙',
@@ -31,7 +32,7 @@ export function PrayerCard({ name, time, isNext, dark }: Props) {
         isNext && styles.cardActive,
       ]}
     >
-      <Text style={styles.icon}>{ICONS[name] ?? '🕌'}</Text>
+      <View style={styles.icon}><GlyphIcon glyph={ICONS[name] ?? '🕌'} size={24} color={isNext ? '#fff' : Colors.primary} /></View>
       <View style={styles.info}>
         <Text style={[styles.name, { color: isNext ? '#fff' : theme.text }]}>{name}</Text>
         {isNext && <Text style={styles.nextLabel}>{t('prayerCard.nextLabel')}</Text>}
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 6,
   },
-  icon: { fontSize: 24 },
+  icon: { width: 28, alignItems: 'center' },
   info: { flex: 1 },
   name: { fontSize: 16, fontWeight: '600' },
   nextLabel: {

@@ -426,7 +426,7 @@
         "travel": "سفر",
         "waking": "بیداری"
       },
-      "disclaimer": "ℹ️ اردو تراجم مستند اسلامی ماخذ پر مبنی ہیں۔ تصدیق کے لیے براہِ کرم حصنُ المسلم کے چھپے ہوئے اردو ایڈیشن سے رجوع کریں۔",
+      "disclaimer": "اردو تراجم مستند اسلامی ماخذ پر مبنی ہیں۔ تصدیق کے لیے براہِ کرم حصنُ المسلم کے چھپے ہوئے اردو ایڈیشن سے رجوع کریں۔",
       "empty": {
         "categorySubtitle": "ان شاء اللہ جلد مزید شامل کر رہے ہیں",
         "categoryTitle": "اس زمرے میں ابھی کوئی دعا نہیں",
@@ -637,7 +637,7 @@
     },
     "greeting": {
       "salam": "السلام علیکم",
-      "eidMubarak": "عید مبارک! 🌙",
+      "eidMubarak": "عید مبارک!",
       "todayIs": "آج {{event}} ہے"
     },
     "moreSections": {
@@ -715,7 +715,7 @@
       }
     },
     "ramadan": {
-      "banner": "🌙 رمضان مبارک",
+      "banner": "رمضان مبارک",
       "iftar": "افطار: {{time}}",
       "sehri": "سحری: {{time}}"
     },
@@ -876,7 +876,7 @@
       }
     },
     "quote": {
-      "badge": "✨ حدیثِ حکمت"
+      "badge": "حدیثِ حکمت"
     },
     "search": {
       "label": "تلاش",
@@ -1414,8 +1414,8 @@
       "error": "سورہ لوڈ نہیں ہو سکی",
       "fontSize": "فونٹ سائز",
       "loading": "سورہ لوڈ ہو رہی ہے...",
-      "modeRecite": "🔊 تلاوت",
-      "modeStudy": "📖 مطالعہ",
+      "modeRecite": "تلاوت",
+      "modeStudy": "مطالعہ",
       "playbackFailedBody": "آڈیو لوڈ نہیں ہو سکی۔ اپنا کنکشن چیک کریں۔",
       "playbackFailedTitle": "پلے بیک ناکام",
       "switchToStudy": "مطالعہ موڈ پر جائیں",
@@ -1629,14 +1629,14 @@
       "resetAllSettings": "تمام سیٹنگز ری سیٹ کریں"
     },
     "translationLang": {
-      "englishOption": "🇬🇧 انگریزی",
+      "englishOption": "انگریزی",
       "explainer": "نوٹ: عربی ہمیشہ دکھائی جاتی ہے۔ یہ سیٹنگ دعاؤں، ذکر اور حدیث کے انگریزی/اردو ترجمے پر اثر ڈالتی ہے۔",
-      "urduOption": "🇵🇰 اردو (Urdu)"
+      "urduOption": "اردو (Urdu)"
     },
     "appLang": {
-      "englishOption": "🇬🇧 انگریزی",
+      "englishOption": "انگریزی",
       "explainer": "اس سے پوری ایپ کا انٹرفیس بدل جاتا ہے۔ اردو منتخب کرنے پر ترجمہ بھی اردو میں ہو جاتا ہے؛ انگریزی منتخب کرنے پر آپ کا ترجمے کا انتخاب برقرار رہتا ہے۔",
-      "urduOption": "🇵🇰 اردو (Urdu)"
+      "urduOption": "اردو (Urdu)"
     }
   },
   "tabs": {
@@ -1661,7 +1661,7 @@
       },
       "progress": "{{current}} / {{target}}",
       "round": "راؤنڈ {{round}}",
-      "roundComplete": "✨ راؤنڈ {{round}} مکمل!",
+      "roundComplete": "راؤنڈ {{round}} مکمل!",
       "settings": {
         "lifetimeTotal": "تاحیات کل تعداد",
         "soundFeedback": "آواز کا اشارہ",
@@ -1806,7 +1806,7 @@
     },
     "result": {
       "aboveNisab": "✓ نصاب سے زیادہ — زکوٰۃ واجب ہے",
-      "belowNisab": "ℹ نصاب سے کم — اس سال زکوٰۃ واجب نہیں",
+      "belowNisab": "نصاب سے کم — اس سال زکوٰۃ واجب نہیں",
       "breakdown": "اثاثے {{currency}} {{assets}} − قرضے {{currency}} {{debts}}",
       "netWealthLabel": "قابلِ زکوٰۃ خالص مال",
       "nisabThresholdLabel": "{{basis}} کے حساب سے نصاب کی حد",

@@ -155,11 +155,11 @@ function StepCard({
           ) : null}
           {step.item.benefit ? (
             <View style={[styles.benefitRow, { borderTopColor: theme.border }]}>
-              <Text style={[styles.benefitText, { color: theme.textSecondary }]}>✨ {step.item.benefit}</Text>
+              <Text style={[styles.benefitText, { color: theme.textSecondary }]}>{step.item.benefit}</Text>
             </View>
           ) : null}
           <View style={[styles.referenceRow, { borderTopColor: theme.border }]}>
-            <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 </Text>
+            <Ionicons name="book-outline" size={12} color={theme.textMuted} style={styles.referenceLabel} />
             <Text style={[styles.referenceText, { color: GOLD }]}>{step.item.reference}</Text>
           </View>
         </>
@@ -192,7 +192,7 @@ function StepCard({
             </View>
           ))}
           <View style={[styles.referenceRow, { borderTopColor: theme.border }]}>
-            <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 </Text>
+            <Ionicons name="book-outline" size={12} color={theme.textMuted} style={styles.referenceLabel} />
             <Text style={[styles.referenceText, { color: GOLD }]}>
               {t('afterSalah.quranReference', { surah: step.surah.number, count: step.ayahs.length })}
             </Text>

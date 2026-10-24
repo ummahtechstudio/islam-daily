@@ -23,6 +23,7 @@ import { trackScreen } from '../src/services/analytics';
 import { fetchWithTimeout, withTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
 import { useIsOnline } from '../src/hooks/useIsOnline';
 import MosqueFinderEmptyState from '../src/components/MosqueFinderEmptyState';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 const RADIUS_OPTIONS = [1, 5, 10, 25, 50] as const;
 type Radius = (typeof RADIUS_OPTIONS)[number];
@@ -249,7 +250,7 @@ export default function HalalFinderScreen() {
     <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: ACCENT }]}>
-        <Text style={styles.headerEmoji}>🥩</Text>
+        <GlyphIcon glyph="🥩" size={26} color="#fff" />
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>{t('halalFinder.header.title')}</Text>
           <Text style={styles.headerSub} numberOfLines={1}>
@@ -337,7 +338,7 @@ export default function HalalFinderScreen() {
         </View>
       ) : places.length === 0 ? (
         <View style={styles.centerBox}>
-          <Text style={{ fontSize: 40 }}>🔍</Text>
+          <GlyphIcon glyph="🔍" size={40} color={theme.textMuted} />
           <Text style={[styles.emptyText, { color: theme.textMuted }]}>
             {t('halalFinder.empty', { radius: effectiveRadiusKm })}
           </Text>
@@ -350,7 +351,7 @@ export default function HalalFinderScreen() {
           renderItem={({ item }) => (
             <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <View style={styles.iconBg}>
-                <Text style={{ fontSize: 22 }}>🥙</Text>
+                <GlyphIcon glyph="🥙" size={22} color={ACCENT} />
               </View>
               <View style={styles.info}>
                 <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={1}>
@@ -368,7 +369,7 @@ export default function HalalFinderScreen() {
                   </Text>
                 )}
                 <Text style={styles.distance}>
-                  📍 {item.distance < 1
+                  {item.distance < 1
                     ? t('halalFinder.distance.meters', { m: Math.round(item.distance * 1000) })
                     : t('halalFinder.distance.km', { km: item.distance.toFixed(1) })}
                 </Text>

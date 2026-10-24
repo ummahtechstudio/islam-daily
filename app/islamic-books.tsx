@@ -22,6 +22,7 @@ import {
   openBook,
 } from '../src/services/books';
 import { FEATURES } from '../src/constants/featureFlags';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 const TABS: { key: BookLanguage; label: string; icon: string }[] = [
   { key: 'arabic',  label: 'Arabic',  icon: 'text' },
@@ -119,7 +120,7 @@ function IslamicBooksScreenInner() {
             >
               <View style={styles.bookTop}>
                 <View style={[styles.bookIcon, { backgroundColor: book.color + '18' }]}>
-                  <Text style={{ fontSize: 26 }}>{book.icon}</Text>
+                  <GlyphIcon glyph={book.icon} size={24} color={book.color} />
                 </View>
                 <View style={styles.bookInfo}>
                   <Text style={[styles.bookTitle, { color: theme.text }]}>{book.title}</Text>

@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store';
 import { Colors } from '../constants/colors';
+import { GlyphIcon } from './GlyphIcon';
 
 interface Props {
   onAccept: () => void;
@@ -35,7 +36,7 @@ export function PrivacyConsentModal({ onAccept, onDecline }: Props) {
         <View style={[styles.sheet, { backgroundColor: theme.card, borderColor: theme.border }]}>
           {/* Header */}
           <View style={[styles.header, { backgroundColor: Colors.primary }]}>
-            <Text style={{ fontSize: 28 }}>🌙</Text>
+            <GlyphIcon glyph="🌙" size={28} color="#fff" />
             <Text style={styles.headerTitle}>{t('privacy.header')}</Text>
           </View>
 

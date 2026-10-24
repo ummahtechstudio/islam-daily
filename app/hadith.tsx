@@ -41,6 +41,7 @@ import {
   type HadithDownloadProgress,
 } from '../src/services/hadithCache';
 import HadithBookDownloadStrip from '../src/components/hadith/HadithBookDownloadStrip';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 const GOLD = '#EF9F27';
 const PAGE_SIZE = 25;
@@ -137,7 +138,7 @@ function CollectionsGrid({
               activeOpacity={0.75}
             >
               <View style={[gridStyles.iconBg, { backgroundColor: meta.bg }]}>
-                <Text style={gridStyles.icon}>{meta.icon}</Text>
+                <GlyphIcon glyph={meta.icon} size={22} color={meta.color} />
               </View>
               <Text style={[gridStyles.name, { color: theme.text }]} numberOfLines={2}>
                 {hadithCollectionName(col.key, i18n.language, col.name)}

@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import type { HadithDownloadProgress } from '../../services/hadithCache';
+import { GlyphIcon } from '../GlyphIcon';
 
 const GREEN = '#0F6E56';
 const GOLD = '#EF9F27';
@@ -75,7 +76,7 @@ export default function HadithBookDownloadStrip({
     <View style={[styles.root, { backgroundColor: bg }]}>
       <View style={styles.row}>
         {inErrorState ? (
-          <Text style={styles.errIcon}>⚠</Text>
+          <View style={styles.errIcon}><GlyphIcon glyph="⚠" size={16} color="#fff" /></View>
         ) : (
           <ActivityIndicator color="#fff" size="small" />
         )}
@@ -110,11 +111,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   errIcon: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
     width: 20,
-    textAlign: 'center',
+    alignItems: 'center',
   },
   message: {
     flex: 1,

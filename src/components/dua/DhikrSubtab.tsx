@@ -20,6 +20,7 @@ import { createCounterFromTemplate } from '../../utils/tasbeeh';
 import { getTranslationLanguage, type TranslationLanguage } from '../../utils/settings';
 import type { DhikrCategory, DhikrItem } from '../../types/content';
 import type { TasbeehTemplate } from '../../types/tasbeeh';
+import { GlyphIcon } from '../GlyphIcon';
 
 const GOLD = '#EF9F27';
 
@@ -100,7 +101,7 @@ export function DhikrSubtab({ theme, onCountWithTasbeeh }: DhikrSubtabProps) {
   if (entries.length < 5) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyEmoji}>📿</Text>
+        <View style={styles.emptyEmoji}><GlyphIcon glyph="📿" size={44} color={theme.textMuted} /></View>
         <Text style={[styles.emptyTitle, { color: theme.text }]}>
           {t('dhikr.loading.title')}
         </Text>
@@ -123,7 +124,7 @@ export function DhikrSubtab({ theme, onCountWithTasbeeh }: DhikrSubtabProps) {
           activeOpacity={0.8}
           accessibilityRole="button"
         >
-          <Text style={styles.afterSalahEmoji}>🕌</Text>
+          <GlyphIcon glyph="🕌" size={26} color={Colors.primary} />
           <View style={styles.afterSalahBody}>
             <Text style={[styles.afterSalahTitle, { color: theme.text }]}>
               {t('afterSalah.entry.title')}
@@ -204,13 +205,13 @@ function DhikrCard({
       {item.benefit ? (
         <View style={[styles.benefitRow, { borderTopColor: theme.border }]}>
           <Text style={[styles.benefitText, { color: theme.textSecondary }]}>
-            ✨ {item.benefit}
+            {item.benefit}
           </Text>
         </View>
       ) : null}
 
       <View style={[styles.referenceRow, { borderTopColor: theme.border }]}>
-        <Text style={[styles.referenceLabel, { color: theme.textMuted }]}>📖 </Text>
+        <Ionicons name="book-outline" size={12} color={theme.textMuted} style={styles.referenceLabel} />
         <Text style={[styles.referenceText, { color: GOLD }]}>
           {item.reference}
         </Text>
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     padding: 32,
     gap: 8,
   },
-  emptyEmoji: { fontSize: 48, marginBottom: 8 },
+  emptyEmoji: { marginBottom: 8 },
   emptyTitle: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
   emptySubtitle: { fontSize: 13, textAlign: 'center' },
 });

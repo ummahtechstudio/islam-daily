@@ -25,6 +25,7 @@ import { getHadithOfTheDay, warmHadithOfTheDayPool, type HadithOfTheDay } from '
 import { COLLECTION_NAMES, type HadithCollectionKey } from '../src/services/hadiths';
 import { hadithCollectionName } from '../src/constants';
 import { getTranslationLanguage, type TranslationLanguage } from '../src/utils/settings';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 /**
  * Full view of today's hadith. This is also the Daily Hadith notification's
@@ -82,7 +83,7 @@ export default function HadithOfTheDayScreen() {
     return (
       <SafeAreaView style={[styles.flex, { backgroundColor: theme.background }]} edges={['bottom']}>
         <View style={styles.centered}>
-          <Text style={styles.emptyEmoji}>📜</Text>
+          <View style={styles.emptyEmoji}><GlyphIcon glyph="📜" size={44} color={theme.textMuted} /></View>
           <Text style={[styles.emptyTitle, { color: theme.text }]}>{t('hadithOfDay.unavailable.title')}</Text>
           <Text style={[styles.emptyBody, { color: theme.textSecondary }]}>{t('hadithOfDay.unavailable.body')}</Text>
           <TouchableOpacity
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing['2xl'] },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing['2xl'], gap: spacing.sm },
-  emptyEmoji: { fontSize: 48, marginBottom: spacing.sm },
+  emptyEmoji: { marginBottom: spacing.sm },
   emptyTitle: { fontSize: 17, fontWeight: '700', textAlign: 'center' },
   emptyBody: { fontSize: 14, lineHeight: 21, textAlign: 'center', marginBottom: spacing.md },
   primaryBtn: {

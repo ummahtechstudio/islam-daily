@@ -18,6 +18,7 @@ import { Colors } from '../src/constants/colors';
 import { trackScreen } from '../src/services/analytics';
 import { searchQuran, QuranSearchResult } from '../src/services/api';
 import { useStore } from '../src/store';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 export default function SearchScreen() {
   useEffect(() => { trackScreen('Search'); }, []);
@@ -161,7 +162,7 @@ export default function SearchScreen() {
             searched ? (
               searchError ? (
                 <View style={styles.empty}>
-                  <Text style={styles.emptyIcon}>📡</Text>
+                  <View style={styles.emptyIcon}><GlyphIcon glyph="📡" size={40} color={theme.textMuted} /></View>
                   <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
                     {t('search.error.connection')}
                   </Text>
@@ -174,7 +175,7 @@ export default function SearchScreen() {
                 </View>
               ) : (
                 <View style={styles.empty}>
-                  <Text style={styles.emptyIcon}>🔍</Text>
+                  <View style={styles.emptyIcon}><GlyphIcon glyph="🔍" size={40} color={theme.textMuted} /></View>
                   <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
                     {t('search.empty.noResults', { query })}
                   </Text>
@@ -250,6 +251,6 @@ const styles = StyleSheet.create({
   resultEnglish: { fontSize: 14, lineHeight: 22 },
 
   empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
-  emptyIcon: { fontSize: 40 },
+  emptyIcon: { marginBottom: 4 },
   emptyText: { fontSize: 15, textAlign: 'center' },
 });

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
-import Svg, { Circle, Line, Polygon, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Line, Polygon, Rect, Text as SvgText } from 'react-native-svg';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import { useLocation } from '../src/hooks/useLocation';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { LoadingSpinner } from '../src/components/LoadingSpinner';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 const KAABA_LAT = 21.4225;
 const KAABA_LNG = 39.8262;
@@ -220,7 +221,7 @@ export default function QiblaScreen() {
   if (locError && !location) {
     return (
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
-        <Text style={styles.permIcon}>📍</Text>
+        <View style={styles.permIcon}><GlyphIcon glyph="📍" size={48} color={Colors.primary} /></View>
         <Text style={[styles.permTitle, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
           {t('qibla.locationRequired.title')}
         </Text>
@@ -242,7 +243,7 @@ export default function QiblaScreen() {
   if (Platform.OS === 'web' && !orientationReady) {
     return (
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
-        <Text style={styles.permIcon}>🧭</Text>
+        <View style={styles.permIcon}><GlyphIcon glyph="🧭" size={48} color={Colors.primary} /></View>
         <Text style={[styles.permTitle, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
           {t('qibla.compassNeeded.title')}
         </Text>
@@ -257,7 +258,7 @@ export default function QiblaScreen() {
   if (!hasCompass) {
     return (
       <View style={[styles.centered, { backgroundColor: isDark ? Colors.dark.background : Colors.light.background }]}>
-        <Text style={styles.permIcon}>🧭</Text>
+        <View style={styles.permIcon}><GlyphIcon glyph="🧭" size={48} color={Colors.primary} /></View>
         <Text style={[styles.permTitle, { color: isDark ? Colors.dark.text : Colors.light.text }]}>
           {t('qibla.noCompass.title')}
         </Text>
@@ -324,7 +325,7 @@ export default function QiblaScreen() {
             ]}
           />
           <View style={[styles.arKaaba, { borderColor: accentColor }]}>
-            <Text style={styles.arKaabaEmoji}>🕋</Text>
+            <GlyphIcon glyph="🕋" size={30} color={accentColor} />
           </View>
         </Animated.View>
       </View>
@@ -432,9 +433,9 @@ export default function QiblaScreen() {
                 points={`${R},${COMPASS_SIZE - 36} ${R - 7},${R + 4} ${R + 7},${R + 4}`}
                 fill="rgba(255,255,255,0.4)"
               />
-              <SvgText x={R} y={28} textAnchor="middle" fontSize={20}>
-                🕋
-              </SvgText>
+              {/* Kaaba marker: dark cube with a gold band (no emoji) */}
+              <Rect x={R - 8} y={12} width={16} height={16} rx={1.5} fill="#1F2937" stroke="#C9A84C" strokeWidth={1} />
+              <Line x1={R - 8} y1={17} x2={R + 8} y2={17} stroke="#C9A84C" strokeWidth={2} />
             </Svg>
           </Animated.View>
         </View>
@@ -551,7 +552,7 @@ const styles = StyleSheet.create({
   },
   infoValue: { fontSize: 24, fontWeight: '700', color: '#FFFFFF' },
   bearingValue: { fontSize: 36, fontWeight: '800', marginTop: 8 },
-  permIcon: { fontSize: 48, marginBottom: 16 },
+  permIcon: { marginBottom: 16 },
   permTitle: { fontSize: 20, fontWeight: '700', marginBottom: 8, textAlign: 'center' },
   permMsg: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
   startBtn: {

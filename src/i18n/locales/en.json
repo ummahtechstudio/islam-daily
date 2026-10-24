@@ -426,7 +426,7 @@
         "travel": "Travel",
         "waking": "Waking"
       },
-      "disclaimer": "ℹ️ Urdu translations are based on authentic Islamic sources. For verification, please refer to printed Hisn al-Muslim Urdu edition.",
+      "disclaimer": "Urdu translations are based on authentic Islamic sources. For verification, please refer to printed Hisn al-Muslim Urdu edition.",
       "empty": {
         "categorySubtitle": "We're adding more soon InshaAllah",
         "categoryTitle": "No duas in this category yet",
@@ -637,7 +637,7 @@
     },
     "greeting": {
       "salam": "Assalamu Alaikum",
-      "eidMubarak": "Eid Mubarak! 🌙",
+      "eidMubarak": "Eid Mubarak!",
       "todayIs": "Today: {{event}}"
     },
     "moreSections": {
@@ -715,7 +715,7 @@
       }
     },
     "ramadan": {
-      "banner": "🌙 Ramadan Mubarak",
+      "banner": "Ramadan Mubarak",
       "iftar": "Iftar: {{time}}",
       "sehri": "Sehri: {{time}}"
     },
@@ -876,7 +876,7 @@
       }
     },
     "quote": {
-      "badge": "✨ Hadith of Wisdom"
+      "badge": "Hadith of Wisdom"
     },
     "search": {
       "label": "Search",
@@ -1414,8 +1414,8 @@
       "error": "Failed to load surah",
       "fontSize": "Font Size",
       "loading": "Loading surah...",
-      "modeRecite": "🔊 Recite",
-      "modeStudy": "📖 Study",
+      "modeRecite": "Recite",
+      "modeStudy": "Study",
       "playbackFailedBody": "Could not load audio. Check your connection.",
       "playbackFailedTitle": "Playback failed",
       "switchToStudy": "Switch to Study Mode",
@@ -1629,14 +1629,14 @@
       "resetAllSettings": "Reset All Settings"
     },
     "translationLang": {
-      "englishOption": "🇬🇧 English",
+      "englishOption": "English",
       "explainer": "Note: Arabic is always shown. This setting affects English/Urdu translations of duas, dhikr, and hadith.",
-      "urduOption": "🇵🇰 اردو (Urdu)"
+      "urduOption": "اردو (Urdu)"
     },
     "appLang": {
-      "englishOption": "🇬🇧 English",
+      "englishOption": "English",
       "explainer": "Changes the whole app interface. Choosing Urdu also switches translations to Urdu; choosing English keeps your translation choice.",
-      "urduOption": "🇵🇰 اردو (Urdu)"
+      "urduOption": "اردو (Urdu)"
     }
   },
   "tabs": {
@@ -1661,7 +1661,7 @@
       },
       "progress": "{{current}} / {{target}}",
       "round": "Round {{round}}",
-      "roundComplete": "✨ Round {{round}} complete!",
+      "roundComplete": "Round {{round}} complete!",
       "settings": {
         "lifetimeTotal": "LIFETIME TOTAL",
         "soundFeedback": "Sound feedback",
@@ -1806,7 +1806,7 @@
     },
     "result": {
       "aboveNisab": "✓ Above Nisab — Zakat is obligatory",
-      "belowNisab": "ℹ Below Nisab — no Zakat due this year",
+      "belowNisab": "Below Nisab — no Zakat due this year",
       "breakdown": "Assets {{currency}} {{assets}} − Debts {{currency}} {{debts}}",
       "netWealthLabel": "Net zakatable wealth",
       "nisabThresholdLabel": "Nisab threshold ({{basis}})",

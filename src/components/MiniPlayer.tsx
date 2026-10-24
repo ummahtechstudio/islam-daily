@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioPlayer } from '../context/AudioPlayerContext';
 import { Colors } from '../constants/colors';
+import { GlyphIcon } from './GlyphIcon';
 
 const fmtTime = (s: number) =>
   `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
@@ -54,7 +55,7 @@ export function MiniPlayer({ isDark }: Props) {
 
       <View style={styles.row}>
         <View style={[styles.iconBox, { backgroundColor: Colors.primary + '20' }]}>
-          <Text style={styles.iconEmoji}>🎧</Text>
+          <GlyphIcon glyph="🎧" size={20} color={Colors.primary} />
         </View>
 
         <View style={styles.info}>

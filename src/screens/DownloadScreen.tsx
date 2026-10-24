@@ -28,6 +28,7 @@ import {
   downloadHadiths,
   downloadAll,
 } from '../services/downloadService';
+import { GlyphIcon } from '../components/GlyphIcon';
 
 // ─── Pack configuration ───────────────────────────────────────────────────────
 
@@ -296,7 +297,7 @@ export default function DownloadScreen() {
         ]}
       >
         <View style={[styles.iconWrap, { backgroundColor: pack.accentColor + '20' }]}>
-          <Text style={styles.packIcon}>{pack.icon}</Text>
+          <GlyphIcon glyph={pack.icon} size={24} color={pack.accentColor} />
         </View>
 
         <View style={styles.packInfo}>

@@ -15,17 +15,19 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { getHijriParts } from '../src/utils/formatPrayerTime';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 // ─── Islamic events ───────────────────────────────────────────────────────────
 
+// `icon` is a key for GlyphIcon (rendered as a line icon — never as emoji).
 // Event names + the Hijri month names in the eventDate display are Islamic
 // calendar content, but they should follow the UI language — each entry carries
 // an i18n key (calendar.islamicEvents.*) translated at render time.
 const ISLAMIC_EVENTS: { hijriMonth: number; hijriDay: number; key: string; icon: string }[] = [
-  { hijriMonth: 1, hijriDay: 1, key: 'islamicNewYear', icon: '🎊' },
+  { hijriMonth: 1, hijriDay: 1, key: 'islamicNewYear', icon: '📅' },
   { hijriMonth: 1, hijriDay: 10, key: 'ashura', icon: '🌙' },
   { hijriMonth: 3, hijriDay: 12, key: 'mawlid', icon: '🌟' },
-  { hijriMonth: 7, hijriDay: 27, key: 'israMiraj', icon: '✨' },
+  { hijriMonth: 7, hijriDay: 27, key: 'israMiraj', icon: '🕌' },
   { hijriMonth: 8, hijriDay: 15, key: 'baraat', icon: '🙏' },
   { hijriMonth: 9, hijriDay: 1, key: 'ramadanBegins', icon: '🌙' },
   { hijriMonth: 9, hijriDay: 27, key: 'laylatAlQadr', icon: '💫' },
@@ -219,7 +221,9 @@ export default function CalendarScreen() {
               key={event.key}
               style={[styles.eventCard, { backgroundColor: theme.card, borderColor: theme.border }]}
             >
-              <Text style={styles.eventIcon}>{event.icon}</Text>
+              <View style={[styles.eventIcon, { backgroundColor: isDark ? Colors.dark.surface : Colors.primary + '12' }]}>
+                <GlyphIcon glyph={event.icon} size={20} color={eventDateColor} />
+              </View>
               <View style={styles.eventInfo}>
                 <Text style={[styles.eventName, { color: theme.text }]}>
                   {t(`calendar.islamicEvents.${event.key}`)}
@@ -309,7 +313,7 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 12,
   },
-  eventIcon: { fontSize: 28 },
+  eventIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   eventInfo: { flex: 1 },
   eventName: { fontSize: 15, fontWeight: '600' },
   eventDate: { fontSize: 13, marginTop: 2 },

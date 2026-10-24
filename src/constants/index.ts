@@ -4,7 +4,6 @@ export * from './typography';
 export * from './spacing';
 
 export const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-export const PRAYER_ICONS = ['🌙', '🌅', '☀️', '🌤️', '🌇', '⭐'];
 
 // name = English proper noun; name_ur = the name Urdu readers use.
 export const HADITH_COLLECTIONS = [

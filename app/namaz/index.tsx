@@ -19,6 +19,7 @@ import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getNamazCategories } from '../../src/services/namazContent';
 import { NamazBrandingHeader } from '../../src/components/namaz/NamazBrandingHeader';
+import { GlyphIcon } from '../../src/components/GlyphIcon';
 
 export default function NamazHomeScreen() {
   useEffect(() => { trackScreen('Namaz'); }, []);
@@ -53,7 +54,7 @@ export default function NamazHomeScreen() {
               activeOpacity={0.8}
             >
               <View style={[styles.iconBox, { backgroundColor: theme.surface }]}>
-                <Text style={styles.icon}>{cat.icon}</Text>
+                <GlyphIcon glyph={cat.icon} size={22} color={Colors.primary} />
               </View>
               <View style={styles.cardText}>
                 <Text style={[styles.titleEn, { color: theme.text }]}>

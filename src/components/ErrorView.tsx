@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Colors } from '../constants/colors';
+import { GlyphIcon } from './GlyphIcon';
 
 interface Props {
   message: string;
@@ -14,7 +15,7 @@ export function ErrorView({ message, onRetry, dark }: Props) {
   const theme = dark ? Colors.dark : Colors.light;
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>⚠️</Text>
+      <View style={styles.icon}><GlyphIcon glyph="⚠" size={40} color={Colors.warning} /></View>
       <Text style={[styles.message, { color: theme.text }]}>{message}</Text>
       {onRetry && (
         <TouchableOpacity style={styles.btn} onPress={onRetry} activeOpacity={0.8}>
@@ -33,7 +34,7 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 24,
   },
-  icon: { fontSize: 40 },
+  icon: { marginBottom: 4 },
   message: { fontSize: 15, textAlign: 'center', lineHeight: 22 },
   btn: {
     marginTop: 8,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors } from '../constants/colors';
 import { FontSizes } from '../constants/fonts';
+import { GlyphIcon } from './GlyphIcon';
 
 interface Props {
   arabic: string;
@@ -24,7 +25,7 @@ export function VerseCard({
         <Text style={[styles.reference, { color: Colors.primary }]}>{reference}</Text>
         {onBookmark && (
           <TouchableOpacity onPress={onBookmark} hitSlop={8}>
-            <Text style={styles.bookmarkIcon}>{isBookmarked ? '🔖' : '📌'}</Text>
+            <GlyphIcon glyph={isBookmarked ? '🔖' : '📌'} size={20} color={Colors.primary} />
           </TouchableOpacity>
         )}
       </View>

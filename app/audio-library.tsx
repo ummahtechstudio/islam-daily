@@ -28,6 +28,7 @@ import { prefs } from '../src/lib/storage';
 import { safeJsonParse } from '../src/utils/safeJsonParse';
 import { FEATURES } from '../src/constants/featureFlags';
 import { Redirect } from 'expo-router';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 // MMKV keys for the Favorites and Recently Played lists. Without these the
 // state lived only in component memory and was wiped on every screen exit.
@@ -333,7 +334,7 @@ function AudioLibraryScreenInner() {
                         },
                       ]}
                     >
-                      <Text style={styles.catIcon}>{cat.icon}</Text>
+                      <GlyphIcon glyph={cat.icon} size={16} color={cat.color} />
                       <Text
                         style={[
                           styles.catLabel,
@@ -383,7 +384,7 @@ function AudioLibraryScreenInner() {
               return (
                 <View style={styles.section}>
                   <View style={styles.sectionHeaderRow}>
-                    <Text style={{ fontSize: 16 }}>{cat.icon}</Text>
+                    <GlyphIcon glyph={cat.icon} size={16} color={cat.color} />
                     <Text style={[styles.sectionTitle, { color: cat.color }]}>
                       {t(`audioLibrary.categories.${cat.id}`)}
                     </Text>
@@ -418,7 +419,7 @@ function AudioLibraryScreenInner() {
                 return (
                   <View key={cat.id} style={styles.section}>
                     <View style={styles.sectionHeaderRow}>
-                      <Text style={{ fontSize: 14 }}>{cat.icon}</Text>
+                      <GlyphIcon glyph={cat.icon} size={14} color={cat.color} />
                       <Text style={[styles.sectionTitle, { color: cat.color }]}>
                         {t(`audioLibrary.categories.${cat.id}`)}
                       </Text>
@@ -625,7 +626,7 @@ function RecentCard({
       <View
         style={[styles.recentArt, { backgroundColor: accent + '20' }]}
       >
-        <Text style={{ fontSize: 26 }}>{cat?.icon ?? '🎧'}</Text>
+        <GlyphIcon glyph={cat?.icon ?? '🎧'} size={24} color={accent} />
       </View>
       <Text
         style={[styles.recentTitle, { color: theme.text }]}

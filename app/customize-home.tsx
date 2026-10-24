@@ -23,6 +23,7 @@ import {
   DEFAULT_ENABLED_TILE_IDS,
   HomeTile,
 } from '../src/constants/homeTiles';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 export default function CustomizeHomeScreen() {
   useEffect(() => { trackScreen('CustomizeHome'); }, []);
@@ -97,7 +98,7 @@ export default function CustomizeHomeScreen() {
     <>
       <View style={[styles.row, { opacity: 0.55 }]}>
         <View style={[styles.emojiBox, { backgroundColor: themeColors.surface }]}>
-          <Text style={styles.emoji}>{tile.emoji}</Text>
+          <GlyphIcon glyph={tile.emoji} size={20} color={Colors.primary} />
         </View>
         <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t(`home.tiles.${tile.id}`)}</Text>
         <Ionicons name="lock-closed" size={16} color={themeColors.textMuted} />
@@ -112,7 +113,7 @@ export default function CustomizeHomeScreen() {
       <>
         <View style={styles.row}>
           <View style={[styles.emojiBox, { backgroundColor: themeColors.surface }]}>
-            <Text style={styles.emoji}>{tile.emoji}</Text>
+            <GlyphIcon glyph={tile.emoji} size={20} color={Colors.primary} />
           </View>
           <Text style={[styles.rowLabel, { color: themeColors.text }]}>{t(`home.tiles.${tile.id}`)}</Text>
           <Switch

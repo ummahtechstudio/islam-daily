@@ -17,6 +17,7 @@ import { useResolvedLocation } from '../src/hooks/useResolvedLocation';
 import { computePrayerTimes } from '../src/services/prayerTimesService';
 import { formatPrayerTime, getHijriParts } from '../src/utils/formatPrayerTime';
 import type { PrayerTimesSettings } from '../src/types/prayerTimes';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 interface DayEntry {
   day: number;
@@ -171,7 +172,7 @@ export default function RamadanScreen() {
         {isRamadan && todaySehri && todayIftar && (
           <View style={[styles.timingsCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
             <View style={styles.timingBox}>
-              <Text style={styles.timingIcon}>🌙</Text>
+              <View style={styles.timingIcon}><GlyphIcon glyph="🌙" size={26} color={Colors.primary} /></View>
               <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>
                 {t('ramadan.timings.sehriLabel')}
               </Text>
@@ -179,7 +180,7 @@ export default function RamadanScreen() {
             </View>
             <View style={[styles.timingDivider, { backgroundColor: theme.border }]} />
             <View style={styles.timingBox}>
-              <Text style={styles.timingIcon}>🌅</Text>
+              <View style={styles.timingIcon}><GlyphIcon glyph="🌅" size={26} color={Colors.accent} /></View>
               <Text style={[styles.timingLabel, { color: theme.textSecondary }]}>
                 {t('ramadan.timings.iftarLabel')}
               </Text>
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   timingBox: { flex: 1, padding: 20, alignItems: 'center', gap: 4 },
-  timingIcon: { fontSize: 28 },
+  timingIcon: { marginBottom: 2 },
   timingLabel: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
   timingTime: { fontSize: 22, fontWeight: '800' },
   timingDivider: { width: 1 },

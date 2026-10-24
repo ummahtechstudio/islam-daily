@@ -157,7 +157,7 @@ export default function BookmarksScreen() {
         ) : null}
 
         <Text style={[styles.reference, { color: theme.textMuted }]} numberOfLines={1}>
-          📖 {item.reference}
+          {item.reference}
         </Text>
 
         <View style={styles.actions}>

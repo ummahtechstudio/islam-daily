@@ -15,6 +15,7 @@ import { useAudioPlayer } from '../context/AudioPlayerContext';
 import { Colors } from '../constants/colors';
 import { urduStyle } from '../constants/fonts';
 import { AUDIO_CATEGORIES } from '../constants/audioLibraryData';
+import { GlyphIcon } from './GlyphIcon';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ export function FullPlayerModal({ isDark }: Props) {
 
         {/* Album art */}
         <View style={[styles.artWrap, { backgroundColor: (cat?.color ?? Colors.primary) + '18' }]}>
-          <Text style={styles.artEmoji}>{cat?.icon ?? '🎧'}</Text>
+          <GlyphIcon glyph={cat?.icon ?? '🎧'} size={64} color={cat?.color ?? Colors.primary} />
           <View style={[styles.langBadge, { backgroundColor: Colors.primary }]}>
             <Text style={styles.langBadgeTxt}>
               {currentTrack.language === 'urdu'

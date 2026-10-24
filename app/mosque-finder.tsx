@@ -22,6 +22,7 @@ import { trackScreen } from '../src/services/analytics';
 import { fetchWithTimeout, withTimeout, OfflineError, OFFLINE_MESSAGE } from '../src/utils/network';
 import { useIsOnline } from '../src/hooks/useIsOnline';
 import MosqueFinderEmptyState from '../src/components/MosqueFinderEmptyState';
+import { GlyphIcon } from '../src/components/GlyphIcon';
 
 interface Mosque {
   id: string;
@@ -339,7 +340,7 @@ export default function MosqueFinder() {
           renderItem={({ item }) => (
             <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <View style={[styles.iconBg, { backgroundColor: Colors.primary + '15' }]}>
-                <Text style={{ fontSize: 22 }}>🕌</Text>
+                <GlyphIcon glyph="🕌" size={22} color={Colors.primary} />
               </View>
               <View style={styles.info}>
                 <Text style={[styles.mosqueName, { color: theme.text }]} numberOfLines={1}>
@@ -351,7 +352,7 @@ export default function MosqueFinder() {
                   </Text>
                 ) : null}
                 <Text style={[styles.distance, { color: Colors.primary }]}>
-                  📍 {t('mosqueFinder.distance', { km: item.distance.toFixed(1) })}
+                  {t('mosqueFinder.distance', { km: item.distance.toFixed(1) })}
                 </Text>
               </View>
               <TouchableOpacity
