@@ -1375,7 +1375,8 @@
       "playbackFailedBody": "آڈیو لوڈ نہیں ہو سکی۔ اپنا کنکشن چیک کریں۔",
       "playbackFailedTitle": "پلے بیک ناکام",
       "switchToStudy": "مطالعہ موڈ پر جائیں",
-      "verses": "{{count}} آیات"
+      "verses": "{{count}} آیات",
+      "translationFallback": "آف لائن — {{shown}} دکھایا جا رہا ہے۔ {{selected}} کے لیے انٹرنیٹ درکار ہے۔"
     },
     "reciteSettings": {
       "title": "تلاوت کی ترتیبات"

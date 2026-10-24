@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchWithTimeout } from '../utils/network';
 import { getQuranFromCache } from './quranCache';
+import { buildBundledSurah, bundledFallbackEdition } from './quranBundled';
 import { SURAH_META } from '../constants/surahMeta';
 
 const QURAN_BASE = 'https://api.alquran.cloud/v1';
@@ -90,11 +91,10 @@ export async function fetchSurah(
   number: number,
   translation = 'ur.jalandhry'
 ) {
-  // Offline download pack (stored without translation suffix — language-agnostic pack)
-  try {
-    const offlineRaw = await AsyncStorage.getItem(`offline_surah_${number}`);
-    if (offlineRaw) return JSON.parse(offlineRaw) as [SurahEdition, SurahEdition];
-  } catch {}
+  // NOTE: the old "Quran Text" download pack (offline_surah_N) is deliberately
+  // not consulted: it stored one fixed English edition, and serving it here
+  // would label that text as whatever edition was requested. The whole Quran
+  // (Arabic + Jalandhri + Asad) is bundled — see services/quranBundled.
 
   // Cache key includes translation so switching languages fetches fresh data
   return cachedFetch(`api_surah_${number}_${translation}`, async () => {
@@ -122,7 +122,24 @@ export async function fetchRandomVerse(edition: string = 'ur.jalandhry') {
     (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
   );
   const surahNum = (dayOfYear % 114) + 1;
-  const data = await fetchSurah(surahNum, edition);
+  // Bundled editions need no network at all. Any other edition is fetched; if
+  // that fails (offline), fall back to a bundled translation and echo ITS
+  // edition so the card labels it truthfully.
+  let shownEdition = edition;
+  let data: [SurahEdition, SurahEdition] | null = null;
+  const bundled = buildBundledSurah(surahNum, edition);
+  if (bundled?.translation) {
+    data = [bundled.arabic, bundled.translation];
+  } else {
+    try {
+      data = await fetchSurah(surahNum, edition);
+    } catch (err) {
+      shownEdition = bundledFallbackEdition(edition);
+      const fb = buildBundledSurah(surahNum, shownEdition);
+      if (!fb?.translation) throw err;
+      data = [fb.arabic, fb.translation];
+    }
+  }
   // Guard the destructure: a malformed offline/cached pack could have a missing
   // element 0, which would throw on `.englishName` / `.ayahs` below.
   const arabic = data?.[0];
@@ -146,7 +163,7 @@ export async function fetchRandomVerse(edition: string = 'ur.jalandhry') {
     verseNumber: arabicAyah?.numberInSurah ?? verseIdx + 1,
     arabic: arabicAyah?.text ?? '',
     translation: translationAyah?.text ?? '',
-    edition,
+    edition: shownEdition,
   };
 }
 

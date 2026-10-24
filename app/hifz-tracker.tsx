@@ -17,6 +17,7 @@ import { useStore } from '../src/store';
 import { CACHE_KEYS } from '../src/constants';
 import { trackScreen } from '../src/services/analytics';
 import { fetchSurahList, SurahMeta } from '../src/services/api';
+import { bundledSurahList } from '../src/services/quranBundled';
 import { LoadingSpinner } from '../src/components/LoadingSpinner';
 import { ErrorView } from '../src/components/ErrorView';
 import { safeJsonParse } from '../src/utils/safeJsonParse';
@@ -42,8 +43,9 @@ export default function HifzTrackerScreen() {
     setLoading(true);
     setError(null);
     try {
+      // The surah list is bundled; the network copy is only a refresh.
       const [list, raw] = await Promise.all([
-        fetchSurahList(),
+        fetchSurahList().catch(() => bundledSurahList()),
         AsyncStorage.getItem(CACHE_KEYS.hifzProgress),
       ]);
       setSurahs(list);

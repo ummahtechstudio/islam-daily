@@ -130,3 +130,125 @@ export function getSurahMeta(n: number): SurahMetaEntry | undefined {
   if (n < 1 || n > 114) return undefined;
   return SURAH_META[n - 1];
 }
+
+/**
+ * English meaning of each surah name, index = surah number - 1. Taken verbatim
+ * from the alquran.cloud surah list (englishNameTranslation) so the bundled
+ * list matches what the online list shows.
+ */
+export const SURAH_NAME_MEANINGS: readonly string[] = [
+  "The Opening", // 1
+  "The Cow", // 2
+  "The Family of Imraan", // 3
+  "The Women", // 4
+  "The Table", // 5
+  "The Cattle", // 6
+  "The Heights", // 7
+  "The Spoils of War", // 8
+  "The Repentance", // 9
+  "Jonas", // 10
+  "Hud", // 11
+  "Joseph", // 12
+  "The Thunder", // 13
+  "Abraham", // 14
+  "The Rock", // 15
+  "The Bee", // 16
+  "The Night Journey", // 17
+  "The Cave", // 18
+  "Mary", // 19
+  "Taa-Haa", // 20
+  "The Prophets", // 21
+  "The Pilgrimage", // 22
+  "The Believers", // 23
+  "The Light", // 24
+  "The Criterion", // 25
+  "The Poets", // 26
+  "The Ant", // 27
+  "The Stories", // 28
+  "The Spider", // 29
+  "The Romans", // 30
+  "Luqman", // 31
+  "The Prostration", // 32
+  "The Clans", // 33
+  "Sheba", // 34
+  "The Originator", // 35
+  "Yaseen", // 36
+  "Those drawn up in Ranks", // 37
+  "The letter Saad", // 38
+  "The Groups", // 39
+  "The Forgiver", // 40
+  "Explained in detail", // 41
+  "Consultation", // 42
+  "Ornaments of gold", // 43
+  "The Smoke", // 44
+  "Crouching", // 45
+  "The Dunes", // 46
+  "Muhammad", // 47
+  "The Victory", // 48
+  "The Inner Apartments", // 49
+  "The letter Qaaf", // 50
+  "The Winnowing Winds", // 51
+  "The Mount", // 52
+  "The Star", // 53
+  "The Moon", // 54
+  "The Beneficent", // 55
+  "The Inevitable", // 56
+  "The Iron", // 57
+  "The Pleading Woman", // 58
+  "The Exile", // 59
+  "She that is to be examined", // 60
+  "The Ranks", // 61
+  "Friday", // 62
+  "The Hypocrites", // 63
+  "Mutual Disillusion", // 64
+  "Divorce", // 65
+  "The Prohibition", // 66
+  "The Sovereignty", // 67
+  "The Pen", // 68
+  "The Reality", // 69
+  "The Ascending Stairways", // 70
+  "Noah", // 71
+  "The Jinn", // 72
+  "The Enshrouded One", // 73
+  "The Cloaked One", // 74
+  "The Resurrection", // 75
+  "Man", // 76
+  "The Emissaries", // 77
+  "The Announcement", // 78
+  "Those who drag forth", // 79
+  "He frowned", // 80
+  "The Overthrowing", // 81
+  "The Cleaving", // 82
+  "Defrauding", // 83
+  "The Splitting Open", // 84
+  "The Constellations", // 85
+  "The Morning Star", // 86
+  "The Most High", // 87
+  "The Overwhelming", // 88
+  "The Dawn", // 89
+  "The City", // 90
+  "The Sun", // 91
+  "The Night", // 92
+  "The Morning Hours", // 93
+  "The Consolation", // 94
+  "The Fig", // 95
+  "The Clot", // 96
+  "The Power, Fate", // 97
+  "The Evidence", // 98
+  "The Earthquake", // 99
+  "The Chargers", // 100
+  "The Calamity", // 101
+  "Competition", // 102
+  "The Declining Day, Epoch", // 103
+  "The Traducer", // 104
+  "The Elephant", // 105
+  "Quraysh", // 106
+  "Almsgiving", // 107
+  "Abundance", // 108
+  "The Disbelievers", // 109
+  "Divine Support", // 110
+  "The Palm Fibre", // 111
+  "Sincerity", // 112
+  "The Dawn", // 113
+  "Mankind", // 114
+];

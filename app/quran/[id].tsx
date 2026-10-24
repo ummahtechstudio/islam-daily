@@ -477,9 +477,13 @@ export default function SurahReaderScreen() {
   const theme = isDark ? Colors.dark : Colors.light;
 
   const selectedEdition = settings.selectedTranslation ?? 'ur.jalandhry';
-  const translationMeta = useMemo(() => findTranslation(selectedEdition), [selectedEdition]);
 
   const { arabic, translation, loading, error, fromCache } = useSurah(surahNum, selectedEdition);
+  // Label the translation by the edition actually shown: offline, a bundled
+  // edition stands in for one that needs the network.
+  const shownEdition = translation?.edition?.identifier ?? selectedEdition;
+  const translationMeta = useMemo(() => findTranslation(shownEdition), [shownEdition]);
+  const translationFallback = !!translation && shownEdition !== selectedEdition;
 
   const [showTranslation, setShowTranslation] = useState(true);
   const [fontSize, setFontSize] = useState(settings.arabicFontSize);
@@ -912,6 +916,18 @@ export default function SurahReaderScreen() {
       )}
 
       {/* Tajweed legend */}
+      {quranMode === 'study' && translationFallback && (
+        <View style={[styles.fallbackNote, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
+          <Ionicons name="cloud-offline-outline" size={14} color={theme.textMuted} />
+          <Text style={[styles.fallbackNoteText, { color: theme.textSecondary }]}>
+            {t('quran.reader.translationFallback', {
+              shown: translationMeta.name,
+              selected: findTranslation(selectedEdition).name,
+            })}
+          </Text>
+        </View>
+      )}
+
       {quranMode === 'study' && tajweedOn && (
         <View style={[styles.legend, { backgroundColor: theme.surface, borderBottomColor: theme.border }]}>
           <Text style={[styles.legendItem, { color: '#4B9BFF' }]}>{t('quran.tajweed.qalqala')}</Text>
@@ -1310,6 +1326,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
+  fallbackNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  fallbackNoteText: { fontSize: 12, flex: 1, lineHeight: 17 },
   translationBlock: { borderLeftWidth: 3, paddingLeft: 12, marginTop: 4 },
   translationLabel: {
     fontSize: 11,

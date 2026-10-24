@@ -1375,7 +1375,8 @@
       "playbackFailedBody": "Could not load audio. Check your connection.",
       "playbackFailedTitle": "Playback failed",
       "switchToStudy": "Switch to Study Mode",
-      "verses": "{{count}} Verses"
+      "verses": "{{count}} Verses",
+      "translationFallback": "Offline — showing {{shown}}. {{selected}} needs an internet connection."
     },
     "reciteSettings": {
       "title": "Recite Settings"
