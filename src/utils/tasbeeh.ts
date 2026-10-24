@@ -109,6 +109,7 @@ export const loadDhikrTemplates = (): TasbeehTemplate[] => {
         target: item.count > 0 ? item.count : 33,
         source: item.reference,
         category: cat.title,
+        categoryId: cat.id,
       });
     }
   }

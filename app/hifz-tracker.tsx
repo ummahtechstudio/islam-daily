@@ -122,7 +122,7 @@ export default function HifzTrackerScreen() {
               <View style={styles.surahInfo}>
                 <Text style={[styles.surahName, { color: theme.text }]}>{item.englishName}</Text>
                 <Text style={[styles.surahSub, { color: theme.textMuted }]}>
-                  {item.revelationType} · {t('hifz.surah.verses', { count: item.numberOfAyahs })}
+                  {t(`quran.revelation.${item.revelationType}`, { defaultValue: item.revelationType })} · {t('hifz.surah.verses', { count: item.numberOfAyahs })}
                 </Text>
               </View>
               <Text style={[styles.surahArabic, { color: done ? Colors.primary : theme.textSecondary }]}>

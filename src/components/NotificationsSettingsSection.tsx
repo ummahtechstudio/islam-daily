@@ -31,7 +31,9 @@ import {
   type PrayerNotificationSettings,
   type PrayerSoundChoice,
 } from '../services/notificationsService';
-import { computePrayerTimes, getPersistedSettings, KARACHI_DEFAULT } from '../services/prayerTimesService';
+import { computePrayerTimes } from '../services/prayerTimesService';
+import { useResolvedLocation } from '../hooks/useResolvedLocation';
+import type { PrayerTimesSettings } from '../types/prayerTimes';
 import { formatPrayerTime } from '../utils/formatPrayerTime';
 import { getSetting, setSetting } from '../utils/settings';
 import {
@@ -72,6 +74,8 @@ function lightHaptic() {
 }
 
 type Props = {
+  /** Prayer settings the host screen shows, so the chips match it exactly. */
+  prayerSettings?: PrayerTimesSettings;
   textColor: string;
   textMutedColor: string;
   cardColor: string;
@@ -79,6 +83,7 @@ type Props = {
 };
 
 export function NotificationsSettingsSection({
+  prayerSettings: hostPrayerSettings,
   textColor,
   textMutedColor,
   cardColor,
@@ -135,11 +140,15 @@ export function NotificationsSettingsSection({
     return () => sub.remove();
   }, []);
 
-  // Compute today's times for the small per-prayer time chips.
+  // Today's times for the small per-prayer chips — from the same resolved
+  // location as the rest of the screen (was read once at mount, so it showed
+  // Karachi times until the first GPS fix was saved, and never updated after a
+  // city/method change on this screen).
+  const { settings: resolvedPrayerSettings } = useResolvedLocation();
+  const prayerSettings = hostPrayerSettings ?? resolvedPrayerSettings;
   useEffect(() => {
     try {
-      const ps = getPersistedSettings() ?? KARACHI_DEFAULT;
-      const computed = computePrayerTimes(ps, new Date());
+      const computed = computePrayerTimes(prayerSettings, new Date());
       const map: Partial<Record<PrayerName, Date>> = {};
       for (const p of computed.prayers) {
         if (p.name === 'sunrise') continue;
@@ -149,7 +158,7 @@ export function NotificationsSettingsSection({
     } catch {
       setTodayTimes({});
     }
-  }, []);
+  }, [prayerSettings]);
 
   const persistAndReschedule = useCallback(async (next: PrayerNotificationSettings) => {
     setSettings(next);
@@ -508,7 +517,9 @@ export function NotificationsSettingsSection({
           const today = todayTimes[p.key];
           const dimmed = rowsDisabled || !cfg.enabled;
           // Capitalise the prayer key for the English name label
-          const englishName = p.key.charAt(0).toUpperCase() + p.key.slice(1);
+          const englishName = t(`prayers.names.${p.key}`, {
+            defaultValue: p.key.charAt(0).toUpperCase() + p.key.slice(1),
+          });
           return (
             <View
               key={p.key}
@@ -764,7 +775,9 @@ export function NotificationsSettingsSection({
             <Text style={styles.modalBody}>{t('notifications.testPickerModal.body')}</Text>
             <View style={styles.testList}>
               {PRAYERS.map((p) => {
-                const englishName = p.key.charAt(0).toUpperCase() + p.key.slice(1);
+                const englishName = t(`prayers.names.${p.key}`, {
+            defaultValue: p.key.charAt(0).toUpperCase() + p.key.slice(1),
+          });
                 return (
                   <TouchableOpacity
                     key={p.key}

@@ -394,6 +394,7 @@ export default function PrayerTimesSettingsScreen() {
 
         {/* Notifications */}
         <NotificationsSettingsSection
+          prayerSettings={previewSettings}
           textColor={theme.text}
           textMutedColor={theme.textMuted}
           cardColor={theme.card}

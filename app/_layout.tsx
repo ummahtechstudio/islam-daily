@@ -46,11 +46,12 @@ import {
   downloadHadithBook,
   isHadithBookCached,
 } from '../src/services/hadithCache';
-import { migrateInvalidPersistedSettings } from '../src/services/prayerTimesService';
+import { migrateInvalidPersistedSettings, onPersistedSettingsChange } from '../src/services/prayerTimesService';
 import { resetHadithBookmarksForV2Once } from '../src/utils/bookmarks';
 import {
   refreshNotificationsIfStale,
   refreshNotificationsOnForeground,
+  scheduleNotificationsForNext7Days,
 } from '../src/services/notificationsService';
 
 SplashScreen.preventAutoHideAsync();
@@ -126,6 +127,13 @@ export default function RootLayout() {
     refreshNotificationsIfStale().catch((err) =>
       console.warn('[Layout] notifications refresh failed', err),
     );
+    // Location / method / madhab changed (first GPS fix, city picker, GPS
+    // refresh, settings) → re-arm so reminders follow the new prayer times.
+    return onPersistedSettingsChange(() => {
+      scheduleNotificationsForNext7Days().catch((err) =>
+        console.warn('[Layout] notifications re-arm failed', err),
+      );
+    });
   }, []);
 
   useEffect(() => {

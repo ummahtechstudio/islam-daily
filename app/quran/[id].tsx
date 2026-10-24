@@ -810,7 +810,7 @@ export default function SurahReaderScreen() {
           <Text style={styles.surahName}>{arabic.englishName}</Text>
           <Text style={styles.surahArabicName}>{arabic.name}</Text>
           <Text style={styles.surahMeta}>
-            {arabic.revelationType} · {t('quran.reader.verses', { count: arabic.numberOfAyahs })}
+            {t(`quran.revelation.${arabic.revelationType}`, { defaultValue: arabic.revelationType })} · {t('quran.reader.verses', { count: arabic.numberOfAyahs })}
           </Text>
           {surahNum !== 9 && surahNum !== 1 && (
             <Text style={styles.bismillah}>{BISMILLAH}</Text>

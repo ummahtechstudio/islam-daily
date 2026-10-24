@@ -277,7 +277,9 @@ function TemplateCard({
             <>
               <Text style={[styles.cardMetaDot, { color: theme.textMuted }]}>•</Text>
               <Text style={[styles.cardMetaText, { color: theme.textMuted }]} numberOfLines={1}>
-                {template.category}
+                {template.categoryId
+                  ? t(`dhikr.categories.${template.categoryId}`, { defaultValue: template.category })
+                  : template.category}
               </Text>
             </>
           ) : null}

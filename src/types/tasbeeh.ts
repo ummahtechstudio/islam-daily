@@ -27,4 +27,6 @@ export interface TasbeehTemplate {
   target: number;
   source?: string;
   category?: string;
+  /** Dhikr category id (after_salah, morning, …) for a translated label. */
+  categoryId?: string;
 }

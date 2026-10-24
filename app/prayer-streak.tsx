@@ -51,7 +51,7 @@ function dateKey(d: Date): string {
 
 export default function PrayerStreakScreen() {
   useEffect(() => { trackScreen('PrayerStreak'); }, []);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -143,7 +143,7 @@ export default function PrayerStreakScreen() {
                   activeOpacity={0.7}
                 >
                   <Text style={[styles.prayerPillText, { color: done ? '#fff' : theme.textSecondary }]}>
-                    {prayer}
+                    {t(`prayers.names.${prayer.toLowerCase()}`, { defaultValue: prayer })}
                   </Text>
                   {done && <Ionicons name="checkmark" size={12} color="#fff" />}
                 </TouchableOpacity>
@@ -174,7 +174,9 @@ export default function PrayerStreakScreen() {
           {PRAYER_LIST.map((prayer) => (
             <View key={prayer} style={[styles.gridRow, { borderTopWidth: 1, borderTopColor: theme.border }]}>
               <View style={styles.gridLabel}>
-                <Text style={[styles.prayerLabel, { color: theme.textSecondary }]}>{prayer.slice(0, 3)}</Text>
+                <Text style={[styles.prayerLabel, { color: theme.textSecondary }]}>{i18n.language === 'ur'
+                    ? t(`prayers.names.${prayer.toLowerCase()}`)
+                    : prayer.slice(0, 3)}</Text>
               </View>
               {last7.map((d) => {
                 const done = !!records[d]?.prayers[prayer];

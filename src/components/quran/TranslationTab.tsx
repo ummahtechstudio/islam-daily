@@ -144,7 +144,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
                   { color: isMakki ? Colors.primary : '#3B82F6' },
                 ]}
               >
-                {item.revelationType}
+                {t(`quran.revelation.${item.revelationType}`, { defaultValue: item.revelationType })}
               </Text>
             </View>
             <Text style={[styles.surahMeta, { color: theme.textMuted }]}>

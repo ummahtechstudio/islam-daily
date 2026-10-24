@@ -133,8 +133,44 @@ export function getPersistedSettings(): PrayerTimesSettings | null {
   return prefs.getJSON<PrayerTimesSettings>(PREFS_KEYS.PRAYER_TIMES_SETTINGS);
 }
 
+type PersistListener = (settings: PrayerTimesSettings) => void;
+const persistListeners = new Set<PersistListener>();
+
+/**
+ * Notified when a save changes anything that moves prayer times (position,
+ * method, madhab, high-latitude rule). The app root uses it to re-arm prayer
+ * notifications, so a first GPS fix or a city picked from any screen never
+ * leaves reminders scheduled for the previous (or default Karachi) location.
+ */
+export function onPersistedSettingsChange(listener: PersistListener): () => void {
+  persistListeners.add(listener);
+  return () => {
+    persistListeners.delete(listener);
+  };
+}
+
+function timingKey(s: PrayerTimesSettings | null): string {
+  if (!s) return '';
+  return JSON.stringify([
+    s.location?.latitude,
+    s.location?.longitude,
+    s.method,
+    s.madhab,
+    s.highLatitudeRule ?? null,
+  ]);
+}
+
 export function persistSettings(settings: PrayerTimesSettings): void {
+  const before = timingKey(getPersistedSettings());
   prefs.setJSON(PREFS_KEYS.PRAYER_TIMES_SETTINGS, settings);
+  if (timingKey(settings) === before) return;
+  for (const listener of persistListeners) {
+    try {
+      listener(settings);
+    } catch {
+      // a listener failure must never break saving settings
+    }
+  }
 }
 
 export const KARACHI_DEFAULT: PrayerTimesSettings = {

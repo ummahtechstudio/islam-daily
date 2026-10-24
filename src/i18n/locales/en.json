@@ -1464,6 +1464,10 @@
     },
     "wordPopup": {
       "transliteration": "Transliteration"
+    },
+    "revelation": {
+      "Meccan": "Meccan",
+      "Medinan": "Medinan"
     }
   },
   "ramadan": {
