@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchWithTimeout } from '../utils/network';
-import { getQuranFromCache } from './quranCache';
+import { getQuranFromCache, type AyahLite } from './quranCache';
 import { buildBundledSurah, bundledFallbackEdition } from './quranBundled';
 import { SURAH_META } from '../constants/surahMeta';
 
@@ -238,52 +238,89 @@ export async function fetchRandomHadith() {
 // search still works without a network (the full Quran ships locally). Mirrors
 // the remote en.asad behaviour closely enough; results are capped to keep the
 // list bounded.
-function searchBundledQuran(query: string): QuranSearchResult[] {
+// ─── Quran search (on-device) ─────────────────────────────────────────────────
+// The whole Quran ships with the app (Arabic, Urdu Jalandhri, English Asad), so
+// search runs locally: instant, offline, and in the language the user types.
+// (The old online search only covered English, so every Urdu query — including
+// the Urdu suggestion chips — returned "no results".)
+
+// Harakat, Quranic annotation marks, tatweel and invisible joiners.
+const AR_MARKS = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\u200C-\u200F\uFEFF]/g;
+const ARABIC_SCRIPT = /[\u0600-\u06FF]/;
+
+/** Folds the letter variants Arabic and Urdu spell differently so either matches. */
+export function normaliseArabicScript(s: string): string {
+  return s
+    .replace(AR_MARKS, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/[ىیيېےۓئ]/g, 'ي')
+    .replace(/[ةۃہھۀ]/g, 'ه')
+    .replace(/ک/g, 'ك')
+    .replace(/ؤ/g, 'و')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+type SearchRow = { a: AyahLite; surah: (typeof SURAH_META)[number]; ur: string; ar: string; en: string };
+let searchRows: SearchRow[] | null = null;
+function getSearchRows(): SearchRow[] {
+  if (searchRows) return searchRows;
   const idx = getQuranFromCache();
-  const q = query.trim().toLowerCase();
-  if (!idx || !q) return [];
-  const results: QuranSearchResult[] = [];
+  const rows: SearchRow[] = [];
   for (const surah of SURAH_META) {
-    const ayahs = idx.bySurah[surah.number];
-    if (!ayahs) continue;
-    for (const a of ayahs) {
-      const text = a.translation_en ?? '';
-      if (text.toLowerCase().includes(q)) {
-        results.push({
-          // Unique global ayah number (surah×1000 + ayah) so the search list's
-          // keyExtractor doesn't collide on a shared "0" for every offline hit.
-          number: surah.number * 1000 + a.ayah,
-          text,
-          edition: { identifier: 'en.bundled', language: 'en' },
-          surah: { number: surah.number, name: surah.name_arabic, englishName: surah.name_english },
-          numberInSurah: a.ayah,
-        });
-        if (results.length >= 100) return results;
-      }
+    for (const a of idx?.bySurah[surah.number] ?? []) {
+      rows.push({
+        a,
+        surah,
+        ur: normaliseArabicScript(a.translation_ur ?? ''),
+        ar: normaliseArabicScript(a.text_arabic ?? ''),
+        en: (a.translation_en ?? '').toLowerCase(),
+      });
     }
+  }
+  searchRows = rows;
+  return rows;
+}
+
+const SEARCH_LIMIT = 200;
+
+function searchBundledQuran(query: string): QuranSearchResult[] {
+  const raw = query.trim();
+  if (!raw) return [];
+  const arabicScript = ARABIC_SCRIPT.test(raw);
+  const q = arabicScript ? normaliseArabicScript(raw) : raw.toLowerCase();
+  if (!q) return [];
+  const results: QuranSearchResult[] = [];
+  for (const row of getSearchRows()) {
+    let text: string | null = null;
+    let edition = { identifier: 'en.asad', language: 'en' };
+    if (arabicScript) {
+      if (row.ur.includes(q)) {
+        text = row.a.translation_ur ?? '';
+        edition = { identifier: 'ur.jalandhry', language: 'ur' };
+      } else if (row.ar.includes(q)) {
+        text = row.a.text_arabic ?? '';
+        edition = { identifier: 'quran-uthmani', language: 'ar' };
+      }
+    } else if (row.en.includes(q)) {
+      text = row.a.translation_en ?? '';
+    }
+    if (text === null) continue;
+    results.push({
+      // Unique global ayah number (surah×1000 + ayah) for the list's keyExtractor.
+      number: row.surah.number * 1000 + row.a.ayah,
+      text,
+      edition,
+      surah: { number: row.surah.number, name: row.surah.name_arabic, englishName: row.surah.name_english },
+      numberInSurah: row.a.ayah,
+    });
+    if (results.length >= SEARCH_LIMIT) break;
   }
   return results;
 }
 
 export async function searchQuran(query: string): Promise<QuranSearchResult[]> {
-  try {
-    const res = await fetchWithTimeout(
-      `${QURAN_BASE}/search/${encodeURIComponent(query)}/all/en.asad`,
-      {},
-      NET_TIMEOUT_MS,
-    );
-    const json = await res.json().catch(() => null);
-    // alquran.cloud returns code 404 when a valid query simply has no matches —
-    // that's "no results", not a failure, so return [] rather than throwing.
-    if (json && json.code === 404) return [];
-    if (!res.ok || !json || json.code !== 200) {
-      throw new Error(`Quran search failed (HTTP ${res.status})`);
-    }
-    return (json.data?.matches ?? []) as QuranSearchResult[];
-  } catch {
-    // Offline or remote failure → scan the bundled Quran instead of erroring.
-    return searchBundledQuran(query);
-  }
+  return searchBundledQuran(query);
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────

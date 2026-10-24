@@ -7,7 +7,11 @@
  * or missing values fall back to a small neutral ornament — never the emoji.
  */
 import React from 'react';
+import { useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import { Colors } from '../constants/colors';
+import { useStore } from '../store';
 
 import { KaabaIcon, MinaretIcon, PrayerBeadsIcon } from './icons';
 
@@ -57,15 +61,27 @@ export function glyphSpec(glyph?: string | null): Spec {
   return MAP[g] ?? MAP[glyph] ?? 'ellipse-outline';
 }
 
+/** Brand green lifted for dark backgrounds (#0F6E56 is unreadable on them). */
+export const DARK_MODE_GREEN = '#5DCAA5';
+
+export function useIsDarkTheme(): boolean {
+  const system = useColorScheme();
+  const pref = useStore((s) => s.settings.colorScheme);
+  return pref === 'dark' || (pref === 'system' && system === 'dark');
+}
+
 export function GlyphIcon({
   glyph,
   size = 22,
-  color,
+  color: requested,
 }: {
   glyph?: string | null;
   size?: number;
   color: string;
 }) {
+  const isDark = useIsDarkTheme();
+  const color =
+    isDark && requested.toLowerCase() === Colors.primary.toLowerCase() ? DARK_MODE_GREEN : requested;
   const spec = glyphSpec(glyph);
   if (spec === 'minaret') return <MinaretIcon size={size} color={color} strokeWidth={1.6} />;
   if (spec === 'kaaba') return <KaabaIcon size={size} color={color} />;

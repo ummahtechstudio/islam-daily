@@ -41,7 +41,7 @@ import {
   type HadithDownloadProgress,
 } from '../src/services/hadithCache';
 import HadithBookDownloadStrip from '../src/components/hadith/HadithBookDownloadStrip';
-import { GlyphIcon } from '../src/components/GlyphIcon';
+import { DARK_MODE_GREEN, GlyphIcon } from '../src/components/GlyphIcon';
 
 const GOLD = '#EF9F27';
 const PAGE_SIZE = 25;
@@ -144,7 +144,12 @@ function CollectionsGrid({
                 {hadithCollectionName(col.key, i18n.language, col.name)}
               </Text>
               <View style={[gridStyles.countBadge, { backgroundColor: meta.color + '20' }]}>
-                <Text style={[gridStyles.count, { color: meta.color }]}>
+                <Text
+                  style={[
+                    gridStyles.count,
+                    { color: isDark && meta.color === Colors.primary ? DARK_MODE_GREEN : meta.color },
+                  ]}
+                >
                   {t('hadith.collections.hadithsCount', { count: (count ?? DEFAULT_COLLECTION_COUNTS[col.key] ?? 0).toLocaleString() })}
                 </Text>
               </View>

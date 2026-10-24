@@ -19,10 +19,12 @@ import { trackScreen } from '../src/services/analytics';
 import { searchQuran, QuranSearchResult } from '../src/services/api';
 import { useStore } from '../src/store';
 import { GlyphIcon } from '../src/components/GlyphIcon';
+import { urduStyle } from '../src/constants/fonts';
+import { getSurahMeta } from '../src/constants/surahMeta';
 
 export default function SearchScreen() {
   useEffect(() => { trackScreen('Search'); }, []);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -71,11 +73,23 @@ export default function SearchScreen() {
       <View style={styles.resultHeader}>
         <View style={[styles.refBadge, { backgroundColor: Colors.primary + '18' }]}>
           <Text style={[styles.refText, { color: Colors.primary }]}>
-            {item.surah.englishName} {item.surah.number}:{item.numberInSurah}
+            {(i18n.language === 'ur' ? getSurahMeta(item.surah.number)?.name_urdu : null) ?? item.surah.englishName}{' '}
+            {item.surah.number}:{item.numberInSurah}
           </Text>
         </View>
       </View>
-      <Text style={[styles.resultEnglish, { color: theme.text }]}>{item.text}</Text>
+      <Text
+        style={[
+          item.edition.language === 'ur'
+            ? urduStyle(16)
+            : item.edition.language === 'ar'
+              ? styles.resultArabic
+              : styles.resultEnglish,
+          { color: theme.text },
+        ]}
+      >
+        {item.text}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -249,6 +263,7 @@ const styles = StyleSheet.create({
   refBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start' },
   refText: { fontSize: 12, fontWeight: '700' },
   resultEnglish: { fontSize: 14, lineHeight: 22 },
+  resultArabic: { fontFamily: 'Amiri_400Regular', fontSize: 20, lineHeight: 40, textAlign: 'right', writingDirection: 'rtl' },
 
   empty: { alignItems: 'center', paddingTop: 60, gap: 12 },
   emptyIcon: { marginBottom: 4 },

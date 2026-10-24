@@ -15,7 +15,7 @@ import { Colors } from '../src/constants/colors';
 import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { getHijriParts } from '../src/utils/formatPrayerTime';
-import { GlyphIcon } from '../src/components/GlyphIcon';
+import { DARK_MODE_GREEN, GlyphIcon } from '../src/components/GlyphIcon';
 
 // ─── Islamic events ───────────────────────────────────────────────────────────
 
@@ -156,7 +156,7 @@ export default function CalendarScreen() {
               key={key}
               style={[
                 styles.dayHeader,
-                { color: key === 'fri' ? Colors.primary : theme.textSecondary },
+                { color: key === 'fri' ? (isDark ? DARK_MODE_GREEN : Colors.primary) : theme.textSecondary },
               ]}
             >
               {dayLabels[idx]}
@@ -190,7 +190,7 @@ export default function CalendarScreen() {
                 <Text
                   style={[
                     styles.dayNum,
-                    { color: isToday ? '#fff' : isFriday ? Colors.primary : theme.text },
+                    { color: isToday ? '#fff' : isFriday ? (isDark ? DARK_MODE_GREEN : Colors.primary) : theme.text },
                   ]}
                 >
                   {day}
