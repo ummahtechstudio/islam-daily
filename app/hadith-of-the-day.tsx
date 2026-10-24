@@ -23,6 +23,7 @@ import { useStore } from '../src/store';
 import { trackScreen } from '../src/services/analytics';
 import { getHadithOfTheDay, warmHadithOfTheDayPool, type HadithOfTheDay } from '../src/services/hadithOfTheDay';
 import { COLLECTION_NAMES, type HadithCollectionKey } from '../src/services/hadiths';
+import { hadithCollectionName } from '../src/constants';
 import { getTranslationLanguage, type TranslationLanguage } from '../src/utils/settings';
 
 /**
@@ -35,7 +36,7 @@ import { getTranslationLanguage, type TranslationLanguage } from '../src/utils/s
  */
 export default function HadithOfTheDayScreen() {
   useEffect(() => { trackScreen('HadithOfTheDay'); }, []);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -98,7 +99,7 @@ export default function HadithOfTheDayScreen() {
   }
 
   const { hadith } = today;
-  const collName = COLLECTION_NAMES[hadith.collection_key as HadithCollectionKey] ?? hadith.collection_name;
+  const collName = hadithCollectionName(hadith.collection_key, i18n.language, COLLECTION_NAMES[hadith.collection_key as HadithCollectionKey] ?? hadith.collection_name);
   const showUrdu = language === 'urdu' && !!hadith.urdu;
   const displayedTranslation = showUrdu ? hadith.urdu! : hadith.english ?? '';
 

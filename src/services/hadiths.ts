@@ -18,16 +18,17 @@ const HADITH_TIMEOUT_MS = 45000;
 export const R2_HADITHS_BASE_URL =
   'https://pub-3f76e9c4da264c6ba85283d8af8108a0.r2.dev/hadiths-v2';
 
-// Totals from hadiths-v2/index.json (full record counts incl. fractional
-// sub-narrations and any-language records).
+// Records with text, from hadiths-v2/index.json totals minus the records that
+// have no Arabic, English or Urdu (skipped by normalize). Verified against the
+// live R2 files on 2026-10-24.
 export const DEFAULT_COLLECTION_COUNTS: Record<string, number> = {
-  bukhari: 7589,
-  muslim: 7564,
-  tirmidhi: 3998,
+  bukhari: 7583,
+  muslim: 7482,
+  tirmidhi: 3989,
   abudawud: 5274,
-  ibnmajah: 4343,
-  nasai: 5765,
-  malik: 1889,
+  ibnmajah: 4342,
+  nasai: 5683,
+  malik: 1867,
   nawawi: 42,
   qudsi: 40,
   dehlawi: 40,
@@ -97,6 +98,10 @@ export function normalize(
   const hadiths = raw.hadiths ?? [];
   for (let i = 0; i < hadiths.length; i++) {
     const h = hadiths[i];
+    // ~200 source records carry no text in any language (Muslim 82, Nasa'i 82,
+    // Malik 22, a few elsewhere). They would render as blank cards, so skip
+    // them. `id` stays the source index, so ids remain stable.
+    if (!h.arabic && !h.english && !h.urdu) continue;
     // hadithnumber may be fractional (sub-narrations, e.g. 631.5) — keep it as
     // a string so the value is preserved exactly for display and lookup.
     const hadithNumber = String(h.hadithnumber ?? i + 1);

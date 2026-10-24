@@ -31,6 +31,7 @@ import { trackScreen } from '../../src/services/analytics';
 import { getSetting, getTranslationLanguage, type TranslationLanguage } from '../../src/utils/settings';
 import { getHadithOfTheDay, localDateKey, warmHadithOfTheDayPool, type HadithOfTheDay } from '../../src/services/hadithOfTheDay';
 import { COLLECTION_NAMES, type HadithCollectionKey } from '../../src/services/hadiths';
+import { hadithCollectionName } from '../../src/constants';
 import { HOME_TILES, HOME_TILES_STORAGE_KEY, DEFAULT_ENABLED_TILE_IDS } from '../../src/constants/homeTiles';
 import { isRouteHidden } from '../../src/constants/featureFlags';
 
@@ -443,9 +444,9 @@ function HadithOfDayCard({
 }: {
   today: HadithOfTheDay; language: TranslationLanguage; onPress: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { hadith } = today;
-  const collName = COLLECTION_NAMES[hadith.collection_key as HadithCollectionKey] ?? hadith.collection_name;
+  const collName = hadithCollectionName(hadith.collection_key, i18n.language, COLLECTION_NAMES[hadith.collection_key as HadithCollectionKey] ?? hadith.collection_name);
   const showUrdu = language === 'urdu' && !!hadith.urdu;
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={{ marginBottom: spacing.md }}>

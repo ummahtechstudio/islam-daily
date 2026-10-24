@@ -20,7 +20,7 @@ import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
 import { spacing, radius } from '../src/constants/spacing';
-import { HADITH_COLLECTIONS } from '../src/constants';
+import { HADITH_COLLECTIONS, hadithCollectionName } from '../src/constants';
 import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import { trackScreen } from '../src/services/analytics';
 import { HadithGrade, SupabaseHadith } from '../src/lib/supabase';
@@ -118,7 +118,7 @@ function CollectionsGrid({
   isDark: boolean;
   counts: Record<string, number>;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const theme = isDark ? Colors.dark : Colors.light;
   return (
     <View style={gridStyles.container}>
@@ -139,8 +139,9 @@ function CollectionsGrid({
               <View style={[gridStyles.iconBg, { backgroundColor: meta.bg }]}>
                 <Text style={gridStyles.icon}>{meta.icon}</Text>
               </View>
-              {/* col.name is the proper-noun collection name (e.g. "Sahih Bukhari") — content, not translated */}
-              <Text style={[gridStyles.name, { color: theme.text }]} numberOfLines={2}>{col.name}</Text>
+              <Text style={[gridStyles.name, { color: theme.text }]} numberOfLines={2}>
+                {hadithCollectionName(col.key, i18n.language, col.name)}
+              </Text>
               <View style={[gridStyles.countBadge, { backgroundColor: meta.color + '20' }]}>
                 <Text style={[gridStyles.count, { color: meta.color }]}>
                   {t('hadith.collections.hadithsCount', { count: (count ?? DEFAULT_COLLECTION_COUNTS[col.key] ?? 0).toLocaleString() })}
@@ -171,7 +172,7 @@ const gridStyles = StyleSheet.create({
 export default function HadithScreen() {
   useEffect(() => { trackScreen('Hadith'); }, []);
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark = settings.colorScheme === 'dark' || (settings.colorScheme === 'system' && colorScheme === 'dark');
@@ -197,7 +198,7 @@ export default function HadithScreen() {
   });
 
   const collMeta = COLLECTION_META[selectedCollection] ?? { color: '#0F6E56', bg: '#0F6E5615', icon: '📗' };
-  const collName = HADITH_COLLECTIONS.find((c) => c.key === selectedCollection)?.name ?? '';
+  const collName = selectedCollection ? hadithCollectionName(selectedCollection, i18n.language) : '';
 
   // Pull cached counts once on mount.
   useEffect(() => {

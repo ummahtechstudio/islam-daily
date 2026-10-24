@@ -338,7 +338,7 @@
         "title": "Duas & Dhikr"
       },
       "hadiths": {
-        "subtitle": "Bukhari · Muslim · Tirmidhi · Abu Dawud · Ibn Majah · Nasai",
+        "subtitle": "Bukhari · Muslim · Tirmidhi · Abu Dawud · Ibn Majah · Nasai · Malik · 40 Hadith",
         "title": "Hadith Collections"
       },
       "islamicBooks": {
@@ -616,7 +616,7 @@
         },
         "hadith": {
           "label": "Hadith",
-          "sub": "6 collections"
+          "sub": "10 collections"
         },
         "halal-finder": {
           "label": "Halal Finder",
@@ -777,7 +777,7 @@
       },
       "hadithBrowser": {
         "label": "Hadith Browser",
-        "sub": "6 major collections"
+        "sub": "10 collections"
       },
       "halalFinder": {
         "label": "Halal Finder",

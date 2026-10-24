@@ -6,18 +6,26 @@ export * from './spacing';
 export const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 export const PRAYER_ICONS = ['🌙', '🌅', '☀️', '🌤️', '🌇', '⭐'];
 
+// name = English proper noun; name_ur = the name Urdu readers use.
 export const HADITH_COLLECTIONS = [
-  { key: 'bukhari',  name: 'Sahih Bukhari' },
-  { key: 'muslim',   name: 'Sahih Muslim' },
-  { key: 'tirmidhi', name: 'Jami at-Tirmidhi' },
-  { key: 'abudawud', name: 'Sunan Abu Dawud' },
-  { key: 'ibnmajah', name: 'Sunan Ibn Majah' },
-  { key: 'nasai',    name: "Sunan an-Nasa'i" },
-  { key: 'malik',    name: 'Muwatta Malik' },
-  { key: 'nawawi',   name: 'Forty Hadith of an-Nawawi' },
-  { key: 'qudsi',    name: 'Forty Hadith Qudsi' },
-  { key: 'dehlawi',  name: 'Forty Hadith of Shah Waliullah Dehlawi' },
+  { key: 'bukhari',  name: 'Sahih Bukhari', name_ur: 'صحیح بخاری' },
+  { key: 'muslim',   name: 'Sahih Muslim', name_ur: 'صحیح مسلم' },
+  { key: 'tirmidhi', name: 'Jami at-Tirmidhi', name_ur: 'جامع ترمذی' },
+  { key: 'abudawud', name: 'Sunan Abu Dawud', name_ur: 'سنن ابو داؤد' },
+  { key: 'ibnmajah', name: 'Sunan Ibn Majah', name_ur: 'سنن ابن ماجہ' },
+  { key: 'nasai',    name: "Sunan an-Nasa'i", name_ur: 'سنن نسائی' },
+  { key: 'malik',    name: 'Muwatta Malik', name_ur: 'مؤطا امام مالک' },
+  { key: 'nawawi',   name: 'Forty Hadith of an-Nawawi', name_ur: 'اربعینِ نووی' },
+  { key: 'qudsi',    name: 'Forty Hadith Qudsi', name_ur: 'اربعین قدسی' },
+  { key: 'dehlawi',  name: 'Forty Hadith of Shah Waliullah Dehlawi', name_ur: 'اربعین دہلوی' },
 ];
+
+/** Collection name in the current UI language (Urdu UI → Urdu name). */
+export function hadithCollectionName(key: string, lang: string, fallback = ''): string {
+  const c = HADITH_COLLECTIONS.find((x) => x.key === key);
+  if (!c) return fallback;
+  return lang === 'ur' ? c.name_ur : c.name;
+}
 
 export const MAKKAH_COORDS = { latitude: 21.4225, longitude: 39.8262 };
 

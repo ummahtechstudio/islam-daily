@@ -19,7 +19,8 @@ import {
 // v2: new trilingual schema (arabic/english/urdu + grades[]) from hadiths-v2/.
 // Bumped from 1 → 2 so any cache written under the old A7med3bdulBaset shape
 // (idInBook numbering, English-only) is discarded and re-fetched.
-const HADITH_CACHE_VERSION = 2;
+// v3: normalize() now drops records with no text — re-download older caches.
+const HADITH_CACHE_VERSION = 3;
 
 const ALL_BOOK_SLUGS: HadithCollectionKey[] = [
   'bukhari',
