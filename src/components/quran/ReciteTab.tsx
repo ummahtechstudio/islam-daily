@@ -127,7 +127,6 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
     setStartPage(page);
     setListKey((k) => k + 1);
     // Only once, right after hydration.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated]);
 
   // Persist fontScale (debounced)

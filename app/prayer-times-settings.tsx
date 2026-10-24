@@ -290,7 +290,7 @@ export default function PrayerTimesSettingsScreen() {
         <View style={styles.helperRow}>
           <Text style={[styles.helperText, { color: theme.textMuted }]}>
             {t('prayerSettings.method.autoDetected')}
-            <Text style={{ color: GREEN, fontWeight: '700' }}>{autoDetected.method}</Text>
+            <Text style={{ color: GREEN, fontWeight: '700' }}>{t(`prayerSettings.method.options.${autoDetected.method}.label`)}</Text>
           </Text>
           {!isAutoMethod && (
             <TouchableOpacity onPress={handleResetToAuto} hitSlop={6}>

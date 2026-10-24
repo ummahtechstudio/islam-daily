@@ -7,6 +7,7 @@ import {
   KARACHI_DEFAULT,
 } from '../services/prayerTimesService';
 import type { PrayerTimesSettings } from '../types/prayerTimes';
+import { nearestBundledCity } from '../utils/nearestCity';
 
 export type LocationSource = 'cached' | 'gps' | 'fallback' | 'manual';
 
@@ -65,20 +66,38 @@ async function resolveFromGps(): Promise<{
     reverse = [];
   }
 
+  const { latitude, longitude } = pos.coords;
   const top = reverse[0];
-  if (!looksUseful(top)) {
-    return { settings: KARACHI_DEFAULT, source: 'fallback' };
+  let city: string;
+  let country: string;
+  let countryCode: string;
+  if (looksUseful(top)) {
+    city = top.city ?? top.region ?? '';
+    country = top.country ?? '';
+    countryCode = top.isoCountryCode ?? '';
+  } else {
+    // Reverse geocoding is unavailable offline, on devices without a geocoder,
+    // and on web. The GPS fix itself is still exact — keep it (prayer times
+    // depend only on the coordinates) and label it from the bundled city list.
+    // Previously this case threw the fix away and used Karachi.
+    const near = nearestBundledCity(latitude, longitude);
+    const closeBy = near && near.km <= 50;
+    const sameRegion = near && near.km <= 300;
+    city = closeBy
+      ? near.city.name
+      : `${Math.abs(latitude).toFixed(2)}°${latitude >= 0 ? 'N' : 'S'}, ${Math.abs(longitude).toFixed(2)}°${longitude >= 0 ? 'E' : 'W'}`;
+    country = sameRegion ? near.city.country : 'GPS';
+    countryCode = sameRegion ? near.city.countryCode : '';
   }
 
-  const countryCode = top.isoCountryCode ?? 'PK';
   const { method, madhab } = autoDetectMethodAndMadhab(countryCode);
 
   const resolved: PrayerTimesSettings = {
     location: {
-      latitude: pos.coords.latitude,
-      longitude: pos.coords.longitude,
-      city: top.city ?? top.region ?? '',
-      country: top.country ?? '',
+      latitude,
+      longitude,
+      city,
+      country,
       countryCode,
     },
     method,
@@ -92,6 +111,17 @@ async function resolveFromGps(): Promise<{
   return { settings: resolved, source: 'gps' };
 }
 
+// One GPS resolution per app session, shared by every screen that mounts this
+// hook before a location is saved (avoids parallel permission prompts). A hard
+// fallback (permission denied / no fix) is remembered for the session only —
+// it is NOT persisted, so the next launch tries GPS again instead of keeping
+// Karachi forever.
+let sessionResolution: Promise<{ settings: PrayerTimesSettings; source: 'gps' | 'fallback' }> | null = null;
+
+function persistIfReal(result: { settings: PrayerTimesSettings; source: 'gps' | 'fallback' }) {
+  if (result.source === 'gps') persistSettings(result.settings);
+}
+
 export function useResolvedLocation(): LocationResolution {
   const cached = getPersistedSettings();
   const [settings, setSettings] = useState<PrayerTimesSettings>(cached ?? KARACHI_DEFAULT);
@@ -103,9 +133,10 @@ export function useResolvedLocation(): LocationResolution {
 
     let cancelled = false;
     (async () => {
-      const result = await resolveFromGps();
+      if (!sessionResolution) sessionResolution = resolveFromGps();
+      const result = await sessionResolution;
       if (cancelled) return;
-      persistSettings(result.settings);
+      persistIfReal(result);
       setSettings(result.settings);
       setSource(result.source);
       setLoading(false);
@@ -120,7 +151,19 @@ export function useResolvedLocation(): LocationResolution {
   const refreshFromGps = useCallback(async () => {
     setLoading(true);
     const result = await resolveFromGps();
-    persistSettings(result.settings);
+    sessionResolution = Promise.resolve(result);
+    // A failed refresh must not overwrite a location the user already has.
+    if (result.source === 'gps') {
+      persistSettings(result.settings);
+    } else {
+      const saved = getPersistedSettings();
+      if (saved) {
+        setSettings(saved);
+        setSource('cached');
+        setLoading(false);
+        return;
+      }
+    }
     setSettings(result.settings);
     setSource(result.source);
     setLoading(false);
