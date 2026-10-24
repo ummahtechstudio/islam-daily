@@ -194,6 +194,7 @@ export default function BookmarksScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.filterScroll}
         contentContainerStyle={styles.filterRow}
       >
         {FILTER_KEYS.map((key) => {
@@ -281,7 +282,11 @@ const styles = StyleSheet.create({
   headerSub: { color: 'rgba(255,255,255,0.65)', fontSize: 12, marginTop: 2 },
   clearAll: { color: '#FCA5A5', fontSize: 13, fontWeight: '700' },
 
+  // flexGrow 0: a horizontal ScrollView in a column otherwise stretches to fill
+  // the screen, turning the filter chips into tall bars.
+  filterScroll: { flexGrow: 0 },
   filterRow: {
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 8,

@@ -18,9 +18,12 @@ const GREEN = '#0F6E56';
 
 export type MosqueFinderEmptyStateProps = {
   onRetry?: () => void;
+  /** Which finder is offline — picks the header and copy. */
+  variant?: 'mosque' | 'halal';
 };
 
-export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptyStateProps) {
+export default function MosqueFinderEmptyState({ onRetry, variant = 'mosque' }: MosqueFinderEmptyStateProps) {
+  const ns = variant === 'halal' ? 'halalFinder.offline' : 'mosqueFinder.offlineState';
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
@@ -35,9 +38,9 @@ export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptySta
       <View style={[styles.header, { backgroundColor: Colors.primary }]}>
         <Ionicons name="location" size={24} color="#fff" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>{t('mosqueFinder.header.title')}</Text>
+          <Text style={styles.headerTitle}>{t(`${ns}.headerTitle`)}</Text>
           <Text style={styles.headerSub} numberOfLines={1}>
-            {t('mosqueFinder.header.sub')}
+            {t(`${ns}.headerSub`)}
           </Text>
         </View>
       </View>
@@ -47,9 +50,9 @@ export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptySta
           <Ionicons name="map-outline" size={56} color={GREEN} />
         </View>
 
-        <Text style={[styles.title, { color: theme.text }]}>{t('mosqueFinder.empty.title')}</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t(`${ns}.title`)}</Text>
         <Text style={[styles.body_text, { color: theme.textSecondary }]}>
-          {t('mosqueFinder.empty.body')}
+          {t(`${ns}.body`)}
         </Text>
 
         <TouchableOpacity
@@ -67,7 +70,7 @@ export default function MosqueFinderEmptyState({ onRetry }: MosqueFinderEmptySta
         </TouchableOpacity>
 
         <Text style={[styles.note, { color: theme.textMuted }]}>
-          {t('mosqueFinder.empty.note')}
+          {t(`${ns}.note`)}
         </Text>
       </View>
     </SafeAreaView>

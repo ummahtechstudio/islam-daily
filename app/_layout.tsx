@@ -268,6 +268,8 @@ export default function RootLayout() {
         <Stack.Screen name="prayer-times-settings" options={{ headerShown: false }} />
         <Stack.Screen name="city-picker" options={{ headerShown: false }} />
         <Stack.Screen name="search" options={{ headerShown: false }} />
+        {/* Bookmarks draws its own green header (it showed a second, raw "bookmarks" header). */}
+        <Stack.Screen name="bookmarks" options={{ headerShown: false }} />
         <Stack.Screen name="qibla" options={{ title: t('nav.titles.qibla') }} />
         <Stack.Screen name="hadith" options={{ title: t('nav.titles.hadith') }} />
         <Stack.Screen name="hadith-of-the-day" options={{ title: t('nav.titles.hadithOfDay') }} />

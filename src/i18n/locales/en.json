@@ -580,7 +580,14 @@
       "title": "Halal Restaurants"
     },
     "loading": "Finding halal restaurants nearby...",
-    "openSettings": "Open Settings"
+    "openSettings": "Open Settings",
+    "offline": {
+      "headerTitle": "Halal Restaurant Finder",
+      "headerSub": "Discover halal food near you",
+      "title": "Find Halal Food Nearby",
+      "body": "Connect to the internet to find halal restaurants around you, with distance and directions.",
+      "note": "Restaurant locations come from live map data and can't be saved offline."
+    }
   },
   "hifz": {
     "error": "Could not load the surah list. Check your connection and try again.",
@@ -693,6 +700,7 @@
       "hifz-tracker": "Hifz Tracker",
       "islamic-books": "Islamic Books",
       "mosque-finder": "Mosque Finder",
+      "namaz": "Namaz Guide",
       "names": "99 Names of Allah",
       "prayer-streak": "Prayer Streak",
       "prayer-times": "Prayer Times",
@@ -859,11 +867,8 @@
     "autoExpand": "No mosques within {{requested}}km — showing within {{effective}}km",
     "distance": "{{km}} km away",
     "empty": {
-      "body": "Connect to the internet to discover masjids around you with directions, prayer times, and reviews.",
-      "note": "Mosque locations need real-time data and can't be saved offline.",
       "retryOffline": "Waiting for connection…",
-      "retryOnline": "Retry",
-      "title": "Find Mosques Nearby"
+      "retryOnline": "Retry"
     },
     "emptySearch": "No mosques found within {{radius}}km. Try expanding your radius.",
     "errors": {
@@ -881,7 +886,14 @@
       "title": "Mosque Finder"
     },
     "loading": "Finding mosques near you...",
-    "openSettings": "Open Settings"
+    "openSettings": "Open Settings",
+    "offlineState": {
+      "headerTitle": "Mosque Finder",
+      "headerSub": "Discover masjids near you",
+      "title": "Find Mosques Nearby",
+      "body": "Connect to the internet to find masjids around you, with distance and directions.",
+      "note": "Mosque locations come from live map data and can't be saved offline."
+    }
   },
   "namaz": {
     "about": {
@@ -1424,17 +1436,19 @@
   "ramadan": {
     "header": {
       "hijriDay": "Hijri Day {{day}} · Month {{month}}",
-      "title": "Ramadan Mubarak"
+      "title": "Ramadan Mubarak",
+      "upcomingTitle": "Ramadan {{year}} AH"
     },
     "notice": {
-      "notStarted": "Ramadan has not started yet. This screen will show live countdowns and the timetable during Ramadan."
+      "notStarted": "Ramadan has not started yet. This screen will show live countdowns and the timetable during Ramadan.",
+      "upcoming": "Ramadan is expected to begin on {{date}} — in {{days}} days (Umm al-Qura calendar; the actual start depends on the moon sighting in your country). The Sehri and Iftar timetable for your location is below."
     },
     "timetable": {
       "colDate": "Date",
       "colDay": "Day",
       "colIftar": "Iftar",
       "colSehri": "Sehri",
-      "sectionLabel": "Full Ramadan Timetable — 1446 AH"
+      "sectionLabel": "Full Ramadan Timetable"
     },
     "timings": {
       "iftarLabel": "Iftar (Maghrib)",

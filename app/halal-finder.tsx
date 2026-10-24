@@ -233,7 +233,7 @@ export default function HalalFinderScreen() {
   // empty state that mosque-finder uses instead of letting the request go
   // out, time out, and surface a generic "Failed to find restaurants" toast.
   if (!isOnline) {
-    return <MosqueFinderEmptyState onRetry={handleRefresh} />;
+    return <MosqueFinderEmptyState onRetry={handleRefresh} variant="halal" />;
   }
 
   const openDirections = (lat: number, lon: number, name: string) => {
