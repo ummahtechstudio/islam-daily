@@ -34,7 +34,7 @@
 <body>
   <div class="container">
     <h1>🕌 Privacy Policy — Islam Daily</h1>
-    <p class="updated"><strong>Last Updated:</strong> September 20, 2026</p>
+    <p class="updated"><strong>Last Updated:</strong> October 24, 2026</p>
 
     <h2>Introduction</h2>
     <p>Islam Daily ("we", "our", "the app") is developed by <strong>Ummah Tech Studio</strong>. This policy describes, in plain words, exactly what information the app sends off your device, why, where it goes, and how you control it. It was written by checking every network request in the app's source code, and it is updated whenever that changes.</p>
@@ -93,12 +93,12 @@
     <p>Like any app that loads content from the internet, Islam Daily contacts the servers below. Each of them sees the request itself and your device's IP address, as any website does. <strong>None of them receives your name, an identifier, or — except Overpass, above — your location.</strong></p>
     <table>
       <tr><th>Service</th><th>Used for</th><th>What it receives</th></tr>
-      <tr><td><strong>Supabase</strong> (our backend host; project hosted in Sydney, Australia)</td><td>Storing the optional session records and your feedback; serving refreshed duas and 99 Names content and the optional Quran text download pack.</td><td>The session record (1.1) and feedback (1.2) you send; otherwise only content requests.</td></tr>
+      <tr><td><strong>Supabase</strong> (our backend host; project hosted in Sydney, Australia)</td><td>Storing the optional session records and your feedback; serving refreshed duas and 99 Names content.</td><td>The session record (1.1) and feedback (1.2) you send; otherwise only content requests.</td></tr>
       <tr><td><strong>Cloudflare R2</strong> (our content CDN)</td><td>Hadith collections and other downloadable content. On iOS the app's network library also uses this host for its "is the internet reachable?" check (a tiny request about once a minute for the rest of the session after an offline-aware screen has been opened); Android uses the operating system's own network status instead.</td><td>Content requests only. No data.</td></tr>
       <tr><td><strong>OpenStreetMap — Overpass API</strong> (overpass-api.de)</td><td>Mosque Finder, Halal Finder.</td><td>Your position and search radius, while you search. Map data © OpenStreetMap contributors (ODbL).</td></tr>
-      <tr><td><strong>Aladhan API</strong> (aladhan.com)</td><td>Downloading the offline Hijri calendar pack; a lightweight "am I online?" check on the Downloads screen.</td><td>Month/year, or an empty request. No location.</td></tr>
+      <tr><td><strong>Aladhan API</strong> (aladhan.com)</td><td>A lightweight "am I online?" check while the Downloads screen is open.</td><td>An empty request. No location.</td></tr>
       <tr><td><strong>AlQuran.cloud API</strong></td><td>Additional Quran translation editions, word-by-word meanings, and Quran text search when online.</td><td>Surah/ayah numbers, edition names, and the search text you type.</td></tr>
-      <tr><td><strong>Audio hosts</strong>: EveryAyah.com, Islamic Network CDN, QuranicAudio.com, Internet Archive (archive.org), IslamicFinder.org</td><td>Streaming recitations, lectures and adhan previews when you press play.</td><td>Which file you play.</td></tr>
+      <tr><td><strong>Audio hosts</strong>: EveryAyah.com, Islamic Network CDN, QuranicAudio.com, Internet Archive (archive.org)</td><td>Streaming recitations, lectures and adhan previews when you press play.</td><td>Which file you play.</td></tr>
       <tr><td><strong>Your device's operating system</strong> (Google Play services on Android, Apple on iOS)</td><td>Location fixes and reverse geocoding (city name).</td><td>Handled by the OS under Google's / Apple's own policies.</td></tr>
       <tr><td><strong>Apps you open from Islam Daily</strong> (maps app, browser, e-mail)</td><td>Directions to a mosque or restaurant, links in Sources &amp; Credits, contacting us.</td><td>Only what is in the link — never your position.</td></tr>
     </table>
@@ -108,7 +108,7 @@
     <ul>
       <li><strong>Session records and feedback text</strong> are stored in our database hosted by Supabase in <strong>Australia (Sydney region)</strong>, protected by HTTPS in transit, and accessible only to the Islam Daily development team. <strong>Feedback screenshots</strong> are stored in a private storage bucket on the same backend, likewise accessible only to the development team (see 1.2).</li>
       <li><strong>Retention:</strong> session records are anonymous and are kept in aggregate for as long as they are useful for understanding where the app is used. Feedback is kept while we work on the issue it describes and for reference afterwards. There is no automatic deletion; we delete on request (see 5).</li>
-      <li><strong>Content</strong> (Quran, hadith, duas, audio) is stored on your device once downloaded and can be deleted pack by pack from the <strong>Downloads</strong> screen.</li>
+      <li><strong>Content</strong> the app downloads or caches (hadith collections, Quran translations fetched online, refreshed duas) is stored on your device; downloaded hadith collections can be deleted from the <strong>Downloads</strong> screen.</li>
     </ul>
 
     <h2 id="your-choices">5. Your choices and rights</h2>
