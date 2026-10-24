@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
@@ -16,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { Colors, palette } from '../../constants/colors';
 import { typography } from '../../constants/typography';
 import { spacing, radius } from '../../constants/spacing';
-import { urduStyle } from '../../constants/fonts';
+import { urduStyle, Fonts } from '../../constants/fonts';
 import { ManuscriptCard } from '../ManuscriptCard';
 import { MinaretIcon } from '../icons';
 import {
@@ -31,7 +30,6 @@ import CardActionsRow from '../../../components/CardActionsRow';
 import type { Dua, DuaCategory } from '../../types/content';
 
 const URDU_DISCLAIMER_KEY = 'urdu_disclaimer_dismissed';
-const GOLD = '#EF9F27';
 
 type CategoryIconSpec =
   | { kind: 'ionicon'; name: keyof typeof Ionicons.glyphMap }
@@ -384,12 +382,12 @@ const styles = StyleSheet.create({
   duaList: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing['2xl'] },
   duaDescription: {
     fontSize: 13,
-    lineHeight: 24,
+    lineHeight: 29,
     marginBottom: spacing.sm + 2,
     textAlign: 'right',
     writingDirection: 'rtl',
     color: palette.textOnCreamSecondary,
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    fontFamily: Fonts.urdu,
   },
   duaHeader: {
     flexDirection: 'row',
@@ -450,9 +448,9 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
     fontSize: 16,
-    lineHeight: 28,
+    lineHeight: 35,
     fontStyle: 'normal',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    fontFamily: Fonts.urdu,
     color: palette.textOnCream,
   },
   disclaimerCard: {
@@ -468,11 +466,11 @@ const styles = StyleSheet.create({
   disclaimerText: { fontSize: 12, lineHeight: 18 },
   disclaimerTextUrdu: {
     fontSize: 12,
-    lineHeight: 22,
+    lineHeight: 26,
     marginTop: 6,
     textAlign: 'right',
     writingDirection: 'rtl',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    fontFamily: Fonts.urdu,
   },
 
   referenceContainer: {

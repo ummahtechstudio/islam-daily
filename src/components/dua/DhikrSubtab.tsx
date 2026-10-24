@@ -5,13 +5,13 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Colors } from '../../constants/colors';
+import { Fonts } from '../../constants/fonts';
 import {
   getBundledDhikr,
   getCachedOrBundledDhikr,
@@ -22,6 +22,7 @@ import type { DhikrCategory, DhikrItem } from '../../types/content';
 import type { TasbeehTemplate } from '../../types/tasbeeh';
 
 const GOLD = '#EF9F27';
+
 
 interface FlatDhikrEntry {
   key: string;
@@ -167,7 +168,7 @@ function DhikrCard({
       <View style={styles.cardHeader}>
         <View style={[styles.catBadge, { backgroundColor: Colors.primary + '18' }]}>
           <Text style={[styles.catBadgeText, { color: Colors.primary }]}>
-            {entry.categoryTitle}
+            {t(`dhikr.categories.${entry.categoryId}`, { defaultValue: entry.categoryTitle })}
           </Text>
         </View>
         {item.count > 0 ? (
@@ -187,9 +188,12 @@ function DhikrCard({
         {item.transliteration}
       </Text>
 
-      <Text style={[styles.english, { color: theme.textSecondary }]}>
-        {item.english}
-      </Text>
+      {/* One translation, in the reader's chosen language (English if no Urdu). */}
+      {language !== 'urdu' || !item.urdu ? (
+        <Text style={[styles.english, { color: theme.textSecondary }]}>
+          {item.english}
+        </Text>
+      ) : null}
 
       {language === 'urdu' && item.urdu ? (
         <Text style={[styles.urdu, { color: theme.textSecondary }]}>
@@ -292,8 +296,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
     fontSize: 16,
-    lineHeight: 28,
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    lineHeight: 35,
+    fontFamily: Fonts.urdu,
   },
 
   benefitRow: {

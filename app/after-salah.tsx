@@ -146,7 +146,10 @@ function StepCard({
             {step.item.arabic}
           </Text>
           <Text style={[styles.translit, { color: Colors.primary }]}>{step.item.transliteration}</Text>
-          <Text style={[styles.english, { color: theme.textSecondary }]}>{step.item.english}</Text>
+          {/* One translation, in the reader's chosen language (English if no Urdu). */}
+          {!showUrdu || !step.item.urdu ? (
+            <Text style={[styles.english, { color: theme.textSecondary }]}>{step.item.english}</Text>
+          ) : null}
           {showUrdu && step.item.urdu ? (
             <Text style={[styles.urdu, { color: theme.textSecondary }]}>{step.item.urdu}</Text>
           ) : null}
@@ -180,7 +183,7 @@ function StepCard({
               <Text style={[styles.arabic, { color: theme.text }]} textBreakStrategy="simple">
                 {a.arabic} ﴿{a.ayah}﴾
               </Text>
-              {a.english ? (
+              {a.english && (!showUrdu || !a.urdu) ? (
                 <Text style={[styles.english, { color: theme.textSecondary }]}>{a.english}</Text>
               ) : null}
               {showUrdu && a.urdu ? (

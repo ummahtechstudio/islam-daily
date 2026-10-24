@@ -150,7 +150,7 @@ export default function QuranScreen() {
 
       <View style={styles.body}>
         {activeTab === 'translation' && <TranslationTab isDark={isDark} />}
-        {activeTab === 'recite' && <ReciteTab jumpRequest={reciteJumpRequest} />}
+        {activeTab === 'recite' && <ReciteTab jumpRequest={reciteJumpRequest} isDark={isDark} />}
         {activeTab === 'listen' && <ListenTab isDark={isDark} />}
       </View>
     </SafeAreaView>

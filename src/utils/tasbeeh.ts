@@ -134,3 +134,15 @@ export const createCounterFromTemplate = async (
   await saveCounter(counter);
   return counter;
 };
+
+/** Default counters ship with an English source line; show it in the UI language. */
+export const DEFAULT_TASBEEH_SOURCE = 'After every prayer (Bukhari 843)';
+export function displayTasbeehSource(
+  counter: Pick<TasbeehCounter, 'isDefault' | 'source'>,
+  t: (key: string) => string,
+): string | undefined {
+  if (counter.isDefault && counter.source === DEFAULT_TASBEEH_SOURCE) {
+    return t('tasbeeh.defaultSource');
+  }
+  return counter.source;
+}

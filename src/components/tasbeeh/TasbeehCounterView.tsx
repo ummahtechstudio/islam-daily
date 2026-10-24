@@ -26,6 +26,7 @@ import {
   saveSettings,
   updateCounter,
   resetCounter,
+  displayTasbeehSource,
 } from '../../utils/tasbeeh';
 import type { TasbeehCounter, TasbeehSettings } from '../../types/tasbeeh';
 
@@ -468,7 +469,7 @@ export function TasbeehCounterView({
                 style={[styles.dhikrSourceInner, { color: theme.textMuted }]}
                 numberOfLines={2}
               >
-                {selected.source}
+                {displayTasbeehSource(selected, t)}
               </Text>
             ) : null}
             <View style={styles.ringMetaRow}>

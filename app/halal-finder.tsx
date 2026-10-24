@@ -356,13 +356,13 @@ export default function HalalFinderScreen() {
                 <Text style={[styles.placeName, { color: theme.text }]} numberOfLines={1}>
                   {item.name}
                 </Text>
-                {item.halalCert && (
+                {!!item.halalCert && (
                   <View style={styles.certRow}>
                     <Ionicons name="checkmark-circle" size={12} color={Colors.success} />
                     <Text style={styles.certText}>{t(`halalFinder.halalCert.${item.halalCert}`)}</Text>
                   </View>
                 )}
-                {item.cuisine && (
+                {!!item.cuisine && (
                   <Text style={[styles.cuisineText, { color: theme.textMuted }]} numberOfLines={1}>
                     {item.cuisine}
                   </Text>

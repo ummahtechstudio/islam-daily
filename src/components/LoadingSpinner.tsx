@@ -11,7 +11,7 @@ export function LoadingSpinner({ message, dark }: Props) {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color={Colors.primary} />
-      {message && (
+      {!!message && (
         <Text style={[styles.message, dark && styles.messageDark]}>{message}</Text>
       )}
     </View>

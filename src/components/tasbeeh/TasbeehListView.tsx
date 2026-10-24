@@ -18,6 +18,7 @@ import {
   deleteCounter,
   loadDhikrTemplates,
   createCounterFromTemplate,
+  displayTasbeehSource,
 } from '../../utils/tasbeeh';
 import type { TasbeehCounter, TasbeehTemplate } from '../../types/tasbeeh';
 
@@ -230,7 +231,7 @@ function CounterCard({
         </View>
         {counter.source ? (
           <Text style={[styles.cardSource, { color: theme.textMuted }]} numberOfLines={1}>
-            {counter.source}
+            {displayTasbeehSource(counter, t)}
           </Text>
         ) : null}
       </View>

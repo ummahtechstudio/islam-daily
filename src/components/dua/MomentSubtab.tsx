@@ -4,13 +4,13 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../../constants/colors';
+import { Fonts } from '../../constants/fonts';
 import { spacing, radius } from '../../constants/spacing';
 import { ManuscriptCard } from '../ManuscriptCard';
 import { MinaretIcon } from '../icons';
@@ -25,7 +25,6 @@ import {
 import CardActionsRow from '../../../components/CardActionsRow';
 import type { Dua, DuaCategory } from '../../types/content';
 
-const GOLD = '#EF9F27';
 
 type CategoryIconSpec =
   | { kind: 'ionicon'; name: keyof typeof Ionicons.glyphMap }
@@ -69,33 +68,33 @@ function CategoryIcon({
 
 function getDuaOfMoment(
   duas: DuaCategory[],
-): { category: DuaCategory; dua: Dua; reason: string } | null {
+): { category: DuaCategory; dua: Dua; reasonKey: string } | null {
   if (!duas.length) return null;
   const hour = new Date().getHours();
   let catId: string;
-  let reason: string;
+  let reasonKey: string;
 
   if (hour >= 4 && hour < 7) {
-    catId = 'waking'; reason = 'Morning awakening';
+    catId = 'waking'; reasonKey = 'waking';
   } else if (hour >= 7 && hour < 12) {
-    catId = 'morning'; reason = 'Morning adhkar time';
+    catId = 'morning'; reasonKey = 'morning';
   } else if (hour >= 12 && hour < 13) {
-    catId = 'prayer'; reason = 'Dhuhr prayer time';
+    catId = 'prayer'; reasonKey = 'dhuhr';
   } else if (hour >= 13 && hour < 15) {
-    catId = 'knowledge'; reason = 'Midday — seek knowledge';
+    catId = 'knowledge'; reasonKey = 'midday';
   } else if (hour >= 15 && hour < 18) {
-    catId = 'evening'; reason = 'Evening adhkar time';
+    catId = 'evening'; reasonKey = 'evening';
   } else if (hour >= 18 && hour < 20) {
-    catId = 'evening'; reason = 'Sunset adhkar';
+    catId = 'evening'; reasonKey = 'sunset';
   } else if (hour >= 20 && hour < 23) {
-    catId = 'sleep'; reason = 'Preparing for sleep';
+    catId = 'sleep'; reasonKey = 'sleep';
   } else {
-    catId = 'sleep'; reason = 'Late night';
+    catId = 'sleep'; reasonKey = 'lateNight';
   }
 
   const category = duas.find((c) => c.id === catId) ?? duas[0];
   const dua = category.duas[new Date().getDate() % category.duas.length];
-  return dua ? { category, dua, reason } : null;
+  return dua ? { category, dua, reasonKey } : null;
 }
 
 export interface MomentSubtabProps {
@@ -159,9 +158,11 @@ export function MomentSubtab({ theme }: MomentSubtabProps) {
           ) : null}
           <Text style={styles.badgeText}>{t('dua.moment.badge')}</Text>
         </View>
-        <Text style={[styles.reason, { color: theme.textMuted }]}>{moment.reason}</Text>
+        <Text style={[styles.reason, { color: theme.textMuted }]}>
+          {t(`dua.moment.reasons.${moment.reasonKey}`)}
+        </Text>
         <Text style={[styles.categoryTitle, { color: theme.textSecondary }]}>
-          {moment.category.title}
+          {t(`dua.duas.categories.${moment.category.id}`, { defaultValue: moment.category.title })}
         </Text>
       </View>
 
@@ -282,9 +283,9 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     writingDirection: 'rtl',
     fontSize: 16,
-    lineHeight: 28,
+    lineHeight: 35,
     fontStyle: 'normal',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    fontFamily: Fonts.urdu,
     color: palette.textOnCream,
   },
   referenceContainer: {

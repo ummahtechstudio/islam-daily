@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Colors, palette } from '../src/constants/colors';
 import { typography } from '../src/constants/typography';
-import { spacing, radius } from '../src/constants/spacing';
+import { spacing } from '../src/constants/spacing';
 import { urduStyle } from '../src/constants/fonts';
 import { ManuscriptCard } from '../src/components/ManuscriptCard';
 import { trackScreen } from '../src/services/analytics';

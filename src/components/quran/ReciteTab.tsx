@@ -65,9 +65,11 @@ export type ReciteTabProps = {
   // setting `jumpRequest` to a new object. The child watches the nonce so
   // repeated taps with the same page still re-trigger the scroll.
   jumpRequest?: { page: number; nonce: number };
+  /** Dark theme: the toolbar follows the app theme; the mushaf page stays paper-coloured. */
+  isDark?: boolean;
 };
 
-export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
+export default function ReciteTab({ jumpRequest, isDark = false }: ReciteTabProps = {}) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList<number>>(null);
@@ -226,8 +228,10 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
   return (
     <View style={styles.flex}>
       {/* Font-scale toolbar */}
-      <View style={styles.toolbar}>
-        <Text style={styles.toolbarLabel}>{t('quran.reciteTab.textSize')}</Text>
+      <View style={[styles.toolbar, isDark && styles.toolbarDark]}>
+        <Text style={[styles.toolbarLabel, isDark && { color: Colors.dark.textSecondary }]}>
+          {t('quran.reciteTab.textSize')}
+        </Text>
         <View style={styles.toolbarBtns}>
           <TouchableOpacity
             style={[
@@ -240,7 +244,7 @@ export default function ReciteTab({ jumpRequest }: ReciteTabProps = {}) {
           >
             <Text style={styles.scaleBtnText}>A−</Text>
           </TouchableOpacity>
-          <Text style={styles.scaleValue}>
+          <Text style={[styles.scaleValue, isDark && { color: Colors.dark.text }]}>
             {Math.round(fontScale * 100)}%
           </Text>
           <TouchableOpacity
@@ -463,6 +467,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E8EDE9',
+  },
+  toolbarDark: {
+    backgroundColor: Colors.dark.surface,
+    borderBottomColor: Colors.dark.border,
   },
   toolbarLabel: {
     fontSize: 12,

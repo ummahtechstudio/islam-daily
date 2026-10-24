@@ -47,18 +47,38 @@ export function formatPrayerTime(date: Date, opts?: { hour12?: boolean }): strin
   }).format(date);
 }
 
-export function formatCountdown(target: Date, now: Date = new Date()): string {
+export type CountdownParts =
+  | { kind: 'now' }
+  | { kind: 'lt1' }
+  | { kind: 'm'; m: number }
+  | { kind: 'h'; h: number }
+  | { kind: 'hm'; h: number; m: number };
+
+/** Language-neutral countdown pieces; see formatCountdownT for the UI string. */
+export function countdownParts(target: Date, now: Date = new Date()): CountdownParts {
   const diff = target.getTime() - now.getTime();
-  if (diff <= 0) return 'now';
+  if (diff <= 0) return { kind: 'now' };
   // Under a minute, Math.round would floor to "in 0m" in the final ~30s; show
   // "in <1m" instead so the countdown never reads zero before the prayer.
-  if (diff < 60000) return 'in <1m';
+  if (diff < 60000) return { kind: 'lt1' };
   const mins = Math.round(diff / 60000);
-  if (mins < 60) return `in ${mins}m`;
-  const hours = Math.floor(mins / 60);
-  const remMins = mins % 60;
-  if (remMins === 0) return `in ${hours}h`;
-  return `in ${hours}h ${remMins}m`;
+  if (mins < 60) return { kind: 'm', m: mins };
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (m === 0) return { kind: 'h', h };
+  return { kind: 'hm', h, m };
+}
+
+/** English-only countdown ("in 2h 33m"). UI code should use formatCountdownT. */
+export function formatCountdown(target: Date, now: Date = new Date()): string {
+  const c = countdownParts(target, now);
+  switch (c.kind) {
+    case 'now': return 'now';
+    case 'lt1': return 'in <1m';
+    case 'm': return `in ${c.m}m`;
+    case 'h': return `in ${c.h}h`;
+    default: return `in ${c.h}h ${c.m}m`;
+  }
 }
 
 /**

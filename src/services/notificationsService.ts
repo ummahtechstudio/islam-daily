@@ -381,14 +381,15 @@ async function schedulePrayerNotifications(
       if (fireTime <= now + 1000) continue;
 
       const arabic = PRAYER_ARABIC[prayer];
-      const english = PRAYER_ENGLISH[prayer];
+      // Title follows the UI language (Fajr / فجر); the body keeps the Arabic name.
+      const prayerLabel = i18n.t(`prayers.names.${prayer}`, { defaultValue: PRAYER_ENGLISH[prayer] });
       const formatted = formatPrayerTime(entry.time);
       const cityPart = city ? ` · ${city}` : '';
 
       try {
         await Notifications.scheduleNotificationAsync({
           content: {
-            title: english,
+            title: prayerLabel,
             body: i18n.t('notifications.prayerNotif.body', { arabic, time: formatted, cityPart }),
             sound: soundForContent(cfg.sound),
             data: { tag: SCHEDULED_TAG, prayer, dayOffset },
@@ -677,11 +678,11 @@ export async function fireTestNotification(prayerName: PrayerName): Promise<void
   const settings = await getNotificationSettings();
   const cfg = settings.perPrayer[prayerName];
   const arabic = PRAYER_ARABIC[prayerName];
-  const english = PRAYER_ENGLISH[prayerName];
+  const prayerLabel = i18n.t(`prayers.names.${prayerName}`, { defaultValue: PRAYER_ENGLISH[prayerName] });
 
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: i18n.t('notifications.testNotif.title', { prayer: english }),
+      title: i18n.t('notifications.testNotif.title', { prayer: prayerLabel }),
       body: i18n.t('notifications.testNotif.body', { arabic }),
       sound: soundForContent(cfg.sound),
       data: { tag: SCHEDULED_TAG, prayer: prayerName, test: true },

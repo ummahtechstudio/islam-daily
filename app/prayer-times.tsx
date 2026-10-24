@@ -22,9 +22,8 @@ import { useResolvedLocation } from '../src/hooks/useResolvedLocation';
 import { computePrayerTimes } from '../src/services/prayerTimesService';
 import {
   formatPrayerTime,
-  formatCountdown,
-  formatHijriDate,
 } from '../src/utils/formatPrayerTime';
+import { dateLocale, formatCountdownT, formatHijriDateT } from '../src/utils/i18nFormat';
 import { trackScreen } from '../src/services/analytics';
 import type { PrayerName } from '../src/types/prayerTimes';
 import { ManuscriptCard } from '../src/components/ManuscriptCard';
@@ -46,7 +45,7 @@ type PrayerTimesScreenProps = {
 };
 
 export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     trackScreen('PrayerTimes');
@@ -86,16 +85,16 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
     [settings, tick]
   );
 
-  const hijri = useMemo(() => formatHijriDate(new Date(tick)), [tick]);
+  const hijri = useMemo(() => formatHijriDateT(t, new Date(tick)), [t, tick]);
   const gregorian = useMemo(
     () =>
-      new Intl.DateTimeFormat(undefined, {
+      new Intl.DateTimeFormat(dateLocale(i18n.language), {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       }).format(new Date(tick)),
-    [tick]
+    [tick, i18n.language]
   );
 
   const [sunnahOpen, setSunnahOpen] = useState(false);
@@ -201,7 +200,7 @@ export default function PrayerTimesScreen({ asTab = false }: PrayerTimesScreenPr
                 <Text style={nextStyles.time}>{formatPrayerTime(computed.nextPrayerTime)}</Text>
               </View>
               <Text style={nextStyles.countdown}>
-                {formatCountdown(computed.nextPrayerTime, new Date(tick))}
+                {formatCountdownT(t, computed.nextPrayerTime, new Date(tick))}
               </Text>
             </ManuscriptCard>
           </TouchableOpacity>

@@ -3,10 +3,11 @@
 // can reactivate it once the curated content (themed weeks, ayahs with context,
 // hadith explanations, reflection questions) is ready.
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { palette } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
 import { typography } from '../constants/typography';
 import { spacing, radius } from '../constants/spacing';
 import { ManuscriptCard } from './ManuscriptCard';
@@ -184,7 +185,8 @@ const styles = StyleSheet.create({
   pillUr: {
     fontSize: 12,
     fontWeight: '700',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    fontFamily: Fonts.urdu,
+    lineHeight: 26,
   },
   pillEn: {
     ...typography.caption,
@@ -221,11 +223,11 @@ const styles = StyleSheet.create({
   },
   contextUr: {
     fontSize: 12,
-    lineHeight: 22,
+    lineHeight: 26,
     textAlign: 'right',
     writingDirection: 'rtl',
     fontStyle: 'italic',
-    fontFamily: Platform.OS === 'ios' ? 'NotoNastaliqUrdu' : undefined,
+    fontFamily: Fonts.urdu,
     color: palette.textOnCreamMuted,
   },
   footer: {

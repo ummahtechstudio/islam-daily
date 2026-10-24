@@ -81,7 +81,11 @@
   },
   "calendar": {
     "events": {
-      "sectionTitle": "Upcoming Islamic Events"
+      "sectionTitle": "Upcoming Islamic Events",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "inDays": "in {{count}} days",
+      "note": "Dates follow the Umm al-Qura calendar. Depending on the moon sighting in your country, an event may fall a day earlier or later."
     },
     "hijriMonths": {
       "1": "Muharram",
@@ -173,7 +177,17 @@
     "settings": "Settings",
     "share": "Share",
     "tryAgain": "Try Again",
-    "yes": "Yes"
+    "yes": "Yes",
+    "countdown": {
+      "now": "now",
+      "lessThanMinute": "in less than a minute",
+      "minutes": "in {{m}}m",
+      "hours": "in {{h}}h",
+      "hoursMinutes": "in {{h}}h {{m}}m",
+      "hoursOne": "in 1h",
+      "hoursOneMinutes": "in 1h {{m}}m"
+    },
+    "hijriDate": "{{day}} {{monthName}} {{year}} AH"
   },
   "customAdhan": {
     "audioUnavailable": {
@@ -253,7 +267,7 @@
     },
     "entries": {
       "adhanJs": "Prayer times are calculated on your device with this library, using your chosen calculation method and location.",
-      "aladhan": "Used to download the offline Hijri calendar pack and as a lightweight connectivity check; prayer times and the Qibla bearing are computed on your device, not fetched from it.",
+      "aladhan": "Used only as a lightweight connectivity check on the Downloads screen; prayer times and the Qibla bearing are computed on your device, not fetched from it.",
       "alquranCloud": "Verse of the Day, word-by-word meanings and the additional translation editions below are fetched from this API when you are online.",
       "amiri": "Arabic typeface for Quran, dua and dhikr text.",
       "archiveOrg": "Lectures, tafseer, nasheeds and Urdu hadith audio in the Audio Library are streamed from public Internet Archive collections; each item remains the property of its speaker or publisher.",
@@ -290,6 +304,12 @@
     "loading": {
       "subtitle": "Please come back in a moment, in shaa Allah.",
       "title": "Dhikr content is loading"
+    },
+    "categories": {
+      "after_salah": "After Salah",
+      "morning": "Morning Adhkar",
+      "evening": "Evening Adhkar",
+      "general": "General Dhikr"
     }
   },
   "downloads": {
@@ -423,7 +443,17 @@
     "moment": {
       "badge": "Dua of the Moment",
       "loading": "Loading dua of the moment…",
-      "reference": "Reference:"
+      "reference": "Reference:",
+      "reasons": {
+        "waking": "Morning awakening",
+        "morning": "Morning adhkar time",
+        "dhuhr": "Dhuhr prayer time",
+        "midday": "Midday — seek knowledge",
+        "evening": "Evening adhkar time",
+        "sunset": "Sunset adhkar",
+        "sleep": "Preparing for sleep",
+        "lateNight": "Late night"
+      }
     },
     "screenTitle": "Dua & Dhikr",
     "tabs": {
@@ -606,7 +636,9 @@
       "version": "Islam Daily v1.0.0"
     },
     "greeting": {
-      "salam": "Assalamu Alaikum"
+      "salam": "Assalamu Alaikum",
+      "eidMubarak": "Eid Mubarak! 🌙",
+      "todayIs": "Today: {{event}}"
     },
     "moreSections": {
       "calculators": "Calculators",
@@ -1696,7 +1728,8 @@
       },
       "title": "Counters",
       "useBtn": "Use"
-    }
+    },
+    "defaultSource": "After every prayer (Bukhari 843)"
   },
   "welcome": {
     "en": {
@@ -1760,7 +1793,8 @@
       "goldLabel": "Gold Nisab",
       "helper": "Silver is the lower threshold; using it includes more payers and is the common scholarly preference. You can switch to gold if you prefer.",
       "silver": "Silver (recommended)",
-      "silverLabel": "Silver Nisab"
+      "silverLabel": "Silver Nisab",
+      "gramsTola": "{{grams}} g (= {{tola}} tola)"
     },
     "prices": {
       "gold": "Gold ({{currency}}/{{unit}})",
@@ -1787,6 +1821,14 @@
       "gram": "Gram (g)",
       "helper": "1 tola = 11.664 grams. Prices and weights below use your selected unit.",
       "tola": "Tola"
+    },
+    "unitShort": {
+      "gram": "g",
+      "tola": "tola"
+    },
+    "basis": {
+      "silver": "silver",
+      "gold": "gold"
     }
   }
 }

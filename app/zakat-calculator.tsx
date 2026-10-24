@@ -213,7 +213,8 @@ export default function ZakatCalculatorScreen() {
   ]);
 
   const currencyLabel = currency.trim() || '—';
-  const unitLabel = unit === 'tola' ? 'tola' : 'g';
+  const unitLabel = t(`zakat.unitShort.${unit}`);
+  const basisLabel = t(`zakat.basis.${nisabBasis}`);
   // The nisab summary only makes sense once the user has entered a price for
   // the chosen basis. Until then, the value reads as '—'.
   const nisabReady =
@@ -391,12 +392,12 @@ export default function ZakatCalculatorScreen() {
             <Text style={[styles.nisabSummaryAmount, { color: theme.text }]}>
               {nisabReady
                 ? `${currencyLabel} ${formatMoney(calc.nisabValue)}`
-                : t('zakat.nisab.enterPricePrompt', { basis: nisabBasis })}
+                : t('zakat.nisab.enterPricePrompt', { basis: basisLabel })}
             </Text>
             <Text style={[styles.nisabSummarySub, { color: theme.textMuted }]}>
               {nisabBasis === 'silver'
-                ? `${SILVER_NISAB_GRAMS} g (= ${(SILVER_NISAB_GRAMS / TOLA_TO_GRAMS).toFixed(1)} tola)`
-                : `${GOLD_NISAB_GRAMS} g (= ${(GOLD_NISAB_GRAMS / TOLA_TO_GRAMS).toFixed(1)} tola)`}
+                ? t('zakat.nisab.gramsTola', { grams: SILVER_NISAB_GRAMS, tola: (SILVER_NISAB_GRAMS / TOLA_TO_GRAMS).toFixed(1) })
+                : t('zakat.nisab.gramsTola', { grams: GOLD_NISAB_GRAMS, tola: (GOLD_NISAB_GRAMS / TOLA_TO_GRAMS).toFixed(1) })}
             </Text>
           </View>
         </View>
@@ -493,7 +494,7 @@ export default function ZakatCalculatorScreen() {
         </TouchableOpacity>
         {!canCalculate && (
           <Text style={[styles.smallHint, { color: theme.textMuted }]}>
-            {t('zakat.calculateHint', { basis: nisabBasis })}
+            {t('zakat.calculateHint', { basis: basisLabel })}
           </Text>
         )}
 
@@ -509,7 +510,7 @@ export default function ZakatCalculatorScreen() {
             ]}
           >
             <Text style={[styles.resultLabel, { color: theme.textSecondary }]}>
-              {t('zakat.result.nisabThresholdLabel', { basis: nisabBasis })}
+              {t('zakat.result.nisabThresholdLabel', { basis: basisLabel })}
             </Text>
             <Text style={[styles.resultLine, { color: theme.text }]}>
               {currencyLabel} {formatMoney(calc.nisabValue)}

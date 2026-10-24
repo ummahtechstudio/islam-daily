@@ -123,7 +123,7 @@ function IslamicBooksScreenInner() {
                 </View>
                 <View style={styles.bookInfo}>
                   <Text style={[styles.bookTitle, { color: theme.text }]}>{book.title}</Text>
-                  {book.titleAr && (
+                  {!!book.titleAr && (
                     <Text style={[styles.bookTitleAr, { color: theme.textSecondary }]}>{book.titleAr}</Text>
                   )}
                   <Text style={[styles.bookAuthor, { color: Colors.primary }]}>{book.author}</Text>

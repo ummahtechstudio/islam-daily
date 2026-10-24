@@ -23,9 +23,12 @@ import { spacing, radius } from '../../src/constants/spacing';
 import { findTranslation } from '../../src/constants/translations';
 import { useResolvedLocation } from '../../src/hooks/useResolvedLocation';
 import { computePrayerTimes } from '../../src/services/prayerTimesService';
-import { formatPrayerTime, formatCountdown, getHijriParts } from '../../src/utils/formatPrayerTime';
+import { formatPrayerTime, getHijriParts } from '../../src/utils/formatPrayerTime';
+import { formatCountdownT } from '../../src/utils/i18nFormat';
 import type { PrayerName } from '../../src/types/prayerTimes';
 import { fetchRandomVerse } from '../../src/services/api';
+import { splitLeadingBismillah } from '../../src/utils/bismillah';
+import { getSurahMeta } from '../../src/constants/surahMeta';
 import { useStore } from '../../src/store';
 import { trackScreen } from '../../src/services/analytics';
 import { getSetting, getTranslationLanguage, type TranslationLanguage } from '../../src/utils/settings';
@@ -70,7 +73,25 @@ function GeometricPattern({ width, height }: { width: number; height: number }) 
 }
 
 // ─── Greeting Card — manuscript treatment in body ────────────────────────────
-function GreetingCard({ hijriDate }: { hijriDate: string | null }) {
+// Days that get a line under the salam. Kept to occasions observed across
+// schools of thought; the full list (incl. Mawlid, Shab-e-Barat) is on the
+// Islamic Calendar screen.
+function homeOccasionLine(
+  t: (key: string, opts?: Record<string, unknown>) => string,
+  month: number,
+  day: number,
+): string | null {
+  if (month === 10 && day === 1) return t('home.greeting.eidMubarak');
+  if (month === 12 && day === 10) return t('home.greeting.eidMubarak');
+  const key =
+    month === 12 && day === 9 ? 'arafah'
+      : month === 1 && day === 1 ? 'islamicNewYear'
+        : month === 1 && day === 10 ? 'ashura'
+          : null;
+  return key ? t('home.greeting.todayIs', { event: t(`calendar.islamicEvents.${key}`) }) : null;
+}
+
+function GreetingCard({ hijriDate, occasion }: { hijriDate: string | null; occasion: string | null }) {
   const { t } = useTranslation();
   return (
     <View style={{ marginBottom: spacing.md }}>
@@ -79,6 +100,7 @@ function GreetingCard({ hijriDate }: { hijriDate: string | null }) {
           <IslamicPattern size={70} color={palette.green} opacity={0.05} />
         </View>
         <Text style={greetingStyles.salamEn}>{t('home.greeting.salam')}</Text>
+        {occasion ? <Text style={greetingStyles.occasion}>{occasion}</Text> : null}
         {hijriDate ? (
           <Text style={greetingStyles.hijri}>{hijriDate}</Text>
         ) : null}
@@ -99,6 +121,11 @@ const greetingStyles = StyleSheet.create({
   hijri: {
     ...typography.body,
     color: palette.textOnCreamSecondary,
+    marginTop: spacing.xs,
+  },
+  occasion: {
+    ...typography.heading3,
+    color: palette.green,
     marginTop: spacing.xs,
   },
 });
@@ -168,8 +195,10 @@ function PrayerNextCard({ onPress }: { onPress: () => void }) {
   }
 
   const time = formatPrayerTime(computed.nextPrayerTime);
-  const countdown = formatCountdown(computed.nextPrayerTime, new Date(tick));
-  const methodLabel = METHOD_LABEL_MAP[settings.method] ?? settings.method;
+  const countdown = formatCountdownT(t, computed.nextPrayerTime, new Date(tick));
+  const methodLabel = t(`prayer.methods.${settings.method}`, {
+    defaultValue: METHOD_LABEL_MAP[settings.method] ?? settings.method,
+  });
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={{ marginBottom: spacing.md }}>
@@ -331,6 +360,10 @@ function VerseCard({
   arabic: string; translation: string; rtl: boolean; isUrdu: boolean; reference: string; onPress: () => void;
 }) {
   const { t } = useTranslation();
+  // The Bismillah heads the card only when the verse is the opening ayah of a
+  // surah (where Tanzil bakes it into the text). Above a mid-surah verse it
+  // would read as part of that verse, so it is left out.
+  const { bismillah, rest } = splitLeadingBismillah(arabic);
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -338,7 +371,7 @@ function VerseCard({
       style={{ marginBottom: spacing.md }}
     >
       <ManuscriptCard variant="bordered">
-        <Text style={verseStyles.bismillah}>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</Text>
+        {!!bismillah && <Text style={verseStyles.bismillah}>{bismillah}</Text>}
         <View style={verseStyles.refRow}>
           <View style={verseStyles.refBadge}>
             <Text style={verseStyles.refBadgeText}>{t('home.verseOfDay.badge')}</Text>
@@ -346,7 +379,7 @@ function VerseCard({
           <Text style={verseStyles.reference}>{reference}</Text>
         </View>
         <Text style={verseStyles.arabic} textBreakStrategy="simple">
-          {arabic}
+          {rest}
         </Text>
         <View style={verseStyles.divider} />
         <Text
@@ -617,7 +650,7 @@ const stStyles = StyleSheet.create({
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function HomeScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { width: W } = useWindowDimensions();
   const router = useRouter();
   const colorScheme = useColorScheme();
@@ -826,14 +859,15 @@ export default function HomeScreen() {
       >
         <GreetingCard
           hijriDate={
-            hijri.year
-              ? `${hijri.day} ${
-                  hijriMonth >= 1 && hijriMonth <= 12
-                    ? t(`calendar.hijriMonths.${hijriMonth}`)
-                    : ''
-                } ${hijri.year}`.replace(/\s+/g, ' ').trim()
+            hijri.year && hijriMonth >= 1 && hijriMonth <= 12
+              ? t('common.hijriDate', {
+                  day: hijri.day,
+                  monthName: t(`calendar.hijriMonths.${hijriMonth}`),
+                  year: hijri.year,
+                })
               : null
           }
+          occasion={homeOccasionLine(t, hijriMonth, hijri.day)}
         />
 
         {isRamadan && (
@@ -844,10 +878,10 @@ export default function HomeScreen() {
           >
             <Text style={styles.ramadanTitle}>{t('home.ramadan.banner')}</Text>
             <View style={styles.ramadanTimes}>
-              {sehriTime && (
+              {!!sehriTime && (
                 <Text style={styles.ramadanTime}>{t('home.ramadan.sehri', { time: formatPrayerTime(sehriTime) })}</Text>
               )}
-              {iftarTime && (
+              {!!iftarTime && (
                 <Text style={styles.ramadanTime}>{t('home.ramadan.iftar', { time: formatPrayerTime(iftarTime) })}</Text>
               )}
             </View>
@@ -880,8 +914,10 @@ export default function HomeScreen() {
             translation={verse.translation}
             rtl={verseMeta.rtl}
             isUrdu={verseMeta.isUrdu}
-            reference={`${verse.surahName} ${verse.surahNumber}:${verse.verseNumber}`}
-            onPress={() => navigate('/quran')}
+            reference={`${
+              (i18n.language === 'ur' ? getSurahMeta(verse.surahNumber)?.name_urdu : null) ?? verse.surahName
+            } ${verse.surahNumber}:${verse.verseNumber}`}
+            onPress={() => navigate(`/quran/${verse.surahNumber}?ayah=${verse.verseNumber}&mode=study`)}
           />
         ) : verseError ? (
           <TouchableOpacity

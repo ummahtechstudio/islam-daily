@@ -207,6 +207,9 @@ export default function SettingsScreen() {
       setTranslationLang('urdu');
       await setTranslationLanguage('urdu');
     }
+    // Scheduled notification text is resolved at schedule time — re-arm so
+    // already-queued reminders switch language too.
+    scheduleNotificationsForNext7Days().catch(() => {});
   };
 
   // ─── Storage actions ───────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -35,6 +35,29 @@ const ISLAMIC_EVENTS: { hijriMonth: number; hijriDay: number; key: string; icon:
   { hijriMonth: 12, hijriDay: 10, key: 'eidAlAdha', icon: '🎊' },
 ];
 
+type IslamicEvent = (typeof ISLAMIC_EVENTS)[number];
+
+/**
+ * Next occurrence (today or later) of every event on the Umm al-Qura calendar,
+ * soonest first. One Hijri year is ~354 days, so scanning 385 days always
+ * reaches each event once. A day-30 event that a 29-day month skips would be
+ * left out rather than shown with a wrong date (none of ours fall on day 30).
+ */
+function upcomingEvents(from: Date): { event: IslamicEvent; date: Date; days: number }[] {
+  const start = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const found = new Map<string, { event: IslamicEvent; date: Date; days: number }>();
+  for (let i = 0; i < 385 && found.size < ISLAMIC_EVENTS.length; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    const h = getHijriParts(d);
+    for (const event of ISLAMIC_EVENTS) {
+      if (!found.has(event.key) && event.hijriMonth === h.month && event.hijriDay === h.day) {
+        found.set(event.key, { event, date: d, days: i });
+      }
+    }
+  }
+  return Array.from(found.values()).sort((a, b) => a.days - b.days);
+}
+
 // Stable keys for the weekday and Gregorian month labels (UI strings).
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 const MONTH_KEYS = [
@@ -44,7 +67,8 @@ const MONTH_KEYS = [
 
 export default function CalendarScreen() {
   useEffect(() => { trackScreen('Calendar'); }, []);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isUrdu = i18n.language === 'ur';
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -61,6 +85,23 @@ export default function CalendarScreen() {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const todayHijri = getHijriParts(today);
+  const todayKey = today.toDateString();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- recompute once per calendar day, not per render
+  const upcoming = useMemo(() => upcomingEvents(new Date()), [todayKey]);
+  const eventDateColor = isDark ? Colors.accentLight : Colors.primary;
+  const formatGregorian = (d: Date) =>
+    d.toLocaleDateString(isUrdu ? 'ur-PK' : 'en-GB', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  const countdownLabel = (days: number) =>
+    days === 0
+      ? t('calendar.events.today')
+      : days === 1
+        ? t('calendar.events.tomorrow')
+        : t('calendar.events.inDays', { count: days });
 
   const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
   const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
@@ -173,9 +214,9 @@ export default function CalendarScreen() {
           {t('calendar.events.sectionTitle')}
         </Text>
         <View style={styles.eventsList}>
-          {ISLAMIC_EVENTS.map((event, idx) => (
+          {upcoming.map(({ event, date, days }) => (
             <View
-              key={idx}
+              key={event.key}
               style={[styles.eventCard, { backgroundColor: theme.card, borderColor: theme.border }]}
             >
               <Text style={styles.eventIcon}>{event.icon}</Text>
@@ -183,13 +224,31 @@ export default function CalendarScreen() {
                 <Text style={[styles.eventName, { color: theme.text }]}>
                   {t(`calendar.islamicEvents.${event.key}`)}
                 </Text>
-                <Text style={[styles.eventDate, { color: Colors.primary }]}>
-                  {event.hijriDay} {t(`calendar.hijriMonths.${event.hijriMonth}`)}
+                <Text style={[styles.eventDate, { color: eventDateColor }]}>
+                  {event.hijriDay} {t(`calendar.hijriMonths.${event.hijriMonth}`)} · {formatGregorian(date)}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.countdownPill,
+                  { backgroundColor: days <= 1 ? Colors.primary : isDark ? Colors.dark.surface : Colors.light.surface },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.countdownText,
+                    { color: days <= 1 ? '#fff' : theme.textSecondary },
+                  ]}
+                >
+                  {countdownLabel(days)}
                 </Text>
               </View>
             </View>
           ))}
         </View>
+        <Text style={[styles.eventsNote, { color: theme.textMuted }]}>
+          {t('calendar.events.note')}
+        </Text>
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -254,4 +313,7 @@ const styles = StyleSheet.create({
   eventInfo: { flex: 1 },
   eventName: { fontSize: 15, fontWeight: '600' },
   eventDate: { fontSize: 13, marginTop: 2 },
+  countdownPill: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
+  countdownText: { fontSize: 12, fontWeight: '600' },
+  eventsNote: { fontSize: 12, lineHeight: 18, paddingHorizontal: 16, paddingTop: 10 },
 });
