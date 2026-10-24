@@ -321,9 +321,10 @@
       }
     },
     "allDone": "All packs downloaded — full offline access!",
+    "builtInNote": "Already on your device — no download needed: the full Quran (Arabic, IndoPak Mushaf, Urdu translation by Jalandhri, English by Muhammad Asad), duas & dhikr, the 99 Names, the Namaz Guide and prayer times. Download the hadith collections below to read them without internet.",
     "downloadAll": "Download All Available Packs",
     "downloading": "Downloading…",
-    "footer": "Tap the refresh icon to re-download a pack. Tap trash to remove it.\nAudio and book packs require additional packages.",
+    "footer": "Tap the refresh icon to re-download. Tap the trash icon to remove it from your device.",
     "offline": {
       "banner": "You are offline — downloads unavailable"
     },
@@ -377,7 +378,6 @@
       "packsCount": "of {{total}} packs",
       "total": "of ~{{total}} MB total"
     },
-    "supabaseNote": "Quran, Hadiths, Duas & Names are synced from your Supabase database when available.",
     "wifi": {
       "subOff": "Downloads may use mobile data",
       "subOn": "Remind me to check connection before downloading",

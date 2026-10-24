@@ -25,12 +25,7 @@ import {
   getDownloadStatus,
   getStorageUsed,
   clearPack,
-  downloadQuran,
-  downloadQuranAudio,
   downloadHadiths,
-  downloadNames,
-  downloadDuas,
-  downloadPrayerTimes,
   downloadAll,
 } from '../services/downloadService';
 
@@ -45,73 +40,17 @@ interface PackConfig {
   download: (cb: (p: number) => void) => Promise<void>;
 }
 
+// Only content that is NOT bundled in the app needs a download. The Quran
+// (Arabic, IndoPak Mushaf, Jalandhri Urdu, Asad English), duas, dhikr, the 99
+// Names and prayer times all ship inside the app; the old packs for those
+// copied stale or redundant data and are retired (see purgeRemovedPacks).
 const PACKS: PackConfig[] = [
-  {
-    id: 'quranText',
-    icon: '📖',
-    sizeMB: 8,
-    accentColor: '#0F6E56',
-    download: downloadQuran,
-  },
-  {
-    id: 'quranAudioAlafasy',
-    icon: '🔊',
-    sizeMB: 480,
-    accentColor: '#8B5CF6',
-    unavailable: 'Audio downloads require expo-file-system',
-    download: downloadQuranAudio,
-  },
-  {
-    id: 'quranAudioAbdulBasit',
-    icon: '🎙️',
-    sizeMB: 380,
-    accentColor: '#7C3AED',
-    unavailable: 'Audio downloads require expo-file-system',
-    download: downloadQuranAudio,
-  },
   {
     id: 'hadiths',
     icon: '📚',
-    sizeMB: 22,
+    sizeMB: 92, // the 10 hadiths-v2 files on R2, measured 2026-10-24
     accentColor: '#3B82F6',
     download: downloadHadiths,
-  },
-  {
-    id: 'duas',
-    icon: '🤲',
-    sizeMB: 2,
-    accentColor: '#F59E0B',
-    download: downloadDuas,
-  },
-  {
-    id: 'names99',
-    icon: '☪️',
-    sizeMB: 1,
-    accentColor: '#C9A84C',
-    download: downloadNames,
-  },
-  {
-    id: 'islamicBooks',
-    icon: '📕',
-    sizeMB: 45,
-    accentColor: '#EF4444',
-    unavailable: 'Islamic Books pack coming soon',
-    download: async () => { throw new Error('COMING_SOON'); },
-  },
-  {
-    id: 'adhanSounds',
-    icon: '🕌',
-    sizeMB: 12,
-    accentColor: '#22C55E',
-    unavailable: 'Adhan sounds require expo-file-system',
-    download: downloadQuranAudio,
-  },
-  {
-    id: 'prayerTimes',
-    icon: '🕐',
-    sizeMB: 0.05,
-    accentColor: '#14B8A6',
-    download: downloadPrayerTimes,
   },
 ];
 
@@ -534,11 +473,11 @@ export default function DownloadScreen() {
           </View>
         )}
 
-        {/* ── Supabase note ── */}
+        {/* ── What's already built in ── */}
         <View style={[styles.infoBanner, { backgroundColor: Colors.info + '12', borderColor: Colors.info + '30' }]}>
-          <Ionicons name="server-outline" size={14} color={Colors.info} />
+          <Ionicons name="checkmark-done-outline" size={14} color={Colors.info} />
           <Text style={[styles.infoText, { color: Colors.info }]}>
-            {t('downloads.supabaseNote')}
+            {t('downloads.builtInNote')}
           </Text>
         </View>
 

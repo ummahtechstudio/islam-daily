@@ -469,7 +469,17 @@ export async function downloadQuranAudio(
 export async function purgeRemovedPacks(): Promise<void> {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    const stale = keys.filter((k) => k === 'offline_calendar' || k === 'offline_calendar_dates');
+    // Retired packs: the Hijri calendar (never read), and the Quran Text /
+    // Duas / Names copies, which duplicated bundled data (the Quran pack held
+    // one fixed English edition; the duas copy was the stale 53-row table).
+    const stale = keys.filter(
+      (k) =>
+        k === 'offline_calendar' ||
+        k === 'offline_calendar_dates' ||
+        k === 'supabase_duas' ||
+        k === 'offline_99names' ||
+        /^offline_surah_\d+$/.test(k),
+    );
     if (stale.length > 0) await AsyncStorage.multiRemove(stale);
 
     // Both the current status record and the v1 one getDownloadStatus()
@@ -478,10 +488,15 @@ export async function purgeRemovedPacks(): Promise<void> {
       const raw = await AsyncStorage.getItem(statusKey);
       if (!raw) continue;
       const parsed = JSON.parse(raw) as Record<string, unknown>;
-      if (parsed && typeof parsed === 'object' && 'calendar' in parsed) {
-        delete parsed.calendar;
-        await AsyncStorage.setItem(statusKey, JSON.stringify(parsed));
+      if (!parsed || typeof parsed !== 'object') continue;
+      let changed = false;
+      for (const retired of ['calendar', 'quranText', 'duas', 'names99', 'prayerTimes']) {
+        if (retired in parsed) {
+          delete parsed[retired];
+          changed = true;
+        }
       }
+      if (changed) await AsyncStorage.setItem(statusKey, JSON.stringify(parsed));
     }
   } catch {
     // Housekeeping only — never surface.
@@ -506,12 +521,9 @@ export async function downloadPrayerTimes(
 export type ProgressCallback = (pack: PackId, pct: number) => void;
 
 export async function downloadAll(onProgress: ProgressCallback): Promise<void> {
+  // Everything else ships inside the app; hadith is the only real download.
   const packs: [PackId, (cb: (p: number) => void) => Promise<void>][] = [
-    ['duas',        downloadDuas],
-    ['hadiths',     downloadHadiths],
-    ['names99',     downloadNames],
-    ['prayerTimes', downloadPrayerTimes],
-    ['quranText',   downloadQuran],
+    ['hadiths', downloadHadiths],
   ];
 
   for (const [id, fn] of packs) {
