@@ -114,6 +114,14 @@ export function TasbeehCounterView({
     [counters, selectedId],
   );
 
+  // The latest counter state, updated synchronously on every tap. Taps that
+  // land before React re-renders would otherwise all read the same stale
+  // `selected.currentCount` and count as one.
+  const liveRef = useRef<TasbeehCounter | null>(null);
+  useEffect(() => {
+    liveRef.current = selected ?? null;
+  }, [selected]);
+
   useFocusEffect(
     useCallback(() => {
       let alive = true;
@@ -172,16 +180,18 @@ export function TasbeehCounterView({
   );
 
   const increment = useCallback(async () => {
-    if (!selected || !settings) return;
-    const newCount = selected.currentCount + 1;
-    if (newCount >= selected.target) {
+    const current = liveRef.current ?? selected;
+    if (!current || !settings) return;
+    const newCount = current.currentCount + 1;
+    if (newCount >= current.target) {
       const updated: TasbeehCounter = {
-        ...selected,
+        ...current,
         currentCount: 0,
-        rounds: selected.rounds + 1,
-        totalCount: selected.totalCount + 1,
+        rounds: current.rounds + 1,
+        totalCount: current.totalCount + 1,
       };
-      setCounters((prev) => prev.map((c) => (c.id === selected.id ? updated : c)));
+      liveRef.current = updated;
+      setCounters((prev) => prev.map((c) => (c.id === current.id ? updated : c)));
       triggerTarget(settings);
       setShowRoundCelebration(true);
       if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current);
@@ -189,20 +199,21 @@ export function TasbeehCounterView({
         setShowRoundCelebration(false);
         celebrationTimeoutRef.current = null;
       }, 1600);
-      await updateCounter(selected.id, {
+      await updateCounter(current.id, {
         currentCount: 0,
         rounds: updated.rounds,
         totalCount: updated.totalCount,
       });
     } else {
       const updated: TasbeehCounter = {
-        ...selected,
+        ...current,
         currentCount: newCount,
-        totalCount: selected.totalCount + 1,
+        totalCount: current.totalCount + 1,
       };
-      setCounters((prev) => prev.map((c) => (c.id === selected.id ? updated : c)));
+      liveRef.current = updated;
+      setCounters((prev) => prev.map((c) => (c.id === current.id ? updated : c)));
       triggerCount(settings);
-      await updateCounter(selected.id, {
+      await updateCounter(current.id, {
         currentCount: newCount,
         totalCount: updated.totalCount,
       });
@@ -251,27 +262,29 @@ export function TasbeehCounterView({
   }, [mode]);
 
   const decrement = useCallback(async () => {
-    if (!selected) return;
-    if (selected.currentCount === 0 && selected.rounds === 0) return;
-    let newCount = selected.currentCount - 1;
-    let newRounds = selected.rounds;
+    const current = liveRef.current ?? selected;
+    if (!current) return;
+    if (current.currentCount === 0 && current.rounds === 0) return;
+    let newCount = current.currentCount - 1;
+    let newRounds = current.rounds;
     if (newCount < 0) {
       if (newRounds > 0) {
         newRounds -= 1;
-        newCount = selected.target - 1;
+        newCount = current.target - 1;
       } else {
         newCount = 0;
       }
     }
-    const newTotal = Math.max(0, selected.totalCount - 1);
+    const newTotal = Math.max(0, current.totalCount - 1);
     const updated: TasbeehCounter = {
-      ...selected,
+      ...current,
       currentCount: newCount,
       rounds: newRounds,
       totalCount: newTotal,
     };
-    setCounters((prev) => prev.map((c) => (c.id === selected.id ? updated : c)));
-    await updateCounter(selected.id, {
+    liveRef.current = updated;
+    setCounters((prev) => prev.map((c) => (c.id === current.id ? updated : c)));
+    await updateCounter(current.id, {
       currentCount: newCount,
       rounds: newRounds,
       totalCount: newTotal,

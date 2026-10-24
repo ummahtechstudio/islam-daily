@@ -201,7 +201,7 @@ export function MomentSubtab({ theme }: MomentSubtabProps) {
           bookmark={{
             type: 'dua',
             id: `dua-moment-${moment.category.id}`,
-            title: `${moment.category.title} — Dua of the Moment`,
+            title: `${t(`dua.duas.categories.${moment.category.id}`, { defaultValue: moment.category.title })} — ${t('dua.moment.badge')}`,
             arabic: moment.dua.arabic,
             translation: translationFor(moment.dua),
             reference: moment.dua.reference || 'Hisn al-Muslim',
