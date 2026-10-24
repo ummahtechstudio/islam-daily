@@ -7,7 +7,11 @@ name: Supabase Keep-Alive
 
 on:
   schedule:
-    - cron: '0 6 * * *'   # daily, 06:00 UTC
+    # Every 6 hours (minute 17 avoids GitHub's top-of-hour backlog). Supabase now
+    # pauses free projects that lack "sufficient user database activity" over a
+    # week; one ping a day triggered a pause warning in Oct 2026, so we now make
+    # several real reads, four times a day.
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -17,24 +21,31 @@ jobs:
       actions: write   # lets GITHUB_TOKEN call the "enable workflow" endpoint
     steps:
       - name: Query Supabase to reset the inactivity timer
+        env:
+          KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          # `|| RC=$?` keeps `bash -e` from aborting before we can print a
-          # useful message when curl fails at the transport level (DNS, TLS…).
-          RC=0
-          CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-            --max-time 30 --retry 3 --retry-delay 15 --retry-all-errors \
-            "https://vchfykblowmrcvyaljxn.supabase.co/rest/v1/names_of_allah?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}") || RC=$?
-          if [ "$RC" -ne 0 ]; then
-            echo "::error::curl exited $RC (6 = DNS failure, 7 = connection refused, 28 = timeout; last HTTP status seen: ${CODE:-none}). Is the Supabase project paused or still restoring?"
-            exit 1
-          fi
-          echo "HTTP status: $CODE"
-          if [ "$CODE" != "200" ]; then
-            echo "::error::Keep-alive failed — got $CODE instead of 200."
-            exit 1
-          fi
+          # Real reads on tables the app itself uses, so the activity looks like
+          # genuine database use. `|| RC=$?` keeps `bash -e` from aborting before
+          # we can print a useful message on a transport-level curl failure.
+          BASE="https://vchfykblowmrcvyaljxn.supabase.co/rest/v1"
+          FAILED=0
+          for TABLE in names_of_allah duas quran_ayahs; do
+            RC=0
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              --max-time 30 --retry 3 --retry-delay 15 --retry-all-errors \
+              "$BASE/$TABLE?select=*&limit=5" \
+              -H "apikey: $KEY" -H "Authorization: Bearer $KEY") || RC=$?
+            if [ "$RC" -ne 0 ]; then
+              echo "::error::$TABLE: curl exited $RC (6 = DNS failure, 7 = connection refused, 28 = timeout; last HTTP status: ${CODE:-none}). Is the Supabase project paused or restoring?"
+              FAILED=1
+            elif [ "$CODE" != "200" ]; then
+              echo "::error::$TABLE: got HTTP $CODE instead of 200."
+              FAILED=1
+            else
+              echo "$TABLE: HTTP 200"
+            fi
+          done
+          if [ "$FAILED" -ne 0 ]; then exit 1; fi
           echo "Keep-alive OK."
 
       # Runs even if the Supabase ping failed, so an outage on their side
