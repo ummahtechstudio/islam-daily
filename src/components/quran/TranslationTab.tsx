@@ -99,7 +99,7 @@ export default function TranslationTab({ isDark }: { isDark: boolean }) {
     return (
       <TouchableOpacity
         style={[styles.surahRow, { borderBottomColor: theme.border }]}
-        onPress={() => router.push(`/quran/${item.number}` as any)}
+        onPress={() => router.push(`/quran/${item.number}?mode=study` as any)}
         activeOpacity={0.7}
       >
         <View

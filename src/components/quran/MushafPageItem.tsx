@@ -321,36 +321,6 @@ function PageBody({
   );
 }
 
-function AyahBadgeInline({ n, scale }: { n: number; scale: number }) {
-  return (
-    <Text
-      style={[
-        badgeStyles.badge,
-        {
-          fontSize: 14 * scale,
-          lineHeight: 20 * scale,
-        },
-      ]}
-    >
-      {' '}
-      {toArabicDigits(n)}{' '}
-    </Text>
-  );
-}
-
-const badgeStyles = StyleSheet.create({
-  badge: {
-    fontFamily: 'IndoPakNastaleeq',
-    color: MUSHAF_COLORS.ayahBadgeText,
-    backgroundColor: MUSHAF_COLORS.ayahBadgeBg,
-    borderWidth: 1,
-    borderColor: MUSHAF_COLORS.borderInner,
-    borderRadius: 14,
-    overflow: 'hidden',
-    textAlign: 'center',
-  },
-});
-
 function SurahAyahBlock({
   ayahs,
   scale,
@@ -379,8 +349,9 @@ function SurahAyahBlock({
           }
         >
           {idx > 0 ? ' ' : ''}
+          {/* The IndoPak text already ends with its own numbered ayah-marker
+              glyph (rendered by the IndoPak font), so no separate badge. */}
           {a.text_indopak}{' '}
-          <AyahBadgeInline n={a.ayah} scale={scale} />
         </Text>
       ))}
     </Text>

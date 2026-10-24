@@ -443,7 +443,10 @@ const VerseRow = React.memo(function VerseRow({
 export default function SurahReaderScreen() {
   const { t } = useTranslation();
   useEffect(() => { trackScreen('SurahReader'); }, []);
-  const { id, ayah: ayahParam } = useLocalSearchParams<{ id: string; ayah?: string }>();
+  const { id, ayah: ayahParam, mode: modeParam } = useLocalSearchParams<{ id: string; ayah?: string; mode?: string }>();
+  // An explicit ?mode= (e.g. from the Translation tab or search) wins over the
+  // saved preference for this visit.
+  const forcedMode: QuranMode | null = modeParam === 'study' || modeParam === 'recite' ? modeParam : null;
   // Guard against non-numeric route params (deep links, typos): clamp to 1..114
   // so useSurah never sees NaN — which would otherwise propagate to .findIndex
   // and silently render the wrong surah or crash on null data.
@@ -481,7 +484,8 @@ export default function SurahReaderScreen() {
   const [showTranslation, setShowTranslation] = useState(true);
   const [fontSize, setFontSize] = useState(settings.arabicFontSize);
   const [tajweedOn, setTajweedOn] = useState(false);
-  const [quranMode, setQuranMode] = useState<QuranMode>('recite');
+  // Default to study (Arabic + translation) for new users; recite is opt-in.
+  const [quranMode, setQuranMode] = useState<QuranMode>(forcedMode ?? 'study');
   const [reciteFontSize, setReciteFontSize] = useState<number>(DEFAULT_RECITE_FONT_SIZE);
 
   useEffect(() => {
@@ -491,7 +495,7 @@ export default function SurahReaderScreen() {
           AsyncStorage.getItem(QURAN_MODE_KEY),
           AsyncStorage.getItem(QURAN_ARABIC_FONT_SIZE_KEY),
         ]);
-        if (m === 'recite' || m === 'study') setQuranMode(m);
+        if (!forcedMode && (m === 'recite' || m === 'study')) setQuranMode(m);
         const fNum = f ? parseInt(f, 10) : NaN;
         if ((RECITE_FONT_SIZES as readonly number[]).includes(fNum)) {
           setReciteFontSize(fNum);
@@ -802,7 +806,7 @@ export default function SurahReaderScreen() {
           <Text style={styles.surahMeta}>
             {arabic.revelationType} · {t('quran.reader.verses', { count: arabic.numberOfAyahs })}
           </Text>
-          {surahNum !== 9 && (
+          {surahNum !== 9 && surahNum !== 1 && (
             <Text style={styles.bismillah}>{BISMILLAH}</Text>
           )}
         </View>
@@ -932,7 +936,7 @@ export default function SurahReaderScreen() {
         viewabilityConfig={viewabilityConfig.current}
         onScrollToIndexFailed={onScrollToIndexFailed}
         ListHeaderComponent={
-          isRecite && surahNum !== 9 ? (
+          isRecite && surahNum !== 9 && surahNum !== 1 ? (
             <View style={styles.reciteBismillahWrap}>
               <Text style={[styles.reciteBismillah, { color: GOLD }]}>{BISMILLAH}</Text>
             </View>

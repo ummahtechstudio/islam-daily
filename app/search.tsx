@@ -64,7 +64,7 @@ export default function SearchScreen() {
   const renderResult = ({ item }: { item: QuranSearchResult }) => (
     <TouchableOpacity
       style={[styles.resultCard, { backgroundColor: theme.card, borderColor: theme.border }]}
-      onPress={() => router.push(`/quran/${item.surah.number}` as any)}
+      onPress={() => router.push(`/quran/${item.surah.number}?ayah=${item.numberInSurah}&mode=study` as any)}
       activeOpacity={0.75}
     >
       <View style={styles.resultHeader}>
