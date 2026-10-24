@@ -934,7 +934,8 @@
     "detail": {
       "counter": "{{id}} / 99",
       "greatestName": "✦ اسمِ اعظم",
-      "meaningLabel": "معنی"
+      "meaningLabel": "معنی",
+      "referenceLabel": "حوالہ"
     },
     "header": {
       "title": "اللہ کے 99 نام"

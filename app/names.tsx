@@ -30,9 +30,10 @@ interface AllaName {
   id: number;
   name: string;
   transliteration: string;
-  pronunciation: string;
   meaning: string;
-  description?: string | null;
+  urduMeaning: string | null;
+  detail: string | null;
+  reference: string | null;
 }
 
 function toDisplay(rows: NameOfAllah[]): AllaName[] {
@@ -40,9 +41,10 @@ function toDisplay(rows: NameOfAllah[]): AllaName[] {
     id: n.id,
     name: n.arabic,
     transliteration: n.transliteration,
-    pronunciation: '',
     meaning: n.english_meaning,
-    description: n.urdu_meaning ?? n.meaning_detail ?? null,
+    urduMeaning: n.urdu_meaning ?? null,
+    detail: n.meaning_detail ?? null,
+    reference: n.quran_reference ?? null,
   }));
 }
 
@@ -59,7 +61,8 @@ function chunkRTL<T>(arr: T[], chunkSize: number): T[] {
 
 export default function NamesScreen() {
   useEffect(() => { trackScreen('NamesOfAllah'); }, []);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isUrdu = i18n.language === 'ur';
   const colorScheme = useColorScheme();
   const settings = useStore((s) => s.settings);
   const isDark =
@@ -158,19 +161,30 @@ export default function NamesScreen() {
                   <Text style={styles.detailArabic}>{selected.name}</Text>
                   {/* selected.transliteration is content — not translated */}
                   <Text style={styles.detailTranslit}>{selected.transliteration}</Text>
-                  {selected.pronunciation && (
-                    <Text style={styles.detailPronounce}>
-                      /{selected.pronunciation}/
-                    </Text>
-                  )}
                   <View style={styles.meaningInner}>
                     <Text style={styles.meaningLabel}>{t('names.detail.meaningLabel')}</Text>
-                    {/* selected.meaning is English meaning content — not translated */}
-                    <Text style={styles.meaningText}>{selected.meaning}</Text>
+                    {/* Meanings are content. Urdu UI leads with the Urdu meaning,
+                        English UI with the English one; the other follows smaller. */}
+                    {isUrdu && !!selected.urduMeaning ? (
+                      <>
+                        <Text style={[urduStyle(26), styles.meaningUrduPrimary]}>{selected.urduMeaning}</Text>
+                        <Text style={styles.meaningSecondary}>{selected.meaning}</Text>
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.meaningText}>{selected.meaning}</Text>
+                        {!!selected.urduMeaning && (
+                          <Text style={[urduStyle(18), styles.meaningUrduSecondary]}>{selected.urduMeaning}</Text>
+                        )}
+                      </>
+                    )}
                   </View>
-                  {selected.description && (
-                    <Text style={[styles.description, urduStyle(18)]}>
-                      {selected.description}
+                  {!!selected.detail && (
+                    <Text style={styles.description}>{selected.detail}</Text>
+                  )}
+                  {!!selected.reference && (
+                    <Text style={styles.reference}>
+                      {t('names.detail.referenceLabel')}: {selected.reference}
                     </Text>
                   )}
                 </View>
@@ -235,11 +249,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: palette.textOnCream,
   },
-  detailPronounce: {
-    ...typography.body,
-    fontStyle: 'italic',
-    color: palette.textOnCreamSecondary,
-  },
   meaningInner: {
     width: '100%',
     borderTopWidth: 1,
@@ -262,11 +271,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: palette.textOnCream,
   },
+  meaningUrduPrimary: {
+    textAlign: 'center',
+    color: palette.textOnCream,
+  },
+  meaningSecondary: {
+    ...typography.body,
+    textAlign: 'center',
+    color: palette.textOnCreamSecondary,
+  },
+  meaningUrduSecondary: {
+    textAlign: 'center',
+    color: palette.textOnCreamSecondary,
+  },
   description: {
     fontSize: 15,
     lineHeight: 24,
     textAlign: 'center',
     marginTop: spacing.sm,
     color: palette.textOnCreamSecondary,
+  },
+  reference: {
+    ...typography.caption,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+    color: palette.green,
+    fontWeight: '600',
   },
 });

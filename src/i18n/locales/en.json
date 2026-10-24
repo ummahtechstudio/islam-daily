@@ -934,7 +934,8 @@
     "detail": {
       "counter": "{{id}} / 99",
       "greatestName": "✦ The Greatest Name",
-      "meaningLabel": "Meaning"
+      "meaningLabel": "Meaning",
+      "referenceLabel": "Reference"
     },
     "header": {
       "title": "99 Names of Allah"
